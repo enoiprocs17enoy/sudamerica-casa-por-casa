@@ -2005,6 +2005,14 @@ function drawRoadNetwork(selected){
       addBox(w+2.4,.035,len,x,sy,z,sidewalk);
       addBox(w,.042,len,x,ay,z,asphalt);
       curbV(x,z0,z1,w,c,r);
+      if(Math.abs(c)<=3&&Math.abs(r)<=4){
+        for(const side of [-1,1]){
+          for(let tree=1;tree<=4;tree++){
+            const seed=(c+11)*179+(r+11)*31+tree*13+side;
+            addTree(x+side*(w/2+1.02),z0+len*tree/5,seed,1.22,seed%8===0);
+          }
+        }
+      }
       for(let t=z0+7;t<z1-7;t+=9){
         for(const side of [-1,1])
           mark(1.12,.012,.12,x+side*(w/2+.65),sy+.030,t,jointColor);
@@ -2020,8 +2028,8 @@ function drawRoadNetwork(selected){
       curbH(z,x0,x1,w,c,r);
       if(Math.abs(c)<=3&&Math.abs(r)<=4){
         for(const side of [-1,1]){
-          for(let tree=1;tree<=4;tree++){
-            const tx=x0+len*tree/5;
+          for(let tree=1;tree<=7;tree++){
+            const tx=x0+len*tree/8;
             const tz=z+side*(w/2+1.02);
             const seed=(c+9)*163+(r+9)*29+tree*11+side;
             addTree(tx,tz,seed,1.14,seed%8===0);
