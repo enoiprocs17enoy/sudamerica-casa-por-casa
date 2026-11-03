@@ -1605,9 +1605,12 @@ function drawShops(){
   dressShape.closePath();
   const dress=new THREE.ExtrudeGeometry(dressShape,{depth:.12,bevelEnabled:false});
   dress.translate(0,0,-.06);
+  const sculpt=new THREE.SphereGeometry(.5,20,12);
+  const bar=new THREE.CylinderGeometry(.5,.5,1,16);
+  bar.rotateZ(Math.PI/2);
   const cup=new THREE.CylinderGeometry(.5,.34,1,20);
   const handle=new THREE.TorusGeometry(.32,.10,8,18);
-  const structuralKinds=new Set(['cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeMark','tradeRound','tradeDress','shopPaving','body','roof','hotelRoof','cinemaRoof',
+  const structuralKinds=new Set(['cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeMark','tradeRound','tradeDress','tradeSculpt','tradeBar','shopPaving','body','roof','hotelRoof','cinemaRoof',
       'garageRoof','superRoof','displayGlass','entryDoor','entryDoorGlass',
       'signFascia','signInset','garageGate','cinemaParapet','hotelUpperWindow']);
   function put(kind,color,shop,x,y,z,w,h,d){
@@ -1616,7 +1619,7 @@ function drawShops(){
     const detailed=!structuralKinds.has(kind);
     const cx=shop?Math.floor(shop.x/90):0,cz=shop?Math.floor(shop.z/90):0;
     const key=kind+'_'+color+(detailed?'_detail_'+cx+'_'+cz:'');
-    if(!batches.has(key))batches.set(key,{color,geo:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:kind==='tradeDress'?dress:kind.startsWith('pizza')||kind==='tradeRound'?disc:box,entries:[],detailed,
+    if(!batches.has(key))batches.set(key,{color,geo:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:kind==='tradeDress'?dress:kind==='tradeSculpt'?sculpt:kind==='tradeBar'?bar:kind.startsWith('pizza')||kind==='tradeRound'?disc:box,entries:[],detailed,
       chunk:{x:(cx+.5)*90,z:(cz+.5)*90}});
     let rotation=0;
     if(shop){rotation=facadeAngle(shop);
@@ -1674,36 +1677,57 @@ function drawShops(){
         }
         mark(-.92,.52,.13,.29,metal,'tradeMark',0,.76);
         mark(-1.06,.66,.18,.13,0x854429,'tradeMark',0,.81);
-      }else if(shape===2){ // Fork and knife
-        mark(-.36,-.10,.13,1.12,ivory);mark(.35,.04,.22,1.38,ivory);
-        for(const tine of [-.55,-.36,-.17])mark(tine,.46,.085,.44,ivory);
-        mark(-.36,.24,.43,.12,ivory);
-      }else if(shape===3){ // Open book
-        mark(-.40,.02,.68,1.10,ivory);mark(.40,.02,.68,1.10,ivory);
-        for(const side of [-1,1])for(const row of [-.27,0,.27])mark(side*.40,row,.43,.08,trim);
-      }else if(shape===4){ // Pharmacy cross
-        mark(0,0,.47,1.50,0xa6ffb1);mark(0,0,1.50,.47,0xa6ffb1);
-      }else if(shape===5){ // Dress
-        mark(0,0,1.12,1.12,ivory,'tradeDress',0,4.0);
-      }else if(shape===6){ // Open-ended wrench
-        mark(0,-.22,.24,1.00,ivory);mark(0,.24,.79,.20,ivory);
-        for(const side of [-1,1])mark(side*.30,.46,.18,.35,ivory);
-      }else if(shape===7){ // Loaf with scored crust
-        mark(0,0,1.55,.83,0xf4b855,'tradeRound',0,.80);
-        for(const score of [-.35,0,.35])for(const side of [-1,1])mark(score,.20,.10,.23,0xa75b2d,'tradeMark',side*.40,.04);
-      }else if(shape===8){ // Cinema clapperboard
-        mark(0,-.20,1.32,.72,ivory);mark(0,.39,1.45,.22,ivory);
-        for(const slash of [-.45,0,.45])mark(slash,.39,.16,.24,trim);
-      }else if(shape===9){ // Dumbbell
-        mark(0,0,1.52,.15,ivory);
-        for(const side of [-1,1])mark(side*.57,0,.40,.84,ivory,'tradeRound');
-      }else if(shape===10){ // Hotel bed
-        mark(0,-.23,1.49,.20,ivory);mark(-.64,.04,.17,.73,ivory);
-        mark(.23,.03,.94,.35,ivory);mark(-.34,.07,.34,.25,0xfff8df);
-      }else{ // Open-air market stall
-        mark(0,.38,1.49,.22,ivory);mark(0,-.25,1.42,.22,ivory);
-        for(const side of [-1,1])mark(side*.59,-.03,.14,.83,ivory);
-        for(const stripe of [-.42,0,.42])mark(stripe,.37,.17,.26,0xd47049);
+      }else if(shape===2){ // Standing cutlery
+        mark(-.36,-.10,.13,1.12,ivory,'tradeMark',0,.16);
+        mark(.35,-.39,.21,.64,0x814632,'tradeMark',0,.24);
+        mark(.35,.28,.28,.86,ivory,'tradeSculpt',0,.19);
+        for(const tine of [-.55,-.36,-.17])mark(tine,.46,.085,.44,ivory,'tradeMark',0,.13);
+        mark(-.36,.24,.43,.12,ivory,'tradeMark',0,.17);
+      }else if(shape===3){ // Two page blocks and a bound spine
+        mark(0,-.04,1.62,1.24,0x674b8b,'tradeMark',-.13,.33);
+        mark(0,.01,.13,1.17,0xc9a572,'tradeMark',.10,.34);
+        for(const side of [-1,1]){
+          mark(side*.42,.02,.71,1.06,ivory,'tradeMark',.10,.35);
+          for(const row of [-.27,0,.27])mark(side*.42,row,.45,.07,trim,'tradeMark',.29,.045);
+        }
+      }else if(shape===4){ // Thick illuminated pharmacy cross
+        mark(0,0,.51,1.58,0x247e56,'tradeMark',0,.80);
+        mark(0,0,1.58,.51,0x247e56,'tradeMark',0,.80);
+        for(const side of [-1,1]){
+          mark(0,0,.32,1.37,0xa6ffb1,'tradeMark',side*.412,.045);
+          mark(0,0,1.37,.32,0xa6ffb1,'tradeMark',side*.412,.045);
+        }
+      }else if(shape===5){ // Dress on a rounded display mannequin
+        mark(0,.62,.30,.38,0xe4bb94,'tradeSculpt',0,.29);
+        mark(0,0,.63,.95,0xc44f71,'tradeSculpt',0,.62);
+        mark(0,-.12,1.14,1.06,0xd9547c,'tradeDress',0,4.2);
+      }else if(shape===6){ // Wrench with a rounded handle and open jaws
+        mark(0,-.25,.29,1.09,0xadc0c5,'tradeSculpt',0,.46);
+        mark(0,.24,.84,.24,ivory,'tradeMark',0,.49);
+        for(const side of [-1,1])mark(side*.31,.46,.23,.42,ivory,'tradeSculpt',0,.46);
+      }else if(shape===7){ // Rounded loaf with scored crust
+        mark(0,0,1.69,.95,0xe1a34c,'tradeSculpt',0,.96);
+        for(const score of [-.40,0,.40])mark(score,.39,.10,.08,0xffd287,'tradeSculpt',0,.44);
+      }else if(shape===8){ // Clapperboard with a projecting hinged top
+        mark(0,-.19,1.42,.82,0x343d51,'tradeMark',0,.52);
+        mark(0,.37,1.48,.22,ivory,'tradeMark',0,.58);
+        for(const slash of [-.45,0,.45])mark(slash,.37,.17,.24,0x343d51,'tradeMark',0,.59);
+        mark(-.61,.21,.24,.22,0xc38c50,'tradeRound',0,.62);
+      }else if(shape===9){ // Dumbbell with cylindrical weights
+        mark(0,0,1.55,.16,0xcbd3d7,'tradeBar',0,.16);
+        for(const side of [-1,1])mark(side*.61,0,.34,.83,0x30475b,'tradeBar',0,.83);
+      }else if(shape===10){ // Bed with mattress and two pillows
+        mark(0,-.32,1.52,.22,0x8b5737,'tradeMark',0,.95);
+        mark(-.66,.02,.17,.80,0x8b5737,'tradeMark',0,.98);
+        mark(.08,-.10,1.30,.22,ivory,'tradeMark',0,.90);
+        mark(.28,.04,.86,.18,0x6193b8,'tradeMark',0,.87);
+        for(const side of [-1,1])mark(-.40,.08,.36,.20,0xfff8df,'tradeSculpt',side*.23,.41);
+      }else{ // Market stall with counter and striped canopy
+        mark(0,-.33,1.47,.24,0xa96942,'tradeMark',0,.84);
+        for(const side of [-1,1])for(const edge of [-1,1])
+          mark(side*.62,.02,.13,.83,0x9c633d,'tradeMark',edge*.33,.13);
+        for(let stripe=0;stripe<7;stripe++)
+          mark((stripe-3)*.22,.41,.22,.19,stripe%2?0xffe9c3:0xd47049,'tradeMark',0,1.02);
       }
     }
     const entranceW=2.05, doorH=Math.min(2.65,height*.52);
