@@ -1597,7 +1597,7 @@ function drawShops(){
   disc.rotateX(Math.PI/2);
   const cup=new THREE.CylinderGeometry(.5,.34,1,20);
   const handle=new THREE.TorusGeometry(.32,.10,8,18);
-  const structuralKinds=new Set(['cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','shopPaving','body','roof','hotelRoof','cinemaRoof',
+  const structuralKinds=new Set(['cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeBadge','tradeMark','shopPaving','body','roof','hotelRoof','cinemaRoof',
       'garageRoof','superRoof','displayGlass','entryDoor','entryDoorGlass',
       'signFascia','signInset','garageGate','cinemaParapet','hotelUpperWindow']);
   function put(kind,color,shop,x,y,z,w,h,d){
@@ -1606,7 +1606,7 @@ function drawShops(){
     const detailed=!structuralKinds.has(kind);
     const cx=shop?Math.floor(shop.x/90):0,cz=shop?Math.floor(shop.z/90):0;
     const key=kind+'_'+color+(detailed?'_detail_'+cx+'_'+cz:'');
-    if(!batches.has(key))batches.set(key,{color,geo:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:kind.startsWith('pizza')?disc:box,entries:[],detailed,
+    if(!batches.has(key))batches.set(key,{color,geo:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:kind.startsWith('pizza')||kind==='tradeBadge'?disc:box,entries:[],detailed,
       chunk:{x:(cx+.5)*90,z:(cz+.5)*90}});
     let rotation=0;
     if(shop){rotation=facadeAngle(shop);
@@ -1636,6 +1636,48 @@ function drawShops(){
       for(let topping=0;topping<6;topping++){
         const angle=topping*Math.PI/3;
         put('pizzaToppingSign',0xc24438,shop,x+Math.cos(angle)*.73,height+1.39+Math.sin(angle)*.73,front-.09,.34,.34,.07);
+      }
+    }
+    const pizzeria=shape===2&&shop.id%24===14;
+    if(shape!==0&&!pizzeria){
+      const badgeY=height+1.38,badgeZ=front-.35;
+      const mark=(dx,dy,width,markHeight,color)=>
+        put('tradeMark',color,shop,x+dx,badgeY+dy,badgeZ+.17,width,markHeight,.12);
+      put('tradeBadge',trim,shop,x,badgeY,badgeZ,2.48,2.48,.27);
+      const ivory=0xffe9c3;
+      if(shape===1){ // Shopping cart
+        mark(0,.16,1.24,.48,ivory);mark(-.69,.40,.32,.11,ivory);
+        mark(-.39,-.32,.21,.21,ivory);mark(.39,-.32,.21,.21,ivory);
+      }else if(shape===2){ // Fork and knife
+        mark(-.36,-.10,.13,1.12,ivory);mark(.35,.04,.22,1.38,ivory);
+        for(const tine of [-.55,-.36,-.17])mark(tine,.46,.085,.44,ivory);
+        mark(-.36,.24,.43,.12,ivory);
+      }else if(shape===3){ // Open book
+        mark(-.40,.02,.68,1.10,ivory);mark(.40,.02,.68,1.10,ivory);
+        for(const side of [-1,1])for(const row of [-.27,0,.27])mark(side*.40,row,.43,.08,trim);
+      }else if(shape===4){ // Pharmacy cross
+        mark(0,0,.47,1.50,0xa6ffb1);mark(0,0,1.50,.47,0xa6ffb1);
+      }else if(shape===5){ // Dress
+        mark(0,.30,.55,.52,ivory);mark(0,-.15,.78,.41,ivory);mark(0,-.45,1.12,.29,ivory);
+      }else if(shape===6){ // Open-ended wrench
+        mark(0,-.22,.24,1.00,ivory);mark(0,.24,.79,.20,ivory);
+        for(const side of [-1,1])mark(side*.30,.46,.18,.35,ivory);
+      }else if(shape===7){ // Loaf with scored crust
+        mark(0,-.13,1.46,.47,0xf4b855);mark(0,.16,1.18,.31,0xf4b855);
+        for(const score of [-.35,0,.35])mark(score,.20,.10,.23,0xa75b2d);
+      }else if(shape===8){ // Cinema clapperboard
+        mark(0,-.20,1.32,.72,ivory);mark(0,.39,1.45,.22,ivory);
+        for(const slash of [-.45,0,.45])mark(slash,.39,.16,.24,trim);
+      }else if(shape===9){ // Dumbbell
+        mark(0,0,1.52,.15,ivory);
+        for(const side of [-1,1])mark(side*.57,0,.30,.84,ivory);
+      }else if(shape===10){ // Hotel bed
+        mark(0,-.23,1.49,.20,ivory);mark(-.64,.04,.17,.73,ivory);
+        mark(.23,.03,.94,.35,ivory);mark(-.34,.07,.34,.25,0xfff8df);
+      }else{ // Open-air market stall
+        mark(0,.38,1.49,.22,ivory);mark(0,-.25,1.42,.22,ivory);
+        for(const side of [-1,1])mark(side*.59,-.03,.14,.83,ivory);
+        for(const stripe of [-.42,0,.42])mark(stripe,.37,.17,.26,0xd47049);
       }
     }
     const entranceW=2.05, doorH=Math.min(2.65,height*.52);
