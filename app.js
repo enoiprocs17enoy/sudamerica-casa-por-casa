@@ -1697,16 +1697,35 @@ function drawShops(){
     }else{
       put('roof',trim,shop,x,height+.23,z,w+.40,.45,d+.40);
     }
-    if(shape===0){ // Cafe: small patio seating, without blocking the door.
+    if(shape===0){ // Café terrace, counter and chalkboard.
       for(const side of [-1,1]){
-        put('cafeTableTop',0x8c694e,shop,x+side*(w*.34),.76,front+1.35,.88,.10,.88);
-        put('cafeTableLeg',0x6c5b4c,shop,x+side*(w*.34),.40,front+1.35,.10,.72,.10);
+        const tx=x+side*w*.34;
+        put('cafeTableTop',0x426c64,shop,tx,.80,front+1.39,.78,.09,.78);
+        put('cafeTableLeg',0x263a38,shop,tx,.40,front+1.39,.10,.78,.10);
+        put('cafeStool',0xbf8451,shop,tx+side*.64,.44,front+1.39,.43,.10,.43);
+        put('cafeCup',0xffe7c4,shop,tx,.91,front+1.39,.16,.13,.16);
       }
-    }else if(shape===2){ // Restaurant: sheltered outdoor dining at the sides.
+      put('cafeChalkboardFrame',0xa2764a,shop,x-1.48,.58,front+1.14,.59,1.06,.25);
+      put('cafeChalkboard',0x293733,shop,x-1.48,.63,front+1.28,.47,.76,.035);
+    }else if(shape===2){ // Restaurant terrace with set tables and a timber pergola.
+      const patioZ=front+1.72, canopy=0x814439;
+      put('restaurantTerrace',0xc29979,shop,x,.11,patioZ,w*.94,.17,2.95);
       for(const side of [-1,1]){
-        put('restaurantTable',0x9b795c,shop,x+side*w*.36,.74,front+1.28,1.00,.12,.90);
-        put('restaurantStand',0x6d594a,shop,x+side*w*.36,.40,front+1.28,.11,.70,.11);
+        const tx=x+side*w*.34;
+        put('restaurantTable',0xffe4bd,shop,tx,.82,patioZ,1.30,.15,1.08);
+        put('restaurantStand',0x63473a,shop,tx,.46,patioZ,.15,.72,.15);
+        for(const end of [-1,1]){
+          put('restaurantPlate',0xfff6e5,shop,tx,.92,patioZ+end*.29,.28,.04,.24);
+          put('restaurantChairSeat',0x7b4d32,shop,tx,.46,patioZ+end*.84,.53,.12,.50);
+          put('restaurantChairBack',0x9f653e,shop,tx,.69,patioZ+end*1.05,.55,.54,.09);
+        }
+        put('restaurantPergolaPost',canopy,shop,x+side*w*.46,1.41,front+2.97,.17,2.62,.17);
+        put('restaurantPlanter',0xa55e42,shop,x+side*w*.43,.30,front+2.95,.74,.49,.51);
+        put('restaurantPlant',0x638d39,shop,x+side*w*.43,.60,front+2.95,.61,.35,.42);
       }
+      put('restaurantPergolaBeam',canopy,shop,x,2.75,front+2.97,w*.95,.18,.19);
+      for(let slat=0;slat<8;slat++)
+        put('restaurantPergolaSlat',canopy,shop,x+(slat-3.5)*w*.125,2.84,front+1.63,.13,.11,2.80);
     }else if(shape===3){ // Bookshop: vertical book display behind glass.
       for(const side of [-1,1])for(let j=0;j<3;j++)
         put('bookShelf',j%2?0x9c6e50:0xb98b5c,shop,x+side*w*.28,.65+j*.63,front+.28,1.30,.12,.15);
