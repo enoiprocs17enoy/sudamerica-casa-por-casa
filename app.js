@@ -826,7 +826,7 @@ function selectCity(id,fly=false){
  syncPopulationControls();
  $('card').style.display='none';
  $('search').value=homes[0]?.user||'';
- target={x:0,y:0,z:0};distance=142;azimuth=.72;elevation=.26;
+ target={x:-17,y:0,z:16};distance=115;azimuth=.72;elevation=.29;
  updateCitySelection();renderMilestones();
  if(fly){manualCityNavigation=true;map.flyTo([next.lat,next.lng],12,{duration:1.1});map.once('moveend',()=>{manualCityNavigation=false;});}
  else map.setView([next.lat,next.lng],12);
@@ -839,7 +839,7 @@ function cityAtMapCenter(){
   return !best||d<best.distance?{city:c,distance:d}:best;
  },null);
 }
-let count=500,homes=[],threeReady=false,scene,camera,renderer,group,raycaster,houseMeshes=[],shown=0,active=false,target={x:0,y:0,z:0},azimuth=.72,elevation=.26,distance=142,dragging=false,lastX=0,lastY=0,moved=false,panMode=true,pointers=new Map(),gesture=null;
+let count=500,homes=[],threeReady=false,scene,camera,renderer,group,raycaster,houseMeshes=[],shown=0,active=false,target={x:-17,y:0,z:16},azimuth=.72,elevation=.29,distance=115,dragging=false,lastX=0,lastY=0,moved=false,panMode=true,pointers=new Map(),gesture=null;
 const rnd=n=>{let x=Math.sin(n*127.13+19.1)*43758.5453;return x-Math.floor(x)};
 // Urban layout v1.4: blocks, NOT one road per house.
 // A block contains 30 private gardens. Streets are only between city blocks.
@@ -1480,15 +1480,28 @@ function drawSpecial(zone){
     addBox(w-5,.10,3,x,.16,z,0xe5d8b9);
     const basin=new THREE.Mesh(new THREE.CylinderGeometry(2.7,2.85,.48,32),
       new THREE.MeshStandardMaterial({color:0xece0cb,roughness:.79}));
-    basin.position.set(x,.4,z);
+    const fountainZ=z-d*.24;
+    basin.position.set(x,.4,fountainZ);
     basin.castShadow=true;
     basin.receiveShadow=true;
     group.add(basin);
     const water=new THREE.Mesh(new THREE.CylinderGeometry(2.46,2.46,.05,32),
       new THREE.MeshStandardMaterial({color:0x2aaccb,roughness:.19,metalness:.24}));
-    water.position.set(x,.66,z);
+    water.position.set(x,.66,fountainZ);
     group.add(water);
-    addBox(.28,1.05,.28,x,1.1,z,0xa8ebf5);
+    addBox(.28,1.05,.28,x,1.1,fountainZ,0xa8ebf5);
+    addBox(5,.34,5,x,.36,z,0xc5bcb0);
+    addBox(3.8,.52,3.8,x,.76,z,0xe4d9c8);
+    const stone=new THREE.MeshStandardMaterial({color:0xf1e7d9,roughness:.88});
+    const column=new THREE.Mesh(new THREE.CylinderGeometry(.87,1.3,6.4,4,1,false,Math.PI/4),stone);
+    column.position.set(x,4.2,z);
+    column.castShadow=true;
+    column.receiveShadow=true;
+    group.add(column);
+    const spire=new THREE.Mesh(new THREE.ConeGeometry(.87,1.85,4,1,false,Math.PI/4),stone);
+    spire.position.set(x,8.325,z);
+    spire.castShadow=true;
+    group.add(spire);
     for(const side of [-1,1]){
       for(const end of [-1,1]){
         addTree(x+side*w*.28,z+end*d*.28,zone.block*10+(side+1)*2+end+1,1.55,side===end);
@@ -3797,7 +3810,7 @@ function onZoom(){
  const z=map.getZoom();
  if(z>=11&&near){
   if(!manualCityNavigation&&nearest.city.id!==currentCity.id)selectCity(nearest.city.id,false);
-  if(!active){distance=142;enter()}else updateCamera();
+  if(!active){distance=115;enter()}else updateCamera();
  }else if(active)back();
 }
 function setCount(n){
