@@ -7,11 +7,13 @@
  const shadowCenter=new THREE.Vector3(Infinity,0,Infinity);
  let sun=null,lastShadow=-Infinity;
  const shadowInterval=1000/12;
+ let maxRatio=1,lastFrame=0,averageFrame=16.7,samples=0;
  function setup(scene,camera,renderer){
   renderer.useLegacyLights=false;
   renderer.shadowMap.enabled=true;
   renderer.shadowMap.autoUpdate=false;
-  renderer.setPixelRatio(Math.min(renderer.getPixelRatio(),1.5));
+  maxRatio=Math.min(renderer.getPixelRatio(),1.5);
+  renderer.setPixelRatio(maxRatio);
   renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
@@ -30,6 +32,19 @@
  }
  function render(scene,camera,renderer){
   const now=performance.now();
+  const elapsed=now-lastFrame;
+  lastFrame=now;
+  if(elapsed>0&&elapsed<150&&!document.hidden){
+   averageFrame+=(elapsed-averageFrame)*.06;
+   if(++samples>=90){
+    const ratio=renderer.getPixelRatio();
+    const minimum=Math.min(.78,maxRatio);
+    const next=averageFrame>27?Math.max(minimum,ratio-.15):
+      averageFrame<18?Math.min(maxRatio,ratio+.10):ratio;
+    if(next!==ratio)renderer.setPixelRatio(next);
+    samples=0;
+   }
+  }
   if(sun && now-lastShadow>=shadowInterval){
    camera.getWorldDirection(direction);
    const depth=Math.min(350,camera.position.y/Math.max(.15,-direction.y));
