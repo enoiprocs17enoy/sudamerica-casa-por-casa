@@ -472,7 +472,7 @@ const CITY_CATALOG=[
  {id:'ar-paso-de-los-libres',name:'Paso de los Libres',country:'Argentina',lat:-27.7755,lng:-59.1139,pop:56,geoVerified:false},
  {id:'ar-puerto-iguazu',name:'Puerto Iguazú',country:'Argentina',lat:-27.5392,lng:-55.9915,pop:20,geoVerified:false},
  {id:'ar-rada-tilly',name:'Rada Tilly',country:'Argentina',lat:-45.7508,lng:-67.4159,pop:63,geoVerified:false},
- {id:'ar-quilmes',name:'Quilmes',country:'Argentina',lat:-34.3472,lng:-58.4322,pop:54,geoVerified:false},
+ {id:'ar-quilmes',name:'Quilmes',country:'Argentina',lat:-34.72065,lng:-58.25454,pop:54,geoVerified:true},
  {id:'ar-villa-gesell',name:'Villa Gesell',country:'Argentina',lat:-37.911,lng:-57.6404,pop:64,geoVerified:false},
  {id:'ar-tornquist',name:'Tornquist',country:'Argentina',lat:-38.6005,lng:-62.438,pop:49,geoVerified:false},
  {id:'ar-roldan',name:'Roldán',country:'Argentina',lat:-33.1101,lng:-60.3005,pop:43,geoVerified:false},
@@ -1030,7 +1030,9 @@ function publicZones(){
 }
 // Stable, city-specific distribution: monolocali, villette, condomini
 // and a minority of tall towers; no reroll when more users arrive.
+const simulatedComment={user:'lazza',cityId:'ar-quilmes',residentId:1};
 function demoResidentPoints(i,cityId){
+ if(cityId===simulatedComment.cityId&&i===simulatedComment.residentId-1)return 0;
  const citySeed=CITY_CATALOG.findIndex(c=>c.id===cityId)+1;
  const r=rnd((i+1)*71+citySeed*107);
  const magnitude=rnd((i+1)*31+citySeed*43);
@@ -1048,7 +1050,7 @@ function createHomes(n){
     const pos=plotPosition(blockIndex,slot);
     assertInsideParcel('Casa '+(i+1),pos.x,pos.z,15,16,pos);
     result.push({id:i+1,cityId:currentCity.id,blockIndex,slot,...pos,
-      user:i===0?(currentCity.id==='ar-mar-del-plata'?'Carlos75':'pionero_'+currentCity.id.replace(/[^a-z]/g,'')):i===1?'Lucia_'+currentCity.id.slice(0,2):i===2?'Mateo_'+currentCity.id.slice(0,2):'usuario_'+String(i+1).padStart(5,'0'),
+      user:currentCity.id===simulatedComment.cityId&&i+1===simulatedComment.residentId?simulatedComment.user:i===0?(currentCity.id==='ar-mar-del-plata'?'Carlos75':'pionero_'+currentCity.id.replace(/[^a-z]/g,'')):i===1?'Lucia_'+currentCity.id.slice(0,2):i===2?'Mateo_'+currentCity.id.slice(0,2):'usuario_'+String(i+1).padStart(5,'0'),
       points:scoreOverrides.get(scoreOverrideKey(currentCity.id,i+1))??demoResidentPoints(i,currentCity.id),
       district:Math.max(Math.abs(pos.col),Math.abs(pos.row)),
       variant:(Math.floor(rnd(i+30)*9)+CITY_CATALOG.indexOf(currentCity))%9,type:(Math.floor(rnd(i+40)*7)+CITY_CATALOG.indexOf(currentCity))%7,garden:rnd(i+231+CITY_CATALOG.indexOf(currentCity)*31)>.24});
@@ -3954,6 +3956,7 @@ $('back').onclick=()=>{back();map.setView([currentCity.lat,currentCity.lng],9)};
 $('close').onclick=()=>{$('card').style.display='none'};
 $('find').onclick=()=>{
  let q=$('search').value.trim().replace(/^@/,'').toLowerCase();
+ if(q===simulatedComment.user&&currentCity.id!==simulatedComment.cityId)selectCity(simulatedComment.cityId);
  let h=homes.find(x=>x.user.toLowerCase()===q);
  if(!h){$('status').textContent='Utente non presente in '+currentCity.name;return}
  map.setView([currentCity.lat,currentCity.lng],13);
