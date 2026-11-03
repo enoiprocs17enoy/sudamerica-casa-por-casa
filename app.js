@@ -1015,7 +1015,7 @@ function shopLot(id){
   return {id,...pos,
     ownerId:Math.max(1,Math.min(count,1+Math.floor(rnd(id*127+CITY_CATALOG.indexOf(currentCity)*19)*Math.max(1,count)))),
     owner:'',
-    business:shopStyles[id%shopStyles.length]?.name||'Negozio'};
+    business:id%24===14?'Pizzeria':shopStyles[id%shopStyles.length]?.name||'Negozio'};
 }
 function publicZones(){
   const zones=[];
@@ -1593,7 +1593,11 @@ const shopStyles=[
 ];
 function drawShops(){
   const box=new THREE.BoxGeometry(1,1,1),dummy=new THREE.Object3D(),batches=new Map();
-  const structuralKinds=new Set(['shopPaving','body','roof','hotelRoof','cinemaRoof',
+  const disc=new THREE.CylinderGeometry(.5,.5,1,24);
+  disc.rotateX(Math.PI/2);
+  const cup=new THREE.CylinderGeometry(.5,.34,1,20);
+  const handle=new THREE.TorusGeometry(.32,.10,8,18);
+  const structuralKinds=new Set(['cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','shopPaving','body','roof','hotelRoof','cinemaRoof',
       'garageRoof','superRoof','displayGlass','entryDoor','entryDoorGlass',
       'signFascia','signInset','garageGate','cinemaParapet','hotelUpperWindow']);
   function put(kind,color,shop,x,y,z,w,h,d){
@@ -1602,7 +1606,7 @@ function drawShops(){
     const detailed=!structuralKinds.has(kind);
     const cx=shop?Math.floor(shop.x/90):0,cz=shop?Math.floor(shop.z/90):0;
     const key=kind+'_'+color+(detailed?'_detail_'+cx+'_'+cz:'');
-    if(!batches.has(key))batches.set(key,{color,entries:[],detailed,
+    if(!batches.has(key))batches.set(key,{color,geo:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:kind.startsWith('pizza')?disc:box,entries:[],detailed,
       chunk:{x:(cx+.5)*90,z:(cz+.5)*90}});
     let rotation=0;
     if(shop){rotation=facadeAngle(shop);
@@ -1615,13 +1619,25 @@ function drawShops(){
     const style=shopStyles[shop.id%shopStyles.length];
     const seed=shop.id,district=districtStyle(shop.block);
     const shape=shop.id%shopStyles.length;
-    const w=[9.3,11.2,8.4,8.5,8.3,9.1,10.9,8.1,9.6,9.2,9.7,10.5][shape]*(.87+rnd(seed*31+8)*.16);
-    const d=[8.1,9.7,7.8,8.5,7.8,8.3,9.2,8.0,9.0,8.6,8.4,9.4][shape]*(.9+rnd(seed*37+3)*.12);
-    const height=[5.1,5.2,4.7,6.1,5.0,6.3,4.7,4.6,7.1,6.2,10.4,4.8][shape]*(.88+rnd(seed*41+2)*.22)*(district==='centro'?1.08:1);
+    const w=[7.2,14.5,12.2,8.5,8.1,6.4,12.9,7.7,16.2,12.8,11.4,13.1][shape]*(.87+rnd(seed*31+8)*.16);
+    const d=[7.4,12.9,9.4,9.4,7.4,6.8,11.6,7.9,14.2,11.2,10.5,9.4][shape]*(.9+rnd(seed*37+3)*.12);
+    const height=[4.2,5.1,5.2,6.4,4.7,4.0,5.0,4.5,9.0,6.8,12.2,4.3][shape]*(.88+rnd(seed*41+2)*.22)*(district==='centro'?1.08:1);
     const x=shop.x,z=shop.z;
     put('shopPaving',[0xaba99f,0xb8b5a9,0x9ba9a8][seed%3],shop,x,.055,z,17.7,.06,17.5);
     put('body',style.walls,shop,x,height/2,z,w,height,d);
     const front=z+d/2, trim=style.trim, glass=style.glass;
+    if(shape===0){
+      put('cafeCupSign',0xffefcd,shop,x,height+.93,front-.65,1.68,1.26,1.59);
+      put('cafeHandleSign',0xffefcd,shop,x+.84,height+.94,front-.65,1.17,1.22,1.16);
+    }
+    if(shape===2&&shop.id%24===14){
+      put('pizzaDiscSign',0xc47b30,shop,x,height+1.39,front-.39,2.85,2.85,.39);
+      put('pizzaSauceSign',0xffc260,shop,x,height+1.39,front-.16,2.46,2.46,.09);
+      for(let topping=0;topping<6;topping++){
+        const angle=topping*Math.PI/3;
+        put('pizzaToppingSign',0xc24438,shop,x+Math.cos(angle)*.73,height+1.39+Math.sin(angle)*.73,front-.09,.34,.34,.07);
+      }
+    }
     const entranceW=2.05, doorH=Math.min(2.65,height*.52);
     // A single storefront system, shared proportions but distinct identities.
     // The door is central, with two uninterrupted display windows either side.
@@ -1635,6 +1651,7 @@ function drawShops(){
       for(const edge of [-1,1])put('displayJamb',trim,shop,wx+edge*wingW/2,displayY,front+.19,.12,displayH+.12,.19);
       const shelfColors=[0xf4cb70,0xdc7252,0x73ad87,0x7aa4d8];
       for(let shelf=0;shelf<2;shelf++){
+        if(shape===5)break;
         const sy=displayY-displayH*.30+shelf*displayH*.30;
         put('displayShelf',0xc8a77c,shop,wx,sy,front+.176,wingW*.82,.065,.07);
         for(let product=0;product<4;product++){
@@ -1643,6 +1660,14 @@ function drawShops(){
           put('displayProduct',shelfColors[(seed+shelf+product)%4],shop,px,sy+.035+ph/2,
             front+.183,wingW*.11,ph,.068);
         }
+      }
+      if(shape===5){
+        const fabric=side<0?0xd75374:0x467bb1;
+        put('fashionDisplayDress',fabric,shop,wx,displayY-.16,front+.182,.48,1.27,.073);
+        put('fashionDisplayHem',fabric,shop,wx,displayY-.66,front+.182,.73,.43,.073);
+        put('fashionDisplaySleeve',fabric,shop,wx-.29,displayY+.32,front+.182,.19,.32,.073);
+        put('fashionDisplaySleeve',fabric,shop,wx+.29,displayY+.32,front+.182,.19,.32,.073);
+        put('fashionDisplayNeck',0xe5c5a2,shop,wx,displayY+.54,front+.18,.17,.16,.074);
       }
       put('displayReflection',0x9bc9df,shop,wx-wingW*.29,displayY+.12,front+.181,
         .055,displayH*.79,.012);
@@ -1818,7 +1843,7 @@ function drawShops(){
   for(const batch of batches.values()){
     if(!shopMaterials.has(batch.color))
       shopMaterials.set(batch.color,new THREE.MeshStandardMaterial({color:batch.color,side:THREE.FrontSide,roughness:.77,metalness:.02,flatShading:false}));
-    const mesh=new THREE.InstancedMesh(box,shopMaterials.get(batch.color),batch.entries.length);
+    const mesh=new THREE.InstancedMesh(batch.geo,shopMaterials.get(batch.color),batch.entries.length);
     for(let i=0;i<batch.entries.length;i++){
       const e=batch.entries[i];dummy.position.set(e.x,e.y,e.z);dummy.rotation.set(0,e.rotation,0);
       dummy.scale.set(e.w,e.h,e.d);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);
