@@ -4295,3 +4295,31 @@ for(const [id,action] of [
  ['earthPlus',()=>{zoomBy(1.5);updateCamera()}],
  ['earthMinus',()=>{zoomBy(1/1.5);updateCamera()}]
 ]){const el=$(id);if(el)el.addEventListener('click',action)}
+
+
+// Optional wide city view. All simulation controls remain in the side panel.
+const cityPanel=document.querySelector('aside');
+const cityPanelToggle=document.createElement('button');
+cityPanel.id='cityControls';
+cityPanelToggle.type='button';
+cityPanelToggle.id='cityPanelToggle';
+cityPanelToggle.setAttribute('aria-controls',cityPanel.id);
+cityPanelToggle.setAttribute('aria-expanded','true');
+cityPanelToggle.textContent='⛶ Vista ampia';
+document.getElementById('earthControls').append(cityPanelToggle);
+cityPanelToggle.addEventListener('click',()=>{
+ const wide=document.body.classList.toggle('wide-city');
+ cityPanelToggle.setAttribute('aria-expanded',String(!wide));
+ cityPanelToggle.textContent=wide?'☰ Comandi':'⛶ Vista ampia';
+ resize();
+ map.invalidateSize({pan:false});
+});
+const cityViewStyle=document.createElement('style');
+cityViewStyle.textContent=`
+ #cityPanelToggle{width:auto;min-width:42px;font-size:11px;white-space:nowrap;padding-inline:8px}
+ body:not(.city-view) #cityPanelToggle{display:none}
+ .city-view.wide-city .layout{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);height:calc(100dvh - 56px)}
+ .city-view.wide-city #cityControls{display:none}
+ .city-view.wide-city .mapwrap{height:auto}
+`;
+document.head.append(cityViewStyle);
