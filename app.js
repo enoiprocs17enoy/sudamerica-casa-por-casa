@@ -1645,21 +1645,39 @@ function drawShops(){
     const displayH=Math.min(2.85,height*.55),displayY=1.05+displayH/2;
     for(const side of [-1,1]){
       const wx=x+side*(entranceW/2+.22+wingW/2);
-      put('displayGlass',glass,shop,wx,displayY,front+.11,wingW-.28,displayH,.11);
+      if(shape!==6)put('displayGlass',glass,shop,wx,displayY,front+.11,wingW-.28,displayH,.11);
       put('displayTop',trim,shop,wx,displayY+displayH/2+.06,front+.19,wingW,.13,.18);
       put('displaySill',trim,shop,wx,displayY-displayH/2-.05,front+.19,wingW,.12,.20);
       for(const edge of [-1,1])put('displayJamb',trim,shop,wx+edge*wingW/2,displayY,front+.19,.12,displayH+.12,.19);
-      const shelfColors=[0xf4cb70,0xdc7252,0x73ad87,0x7aa4d8];
-      for(let shelf=0;shelf<2;shelf++){
-        if(shape===5)break;
-        const sy=displayY-displayH*.30+shelf*displayH*.30;
-        put('displayShelf',0xc8a77c,shop,wx,sy,front+.176,wingW*.82,.065,.07);
-        for(let product=0;product<4;product++){
-          const px=wx+(product-1.5)*wingW*.177;
-          const ph=.19+rnd(seed*41+shelf*11+product)*.20;
-          put('displayProduct',shelfColors[(seed+shelf+product)%4],shop,px,sy+.035+ph/2,
-            front+.183,wingW*.11,ph,.068);
+      const paneZ=front+.182;
+      if(shape===1){ // Produce bins under the supermarket glass.
+        put('marketProduceCrate',0xa36c3c,shop,wx,displayY-.66,paneZ,wingW*.75,.36,.15);
+        for(let fruit=0;fruit<5;fruit++){
+          put('marketProduce',fruit%2?0x9cbb43:0xff9350,shop,wx+(fruit-2)*wingW*.13,
+            displayY-.43,paneZ+.06,.20,.18,.16);
         }
+      }else if(shape===4){ // Pharmacy: a clinical display with a green cross.
+        put('pharmacyDisplayPanel',0xecf3e8,shop,wx,displayY-.18,paneZ,wingW*.64,.93,.07);
+        put('pharmacyDisplayCross',0x2aa465,shop,wx,displayY-.18,paneZ+.06,.14,.59,.055);
+        put('pharmacyDisplayCross',0x2aa465,shop,wx,displayY-.18,paneZ+.06,.59,.14,.055);
+      }else if(shape===7){ // Bakery: bread on a low warm counter.
+        put('bakeryWindowCounter',0xaf7244,shop,wx,displayY-.65,paneZ,wingW*.77,.38,.17);
+        for(let loaf=0;loaf<3;loaf++){
+          put('bakeryLoaf',loaf%2?0xb77331:0xe5a75b,shop,wx+(loaf-1)*wingW*.22,
+            displayY-.39,paneZ+.08,.37,.19,.14);
+        }
+      }else if(shape===8){ // Cinema: full-height poster cases.
+        const poster=side<0?0xa93951:0x284e8a;
+        put('cinemaPosterFrame',0xd6ad68,shop,wx,displayY,paneZ,wingW*.53,displayH*.80,.10);
+        put('cinemaPoster',poster,shop,wx,displayY,paneZ+.063,wingW*.45,displayH*.71,.055);
+        put('cinemaPosterTitle',0xffdc93,shop,wx,displayY-displayH*.22,paneZ+.10,wingW*.35,.13,.023);
+      }else if(shape===9){ // Gym: weight racks and barbell silhouettes.
+        put('gymBarbell',0xb8c4c6,shop,wx,displayY-.38,paneZ,wingW*.65,.085,.10);
+        for(const plate of [-1,1])
+          put('gymWeightPlate',0x263238,shop,wx+plate*wingW*.25,displayY-.38,paneZ+.035,.16,.52,.13);
+      }else if(shape===10){ // Hotel: reception desk and pendant lights.
+        put('hotelReception',0x85553a,shop,wx,displayY-.53,paneZ,wingW*.72,.57,.19);
+        put('hotelPendant',0xffdd92,shop,wx,displayY+.61,paneZ,.33,.24,.12);
       }
       if(shape===5){
         const fabric=side<0?0xd75374:0x467bb1;
@@ -1669,7 +1687,7 @@ function drawShops(){
         put('fashionDisplaySleeve',fabric,shop,wx+.29,displayY+.32,front+.182,.19,.32,.073);
         put('fashionDisplayNeck',0xe5c5a2,shop,wx,displayY+.54,front+.18,.17,.16,.074);
       }
-      put('displayReflection',0x9bc9df,shop,wx-wingW*.29,displayY+.12,front+.181,
+      if(shape!==6)put('displayReflection',0x9bc9df,shop,wx-wingW*.29,displayY+.12,front+.181,
         .055,displayH*.79,.012);
       // Only a single subtle central mullion on wide shop windows.
       if(wingW>2.8)put('displayDivider',0x5d7073,shop,wx,displayY,front+.19,.06,displayH,.07);
@@ -1751,9 +1769,15 @@ function drawShops(){
       put('restaurantPergolaBeam',canopy,shop,x,2.75,front+2.97,w*.95,.18,.19);
       for(let slat=0;slat<8;slat++)
         put('restaurantPergolaSlat',canopy,shop,x+(slat-3.5)*w*.125,2.84,front+1.63,.13,.11,2.80);
-    }else if(shape===3){ // Bookshop: vertical book display behind glass.
+    }else if(shape===3){ // Bookshop: the only storefront with book shelves.
       for(const side of [-1,1])for(let j=0;j<3;j++)
-        put('bookShelf',j%2?0x9c6e50:0xb98b5c,shop,x+side*w*.28,.65+j*.63,front+.28,1.30,.12,.15);
+        {
+        const sx=x+side*w*.28,sy=1.37+j*.55;
+        put('bookShelf',0x8c654d,shop,sx,sy,front+.28,1.35,.10,.15);
+        for(let volume=0;volume<5;volume++)
+          put('bookSpine',[0xb4525a,0x4e7697,0xdeb16a][(j+volume)%3],shop,
+            sx+(volume-2)*.19,sy+.20,front+.33,.14,.29,.11);
+      }
     }else if(shape===4){ // Pharmacy: unmistakable green cross.
       put('pharmacyCrossV',0x35aa68,shop,x+w*.35,signY+.64,front+.30,.30,.88,.15);
       put('pharmacyCrossH',0x35aa68,shop,x+w*.35,signY+.64,front+.32,.85,.29,.17);
