@@ -1331,18 +1331,18 @@ function addTree(x,z,seed,scale=1,flowering=false) {
  const geometry=new THREE.IcosahedronGeometry(1,1);
  const canopy=new THREE.InstancedMesh(geometry,new THREE.MeshStandardMaterial({
    roughness:.96,flatShading:true
- }),13);
+ }),25);
  const cluster=new THREE.Object3D();
- for(let i=0;i<13;i++){
+ for(let i=0;i<25;i++){
    const angle=i*2.39996;
-   const radius=i===0?0:.64+rnd(seed*7+i)*.78;
-   const size=i===0?1.44:.45+rnd(seed*13+i)*.55;
-   cluster.position.set(Math.cos(angle)*radius,.82+(i%3)*.45,Math.sin(angle)*radius);
+   const radius=i===0?0:.53+rnd(seed*7+i)*1.07;
+   const size=i===0?1.32:i<10?.60+rnd(seed*13+i)*.43:.24+rnd(seed*13+i)*.38;
+   cluster.position.set(Math.cos(angle)*radius,.56+rnd(seed*11+i)*1.65,Math.sin(angle)*radius);
    cluster.rotation.set(i*.6,angle,0);
    cluster.scale.set(size,size*.91,size);
    cluster.updateMatrix();
    canopy.setMatrixAt(i,cluster.matrix);
-   canopy.setColorAt(i,new THREE.Color(color).multiplyScalar(.64+(i%3)*.17+rnd(seed+i)*.22));
+   canopy.setColorAt(i,new THREE.Color(color).lerp(new THREE.Color(flowering?0xffb8f4:0xd5ee62),i<10?.04:(i%4)*.10).multiplyScalar(.70+rnd(seed+i)*.42));
  }
  canopy.scale.setScalar(scale);
  canopy.position.set(x,(height-.1)*scale,z);
