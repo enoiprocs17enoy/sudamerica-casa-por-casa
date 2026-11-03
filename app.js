@@ -1607,7 +1607,7 @@ function drawShops(){
   dress.translate(0,0,-.06);
   const cup=new THREE.CylinderGeometry(.5,.34,1,20);
   const handle=new THREE.TorusGeometry(.32,.10,8,18);
-  const structuralKinds=new Set(['cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeBadge','tradeMark','tradeRound','tradeDress','shopPaving','body','roof','hotelRoof','cinemaRoof',
+  const structuralKinds=new Set(['cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeMark','tradeRound','tradeDress','shopPaving','body','roof','hotelRoof','cinemaRoof',
       'garageRoof','superRoof','displayGlass','entryDoor','entryDoorGlass',
       'signFascia','signInset','garageGate','cinemaParapet','hotelUpperWindow']);
   function put(kind,color,shop,x,y,z,w,h,d){
@@ -1616,7 +1616,7 @@ function drawShops(){
     const detailed=!structuralKinds.has(kind);
     const cx=shop?Math.floor(shop.x/90):0,cz=shop?Math.floor(shop.z/90):0;
     const key=kind+'_'+color+(detailed?'_detail_'+cx+'_'+cz:'');
-    if(!batches.has(key))batches.set(key,{color,geo:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:kind==='tradeDress'?dress:kind.startsWith('pizza')||kind==='tradeBadge'||kind==='tradeRound'?disc:box,entries:[],detailed,
+    if(!batches.has(key))batches.set(key,{color,geo:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:kind==='tradeDress'?dress:kind.startsWith('pizza')||kind==='tradeRound'?disc:box,entries:[],detailed,
       chunk:{x:(cx+.5)*90,z:(cz+.5)*90}});
     let rotation=0;
     if(shop){rotation=facadeAngle(shop);
@@ -1652,12 +1652,10 @@ function drawShops(){
     if(shape!==0&&!pizzeria){
       const badgeY=height+2.05,badgeZ=front+.28;
       const mark=(dx,dy,width,markHeight,color,kind='tradeMark')=>{
-        for(const face of [-1,1])
-          put(kind,color,shop,x+face*dx,badgeY+dy,badgeZ+face*.20,width,markHeight,.12);
+        put(kind,color,shop,x+dx,badgeY+dy,badgeZ,width,markHeight,.38);
       };
-      put('tradeBadge',shape===1?0xb66b13:trim,shop,x,badgeY,badgeZ,2.85,2.85,.27);
       put('tradeMark',trim,shop,x,height+.47,badgeZ,.26,1.05,.22);
-      const ivory=0xffe9c3;
+      const ivory=shape===1?0xffc45c:0xffe9c3;
       if(shape===1){ // Shopping cart
         mark(0,.34,1.29,.12,ivory);mark(.05,-.14,1.19,.12,ivory);
         for(const bar of [-.57,-.28,0,.28,.57])mark(bar,.10,.10,.48,ivory);
