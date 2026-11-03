@@ -1633,6 +1633,19 @@ function drawShops(){
       put('displayTop',trim,shop,wx,displayY+displayH/2+.06,front+.19,wingW,.13,.18);
       put('displaySill',trim,shop,wx,displayY-displayH/2-.05,front+.19,wingW,.12,.20);
       for(const edge of [-1,1])put('displayJamb',trim,shop,wx+edge*wingW/2,displayY,front+.19,.12,displayH+.12,.19);
+      const shelfColors=[0xf4cb70,0xdc7252,0x73ad87,0x7aa4d8];
+      for(let shelf=0;shelf<2;shelf++){
+        const sy=displayY-displayH*.30+shelf*displayH*.30;
+        put('displayShelf',0xc8a77c,shop,wx,sy,front+.176,wingW*.82,.065,.07);
+        for(let product=0;product<4;product++){
+          const px=wx+(product-1.5)*wingW*.177;
+          const ph=.19+rnd(seed*41+shelf*11+product)*.20;
+          put('displayProduct',shelfColors[(seed+shelf+product)%4],shop,px,sy+.035+ph/2,
+            front+.183,wingW*.11,ph,.068);
+        }
+      }
+      put('displayReflection',0x9bc9df,shop,wx-wingW*.29,displayY+.12,front+.181,
+        .055,displayH*.79,.012);
       // Only a single subtle central mullion on wide shop windows.
       if(wingW>2.8)put('displayDivider',0x5d7073,shop,wx,displayY,front+.19,.06,displayH,.07);
     }
