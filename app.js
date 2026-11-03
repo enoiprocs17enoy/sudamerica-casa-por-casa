@@ -4119,13 +4119,13 @@ function v45Bird(i,x,z,phase){
 }
 function v45Balloon(i,home){
  const g=new THREE.Group();
- const palette=[0xe78a71,0x7dc4d4,0xf0c16e,0xb7a2dc,0xe5a6a1];
- const envelope=v4Mesh(new THREE.SphereGeometry(3.3,16,12),palette[i%palette.length],g,0,0,0);
+ const palette=[0xf33751,0xffae28,0xffd15b,0x2d8bd4,0xe84fa3];
+ const envelope=v4Mesh(new THREE.SphereGeometry(3.3,32,18),palette[i%palette.length],g,0,0,0);
  envelope.scale.set(1,1.27,1);
  // Vertical colored gores, a crown, burner, basket and suspension cables.
- for(let k=0;k<8;k++){
-  const theta=k*Math.PI/4;
-  const stripe=v4Mesh(new THREE.SphereGeometry(3.33,5,10,theta,.33,0,Math.PI),palette[(i+k+1)%palette.length],g,0,0,0);
+ for(let k=0;k<10;k++){
+  const theta=k*Math.PI/5;
+  const stripe=v4Mesh(new THREE.SphereGeometry(3.34,6,18,theta,.61,0,Math.PI),palette[(i+k+1)%palette.length],g,0,0,0);
   stripe.scale.y=1.275;
  }
  v4Mesh(new THREE.CylinderGeometry(.8,1.35,1.2,10),0xf5dca8,g,0,-4.15,0);
@@ -4136,8 +4136,9 @@ function v45Balloon(i,home){
  // Distribute balloons over different city blocks, never vertically stack them.
  const offsetX=(rnd(i*37+5)-.5)*45;
  const offsetZ=(rnd(i*71+3)-.5)*40;
- const x=home.x+offsetX,z=home.z+offsetZ;
- g.position.set(x,48+(i%4)*6,z);group.add(g);
+ const x=i===0?-23:home.x+offsetX,z=i===0?-86:home.z+offsetZ;
+ if(i===0)g.scale.setScalar(1.72);
+ g.position.set(x,i===0?45:48+(i%4)*6,z);group.add(g);
  return {g,i,ownerId:home.id,baseY:g.position.y,x,z};
 }
 function createV4Life(selected){
