@@ -2018,6 +2018,16 @@ function drawRoadNetwork(selected){
       addBox(len,.035,w+2.4,x,sy,z,sidewalk);
       addBox(len,.042,w,x,ay,z,asphalt);
       curbH(z,x0,x1,w,c,r);
+      if(Math.abs(c)<=3&&Math.abs(r)<=4){
+        for(const side of [-1,1]){
+          for(let tree=1;tree<=4;tree++){
+            const tx=x0+len*tree/5;
+            const tz=z+side*(w/2+1.02);
+            const seed=(c+9)*163+(r+9)*29+tree*11+side;
+            addTree(tx,tz,seed,1.14,seed%8===0);
+          }
+        }
+      }
       for(let t=x0+7;t<x1-7;t+=9){
         for(const side of [-1,1])
           mark(.12,.012,1.12,t,sy+.030,z+side*(w/2+.65),jointColor);
