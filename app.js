@@ -1084,7 +1084,7 @@ function installReleaseSky(){
      float lightSide=noise(ridge*5.+vec2(height*95.,height*65.));
      vec3 rock=mix(vec3(.27,.49,.65),vec3(.15,.34,.49),l*.35);
      rock*=.85+lightSide*.27;
-     float snow=smoothstep(.052,.084,height+lightSide*.015)*step(.071,summit);
+     float snow=smoothstep(.054,.089,height+lightSide*.022)*smoothstep(.064,.088,summit);
      vec3 slope=mix(rock,vec3(.89,.94,.97),snow);
      color=mix(color,slope,1.-smoothstep(summit-.001,summit+.001,height));
    }
@@ -2210,13 +2210,13 @@ function addUrbanLandscaping(selected){
     for(let j=0;j<corners.length;j++){
       if(rnd(seed+j*17)>.78)continue;
       const [dx,dz]=corners[j],x=bx+dx,z=bz+dz;
-      const tall=style==='giardino'?3.8:style==='centro'?2.5:3.1;
+      const tall=style==='giardino'?5.7:style==='centro'?4.2:4.8;
       item(cube,0x77634b,x,.72,z,.32,1.45,.32);
       item(sphere,[0x497b51,0x548b60,0x6b925b,0x376e59][(block+j)%4],x,1.9+tall*.24,z,tall*.62,tall*.7,tall*.62);
       // A second offset canopy and blossom clusters create a real flowering silhouette.
-      const bloom=((block*7+j*3)%11===0);
-      item(sphere,bloom?0xc98cd2:0x78b96c,x-.55,2.2+tall*.24,z+.25,tall*.44,tall*.49,tall*.44);
-      item(sphere,bloom?0xe8b1e6:0x9acb79,x+.48,2.12+tall*.25,z-.38,tall*.39,tall*.42,tall*.40);
+      const bloom=((block*7+j*3)%6===0);
+      item(sphere,bloom?0xa83be2:0x72ad36,x-.55,2.2+tall*.24,z+.25,tall*.44,tall*.49,tall*.44);
+      item(sphere,bloom?0xdf82ff:0xa3c749,x+.48,2.12+tall*.25,z-.38,tall*.39,tall*.42,tall*.40);
       if(bloom)for(let k=0;k<4;k++){
         const a=k*Math.PI*.5;
         item(sphere,k%2?0xf0b5db:0xdf89c3,x+Math.cos(a)*tall*.36,2.1+tall*.33,z+Math.sin(a)*tall*.36,.55,.53,.55);
