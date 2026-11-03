@@ -1297,16 +1297,17 @@ function addBox(w,h,d,x,y,z,color) {
   group.add(mesh);
   return mesh;
 }
-function addTree(x,z,seed) {
+function addTree(x,z,seed,scale=1,flowering=false) {
  const height=2.1+rnd(seed*3+2)*1.15;
  const bark=new THREE.MeshStandardMaterial({color:0x795239,roughness:1});
  const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.12,.27,height,7),bark);
- trunk.position.set(x,height/2,z);
+ trunk.scale.setScalar(scale);
+ trunk.position.set(x,height*scale/2,z);
  trunk.castShadow=true;
  group.add(trunk);
 
  const palette=[0x55992e,0x78a932,0x3c893e,0x9b51c4,0x508f35,0x82af38];
- const color=palette[Math.floor(rnd(seed+45)*palette.length)];
+ const color=flowering?0xb645d7:palette[Math.floor(rnd(seed+45)*palette.length)];
  const geometry=new THREE.IcosahedronGeometry(1,1);
  const canopy=new THREE.InstancedMesh(geometry,new THREE.MeshStandardMaterial({
    roughness:.96,flatShading:true
@@ -1323,7 +1324,8 @@ function addTree(x,z,seed) {
    canopy.setMatrixAt(i,cluster.matrix);
    canopy.setColorAt(i,new THREE.Color(color).multiplyScalar(.64+(i%3)*.17+rnd(seed+i)*.22));
  }
- canopy.position.set(x,height-.1,z);
+ canopy.scale.setScalar(scale);
+ canopy.position.set(x,(height-.1)*scale,z);
  canopy.castShadow=true;
  canopy.receiveShadow=true;
  canopy.computeBoundingSphere();
@@ -1469,7 +1471,7 @@ function drawSpecial(zone){
     addBox(.28,1.05,.28,x,1.1,z,0xa8ebf5);
     for(const side of [-1,1]){
       for(const end of [-1,1]){
-        addTree(x+side*w*.28,z+end*d*.28,zone.block*10+(side+1)*2+end+1);
+        addTree(x+side*w*.28,z+end*d*.28,zone.block*10+(side+1)*2+end+1,1.55,side===end);
         const bx=x+side*w*.21,bz=z+end*3.25;
         civicFlowerbed(bx,z+end*d*.38,Math.min(7,w*.24),2.1,zone.block*13+side*2+end);
         addBox(2.5,.16,.66,bx,.63,bz,0x9e5931);
@@ -4318,7 +4320,8 @@ const cityViewStyle=document.createElement('style');
 cityViewStyle.textContent=`
  #cityPanelToggle{width:auto;min-width:42px;font-size:11px;white-space:nowrap;padding-inline:8px}
  body:not(.city-view) #cityPanelToggle{display:none}
- .city-view.wide-city .layout{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);height:calc(100dvh - 56px)}
+ .city-view.wide-city header{display:none}
+ .city-view.wide-city .layout{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);height:100dvh}
  .city-view.wide-city #cityControls{display:none}
  .city-view.wide-city .mapwrap{height:auto}
 `;
