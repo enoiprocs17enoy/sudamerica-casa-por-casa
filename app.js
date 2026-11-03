@@ -1640,14 +1640,19 @@ function drawShops(){
     }
     const pizzeria=shape===2&&shop.id%24===14;
     if(shape!==0&&!pizzeria){
-      const badgeY=height+1.38,badgeZ=front-.35;
-      const mark=(dx,dy,width,markHeight,color)=>
-        put('tradeMark',color,shop,x+dx,badgeY+dy,badgeZ+.17,width,markHeight,.12);
-      put('tradeBadge',trim,shop,x,badgeY,badgeZ,2.48,2.48,.27);
+      const badgeY=height+2.05,badgeZ=front+.28;
+      const mark=(dx,dy,width,markHeight,color)=>{
+        for(const face of [-1,1])
+          put('tradeMark',color,shop,x+face*dx,badgeY+dy,badgeZ+face*.20,width,markHeight,.12);
+      };
+      put('tradeBadge',shape===1?0xb66b13:trim,shop,x,badgeY,badgeZ,2.85,2.85,.27);
+      put('tradeMark',trim,shop,x,height+.47,badgeZ,.26,1.05,.22);
       const ivory=0xffe9c3;
       if(shape===1){ // Shopping cart
-        mark(0,.16,1.24,.48,ivory);mark(-.69,.40,.32,.11,ivory);
-        mark(-.39,-.32,.21,.21,ivory);mark(.39,-.32,.21,.21,ivory);
+        mark(0,.34,1.29,.12,ivory);mark(.05,-.14,1.19,.12,ivory);
+        for(const bar of [-.57,-.28,0,.28,.57])mark(bar,.10,.10,.48,ivory);
+        mark(-.73,.46,.39,.12,ivory);mark(-.61,.25,.11,.45,ivory);
+        mark(-.38,-.41,.24,.24,ivory);mark(.42,-.41,.24,.24,ivory);
       }else if(shape===2){ // Fork and knife
         mark(-.36,-.10,.13,1.12,ivory);mark(.35,.04,.22,1.38,ivory);
         for(const tine of [-.55,-.36,-.17])mark(tine,.46,.085,.44,ivory);
