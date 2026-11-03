@@ -2292,6 +2292,25 @@ function addUrbanLandscaping(selected){
         item(sphere,k%2?0xf0b5db:0xdf89c3,x+Math.cos(a)*tall*.36,2.1+tall*.33,z+Math.sin(a)*tall*.36,.55,.53,.55);
       }
     }
+    const bounds=blockBounds(block);
+    for(const side of [-1,1]){
+      const edgeZ=side<0?bounds.top+1.65:bounds.bottom-1.65;
+      for(let tree=0;tree<4;tree++){
+        const edgeX=bounds.left+(bounds.right-bounds.left)*(tree+1)/5;
+        if(!decorationAllowed(edgeX,edgeZ,2.8,2.8))continue;
+        const flowering=(block+tree*3+side+1)%9===0;
+        const green=[0x49882a,0x6da733,0x83bb36][(block+tree)%3];
+        const color=flowering?0xb14bda:green;
+        item(cube,0x745438,edgeX,1.32,edgeZ,.29,2.64,.29);
+        for(let leaf=0;leaf<7;leaf++){
+          const angle=leaf*2.39996,spread=leaf===0?0:.54;
+          const size=leaf===0?1.62:.94+rnd(seed+leaf)*.21;
+          item(sphere,coordinatedHouseColor(color,flowering?0xf4b8ff:0xe0ed79,(leaf%3)*.17),
+            edgeX+Math.cos(angle)*spread,2.7+(leaf%3)*.45,
+            edgeZ+Math.sin(angle)*spread,size,size*.94,size);
+        }
+      }
+    }
     // Each neighborhood has a distinct public-space character. These are
     // located in the broad edge buffer, outside private house/shop plots.
     const quarter=Math.floor(col/3)*23+Math.floor(row/3)*47;
