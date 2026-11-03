@@ -1654,7 +1654,7 @@ function drawShops(){
       const mark=(dx,dy,width,markHeight,color,kind='tradeMark')=>{
         put(kind,color,shop,x+dx,badgeY+dy,badgeZ,width,markHeight,.38);
       };
-      put('tradeMark',trim,shop,x,height+.47,badgeZ,.26,1.05,.22);
+      put('tradeMark',trim,shop,x,height+.94,badgeZ,.26,1.85,.22);
       const ivory=shape===1?0xffc45c:0xffe9c3;
       if(shape===1){ // Shopping cart
         mark(0,.34,1.29,.12,ivory);mark(.05,-.14,1.19,.12,ivory);
