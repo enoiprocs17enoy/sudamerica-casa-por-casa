@@ -1072,11 +1072,11 @@ function installReleaseSky(){
  void main(){
    vec3 ray=normalize(d);
    float height=ray.y;
-   vec3 color=mix(vec3(.69,.85,.94),vec3(.08,.53,.87),smoothstep(0.,.57,height));
+   vec3 color=mix(vec3(.68,.86,.98),vec3(.035,.54,.92),smoothstep(-.015,.23,height));
    vec2 cloudPlane=ray.xz/max(height+.10,.09);
    float cloud=.60*noise(cloudPlane*3.)+.27*noise(cloudPlane*7.)+.13*noise(cloudPlane*17.);
    color=mix(color,mix(vec3(.69,.79,.87),vec3(1.,.99,.95),smoothstep(.56,.77,cloud)),
-             smoothstep(.57,.70,cloud)*smoothstep(.04,.17,height));
+             smoothstep(.55,.70,cloud)*smoothstep(.025,.14,height));
    for(int layer=0;layer<3;layer++){
      float l=float(layer);
      vec2 ridge=ray.xz*(4.+l*2.)+vec2(l*17.,0.);
@@ -4138,7 +4138,7 @@ function v45Balloon(i,home){
  const offsetZ=(rnd(i*71+3)-.5)*40;
  const x=i===0?-23:home.x+offsetX,z=i===0?-86:home.z+offsetZ;
  if(i===0)g.scale.setScalar(1.72);
- g.position.set(x,i===0?45:48+(i%4)*6,z);group.add(g);
+ g.position.set(x,i===0?36:48+(i%4)*6,z);group.add(g);
  return {g,i,ownerId:home.id,baseY:g.position.y,x,z};
 }
 function createV4Life(selected){
