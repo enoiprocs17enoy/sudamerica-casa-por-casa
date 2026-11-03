@@ -2646,6 +2646,26 @@ function renderAllHouses(selected){
     const premium=isPremiumHouse(h);
     const {width:footW,depth:footD,offsetZ}=houseFootprint(h,tier);
     h._visualOffsetZ=offsetZ;
+    if(h.garden&&h.points>0&&h.id%3!==1){
+      const parcel=plotBounds(h.blockIndex,h.slot);
+      const localX=(h.id%2===0?1:-1)*(footW/2+1.65);
+      const localZ=footD*.25+offsetZ;
+      const angle=facadeAngle(h);
+      const tx=h.x+localX*Math.cos(angle)+localZ*Math.sin(angle);
+      const tz=h.z-localX*Math.sin(angle)+localZ*Math.cos(angle);
+      if(isInsideParcel(tx,tz,2.9,2.9,parcel)){
+        const tint=h.id%7===0?0xb34ddb:h.id%2===0?0x67a62e:0x438837;
+        place('gardenTreeTrunk',boxGeo,0x75553a,h,h.x+localX,1.26,h.z+footD*.25,.24,2.52,.24);
+        for(let crown=0;crown<7;crown++){
+          const phase=crown*2.39996;
+          const spread=crown===0?0:.69;
+          const size=crown===0?1.29:.70+rnd(h.id*17+crown)*.28;
+          place('gardenTreeCrown',domeGeo,coordinatedHouseColor(tint,0xcce58e,(crown%3)*.13),h,
+            h.x+localX+Math.cos(phase)*spread,2.5+(crown%3)*.36,
+            h.z+footD*.25+Math.sin(phase)*spread,size,size*.91,size);
+        }
+      }
+    }
     if(tier>=3){
       // Vertical massing; no extensions, parking or roofs leave the parcel.
       const info=HOUSE_TIERS[tier];
@@ -3044,7 +3064,7 @@ function renderAllHouses(selected){
       mesh.castShadow=true;
       mesh.receiveShadow=true;
     }
-    if(/towerBase|towerRoof|homeMain|homeWing|homeRoof|homeCore|homeWall|towerWall|towerBody|mainBody|wingBody|mainRoof/i.test(key)){mesh.castShadow=true;mesh.receiveShadow=true;}
+    if(/gardenTree|towerBase|towerRoof|homeMain|homeWing|homeRoof|homeCore|homeWall|towerWall|towerBody|mainBody|wingBody|mainRoof/i.test(key)){mesh.castShadow=true;mesh.receiveShadow=true;}
     mesh.userData.homes=batch.entries.map(e=>e.h);
     batch.entries.forEach((e,i)=>{
       dummy.position.set(e.x,e.y,e.z);dummy.rotation.set(0,e.rotation,0);
