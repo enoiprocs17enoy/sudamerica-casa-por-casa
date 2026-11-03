@@ -2660,14 +2660,31 @@ function renderAllHouses(selected){
       const height=levels*2.55+1.8,x=h.x,z=h.z;
       // No parcel decorations: landscaping unlocks at one point.
       place('towerBase',boxGeo,wall,h,x,height/2,z,footW,height,footD);
-      if(tier<=5){
-        // A genuine pitched roof on apartment buildings; not a flat slab.
+      if(tier<=5&&urbanSeed%5<3){
+        // Pitched tile roofs alternate with parapet terraces.
         place('apartmentTiledRoof',roofGeo,trim,h,x,height-.04,z,
           (footW+.42)/2,Math.max(1.35,footW*.15),(footD+.42)/2);
         place('apartmentEave',boxGeo,0xe9d9bd,h,x,height-.13,z,
           footW+.32,.12,footD+.32);
       }else{
         place('towerRoof',boxGeo,trim,h,x,height+.24,z,footW+.3,.48,footD+.3);
+        for(const side of [-1,1]){
+          place('terraceParapet',boxGeo,wall,h,x,height+.66,z+side*footD*.48,footW+.27,.48,.22);
+          place('terraceParapet',boxGeo,wall,h,x+side*footW*.48,height+.66,z,.22,.48,footD);
+          place('terraceCap',boxGeo,0xf2dec2,h,x,height+.93,z+side*footD*.48,footW+.31,.10,.31);
+          place('terraceCap',boxGeo,0xf2dec2,h,x+side*footW*.48,height+.93,z,.31,.10,footD);
+        }
+      }
+      if(tier<=5){
+        const entranceZ=z+footD*.5;
+        const entry=x+footW*.045;
+        place('apartmentPortal',boxGeo,0xe6cfaa,h,entry,1.09,entranceZ+.09,1.72,2.18,.22);
+        place('apartmentDoor',boxGeo,0x784f36,h,entry,1.00,entranceZ+.23,1.24,2,.13);
+        place('apartmentStoop',boxGeo,0xb9aa97,h,entry,.13,entranceZ+.47,2.12,.25,.95);
+        for(let stripe=0;stripe<7;stripe++){
+          place('apartmentAwning',boxGeo,stripe%2?0xf6e9d4:trim,h,
+            entry+(stripe-3)*.29,2.27,entranceZ+.41,.29,.14,.86);
+        }
       }
       // Premium design only: rooftop penthouse and enhanced silhouette.
       if(premium&&tier>=5){
