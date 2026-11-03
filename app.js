@@ -1476,8 +1476,25 @@ function drawSpecial(zone){
   assertInsideParcel('Edificio pubblico '+kind,x,z,w,d,b);
   addBox(w,.10,d,x,.07,z,kind==='park'?0x86b77d:0xd0c7b7);
   if(kind==='park'){
-    addBox(3,.10,d-5,x,.16,z,0xe5d8b9);
-    addBox(w-5,.10,3,x,.16,z,0xe5d8b9);
+    addBox(3.8,.10,d-5,x,.16,z,0xc4a99e);
+    addBox(w-5,.10,3.8,x,.16,z,0xc4a99e);
+    addBox(w*.56,.13,d*.47,x,.17,z,0xc4a99e);
+    for(const side of [-1,1]){
+      const walkX=x+side*w*.43;
+      const walkZ=z+side*d*.43;
+      addBox(1.65,.10,d*.86,walkX,.16,z,0xc4a99e);
+      addBox(w*.86,.10,1.65,x,.16,walkZ,0xc4a99e);
+      for(const end of [-1,1]){
+        const flowerX=x+end*w*.26;
+        const flowerZ=z+side*d*.36;
+        addBox(Math.min(6,w*.22)+.28,.16,1.63,flowerX,.17,flowerZ,0xd6c1ac);
+        civicFlowerbed(flowerX,flowerZ,Math.min(6,w*.22),1.35,zone.block+side*4+end);
+        const lampX=x+end*w*.40;
+        addBox(.14,3.2,.14,lampX,1.72,walkZ,0x213e3c);
+        addBox(.42,.29,.42,lampX,3.37,walkZ,0xffd999);
+        addBox(.50,.10,.50,lampX,3.56,walkZ,0x263d38);
+      }
+    }
     const basin=new THREE.Mesh(new THREE.CylinderGeometry(2.7,2.85,.48,32),
       new THREE.MeshStandardMaterial({color:0xece0cb,roughness:.79}));
     const fountainZ=z-d*.24;
