@@ -2754,8 +2754,14 @@ function renderAllHouses(selected){
       for(let floor=0;floor<levels;floor++){
         const wy=1.6+floor*2.55;
         for(const side of [-1,1]){
-          place('towerWindow',boxGeo,0x92c8da,h,x+side*footW*.26,wy,z+footD/2+.055,footW*.24,1.15,.10);
-          place('towerRearWindow',boxGeo,0x92c8da,h,x+side*footW*.26,wy,z-footD/2-.055,footW*.24,1.15,.10);
+          const wx=x+side*footW*.26, width=footW*.24;
+          for(const face of [-1,1]){
+            const wz=z+face*(footD/2+.055);
+            place('towerWindowFrame',boxGeo,0xf0dfc8,h,wx,wy,wz,width+.22,1.33,.12);
+            place('towerWindow',boxGeo,0x39738f,h,wx,wy,wz+face*.075,width,1.15,.075);
+            place('towerWindowMullion',boxGeo,0xe5d7c5,h,wx,wy,wz+face*.12,.065,1.15,.045);
+            place('towerWindowSill',boxGeo,0xf0dfc8,h,wx,wy-.67,wz+face*.13,width+.37,.12,.34);
+          }
         }
         if(premium&&floor>0&&floor%3===0){
           place('towerBand',boxGeo,trim,h,x,wy-.93,z,footW+.22,.13,footD+.22);
@@ -2767,7 +2773,7 @@ function renderAllHouses(selected){
         for(const side of [-1,1]){
           const xx=x+side*(footW/2+.06);
           for(const zz of [-footD*.27,0,footD*.27]){
-            place('aptSideWindow',boxGeo,0x79afc3,h,xx,wy,z+zz,.09,1.24,1.28);
+            place('aptSideWindow',boxGeo,0x467f99,h,xx,wy,z+zz,.09,1.24,1.28);
             place('aptSideSill',boxGeo,0xece0c9,h,xx+side*.055,wy-.69,z+zz,
               .17,.12,1.55);
             place('aptSideMullion',boxGeo,0xe4ddc8,h,xx+side*.07,wy,z+zz,
