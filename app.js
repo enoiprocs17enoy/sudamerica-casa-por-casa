@@ -2648,21 +2648,22 @@ function renderAllHouses(selected){
     h._visualOffsetZ=offsetZ;
     if(h.garden&&h.points>0&&h.id%3!==1){
       const parcel=plotBounds(h.blockIndex,h.slot);
-      const localX=(h.id%2===0?1:-1)*(footW/2+1.65);
-      const localZ=footD*.25+offsetZ;
+      const localX=(h.id%2===0?1:-1)*(parcel.right-parcel.left)*.35;
+      const frontZ=footD/2+2.6;
+      const localZ=frontZ+offsetZ;
       const angle=facadeAngle(h);
       const tx=h.x+localX*Math.cos(angle)+localZ*Math.sin(angle);
       const tz=h.z-localX*Math.sin(angle)+localZ*Math.cos(angle);
       if(isInsideParcel(tx,tz,2.9,2.9,parcel)){
         const tint=h.id%7===0?0xb34ddb:h.id%2===0?0x67a62e:0x438837;
-        place('gardenTreeTrunk',boxGeo,0x75553a,h,h.x+localX,1.26,h.z+footD*.25,.24,2.52,.24);
+        place('gardenTreeTrunk',boxGeo,0x75553a,h,h.x+localX,1.26,h.z+frontZ,.28,2.52,.28);
         for(let crown=0;crown<7;crown++){
           const phase=crown*2.39996;
           const spread=crown===0?0:.69;
           const size=crown===0?1.29:.70+rnd(h.id*17+crown)*.28;
-          place('gardenTreeCrown',domeGeo,coordinatedHouseColor(tint,0xcce58e,(crown%3)*.13),h,
+          place('gardenTreeCrown',domeGeo,coordinatedHouseColor(tint,h.id%7===0?0xf1b5ff:0xcce58e,(crown%3)*.18),h,
             h.x+localX+Math.cos(phase)*spread,2.5+(crown%3)*.36,
-            h.z+footD*.25+Math.sin(phase)*spread,size,size*.91,size);
+            h.z+frontZ+Math.sin(phase)*spread,size,size*.91,size);
         }
       }
     }
