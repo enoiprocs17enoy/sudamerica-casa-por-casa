@@ -1,0 +1,41 @@
+/* Sudamérica Casa por Casa · Visual Engine 8.4
+   Native-resolution physically based rendering, dynamically centered sun shadows,
+   no blur, downsampling or dark screen-space filters. */
+(function(){
+ 'use strict';
+ const target=new THREE.Vector3(),direction=new THREE.Vector3(),offset=new THREE.Vector3(-155,205,115);
+ let sun=null,frame=0;
+ function setup(scene,camera,renderer){
+  renderer.useLegacyLights=false;
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.outputColorSpace=THREE.SRGBColorSpace;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.13;
+  scene.traverse(function(o){
+   if(o.isDirectionalLight&&!sun){
+    sun=o;sun.castShadow=true;
+    sun.shadow.mapSize.set(3072,3072);
+    const c=sun.shadow.camera;
+    c.left=-114;c.right=114;c.top=114;c.bottom=-114;c.near=1;c.far=750;
+    c.updateProjectionMatrix();
+    sun.shadow.bias=-0.00014;sun.shadow.normalBias=.032;
+    sun.shadow.radius=3;
+   }
+  });
+ }
+ function render(scene,camera,renderer){
+  if(sun && (++frame%3===1)){
+   camera.getWorldDirection(direction);
+   const depth=Math.min(350,camera.position.y/Math.max(.15,-direction.y));
+   target.copy(camera.position).addScaledVector(direction,depth);
+   target.y=0;
+   sun.target.position.copy(target);
+   sun.position.copy(target).add(offset);
+   sun.target.updateMatrixWorld();
+  }
+  renderer.setRenderTarget(null);
+  renderer.render(scene,camera);
+ }
+ window.SudamericaRender8={setup,render,resize:function(){}};
+})();

@@ -1,0 +1,118 @@
+
+*{box-sizing:border-box}body{margin:0;background:#10282e;color:#eef7f2;font:14px system-ui,Arial}header{height:56px;background:#123b3d;display:flex;justify-content:space-between;align-items:center;padding:0 18px}header b{font-size:18px}.layout{display:grid;grid-template-columns:290px minmax(0,1fr);height:calc(100vh - 56px)}aside{background:#17383b;padding:19px;overflow:auto}aside p{color:#c2d7d2;line-height:1.55}input,button{font:inherit;border-radius:9px;padding:10px;border:1px solid #658e88}input{background:#0e292d;color:white;width:100%;min-width:0}button{background:#269879;color:white;cursor:pointer;font-weight:700}.row{display:flex;gap:7px;margin:10px 0}.row button{flex:1}.stat{background:#254c4a;padding:12px;border-radius:12px;margin:15px 0}.stat strong{font-size:26px;display:block}.small{font-size:12px;color:#c3d4d0}.mapwrap{position:relative;overflow:hidden;background:#b2d7e4}#map,#threeLayer{position:absolute;inset:0}#threeLayer{z-index:550;pointer-events:none;opacity:0;transition:opacity .45s;background:linear-gradient(#b8e3f4,#e1f3e8)}#threeLayer.active{pointer-events:auto}#threeLayer canvas{display:block;width:100%;height:100%}.hud{position:absolute;z-index:800;left:14px;bottom:14px;background:#163d43ed;border-radius:10px;padding:10px 13px;max-width:min(480px,90%)}#card{position:absolute;z-index:850;right:20px;top:18px;background:#fff;color:#213b35;border-radius:16px;box-shadow:0 10px 35px #0004;padding:17px;width:min(280px,calc(100% - 35px));display:none}#card h3{margin:0 0 8px}#card button{float:right;padding:4px 9px;background:#e7eeea;color:#203d38}.city-marker{background:white;border:2px solid #248c75;border-radius:16px;padding:5px 9px;font-weight:800;white-space:nowrap;box-shadow:0 3px 9px #0004;color:#145448}.leaflet-container{background:#b2d7e4}.leaflet-control-attribution{font-size:9px}.tip{background:#23494c;padding:10px;border-radius:10px}#enter{background:#f1bc5d;color:#352810} @media(max-width:720px){.layout{grid-template-columns:1fr;grid-template-rows:auto minmax(450px,1fr);height:auto}aside{padding:12px}.mapwrap{height:73vh}header span{font-size:11px}}
+
+.tip button.selected{background:#f1bc5d;color:#352810}.tip .row button{font-size:12px;padding:9px 3px}
+
+#milestones{display:grid;gap:5px;margin-top:9px}
+.milestone{display:flex;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:7px;font-size:12px;background:rgba(255,255,255,.08)}
+.milestone.unlocked{color:#b8edbd}.milestone.locked{color:#aeb6c3}
+.milestone strong{font-variant-numeric:tabular-nums}
+
+/* V4: floating game interface, inspired by cozy low-poly worlds */
+header{background:#173f45}aside{background:#183b40}button{transition:filter .15s,transform .15s}button:hover{filter:brightness(1.12)}
+.v4Top{position:absolute;z-index:700;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;gap:12px;pointer-events:none;color:#fff;text-shadow:0 2px 5px #17343b;background:#173a46c9;border:1px solid #ffffff44;border-radius:15px;padding:12px 17px;backdrop-filter:blur(8px)}
+.v4Top small{opacity:.78}.v4Nav{position:absolute;z-index:810;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:6px;padding:8px;border:1px solid #ffffff70;border-radius:18px;background:#1c4653e8;box-shadow:0 8px 30px #102b3540;backdrop-filter:blur(12px)}
+.v4Nav button{background:transparent;border:0;min-width:68px;display:flex;flex-direction:column;gap:5px;align-items:center;font-size:22px;padding:8px;color:#fff}.v4Nav button:hover{background:#ffffff20}.v4Nav button span{font-size:11px;white-space:nowrap}
+.v4Panel{position:absolute;z-index:900;right:16px;top:76px;bottom:105px;overflow-y:auto;width:min(340px,calc(100% - 32px));background:#f7f7ed;color:#24424a;border-radius:20px;box-shadow:0 16px 45px #0b333d60;padding:23px}.v4Panel[hidden]{display:none}.v4Panel h2{margin:0 35px 15px 0}.v4Panel p{line-height:1.5}.v4Panel button:not(.v4Close){width:100%;margin:6px 0;background:#269c8c}.v4Close{position:absolute;right:14px;top:14px;background:#e2e9e5;color:#27434b;padding:5px 10px}.v4Panel label{display:flex;align-items:center;justify-content:space-between;margin:15px 0;gap:10px}.v4Panel input[type=color]{width:64px;height:35px;padding:2px}.v4Rank{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #dce5e0;gap:8px}.v4Rank b{white-space:nowrap}.v4Note{font-size:12px;color:#61747a}
+.v4Welcome{position:absolute;z-index:760;top:50%;left:50%;transform:translate(-50%,-50%);background:#f8f6e9ed;color:#21444a;padding:24px;border-radius:22px;box-shadow:0 15px 45px #10343b50;width:min(370px,80%);text-align:center}.v4Welcome b{font-size:22px}.v4Welcome p{line-height:1.5}.v4Welcome[hidden]{display:none}.v4Welcome button{background:#f1b75e;color:#423019}
+.hud{bottom:96px;max-width:350px;font-size:11px;opacity:.88}
+@media(max-width:800px){.v4Nav{width:calc(100% - 12px);justify-content:space-around;bottom:8px;gap:0;padding:5px}.v4Nav button{min-width:0;padding:7px 4px;font-size:19px}.v4Nav button span{font-size:9px}.v4Top{font-size:11px;top:7px;left:7px;right:7px;padding:9px}.v4Top small{display:none}.v4Panel{top:62px;bottom:85px}.hud{bottom:85px}}
+
+/* V4.2: brighter cozy city UI */
+.v4Top{background:linear-gradient(110deg,#142c49ed,#244c68d9);border-color:#ffffff60;box-shadow:0 8px 28px #102f4850}
+.v4Nav{background:linear-gradient(110deg,#17304beF,#264969eF);border-color:#c6e9fa9c}
+.v4Nav button:hover{background:#ffffff30;transform:translateY(-2px)}
+.v4Panel{background:#fffdf4}.v4Welcome{background:#fffaf0f5}
+
+/* v4.3 — richer, coherent social-world interface */
+.v4Top{top:0;left:0;right:0;border-radius:0 0 18px 18px;border:0;padding:14px 20px;background:linear-gradient(100deg,#112b4aF5,#1d3d62EE);box-shadow:0 5px 18px #122b4b44;align-items:center;font-size:13px}
+.v4Top>span:first-child{font-size:16px}.v4Top .v4Stats{font-size:12px;letter-spacing:.01em;white-space:nowrap}
+.v4Nav{bottom:15px;border:1px solid #d0e7f3a8;border-radius:23px;background:linear-gradient(120deg,#142f50F5,#213d61F5);box-shadow:0 12px 35px #12294766;padding:8px 13px;gap:4px}
+.v4Nav button{min-width:85px;padding:8px 11px;border-radius:12px}.v4Nav button span{font-size:12px;font-weight:750}
+.v4Panel{background:#fffdf3;border:2px solid #f5ebd4;box-shadow:0 16px 48px #112a4b6b}
+@media(max-width:1050px){.v4Stats{display:none}.v4Nav button{min-width:60px}}
+@media(max-width:720px){.v4Nav button{min-width:0;padding:6px 3px}.v4Nav button span{font-size:9px}.v4Top>span:first-child{font-size:12px}}
+
+/* v4.4: unobtrusive marketing line, no forced entry overlay */
+.v4Top small{display:block;font-size:11px;font-weight:500;color:#c5f1ff;opacity:1;margin-top:3px}
+@media(max-width:800px){.v4Top small{display:block;font-size:9px}}
+
+.earthControls{position:absolute;right:16px;top:94px;z-index:810;display:flex;flex-direction:column;gap:7px;pointer-events:auto}
+.earthControls button{background:#183e53eb;color:#fff;border:1px solid #b6d6e155;border-radius:12px;box-shadow:0 5px 16px #0019;font-size:18px;width:42px;height:42px;padding:0;cursor:pointer}
+.earthControls button:hover{background:#2c718c}
+
+.citySelect{display:block;width:100%;margin:8px 0 10px;padding:11px 9px;background:#12383d;color:#fff;border:1px solid #54948b;border-radius:8px;font:inherit}
+.cityOverview{margin:8px 0 13px;padding:9px;background:#214e50;color:#d4f5e9;border-radius:8px;font-size:12px}
+
+/* v5.2: warmer game-like interface, without heavy visual filters. */
+:root{--accent:#e8b85d;--teal:#269c8d}
+header{background:linear-gradient(100deg,#163f46,#17324d 65%,#224763);box-shadow:0 3px 15px #123a4b35}
+.v4Top{background:linear-gradient(110deg,#1a344eeb,#224d61ec);border-bottom:1px solid #ffffff20}
+.v4Nav{background:linear-gradient(125deg,#173552,#254a69);box-shadow:0 8px 30px #092b4380;border:1px solid #d5e7f324}
+.v4Nav button:hover{background:#376b79}
+button{transition:background .16s,transform .16s}
+button:active{transform:scale(.97)}
+#card,.v4Panel{box-shadow:0 14px 36px #16374c55}
+
+/* Real DOM markers sit in Leaflet's marker pane (z-index 600),
+   above the geographical SVG polygons (overlay pane 400). */
+.south-city-pin{background:transparent;border:0}
+.south-city-pin span{display:block;width:16px;height:16px;margin:3px;border:3px solid white;border-radius:50%;background:#e38c5b;box-shadow:0 2px 9px #173a46a0;box-sizing:border-box}
+.south-city-pin.active-city span{width:22px;height:22px;margin:0;background:#209e8c;border-color:#fff;box-shadow:0 0 0 3px #2a9c8b55,0 2px 10px #173a46a0}
+.property-links{display:flex;flex-direction:column;gap:6px;margin-top:9px;max-height:235px;overflow:auto}
+.property-links button{text-align:left;background:#e8f2ee;color:#173f44;border:1px solid #b6d8d1;border-radius:8px;padding:9px;cursor:pointer;font-weight:600}
+.property-links button:hover{background:#c7e5dc}
+#card{max-height:min(76vh,640px);overflow-y:auto}
+
+.population-control{margin:12px 0;padding:12px;border-radius:12px;background:#204a4e;color:#fff}
+.population-control>label{display:block;font-size:13px;font-weight:600;margin-bottom:9px}
+.population-control input[type=range]{width:100%;accent-color:#f5bb57;cursor:pointer}
+.population-entry{display:flex;align-items:center;gap:7px;margin-top:10px;flex-wrap:wrap}
+.population-entry label{font-size:12px;flex:1 1 100%}
+.population-entry input{width:105px;max-width:45%;background:#fff;color:#19383c;border:1px solid #b3d5d0;border-radius:7px;padding:8px}
+.population-entry button{flex:1;background:#269c8d;color:white;border:0;border-radius:7px;padding:9px;font-weight:700;cursor:pointer}
+.population-control .small{font-size:11px;opacity:.85;line-height:1.45;margin:10px 0 0}
+
+.demo-house-controls{margin:12px 0;padding:12px;background:#f0f7f3;border:1px solid #c6ddd2;border-radius:10px;color:#1c4545}
+.demo-house-controls p{font-size:12px;margin:6px 0 9px}
+.demo-house-controls select{width:100%;max-width:100%}
+.demo-points-row{display:flex;gap:7px;margin-top:8px}
+.demo-points-row input{width:85px;min-width:0;flex:1;border-radius:7px;border:1px solid #b8cec5;padding:8px}
+.demo-points-row button{padding:7px 9px;border-radius:7px;background:#168c83;color:white;border:0;cursor:pointer}
+.demo-house-label{font-weight:700;color:#1a7771}
+
+.garden-unlocks{display:flex;flex-direction:column;gap:5px;margin:10px 0;padding:10px;border-radius:9px;background:#f3f4ed}
+.garden-unlock-item{font-size:12px;color:#777;padding:4px 6px;border-radius:5px}
+.garden-unlock-item.unlocked{color:#215c47;background:#e1f1df;font-weight:600}
+
+/* Four visible, independently selectable variants for each milestone. */
+.garden-choice{display:flex;flex-direction:column;gap:7px;margin-top:10px;padding-top:8px;border-top:1px solid #dce5dc}
+.garden-choice>label{font-weight:700;font-size:12px;color:#2d5145}
+.garden-choice>small{font-size:11px;color:#607a6e}
+.garden-variant-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.garden-variant{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;min-height:74px;padding:7px 3px;border:1px solid #c6d6ce;border-radius:10px;background:#fff;cursor:pointer;color:#345b50;font-size:10px;line-height:1.2;text-align:center;overflow-wrap:anywhere}
+.garden-variant-icon{font-size:24px;line-height:1.2}
+.garden-variant.chosen{border:2px solid #287bc6;background:#eaf4ff;color:#184e80}
+.garden-variant:disabled{cursor:not-allowed;opacity:.45}
+.garden-variant:not(:disabled):hover{background:#e7f2ea}
+
+/* Graphic edition: cohesive sunny city interface */
+.v4Top{background:linear-gradient(105deg,rgba(14,30,44,.95),rgba(24,47,59,.90));border-bottom:1px solid rgba(245,226,179,.27)}
+.v4Nav{background:linear-gradient(120deg,rgba(18,42,61,.96),rgba(29,61,78,.95));border:1px solid rgba(231,244,241,.35);box-shadow:0 12px 36px rgba(7,29,39,.35)}
+.v4Nav button:hover{background:rgba(255,255,255,.16)}
+.v4Panel{background:#fffdf4;border:1px solid #e8dfc9}
+#threeLayer{background:linear-gradient(#8ec5e8,#d4ecdc)}
+
+/* Edizione grafica: visual polish without changing the interface layout */
+#threeLayer{background:linear-gradient(#79b9e2,#c8e4e4)}
+button{transition:background-color .16s ease,box-shadow .16s ease}
+button:hover{filter:brightness(1.065)}
+
+/* v6.8: clearer dark-glass HUD against a more saturated city */
+.v4Top{background:linear-gradient(110deg,rgba(9,25,39,.97),rgba(19,38,52,.92));border-bottom:1px solid rgba(255,236,181,.24)}
+.v4Nav{background:linear-gradient(110deg,rgba(14,43,63,.97),rgba(19,53,74,.96));border:1px solid rgba(225,243,245,.35);box-shadow:0 10px 35px rgba(8,26,39,.38)}
+
+/* 7.0 art direction: saturated city and cleaner navigation */
+.city-view #map .leaflet-control-container{visibility:hidden}
+.v4Top{background:linear-gradient(110deg,rgba(10,27,41,.96),rgba(15,40,53,.93));box-shadow:0 3px 12px #10232b55}
+.v4Nav{background:linear-gradient(115deg,#16394eea,#1b5064ed);border:1px solid #c6dbd7aa;box-shadow:0 10px 28px #08243288}
