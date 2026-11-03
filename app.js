@@ -826,7 +826,7 @@ function selectCity(id,fly=false){
  syncPopulationControls();
  $('card').style.display='none';
  $('search').value=homes[0]?.user||'';
- target={x:0,y:0,z:0};distance=142;azimuth=.72;elevation=.32;
+ target={x:0,y:0,z:0};distance=142;azimuth=.72;elevation=.26;
  updateCitySelection();renderMilestones();
  if(fly){manualCityNavigation=true;map.flyTo([next.lat,next.lng],12,{duration:1.1});map.once('moveend',()=>{manualCityNavigation=false;});}
  else map.setView([next.lat,next.lng],12);
@@ -839,7 +839,7 @@ function cityAtMapCenter(){
   return !best||d<best.distance?{city:c,distance:d}:best;
  },null);
 }
-let count=500,homes=[],threeReady=false,scene,camera,renderer,group,raycaster,houseMeshes=[],shown=0,active=false,target={x:0,y:0,z:0},azimuth=.72,elevation=.32,distance=142,dragging=false,lastX=0,lastY=0,moved=false,panMode=true,pointers=new Map(),gesture=null;
+let count=500,homes=[],threeReady=false,scene,camera,renderer,group,raycaster,houseMeshes=[],shown=0,active=false,target={x:0,y:0,z:0},azimuth=.72,elevation=.26,distance=142,dragging=false,lastX=0,lastY=0,moved=false,panMode=true,pointers=new Map(),gesture=null;
 const rnd=n=>{let x=Math.sin(n*127.13+19.1)*43758.5453;return x-Math.floor(x)};
 // Urban layout v1.4: blocks, NOT one road per house.
 // A block contains 30 private gardens. Streets are only between city blocks.
@@ -1080,11 +1080,11 @@ function installReleaseSky(){
    for(int layer=0;layer<3;layer++){
      float l=float(layer);
      vec2 ridge=ray.xz*(4.+l*2.)+vec2(l*17.,0.);
-     float summit=.025+(.19-l*.033)*pow(noise(ridge),1.5)+.018*noise(ridge*5.);
-     float lightSide=noise(ridge*9.+height*8.);
+     float summit=.007+(.106-l*.017)*pow(noise(ridge),1.7)+.009*noise(ridge*5.);
+     float lightSide=noise(ridge*5.+vec2(height*95.,height*65.));
      vec3 rock=mix(vec3(.27,.49,.65),vec3(.15,.34,.49),l*.35);
      rock*=.85+lightSide*.27;
-     float snow=smoothstep(.109,.145,height+lightSide*.024)*step(.124,summit);
+     float snow=smoothstep(.052,.084,height+lightSide*.015)*step(.071,summit);
      vec3 slope=mix(rock,vec3(.89,.94,.97),snow);
      color=mix(color,slope,1.-smoothstep(summit-.001,summit+.001,height));
    }
@@ -1092,7 +1092,7 @@ function installReleaseSky(){
  }`});
  releaseSky=new THREE.Mesh(new THREE.SphereGeometry(3000,32,20),mat);releaseSky.frustumCulled=false;releaseSky.renderOrder=-1000;scene.add(releaseSky);
 }
-function makeScene(){if(!window.THREE){$('status').textContent='Motore 3D non caricato. Verifica Internet e ricarica.';return false}scene=new THREE.Scene();scene.background=new THREE.Color(0x9bc9e7);scene.fog=new THREE.FogExp2(0xb4d1e2,.000048);installReleaseSky();camera=new THREE.PerspectiveCamera(53,1,2,8000);renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=false;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=0.98;$('threeLayer').appendChild(renderer.domElement);scene.add(new THREE.HemisphereLight(0xc6e4ff,0x998762,.67));let sun=new THREE.DirectionalLight(0xffeed5,1.48);sun.position.set(130,240,90);scene.add(sun);if(window.SudamericaRender8)SudamericaRender8.setup(scene,camera,renderer);let ground=new THREE.Mesh(new THREE.PlaneGeometry(12000,12000),new THREE.MeshStandardMaterial({color:0xc8d5ae,roughness:1,map:homePattern('grass')}));ground.rotation.x=-Math.PI/2;ground.position.y=-.12;ground.receiveShadow=true;scene.add(ground);group=new THREE.Group();scene.add(group);raycaster=new THREE.Raycaster();let canvas=renderer.domElement;
+function makeScene(){if(!window.THREE){$('status').textContent='Motore 3D non caricato. Verifica Internet e ricarica.';return false}scene=new THREE.Scene();scene.background=new THREE.Color(0x9bc9e7);scene.fog=new THREE.FogExp2(0xb4d1e2,.000048);installReleaseSky();camera=new THREE.PerspectiveCamera(53,1,2,8000);renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=false;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=0.98;$('threeLayer').appendChild(renderer.domElement);scene.add(new THREE.HemisphereLight(0xcde6ff,0xb8a98c,1.48));let sun=new THREE.DirectionalLight(0xffeed5,3.05);sun.position.set(130,240,90);scene.add(sun);if(window.SudamericaRender8)SudamericaRender8.setup(scene,camera,renderer);let ground=new THREE.Mesh(new THREE.PlaneGeometry(12000,12000),new THREE.MeshStandardMaterial({color:0xc8d5ae,roughness:1,map:homePattern('grass')}));ground.rotation.x=-Math.PI/2;ground.position.y=-.12;ground.receiveShadow=true;scene.add(ground);group=new THREE.Group();scene.add(group);raycaster=new THREE.Raycaster();let canvas=renderer.domElement;
 // Earth-style navigation: left drag pans the ground, right drag or Shift
 // rotates/tilts, wheel zooms toward the cursor, two fingers pan/pinch/rotate.
 canvas.style.touchAction='none';
@@ -1866,7 +1866,7 @@ function drawRoadNetwork(selected){
   }
   const cells=[...occupied].map(k=>k.split(',').map(Number));
   // Warm concrete, fine asphalt and clear curb edge (no change to roads).
-  const asphalt=0x373d49,sidewalk=0xc4a99e,lane=0xfff7e9;
+  const asphalt=0x474d58,sidewalk=0xc4a99e,lane=0xfff7e9;
   const markChunks=new Map(),markSize=160;
   function mark(w,h,d,x,y,z,color){
     const cx=Math.floor(x/markSize),cz=Math.floor(z/markSize);
