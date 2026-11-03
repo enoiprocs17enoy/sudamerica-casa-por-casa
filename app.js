@@ -1456,9 +1456,27 @@ function drawSpecial(zone){
   if(kind==='park'){
     addBox(3,.10,d-5,x,.16,z,0xe5d8b9);
     addBox(w-5,.10,3,x,.16,z,0xe5d8b9);
-    const fountain=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.4,.5,16),new THREE.MeshLambertMaterial({color:0x7dc9d9}));
-    fountain.position.set(x,.45,z);group.add(fountain);
-    for(let i=0;i<4;i++)addTree(x+(i%2?11:-11),z+(i<2?-11:11),zone.block*10+i);
+    const basin=new THREE.Mesh(new THREE.CylinderGeometry(2.7,2.85,.48,32),
+      new THREE.MeshStandardMaterial({color:0xece0cb,roughness:.79}));
+    basin.position.set(x,.4,z);
+    basin.castShadow=true;
+    basin.receiveShadow=true;
+    group.add(basin);
+    const water=new THREE.Mesh(new THREE.CylinderGeometry(2.46,2.46,.05,32),
+      new THREE.MeshStandardMaterial({color:0x2aaccb,roughness:.19,metalness:.24}));
+    water.position.set(x,.66,z);
+    group.add(water);
+    addBox(.28,1.05,.28,x,1.1,z,0xa8ebf5);
+    for(const side of [-1,1]){
+      for(const end of [-1,1]){
+        addTree(x+side*w*.28,z+end*d*.28,zone.block*10+(side+1)*2+end+1);
+        const bx=x+side*w*.21,bz=z+end*3.25;
+        civicFlowerbed(bx,z+end*d*.38,Math.min(7,w*.24),2.1,zone.block*13+side*2+end);
+        addBox(2.5,.16,.66,bx,.63,bz,0x9e5931);
+        addBox(2.5,.54,.12,bx,.94,bz+end*.28,0xc38043);
+        for(const leg of [-1,1])addBox(.13,.56,.52,bx+leg*.94,.32,bz,0x233942);
+      }
+    }
   }else if(kind==='monument'){
     addBox(w-4,.16,d-4,x,.18,z,0xe5d4b8);
     addBox(8,1.4,8,x,1,z,0xb9b8b3);
