@@ -1660,7 +1660,18 @@ function drawShops(){
     put('signFascia',trim,shop,x,signY,front+.15,w*.84,.57,.22);
     put('signInset',0xe6dfd2,shop,x,signY,front+.275,w*.74,.32,.06);
     const canopyY=signY-.46;
-    if(![6,8,10].includes(shape))put('singleCanopy',trim,shop,x,canopyY,front+.47,w*.81,.13,.76);
+    if(![6,8,10].includes(shape)){
+      put('singleCanopy',trim,shop,x,canopyY,front+.47,w*.81,.13,.76);
+      if(shape!==1){
+        const stripeW=w*.81/11;
+        for(let stripe=0;stripe<11;stripe++){
+          const stripeX=x+(stripe-5)*stripeW;
+          const stripeColor=stripe%2?0xfff1dd:trim;
+          put('shopAwningStripe',stripeColor,shop,stripeX,canopyY+.077,front+.49,stripeW,.033,.76);
+          put('shopAwningValance',stripeColor,shop,stripeX,canopyY-.105,front+.86,stripeW,.22,.065);
+        }
+      }
+    }
     // Rooflines and distinctive category silhouettes.
     if(shape===10){ // Hotel: taller body, upper glazing and a proper portico.
       put('hotelRoof',trim,shop,x,height+.25,z,w+.35,.46,d+.35);
