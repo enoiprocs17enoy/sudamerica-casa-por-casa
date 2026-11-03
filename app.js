@@ -2270,7 +2270,7 @@ function addUrbanLandscaping(selected){
   for(const h of selected)occupied.set(h.blockIndex,true);
   for(const sh of shopPurchases)occupied.set(sh.block,true);
   const cube=new THREE.BoxGeometry(1,1,1),sphere=new THREE.IcosahedronGeometry(1,1),dummy=new THREE.Object3D(),batches=new Map();
-  function item(geo,color,x,y,z,w,h,d){if(!decorationAllowed(x,z,w,d))return;const key=(geo===sphere?'s':'b')+color;
+  function item(geo,color,x,y,z,w,h,d,airborne=false){if(!airborne&&!decorationAllowed(x,z,w,d))return;const key=(geo===sphere?'s':'b')+color;
     if(!batches.has(key))batches.set(key,{geo,color,items:[]});batches.get(key).items.push({x,y,z,w,h,d});}
   for(const block of occupied.keys()){
     const {col,row}=spiralCell(block),{x:bx,z:bz}=blockCenter(col,row);
@@ -2294,10 +2294,10 @@ function addUrbanLandscaping(selected){
     }
     const bounds=blockBounds(block);
     for(const side of [-1,1]){
-      const edgeZ=side<0?bounds.top+1.65:bounds.bottom-1.65;
+      const edgeZ=side<0?bounds.top+.56:bounds.bottom-.56;
       for(let tree=0;tree<4;tree++){
         const edgeX=bounds.left+(bounds.right-bounds.left)*(tree+1)/5;
-        if(!decorationAllowed(edgeX,edgeZ,2.8,2.8))continue;
+        if(!decorationAllowed(edgeX,edgeZ,.55,.55))continue;
         const flowering=(block+tree*3+side+1)%9===0;
         const green=[0x49882a,0x6da733,0x83bb36][(block+tree)%3];
         const color=flowering?0xb14bda:green;
@@ -2307,7 +2307,7 @@ function addUrbanLandscaping(selected){
           const size=leaf===0?1.62:.94+rnd(seed+leaf)*.21;
           item(sphere,coordinatedHouseColor(color,flowering?0xf4b8ff:0xe0ed79,(leaf%3)*.17),
             edgeX+Math.cos(angle)*spread,2.7+(leaf%3)*.45,
-            edgeZ+Math.sin(angle)*spread,size,size*.94,size);
+            edgeZ+Math.sin(angle)*spread,size,size*.94,size,true);
         }
       }
     }
