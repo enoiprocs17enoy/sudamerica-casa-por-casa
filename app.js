@@ -691,7 +691,8 @@ const CITY_CATALOG=[
  {id:'sr-south-drain',name:'South Drain',country:'Suriname',lat:5.9909,lng:-57.1738,pop:29,geoVerified:false},
  {id:'sr-domburg-suriname',name:'Domburg Suriname',country:'Suriname',lat:5.8694,lng:-55.4293,pop:37,geoVerified:false},
  {id:'sr-henar',name:'Henar',country:'Suriname',lat:5.7225,lng:-57.266,pop:38,geoVerified:false},
- {id:'sr-groningen-suriname',name:'Groningen Suriname',country:'Suriname',lat:5.97585,lng:-55.39550,pop:65,geoVerified:false}
+ {id:'sr-groningen-suriname',name:'Groningen Suriname',country:'Suriname',lat:5.97585,lng:-55.39550,pop:65,geoVerified:false},
+ {id:'ar-felix-u-camet',name:'Barrio Félix U. Camet',country:'Argentina',lat:-37.89299,lng:-57.53876,pop:1,geoVerified:true}
 ];
 // Virtual continent: five million simulated residents, apportioned across
 // geographic cities. The 3D renderer opens only one city's sample (<= 5000).
@@ -1030,9 +1031,12 @@ function publicZones(){
 }
 // Stable, city-specific distribution: monolocali, villette, condomini
 // and a minority of tall towers; no reroll when more users arrive.
-const simulatedComment={user:'lazza',cityId:'ar-quilmes',residentId:1};
+const simulatedComments=[
+ {user:'lazza',cityId:'ar-quilmes',residentId:1},
+ {user:'dassell',cityId:'ar-felix-u-camet',residentId:1}
+];
 function demoResidentPoints(i,cityId){
- if(cityId===simulatedComment.cityId&&i===simulatedComment.residentId-1)return 0;
+ if(simulatedComments.some(comment=>comment.cityId===cityId&&comment.residentId===i+1))return 0;
  const citySeed=CITY_CATALOG.findIndex(c=>c.id===cityId)+1;
  const r=rnd((i+1)*71+citySeed*107);
  const magnitude=rnd((i+1)*31+citySeed*43);
@@ -1050,7 +1054,7 @@ function createHomes(n){
     const pos=plotPosition(blockIndex,slot);
     assertInsideParcel('Casa '+(i+1),pos.x,pos.z,15,16,pos);
     result.push({id:i+1,cityId:currentCity.id,blockIndex,slot,...pos,
-      user:currentCity.id===simulatedComment.cityId&&i+1===simulatedComment.residentId?simulatedComment.user:i===0?(currentCity.id==='ar-mar-del-plata'?'Carlos75':'pionero_'+currentCity.id.replace(/[^a-z]/g,'')):i===1?'Lucia_'+currentCity.id.slice(0,2):i===2?'Mateo_'+currentCity.id.slice(0,2):'usuario_'+String(i+1).padStart(5,'0'),
+      user:simulatedComments.find(comment=>comment.cityId===currentCity.id&&comment.residentId===i+1)?.user??(i===0?(currentCity.id==='ar-mar-del-plata'?'Carlos75':'pionero_'+currentCity.id.replace(/[^a-z]/g,'')):i===1?'Lucia_'+currentCity.id.slice(0,2):i===2?'Mateo_'+currentCity.id.slice(0,2):'usuario_'+String(i+1).padStart(5,'0')),
       points:scoreOverrides.get(scoreOverrideKey(currentCity.id,i+1))??demoResidentPoints(i,currentCity.id),
       district:Math.max(Math.abs(pos.col),Math.abs(pos.row)),
       variant:(Math.floor(rnd(i+30)*9)+CITY_CATALOG.indexOf(currentCity))%9,type:(Math.floor(rnd(i+40)*7)+CITY_CATALOG.indexOf(currentCity))%7,garden:rnd(i+231+CITY_CATALOG.indexOf(currentCity)*31)>.24});
@@ -3956,7 +3960,8 @@ $('back').onclick=()=>{back();map.setView([currentCity.lat,currentCity.lng],9)};
 $('close').onclick=()=>{$('card').style.display='none'};
 $('find').onclick=()=>{
  let q=$('search').value.trim().replace(/^@/,'').toLowerCase();
- if(q===simulatedComment.user&&currentCity.id!==simulatedComment.cityId)selectCity(simulatedComment.cityId);
+ const comment=simulatedComments.find(entry=>entry.user===q);
+ if(comment&&currentCity.id!==comment.cityId)selectCity(comment.cityId);
  let h=homes.find(x=>x.user.toLowerCase()===q);
  if(!h){$('status').textContent='Utente non presente in '+currentCity.name;return}
  map.setView([currentCity.lat,currentCity.lng],13);
