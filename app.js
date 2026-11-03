@@ -1285,12 +1285,32 @@ function disposeGroup() {
     if(o.geometry)geometries.add(o.geometry);
     if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>materials.add(m));
   });
-  geometries.forEach(g=>g.dispose());materials.forEach(m=>{if(m.map&&!Object.values(homeTextures).includes(m.map))m.map.dispose();m.dispose()});
+  geometries.forEach(g=>g.dispose());materials.forEach(m=>{if(m.map&&!Object.values(homeTextures).includes(m.map))m.map.dispose();if(!streetSurfaceMaterials||![...streetSurfaceMaterials.values()].includes(m))m.dispose()});
   group.clear();
   houseMeshes = [];
 }
+let streetSurfaceMaterials;
+function streetSurfaceMaterial(color){
+ if(!streetSurfaceMaterials)streetSurfaceMaterials=new Map();
+ if(streetSurfaceMaterials.has(color))return streetSurfaceMaterials.get(color);
+ const asphalt=color===0x474d58;
+ const material=new THREE.MeshStandardMaterial({color,roughness:asphalt?.94:.82});
+ material.onBeforeCompile=shader=>{
+   shader.vertexShader='varying vec3 citySurface;\n'+shader.vertexShader.replace(
+     '#include <begin_vertex>',
+     '#include <begin_vertex>\ncitySurface=(modelMatrix*vec4(position,1.)).xyz;');
+   shader.fragmentShader='varying vec3 citySurface;\n'+shader.fragmentShader.replace(
+     '#include <color_fragment>',
+     '#include <color_fragment>\n'+(asphalt?
+       'vec2 grain=floor(citySurface.xz*36.); float fleck=fract(sin(dot(grain,vec2(27.1,61.7)))*43758.5); float detail=1.-smoothstep(.012,.043,max(length(dFdx(citySurface.xz)),length(dFdy(citySurface.xz)))); diffuseColor.rgb*=1.+(fleck-.5)*.21*detail;':
+       'vec2 slab=citySurface.xz*vec2(2.4,1.9); slab.x+=mod(floor(slab.y),2.)*.5; vec2 edge=min(fract(slab),1.-fract(slab)); float seam=smoothstep(.015,.055,min(edge.x,edge.y)); diffuseColor.rgb*=mix(.70,1.04,seam);'));
+ };
+ material.customProgramCacheKey=()=>asphalt?'city-asphalt':'city-pavers';
+ streetSurfaceMaterials.set(color,material);
+ return material;
+}
 function addBox(w,h,d,x,y,z,color) {
-  const mesh = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), new THREE.MeshLambertMaterial({color}));
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), color===0x474d58||color===0xc4a99e ? streetSurfaceMaterial(color) : new THREE.MeshLambertMaterial({color}));
   mesh.position.set(x,y,z);
   mesh.receiveShadow=w>=2||d>=2;
   mesh.castShadow=h>=.65&&w>=.15&&d>=.15;
