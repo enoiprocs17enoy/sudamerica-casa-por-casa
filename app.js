@@ -2550,8 +2550,9 @@ function homeNormalPattern(kind){
  const ctx=canvas.getContext('2d'),img=ctx.createImageData(size,size);
  function relief(x,y){
   if(kind==='roof'){
-   const row=Math.floor(y/16),xx=(x+((row%2)*12))%24,yy=y%16;
-   return (xx<2?-.45:0)+(yy<2?-.52:0)+Math.sin(xx*Math.PI/24)*.13;
+   const row=Math.floor(y/11),xx=(x-(row%2)*8+256)%16,yy=y%11;
+   const roll=Math.pow(Math.sin(xx*Math.PI/16),1.8);
+   return roll*.88*(.65+yy*.035)-(yy<1?.35:0);
   }
   return Math.sin(x*.43+y*.7)*.14+Math.sin(x*.13-y*.22)*.12;
  }
@@ -3077,7 +3078,7 @@ function renderAllHouses(selected){
      color:batch.color,
      map:/(Roof|roof|gable|hip|flatRoof|towerTop|cornice)/i.test(key)?homePattern('roof'):/(Wall|body|towerBase|wing|topSetback|penthouse|bay|longWing)/i.test(key)?homePattern('wall'):null,
      normalMap:/(Roof|roof|gable|hip|flatRoof|towerTop|cornice)/i.test(key)?homeNormalPattern('roof'):/(Wall|body|towerBase|wing|topSetback|penthouse|bay|longWing)/i.test(key)?homeNormalPattern('wall'):null,
-     normalScale:new THREE.Vector2(.56,.56),
+     normalScale:/(Roof|roof|gable|hip)/.test(key)?new THREE.Vector2(.88,.88):new THREE.Vector2(.56,.56),
      side:batch.geo===roofGeo?THREE.DoubleSide:THREE.FrontSide,
      roughness:/(Window|Glass|Mullion)/i.test(key)?.26:/(Roof|roof)/i.test(key)?.79:.87,
      metalness:/(Mullion|Sconce|Handle)/i.test(key)?.48:.02,
