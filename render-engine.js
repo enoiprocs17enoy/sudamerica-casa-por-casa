@@ -34,7 +34,7 @@
   });
  }
  function render(scene,camera,renderer){
-  const city=scene.getObjectByName('city-geometry');
+  const city=scene.children.find(child=>child.name==='city-geometry');
   if(city!==previousCity){shadowDirty=true;previousCity=city;}
   const now=performance.now();
   const elapsed=lastFrame?now-lastFrame:0;
@@ -42,9 +42,10 @@
   if(elapsed>0&&!document.hidden){
    frameTimes[frames++%frameTimes.length]=elapsed;
   }
-  if(elapsed>0&&elapsed<150&&!document.hidden){
-   averageFrame+=(elapsed-averageFrame)*.06;
-   if(++samples>=90){
+  if(elapsed>0&&elapsed<1000&&!document.hidden){
+   const sample=Math.min(elapsed,180);
+   averageFrame+=(sample-averageFrame)*.06;
+   if(++samples>=(averageFrame>27?30:90)){
     const ratio=renderer.getPixelRatio();
     const minimum=Math.min(.78,maxRatio);
     const next=averageFrame>27?Math.max(minimum,ratio-.15):
