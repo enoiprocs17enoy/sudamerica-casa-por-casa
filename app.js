@@ -3185,6 +3185,23 @@ function renderAllHouses(selected){
         }
         place('premiumEntranceCanopy',boxGeo,trim,h,x,2.62,
           z+footD/2+.35,3.8,.24,.72);
+        const stone=coordinatedHouseColor(wall,0xffefd4,.52);
+        const baseZ=z+footD/2;
+        place('premiumTowerPortal',boxGeo,stone,h,x,1.25,baseZ+.12,2.18,2.50,.24);
+        place('premiumTowerDoorGlass',boxGeo,0x36728b,h,x,1.08,baseZ+.28,1.66,2.15,.11);
+        place('premiumTowerEntryStep',boxGeo,stone,h,x,.12,baseZ+.52,3.46,.22,.91);
+        for(const side of [-1,1]){
+          const pierX=x+side*footW*.445;
+          place('premiumTowerPier',boxGeo,stone,h,pierX,height*.52,baseZ+.11,.24,height*.87,.22);
+          place('premiumTowerPortalLamp',boxGeo,0xffd17e,h,x+side*1.48,2.02,baseZ+.31,.24,.34,.17);
+          place('premiumTowerEntryPlanter',boxGeo,trim,h,x+side*2.10,.31,baseZ+.68,.77,.48,.58);
+          place('premiumTowerEntryPlant',domeGeo,0x5f8c43,h,x+side*2.10,.65,baseZ+.68,.65,.43,.51);
+        }
+        for(const face of [-1,1]){
+          place('premiumTowerBaseBand',boxGeo,stone,h,x,2.92,z+face*(footD/2+.10),footW+.12,.18,.26);
+          place('premiumTowerCrownBand',boxGeo,stone,h,x,height-.16,z+face*(footD/2+.10),footW+.12,.26,.27);
+        }
+
       }
       // Rooftop amenities are instanced just like the buildings. The four
       // choices have DIFFERENT silhouettes, not only different colors.
