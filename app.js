@@ -1082,10 +1082,18 @@ function buildRegionalLandscape(houses){
  const angle=coast?.[0]||0;
  const east=Math.sin(angle),south=Math.cos(angle);
  let minX=0,maxX=0,minZ=0,maxZ=0,shore=0;
- for(const lot of [...houses,...shopPurchases,...publicZones().map(zone=>facilityBounds(zone.block))]){
-  minX=Math.min(minX,lot.x);maxX=Math.max(maxX,lot.x);
-  minZ=Math.min(minZ,lot.z);maxZ=Math.max(maxZ,lot.z);
-  shore=Math.max(shore,lot.x*east+lot.z*south);
+ const developed=new Set(houses.map(house=>house.blockIndex));
+ for(const shop of shopPurchases)developed.add(shop.block);
+ for(const zone of publicZones())developed.add(zone.block);
+ const cleared=new Set();
+ for(const block of developed){
+  const {col,row}=spiralCell(block);
+  cleared.add(col+':'+row);
+  const {x,z}=blockCenter(col,row);
+  const halfX=BLOCK_X/2,halfZ=BLOCK_Z/2;
+  minX=Math.min(minX,x-halfX);maxX=Math.max(maxX,x+halfX);
+  minZ=Math.min(minZ,z-halfZ);maxZ=Math.max(maxZ,z+halfZ);
+  shore=Math.max(shore,x*east+z*south+Math.abs(east)*halfX+Math.abs(south)*halfZ);
  }
  shore+=85+(coast?.[1]||0)*12;
  if(coast){
@@ -1109,7 +1117,14 @@ function buildRegionalLandscape(houses){
  for(let i=0;i<2100;i++){
   const x=minX-520+rnd(i*31+city.lng)*(maxX-minX+1040);
   const z=minZ-520+rnd(i*51+city.lat)*(maxZ-minZ+1040);
-  if(x>minX-67&&x<maxX+67&&z>minZ-67&&z<maxZ+67)continue;
+  const margin=28;
+  let nearDevelopment=false;
+  for(let col=Math.round((x-margin)/BLOCK_X);col<=Math.round((x+margin)/BLOCK_X);col++){
+   for(let row=Math.round((z-margin)/BLOCK_Z);row<=Math.round((z+margin)/BLOCK_Z);row++){
+    if(cleared.has(col+':'+row))nearDevelopment=true;
+   }
+  }
+  if(nearDevelopment)continue;
   if(coast&&x*east+z*south>shore-30)continue;
   const grove=Math.sin(x*.018)*Math.cos(z*.021);
   if(rnd(i*79)>.63+grove*.31)continue;
