@@ -1112,6 +1112,36 @@ function buildRegionalLandscape(houses){
  const sky=releaseSky.material.uniforms;
  sky.ridgeDirection.value.set(Math.sin(mountain.angle),Math.cos(mountain.angle));
  sky.ridgeStrength.value=mountain.strength;
+ if(mountain.strength>.12){
+  const axisX=Math.sin(mountain.angle),axisZ=Math.cos(mountain.angle);
+  const edge=Math.max(minX*axisX,maxX*axisX)+Math.max(minZ*axisZ,maxZ*axisZ);
+  const ridgeWidth=Math.min(6800,Math.max(1700,maxZ-minZ+1200));
+  const ridgeDepth=560;
+  const terrain=new THREE.PlaneGeometry(ridgeWidth,ridgeDepth,108,18);
+  terrain.rotateX(-Math.PI/2);
+  const position=terrain.attributes.position;
+  const colors=[];
+  const groundTint=new THREE.Color();
+  const seed=city.lat*17+city.lng*9;
+  for(let index=0;index<position.count;index++){
+   const u=position.getX(index),v=position.getZ(index);
+   const along=edge+160+ridgeDepth*.5+v;
+   const x=axisX*along+axisZ*u,z=axisZ*along-axisX*u;
+   const depthFade=Math.sin(Math.PI*(v/ridgeDepth+.5));
+   const ridge=.55+.24*Math.sin(u*.012+seed)+.16*Math.cos(u*.031-v*.015);
+   const peak=depthFade*depthFade*Math.max(.15,ridge)*mountain.strength*235;
+   const dry=coast&&x*east+z*south>=shore-19;
+   const y=dry?-.15:peak-.14;
+   position.setXYZ(index,x,y,z);
+   groundTint.setHSL(.22-Math.min(.15,peak/900),.26,.29+Math.min(.25,peak/370));
+   colors.push(groundTint.r,groundTint.g,groundTint.b);
+  }
+  terrain.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
+  terrain.computeVertexNormals();
+  const foothills=new THREE.Mesh(terrain,new THREE.MeshStandardMaterial({vertexColors:true,roughness:1}));
+  group.add(foothills);
+ }
+
 
  const candidates=[];
  for(let i=0;i<2100;i++){
