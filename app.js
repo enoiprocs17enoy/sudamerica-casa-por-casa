@@ -1850,7 +1850,11 @@ function drawShops(){
         mark(0,0,1.69,.95,0xe1a34c,'tradeSculpt',0,.96);
         for(const score of [-.40,0,.40])mark(score,.39,.10,.08,0xffd287,'tradeSculpt',0,.44);
       }else if(shape===8){ // Clapperboard with a projecting hinged top
-        mark(0,-.19,1.42,.82,0x343d51,'tradeMark',0,.52);
+        mark(0,-.19,1.42,.82,0xf2d9a9,'tradeMark',0,.52);
+        for(const face of [-1,1]){
+          mark(0,-.04,1.12,.13,0x38445b,'tradeMark',face*.27,.045);
+          mark(0,-.31,.84,.095,0x56627a,'tradeMark',face*.27,.045);
+        }
         mark(0,.37,1.48,.22,ivory,'tradeMark',0,.58);
         for(const slash of [-.45,0,.45])mark(slash,.37,.17,.24,0x343d51,'tradeMark',0,.59);
         mark(-.61,.21,.24,.22,0xc38c50,'tradeRound',0,.62);
