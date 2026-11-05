@@ -4373,10 +4373,12 @@ function buildResidentBatches(people){
   {name:'torso',geo:new THREE.CylinderGeometry(.43,.52,1.25,7),y:1.12},
   {name:'head',geo:new THREE.SphereGeometry(.44,9,7),y:1.95},
   {name:'hair',geo:new THREE.SphereGeometry(.39,8,5,0,Math.PI*2,0,Math.PI*.46),y:2.08},
-  {name:'legs',geo:new THREE.BoxGeometry(.2,.7,.22),y:.38,legs:true}
+  {name:'legs',geo:new THREE.CylinderGeometry(.11,.09,.69,6),y:.39,pair:true,lateral:.19,stride:1},
+  {name:'arms',geo:new THREE.CapsuleGeometry(.082,.42,2,5),y:1.10,pair:true,lateral:.43,stride:-.74},
+  {name:'shoes',geo:new THREE.BoxGeometry(.22,.14,.35),y:.095,pair:true,lateral:.19,stride:1}
  ];
  const meshes=specs.map(spec=>{
-  const mesh=new THREE.InstancedMesh(spec.geo,new THREE.MeshLambertMaterial({color:0xffffff}),n*(spec.legs?2:1));
+  const mesh=new THREE.InstancedMesh(spec.geo,new THREE.MeshLambertMaterial({color:0xffffff}),n*(spec.pair?2:1));
   mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   mesh.frustumCulled=false;
   group.add(mesh);
@@ -4393,6 +4395,12 @@ function buildResidentBatches(people){
   meshes[1].setColorAt(i,new THREE.Color(i===0?v4.skin:skin[i%4]));
   meshes[2].setColorAt(i,new THREE.Color(hair[i%3]));
   meshes[3].setColorAt(2*i,legColor);meshes[3].setColorAt(2*i+1,legColor);
+  const armColor=new THREE.Color(i===0?v4.skin:skin[i%4]);
+  const shoeColor=new THREE.Color(i%2?0x39363b:0x645141);
+  for(let side=0;side<2;side++){
+   meshes[4].setColorAt(i*2+side,armColor);
+   meshes[5].setColorAt(i*2+side,shoeColor);
+  }
   updateResidentMatrix(i);
  }
  for(const mesh of meshes){mesh.instanceMatrix.needsUpdate=true;mesh.instanceColor.needsUpdate=true;}
@@ -4401,14 +4409,19 @@ function updateResidentMatrix(i){
  if(!residentBatches)return;
  const {people,meshes,specs,dummy}=residentBatches;
  const a=people[i];const pos=a.g.position;
+ const c=Math.cos(a.g.rotation.y),si=Math.sin(a.g.rotation.y);
  for(let j=0;j<specs.length;j++){
   const spec=specs[j],mesh=meshes[j];
-  const copies=spec.legs?2:1;
+  const copies=spec.pair?2:1;
   for(let k=0;k<copies;k++){
-   const xx=spec.legs?(k===0?-.2:.2):0;
-   const c=Math.cos(a.g.rotation.y),si=Math.sin(a.g.rotation.y);
-   dummy.position.set(pos.x+(xx*c)*RESIDENT_SCALE,pos.y+spec.y*RESIDENT_SCALE,pos.z-xx*si*RESIDENT_SCALE);
-   dummy.rotation.set(0,a.g.rotation.y,0);
+   const side=k===0?-1:1;
+   const xx=spec.pair?side*spec.lateral:0;
+   const swing=(a.gait||0)*side*(spec.stride||0);
+   const zz=swing*.19+(spec.name==='shoes'?-.07:0);
+   dummy.position.set(pos.x+(xx*c+zz*si)*RESIDENT_SCALE,
+    pos.y+(spec.y+(spec.name==='shoes'?Math.max(0,swing)*.07:0))*RESIDENT_SCALE,
+    pos.z+(zz*c-xx*si)*RESIDENT_SCALE);
+   dummy.rotation.set(swing*.38,a.g.rotation.y,0,'YXZ');
    dummy.scale.setScalar(RESIDENT_SCALE);dummy.updateMatrix();
    mesh.setMatrixAt(i*copies+k,dummy.matrix);
   }
@@ -4645,6 +4658,7 @@ function updateAvatarLabels(t){
 }
 let lastPeopleTick=0;
 function animateLife(t){if(!active||!v4.motion)return;
+ const walkPhase=t*7.2;
  // At 5,000 residents, update only the nearest 160 residents at ~12 FPS.
  // Everyone else remains visible and selectable in their current position.
  if(t-lastPeopleTick>.085){
@@ -4663,7 +4677,8 @@ function animateLife(t){if(!active||!v4.motion)return;
    a.g.position.z=pt.z;
    a.g.rotation.y=pt.angle;
    a.g.position.y=a.mode===0?0:Math.abs(Math.sin(t*3+a.i))*.07;
-   updateResidentMatrix(a.i);
+   a.gait=Math.sin(walkPhase+a.phase);
+    updateResidentMatrix(a.i);
   }
   if(residentBatches)for(const mesh of residentBatches.meshes)mesh.instanceMatrix.needsUpdate=true;
   if(window.v49Focus){
