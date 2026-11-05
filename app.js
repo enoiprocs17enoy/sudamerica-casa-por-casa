@@ -1112,6 +1112,7 @@ function buildRegionalLandscape(houses){
  const sky=releaseSky.material.uniforms;
  sky.ridgeDirection.value.set(Math.sin(mountain.angle),Math.cos(mountain.angle));
  sky.ridgeStrength.value=mountain.strength;
+ let terrainHeight=()=>0;
  if(mountain.strength>.12){
   const axisX=Math.sin(mountain.angle),axisZ=Math.cos(mountain.angle);
   const edge=Math.max(minX*axisX,maxX*axisX)+Math.max(minZ*axisZ,maxZ*axisZ);
@@ -1123,13 +1124,19 @@ function buildRegionalLandscape(houses){
   const colors=[];
   const groundTint=new THREE.Color();
   const seed=city.lat*17+city.lng*9;
+  function elevation(u,v){
+   if(Math.abs(u)>ridgeWidth/2||Math.abs(v)>ridgeDepth/2)return 0;
+   const fade=Math.sin(Math.PI*(v/ridgeDepth+.5));
+   const ridge=.55+.24*Math.sin(u*.012+seed)+.16*Math.cos(u*.031-v*.015);
+   return fade*fade*Math.max(.15,ridge)*mountain.strength*235;
+  }
+  terrainHeight=(x,z)=>elevation(axisZ*x-axisX*z,axisX*x+axisZ*z-edge-160-ridgeDepth*.5);
+
   for(let index=0;index<position.count;index++){
    const u=position.getX(index),v=position.getZ(index);
    const along=edge+160+ridgeDepth*.5+v;
    const x=axisX*along+axisZ*u,z=axisZ*along-axisX*u;
-   const depthFade=Math.sin(Math.PI*(v/ridgeDepth+.5));
-   const ridge=.55+.24*Math.sin(u*.012+seed)+.16*Math.cos(u*.031-v*.015);
-   const peak=depthFade*depthFade*Math.max(.15,ridge)*mountain.strength*235;
+   const peak=elevation(u,v);
    const dry=coast&&x*east+z*south>=shore-19;
    const y=dry?-.15:peak-.14;
    position.setXYZ(index,x,y,z);
@@ -1158,7 +1165,7 @@ function buildRegionalLandscape(houses){
   if(coast&&x*east+z*south>shore-30)continue;
   const grove=Math.sin(x*.018)*Math.cos(z*.021);
   if(rnd(i*79)>.63+grove*.31)continue;
-  candidates.push({x,z,i});
+  candidates.push({x,z,i,y:Math.max(0,terrainHeight(x,z)-.15)});
  }
  const canopy=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,1),
   new THREE.MeshStandardMaterial({roughness:1}),candidates.length);
@@ -1166,14 +1173,14 @@ function buildRegionalLandscape(houses){
   new THREE.MeshStandardMaterial({color:0x645039,roughness:1}),candidates.length);
  const dummy=new THREE.Object3D();
  const color=new THREE.Color();
- candidates.forEach(({x,z,i},index)=>{
+ candidates.forEach(({x,z,i,y},index)=>{
   const size=3+rnd(i*21)*5;
   const trunkHeight=size*.71;
-  dummy.position.set(x,trunkHeight*.5,z);
+  dummy.position.set(x,y+trunkHeight*.5,z);
   dummy.scale.set(size*.20,trunkHeight,size*.20);
   dummy.updateMatrix();
   trunks.setMatrixAt(index,dummy.matrix);
-  dummy.position.set(x,trunkHeight+size*.39,z);
+  dummy.position.set(x,y+trunkHeight+size*.39,z);
   const tall=rnd(i*63)>.65;
   dummy.scale.set(size*(tall?.52:.88),size*(tall?1.20:.72),size*(tall?.52:.83));
   dummy.rotation.y=rnd(i*87)*Math.PI;
