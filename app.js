@@ -4044,7 +4044,7 @@ function rebuild(){
  const builtGroup=group,builtHouseMeshes=houseMeshes;
  group=previousGroup;
  try{disposeGroup();scene.remove(previousGroup)}catch(err){console.error('Pulizia scena',err)}
- group=builtGroup;houseMeshes=builtHouseMeshes;
+ group=builtGroup;group.name='city-geometry';houseMeshes=builtHouseMeshes;
  $('status').textContent=errors.length
   ?'Città parzialmente recuperata: '+errors.join(' | ')
   :`${currentCity.name} · ${selected.length.toLocaleString('it-IT')} case · ${shopPurchases.length.toLocaleString('it-IT')} negozi · ${publicZones().length} strutture pubbliche`;
