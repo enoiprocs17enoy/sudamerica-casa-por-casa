@@ -1007,6 +1007,16 @@ function assertInsideParcel(label,x,z,w,d,b){
   if(!isInsideParcel(x,z,w,d,b))throw Error(label+' invade strada/lotto: '+JSON.stringify({x,z,w,d,b}));
 }
 const shopPurchases=[];
+const shopProgress=new Map();
+try {
+ const saved=JSON.parse(localStorage.getItem('sudamerica-shop-progress')||'[]');
+ for(const [key,value] of saved){
+  if(Number.isFinite(value?.points)&&value.points>=0)shopProgress.set(key,value);
+ }
+}catch{}
+function shopProgressFor(shop){
+ return shopProgress.get(scoreOverrideKey(currentCity.id,shop.id))||{points:0,premium:false};
+}
 function facadeAngle(plot){return plot.lz===0?Math.PI:0}
 function shopLot(id){
   const {block,slot}=ensurePlots('shop',id);
@@ -1610,7 +1620,7 @@ function drawShops(){
   bar.rotateZ(Math.PI/2);
   const cup=new THREE.CylinderGeometry(.5,.34,1,20);
   const handle=new THREE.TorusGeometry(.32,.10,8,18);
-  const structuralKinds=new Set(['cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeMark','tradeRound','tradeDress','tradeSculpt','tradeBar','shopPaving','body','roof','hotelRoof','cinemaRoof',
+  const structuralKinds=new Set(['cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeMark','tradeRound','tradeDress','tradeSculpt','tradeBar','shopPaving','shopUpperBody','shopUpperGlass','shopUpperCap','body','roof','hotelRoof','cinemaRoof',
       'garageRoof','superRoof','displayGlass','entryDoor','entryDoorGlass',
       'signFascia','signInset','garageGate','cinemaParapet','hotelUpperWindow']);
   function put(kind,color,shop,x,y,z,w,h,d){
@@ -1639,6 +1649,32 @@ function drawShops(){
     put('shopPaving',[0xaba99f,0xb8b5a9,0x9ba9a8][seed%3],shop,x,.055,z,17.7,.06,17.5);
     put('body',style.walls,shop,x,height/2,z,w,height,d);
     const front=z+d/2, trim=style.trim, glass=style.glass;
+    const progress=shopProgressFor(shop);
+    const stage=houseTier(progress.points);
+    for(let floor=0;floor<stage;floor++){
+      const width=w*(.86-floor*.045),depth=d*(.72-floor*.043);
+      const centerZ=z-d*.08, floorY=height+.46+floor*2.65;
+      put('shopUpperBody',style.walls,shop,x,floorY+1.325,centerZ,width,2.65,depth);
+      put('shopUpperCap',trim,shop,x,floorY+2.58,centerZ,width+.23,.19,depth+.23);
+      for(const face of [-1,1])for(const column of [-1,0,1]){
+        const wx=x+column*width*.28,wz=centerZ+face*(depth/2+.052);
+        put('shopUpperGlass',glass,shop,wx,floorY+1.42,wz,width*.19,1.28,.10);
+        if(progress.premium){
+          put('shopUpperSill',0xf2dfbf,shop,wx,floorY+.73,wz+face*.09,width*.23,.16,.25);
+          put('shopUpperMullion',0xf2dfbf,shop,wx,floorY+1.42,wz+face*.09,.07,1.28,.08);
+        }
+      }
+    }
+    if(progress.premium){
+      put('shopPremiumCornice',0xf2dfbf,shop,x,height-.12,front+.14,w,.25,.34);
+      for(const side of [-1,1]){
+        const px=x+side*w*.44;
+        put('shopPremiumPilaster',0xf2dfbf,shop,px,height*.47,front+.16,.29,height*.89,.28);
+        put('shopPremiumLamp',0xffd887,shop,px,height*.64,front+.35,.23,.36,.18);
+        put('shopPremiumPlanter',trim,shop,px,.30,front+.93,.64,.47,.52);
+        put('shopPremiumPlant',0x648e40,shop,px,.65,front+.93,.48,.36,.43);
+      }
+    }
     if(shape===0){
       put('cafeCupSign',0xffefcd,shop,x,height+.93,front-.65,1.68,1.26,1.59);
       put('cafeHandleSign',0xffefcd,shop,x+.84,height+.94,front-.65,1.17,1.22,1.16);
@@ -3943,8 +3979,34 @@ function showOwnerCard(h,kind='casa',selected=null){
  const details=$('details');details.replaceChildren();
  const info=document.createElement('div');
  const title=kind==='negozio'?selected?.business||'Negozio':kind==='mongolfiera'?'Mongolfiera':kind==='persona'?'Personaggio':'Casa';
- info.innerHTML='<b>'+title+' · '+currentCity.name+'</b><p>⭐ '+h.points.toLocaleString('it-IT')+' punti</p><p>🌿 Giardino: '+(h.points<1?'non sbloccato':GARDEN_CATALOG[0].options[housePlant(h)]+' · '+(isPremiumHouse(h)?4:2)+' piante')+'</p><p>🎨 Colore: '+housePaint(h).name+'</p><p>🏗️ '+tier.name+' · '+tier.levels+' piani</p><p>🎨 Design: '+(isPremiumHouse(h)?'Premium (abbonamento demo)':'Gratis')+'</p><p>🏠 Casa #'+String(h.id).padStart(5,'0')+'</p>';
+ if(kind==='negozio'&&selected){
+  const progress=shopProgressFor(selected);
+  info.textContent=title+' · '+currentCity.name+' · '+progress.points.toLocaleString('it-IT')+' punti';
+ }else info.innerHTML='<b>'+title+' · '+currentCity.name+'</b><p>⭐ '+h.points.toLocaleString('it-IT')+' punti</p><p>🌿 Giardino: '+(h.points<1?'non sbloccato':GARDEN_CATALOG[0].options[housePlant(h)]+' · '+(isPremiumHouse(h)?4:2)+' piante')+'</p><p>🎨 Colore: '+housePaint(h).name+'</p><p>🏗️ '+tier.name+' · '+tier.levels+' piani</p><p>🎨 Design: '+(isPremiumHouse(h)?'Premium (abbonamento demo)':'Gratis')+'</p><p>🏠 Casa #'+String(h.id).padStart(5,'0')+'</p>';
  details.appendChild(info);
+ if(kind==='negozio'&&selected){
+  const progress=shopProgressFor(selected);
+  const panel=document.createElement('div');panel.className='demo-house-controls';
+  const heading=document.createElement('strong');heading.textContent='Evoluzione attività';
+  const stage=document.createElement('select');stage.className='citySelect';
+  stage.setAttribute('aria-label','Evoluzione attività');
+  HOUSE_TIERS.forEach((tier,index)=>{
+   const label='Livello '+(index+1)+' · '+tier.min.toLocaleString('it-IT')+' punti';
+   stage.add(new Option(label,String(tier.min)));
+  });
+  stage.value=String(HOUSE_TIERS[houseTier(progress.points)].min);
+  const premium=document.createElement('input');premium.type='checkbox';premium.checked=progress.premium;
+  const label=document.createElement('label');label.append(premium,' Design Premium (demo)');
+  const apply=document.createElement('button');apply.textContent='Applica evoluzione';
+  apply.onclick=()=>{
+   shopProgress.set(scoreOverrideKey(currentCity.id,selected.id),{points:Number(stage.value),premium:premium.checked});
+   try{localStorage.setItem('sudamerica-shop-progress',JSON.stringify([...shopProgress]));}catch{}
+   if(active)rebuild();
+   showShopCard(selected);
+  };
+  panel.append(heading,stage,label,apply);
+  details.appendChild(panel);
+ }
  if(kind==='casa'){
   selectedDemoHouseId=h.id;
   updateDemoHouseLabel();
