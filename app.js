@@ -4463,7 +4463,7 @@ function spreadIndex(i,n,length){
 // Each resident retains a unique selectable position and ownership record.
 const RESIDENT_SCALE=.90;
 let residentBatches=null;
-let residentLayer=null;
+
 function buildResidentBatches(people){
  const n=people.length;if(!n)return;
  const specs=[
@@ -4643,10 +4643,6 @@ function flightClearance(group){
 }
 function createV4Life(selected){
  life.people.length=0;life.birds.length=0;life.balloons.length=0;residentBatches=null;
- if(residentLayer){scene.remove(residentLayer);residentLayer.traverse(o=>{
-  if(o.isMesh){o.geometry.dispose();o.material.dispose();}
- });}
- residentLayer=new THREE.Group();scene.add(residentLayer);
  if(!selected.length)return;
  const clearance=flightClearance(group);
  // A sampled owner is visible in every district; the first user's avatar
@@ -4656,24 +4652,7 @@ function createV4Life(selected){
   const h=selected[spreadIndex(i,peopleCount,selected.length)];
   life.people.push(v45Avatar(h,i));
  }
- if(life.people.length<=120){
-  // Reliable mesh-based pedestrians for small and medium simulations.
-  // Every visible avatar is parented to its own animated walk transform.
-  const visibleCount=Math.min(120,life.people.length);
-  for(let k=0;k<visibleCount;k++){
-   const a=life.people[spreadIndex(k,visibleCount,life.people.length)];
-   const torso=v4Mesh(new THREE.CylinderGeometry(.34,.41,1.08,8),
-      a.i===0?v4.shirt:['#e9867c','#75b4cf','#edbf69','#9b8ac5','#75b67b'][a.i%5],a.g,0,1.04,0);
-   v4Mesh(new THREE.SphereGeometry(.36,10,8),
-      a.i===0?v4.skin:['#e4b28e','#b47d5e','#f1c9a2','#d99a78'][a.i%4],a.g,0,1.82,0);
-   v4Mesh(new THREE.SphereGeometry(.33,9,6,0,Math.PI*2,0,Math.PI*.46),
-      [0x5e4238,0x9a704c,0x33343c][a.i%3],a.g,0,1.94,0);
-   for(const side of [-1,1])v4Mesh(new THREE.BoxGeometry(.17,.57,.19),
-      0x586b82,a.g,side*.17,.31,0);
-   residentLayer.add(a.g);
-  }
- }
- if(life.people.length>120)buildResidentBatches(life.people);
+ buildResidentBatches(life.people);
  // Bird populations are scattered over the FULL settled city. Small flocks
  // fly near distinct houses, not hundreds orbiting the first block.
  // One small flock per 12 occupied houses: one house -> one flock,
@@ -4774,15 +4753,16 @@ function animateLife(t){if(!active||!v4.motion)return;
    a.g.position.z=pt.z;
    a.g.rotation.y=pt.angle;
    a.g.position.y=a.mode===0?0:Math.abs(Math.sin(t*3+a.i))*.07;
-   a.gait=Math.sin(walkPhase+a.phase);
-    updateResidentMatrix(a.i);
+   a.gait=a.mode===0?0:Math.sin(walkPhase+a.phase);
+   updateResidentMatrix(a.i);
+   const label=avatarLabels.get(a.home.id);
+   if(label)label.position.set(a.g.position.x,a.g.position.y+3.1,a.g.position.z);
   }
   if(residentBatches)for(const mesh of residentBatches.meshes)mesh.instanceMatrix.needsUpdate=true;
   if(window.v49Focus){
    const {group:marker,person}=window.v49Focus;
    marker.position.set(person.g.position.x,0,person.g.position.z);
   }
-  for(const a of life.people){const label=avatarLabels.get(a.home.id);if(label)label.position.set(a.g.position.x,a.g.position.y+3.1,a.g.position.z);}
  }
  for(const b of life.birds){
   const ang=t*.21+b.phase;
