@@ -6,6 +6,7 @@
  const target=new THREE.Vector3(),direction=new THREE.Vector3(),offset=new THREE.Vector3(-155,205,115);
  const shadowCenter=new THREE.Vector3(Infinity,0,Infinity);
  let sun=null,lastShadow=-Infinity;
+ let shadowDirty=true,previousCity=null;
  const shadowInterval=1000/12;
  const frameTimes=new Float32Array(240);
  let frames=0,metrics=null;
@@ -33,6 +34,8 @@
   });
  }
  function render(scene,camera,renderer){
+  const city=scene.getObjectByName('city-geometry');
+  if(city!==previousCity){shadowDirty=true;previousCity=city;}
   const now=performance.now();
   const elapsed=lastFrame?now-lastFrame:0;
   lastFrame=now;
@@ -50,18 +53,19 @@
     samples=0;
    }
   }
-  if(sun && now-lastShadow>=shadowInterval){
+  if(sun && (shadowDirty||now-lastShadow>=shadowInterval)){
    camera.getWorldDirection(direction);
    const depth=Math.min(350,camera.position.y/Math.max(.15,-direction.y));
    target.copy(camera.position).addScaledVector(direction,depth);
    target.y=0;
-   if(shadowCenter.distanceToSquared(target)>=4 || now-lastShadow>=500){
+   if(shadowDirty||shadowCenter.distanceToSquared(target)>=4||(!city&&now-lastShadow>=500)){
     shadowCenter.copy(target);
     sun.target.position.copy(target);
     sun.position.copy(target).add(offset);
     sun.target.updateMatrixWorld();
     renderer.shadowMap.needsUpdate=true;
     lastShadow=now;
+    shadowDirty=false;
    }
   }
   renderer.setRenderTarget(null);
