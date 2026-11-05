@@ -1388,7 +1388,7 @@ function streetSurfaceMaterial(color){
  material.onBeforeCompile=shader=>{
    shader.vertexShader='varying vec3 citySurface;\n'+shader.vertexShader.replace(
      '#include <begin_vertex>',
-     '#include <begin_vertex>\ncitySurface=(modelMatrix*vec4(position,1.)).xyz;');
+     '#include <begin_vertex>\nvec4 surfacePosition=vec4(position,1.);\n#ifdef USE_INSTANCING\nsurfacePosition=instanceMatrix*surfacePosition;\n#endif\ncitySurface=(modelMatrix*surfacePosition).xyz;');
    shader.fragmentShader='varying vec3 citySurface;\n'+shader.fragmentShader.replace(
      '#include <color_fragment>',
      '#include <color_fragment>\n'+(asphalt?
@@ -2226,6 +2226,12 @@ function drawNeighborhoodDetails(selected){
   }
 }
 function drawRoadNetwork(selected){
+  const surfaceBatches=new Map();
+  function roadBox(w,h,d,x,y,z,color){
+    const key=color+':'+Math.floor(x/480)+':'+Math.floor(z/480);
+    if(!surfaceBatches.has(key))surfaceBatches.set(key,{color,entries:[]});
+    surfaceBatches.get(key).entries.push({w,h,d,x,y,z});
+  }
   // v3.0.2: Roads are constructed from the FOUR edges of each occupied
   // block. Every edge is deduplicated and its endpoints are shared with
   // intersections. This avoids the displaced segments and road gaps in v3.0.
@@ -2253,8 +2259,8 @@ function drawRoadNetwork(selected){
     const mid=(from+to)/2,len=to-from;
     for(const side of [-1,1]){
       const cx=x+side*(w/2+.13);
-      addBox(.24,.135,len,cx,.175,mid,curbFace);
-      addBox(.32,.035,len,cx,.259,mid,curbTop);
+      roadBox(.24,.135,len,cx,.175,mid,curbFace);
+      roadBox(.32,.035,len,cx,.259,mid,curbTop);
     }
   }
   function curbH(z,x0,x1,w,c,r){
@@ -2263,8 +2269,8 @@ function drawRoadNetwork(selected){
     const mid=(from+to)/2,len=to-from;
     for(const side of [-1,1]){
       const cz=z+side*(w/2+.13);
-      addBox(len,.135,.24,mid,.175,cz,curbFace);
-      addBox(len,.035,.32,mid,.259,cz,curbTop);
+      roadBox(len,.135,.24,mid,.175,cz,curbFace);
+      roadBox(len,.035,.32,mid,.259,cz,curbTop);
     }
   }
   // Four curb corners complete the L-shaped junction connections.
@@ -2273,8 +2279,8 @@ function drawRoadNetwork(selected){
     const vw=vWidth(c),hw=hWidth(r);
     for(const sx of [-1,1])for(const sz of [-1,1]){
       const cx=x+sx*(vw/2+.13),cz=z+sz*(hw/2+.13);
-      addBox(.28,.135,.28,cx,.175,cz,curbFace);
-      addBox(.36,.035,.36,cx,.259,cz,curbTop);
+      roadBox(.28,.135,.28,cx,.175,cz,curbFace);
+      roadBox(.36,.035,.36,cx,.259,cz,curbTop);
     }
   }
   const vWidth=c=>(c%4===0?11.5:(c%7===2?8.7:6.8));
@@ -2302,8 +2308,8 @@ function drawRoadNetwork(selected){
     if(vertical){
       const x=streetEdgeX(c),z0=streetEdgeZ(r-1),z1=streetEdgeZ(r);
       const w=vWidth(c),len=z1-z0,z=(z0+z1)/2;
-      addBox(w+2.4,.035,len,x,sy,z,sidewalk);
-      addBox(w,.042,len,x,ay,z,asphalt);
+      roadBox(w+2.4,.035,len,x,sy,z,sidewalk);
+      roadBox(w,.042,len,x,ay,z,asphalt);
       curbV(x,z0,z1,w,c,r);
       if(Math.abs(c)<=3&&Math.abs(r)<=4){
         for(const side of [-1,1]){
@@ -2323,8 +2329,8 @@ function drawRoadNetwork(selected){
     }else{
       const z=streetEdgeZ(r),x0=streetEdgeX(c-1),x1=streetEdgeX(c);
       const w=hWidth(r),len=x1-x0,x=(x0+x1)/2;
-      addBox(len,.035,w+2.4,x,sy,z,sidewalk);
-      addBox(len,.042,w,x,ay,z,asphalt);
+      roadBox(len,.035,w+2.4,x,sy,z,sidewalk);
+      roadBox(len,.042,w,x,ay,z,asphalt);
       curbH(z,x0,x1,w,c,r);
       if(Math.abs(c)<=3&&Math.abs(r)<=4){
         for(const side of [-1,1]){
@@ -2353,7 +2359,7 @@ function drawRoadNetwork(selected){
     // Correct orientation: X is the width of the vertical road; Z is
     // the width of the horizontal road. The previous version swapped them.
     const vW=vWidth(c),hW=hWidth(r);
-    addBox(vW,.044,hW,x,ay+.003,z,asphalt);
+    roadBox(vW,.044,hW,x,ay+.003,z,asphalt);
     curbCorners(c,r);
     // Crosswalks on EVERY existing approach of EVERY intersection.
     // Their footprint stays outside the crossing road, so perpendicular
@@ -2408,6 +2414,25 @@ function drawRoadNetwork(selected){
           stopY,z,stopColor);
       }
     }
+  }
+  const surfaceGeometry=new THREE.BoxGeometry(1,1,1);
+  const surfaceMaterials=new Map();
+  const surfaceTransform=new THREE.Object3D();
+  for(const {color,entries} of surfaceBatches.values()){
+    if(!surfaceMaterials.has(color)){
+      const textured=color===0x474d58||color===0xc4a99e;
+      surfaceMaterials.set(color,textured?streetSurfaceMaterial(color):new THREE.MeshLambertMaterial({color}));
+    }
+    const surface=new THREE.InstancedMesh(surfaceGeometry,surfaceMaterials.get(color),entries.length);
+    entries.forEach(({w,h,d,x,y,z},index)=>{
+      surfaceTransform.position.set(x,y,z);
+      surfaceTransform.scale.set(w,h,d);
+      surfaceTransform.updateMatrix();
+      surface.setMatrixAt(index,surfaceTransform.matrix);
+    });
+    surface.receiveShadow=true;
+    surface.computeBoundingSphere();
+    group.add(surface);
   }
   // Level of detail: markings and sidewalk joints are only rendered in
   // chunks close to the camera focus AND intersecting the view frustum.
