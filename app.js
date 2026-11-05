@@ -751,7 +751,7 @@ function coordinatedHouseColor(wall,other,amount){
  return new THREE.Color(wall).lerp(new THREE.Color(other),amount).getHex();
 }
 function housePaint(h){
- const index=colorOverrides.get(scoreOverrideKey(h.cityId,h.id))??(h.id%HOUSE_PAINTS.length);
+ const index=colorOverrides.get(scoreOverrideKey(h.cityId,h.id))??0;
  return HOUSE_PAINTS[index]||HOUSE_PAINTS[0];
 }
 function isPremiumHouse(h){return designOverrides.get(scoreOverrideKey(h.cityId,h.id))??false;}
@@ -2952,7 +2952,7 @@ function renderAllHouses(selected){
       const info=HOUSE_TIERS[tier];
       // Architectural visual scale: retain the real tier and progression,
       // but keep most homes within a coherent neighborhood skyline.
-      const urbanSeed=Math.floor(rnd(h.id*29.17+h.blockIndex*7.39)*1000);
+      const urbanSeed=tier;
       const levels=tier===3?3+urbanSeed%2:tier===4?4+urbanSeed%2:
         tier===5?5+urbanSeed%2:tier===6?7+urbanSeed%3:
         10+urbanSeed%4;
@@ -3114,9 +3114,7 @@ function renderAllHouses(selected){
       }
       continue;
     }
-    const district=districtStyle(h.blockIndex);
-    // Exactly two architectural designs for each tier: base and premium.
-    // Their massing and color vary by district, but optional elements do not.
+    // The default architecture is shared by all homes of the same tier.
     const family=0; // One coherent gabled-house family for all 3 low-rise tiers
     const scale=1; // Identical dimensions for all homes at this tier
     const width=footW,depth=footD;
@@ -3125,9 +3123,7 @@ function renderAllHouses(selected){
     const wall=housePaint(h).wall;
     const roof=housePaint(h).roof;
     const x=h.x,z=h.z;
-    const yardType=Math.floor(rnd(h.id*29+6)*7);
-    const lawn=(district==='centro'?[0xa3b09a,0x9ea99c,0x9cac96,0xa9b0a3,0x98ad9a,0xa5ad98,0xa2af9d]:
-      [0x7aa47a,0x84ac82,0x739d75,0x92b28a,0x7da996,0x87ab79,0x81b08d])[yardType];
+    const lawn=0x84ac82;
     // v5.8.1: low-rise homes are genuinely composed from two masses.
     // The main gabled home has a shorter depth; a side wing forms an L plan.
     // Both masses stay inside the same footprint at every evolution.
@@ -3853,8 +3849,8 @@ function rebuild(){
  safe('Paesaggio',()=>addUrbanLandscaping(selected));
  safe('Piazze artistiche',()=>addSignaturePlazas(selected));
  safe('Vita urbana',()=>drawCityLife(selected));
- safe('Persone',()=>createV4Life(selected));
  safe('Strutture pubbliche',()=>renderMilestones());
+ safe('Persone',()=>createV4Life(selected));
  scene.add(group);
  // Near-detail failures must not undo the entire city.
  safe('Dettagli vicini',()=>updateProgressiveDetails(true));
@@ -4333,6 +4329,49 @@ function v45Balloon(i,home){
  g.position.set(x,i===0?36:48+(i%4)*6,z);group.add(g);
  return {g,i,ownerId:home.id,baseY:g.position.y,x,z};
 }
+// Flight paths use a fixed safe altitude for the entire orbit.
+function flightClearance(group){
+ const cellSize=24, heights=new Map();
+ const bounds=new THREE.Box3(), world=new THREE.Matrix4(), instance=new THREE.Matrix4();
+ group.updateMatrixWorld(true);
+ function record(){
+  if(bounds.max.y<=12)return;
+  for(let x=Math.floor(bounds.min.x/cellSize);x<=Math.floor(bounds.max.x/cellSize);x++){
+   for(let z=Math.floor(bounds.min.z/cellSize);z<=Math.floor(bounds.max.z/cellSize);z++){
+    const key=x+','+z;
+    heights.set(key,Math.max(heights.get(key)||0,bounds.max.y));
+   }
+  }
+ }
+ group.traverse(mesh=>{
+  if(!mesh.isMesh)return;
+  const geometry=mesh.geometry;
+  if(!geometry.boundingBox)geometry.computeBoundingBox();
+  if(mesh.isInstancedMesh){
+   if(!mesh.boundingBox)mesh.computeBoundingBox();
+   bounds.copy(mesh.boundingBox).applyMatrix4(mesh.matrixWorld);
+   if(bounds.max.y<=12)return;
+   for(let i=0;i<mesh.count;i++){
+    mesh.getMatrixAt(i,instance);
+    world.multiplyMatrices(mesh.matrixWorld,instance);
+    bounds.copy(geometry.boundingBox).applyMatrix4(world);
+    record();
+   }
+  }else{
+   bounds.copy(geometry.boundingBox).applyMatrix4(mesh.matrixWorld);
+   record();
+  }
+ });
+ return (x,z,rx,rz)=>{
+  let height=0;
+  for(let i=Math.floor((x-rx)/cellSize);i<=Math.floor((x+rx)/cellSize);i++){
+   for(let j=Math.floor((z-rz)/cellSize);j<=Math.floor((z+rz)/cellSize);j++){
+    height=Math.max(height,heights.get(i+','+j)||0);
+   }
+  }
+  return height;
+ };
+}
 function createV4Life(selected){
  life.people.length=0;life.birds.length=0;life.balloons.length=0;residentBatches=null;
  if(residentLayer){scene.remove(residentLayer);residentLayer.traverse(o=>{
@@ -4340,6 +4379,7 @@ function createV4Life(selected){
  });}
  residentLayer=new THREE.Group();scene.add(residentLayer);
  if(!selected.length)return;
+ const clearance=flightClearance(group);
  // A sampled owner is visible in every district; the first user's avatar
  // always exists even when there is only one house.
  const peopleCount=selected.length;
@@ -4379,7 +4419,10 @@ function createV4Life(selected){
   const phase=rnd(flock*31+4)*Math.PI*2;
   for(let j=0;j<birdsInFlock;j++){
    const i=flock*5+j;
-   life.birds.push(v45Bird(i,centerX+(j-2)*5,centerZ+(j%2?4:-4),phase+j*.09));
+   const bird=v45Bird(i,centerX+(j-2)*5,centerZ+(j%2?4:-4),phase+j*.09);
+   bird.altitude=Math.max(22+bird.i%6*3,clearance(bird.x,bird.z,bird.rx+3,bird.rz+3)+4);
+   bird.g.position.y=bird.altitude;
+   life.birds.push(bird);
   }
  }
  // Use evenly distributed owners, never selected[i] (which stacks them
@@ -4387,7 +4430,11 @@ function createV4Life(selected){
  const balloonCount=Math.min(20,v4.balloons);
  for(let i=0;i<balloonCount;i++){
   const h=selected[spreadIndex(i,balloonCount,selected.length)];
-  life.balloons.push(v45Balloon(i,h));
+  const balloon=v45Balloon(i,h);
+  const scale=balloon.g.scale.x;
+  balloon.baseY=Math.max(balloon.baseY,clearance(balloon.x,balloon.z,5+4*scale,4+4*scale)+7*scale+3);
+  balloon.g.position.y=balloon.baseY;
+  life.balloons.push(balloon);
  }
 }
 // Only create name labels near the camera. Faraway residents remain visible
@@ -4471,7 +4518,7 @@ function animateLife(t){if(!active||!v4.motion)return;
   const vx=Math.cos(ang)*b.rx*.21,vz=-Math.sin(ang)*b.rz*.21;
   b.g.position.x=b.x+Math.sin(ang)*b.rx;
   b.g.position.z=b.z+Math.cos(ang)*b.rz;
-  b.g.position.y=22+b.i%6*3+Math.sin(t*1.6+b.i)*.9;
+  b.g.position.y=b.altitude+Math.sin(t*1.6+b.i)*.9;
   b.g.rotation.set(0,Math.atan2(-vx,-vz),Math.sin(ang)*.08);
   for(const wing of b.wings)wing.pivot.rotation.z=wing.side*(.05+Math.sin(t*4.7+b.i)*.32);
  }
