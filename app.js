@@ -1117,19 +1117,28 @@ function buildRegionalLandscape(houses){
  }
  const canopy=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,1),
   new THREE.MeshStandardMaterial({roughness:1}),candidates.length);
+ const trunks=new THREE.InstancedMesh(new THREE.CylinderGeometry(.35,.62,1,6),
+  new THREE.MeshStandardMaterial({color:0x645039,roughness:1}),candidates.length);
  const dummy=new THREE.Object3D();
  const color=new THREE.Color();
  candidates.forEach(({x,z,i},index)=>{
   const size=3+rnd(i*21)*5;
-  dummy.position.set(x,size*.83,z);
-  dummy.scale.set(size*.68,size,size*.65);
+  const trunkHeight=size*.71;
+  dummy.position.set(x,trunkHeight*.5,z);
+  dummy.scale.set(size*.20,trunkHeight,size*.20);
+  dummy.updateMatrix();
+  trunks.setMatrixAt(index,dummy.matrix);
+  dummy.position.set(x,trunkHeight+size*.39,z);
+  const tall=rnd(i*63)>.65;
+  dummy.scale.set(size*(tall?.52:.88),size*(tall?1.20:.72),size*(tall?.52:.83));
   dummy.rotation.y=rnd(i*87)*Math.PI;
   dummy.updateMatrix();
   canopy.setMatrixAt(index,dummy.matrix);
   canopy.setColorAt(index,color.setHSL(.22+rnd(i*31)*.10,.30+rnd(i*47)*.27,.21+rnd(i*12)*.16));
  });
  canopy.computeBoundingSphere();
- group.add(canopy);
+ trunks.computeBoundingSphere();
+ group.add(trunks,canopy);
 }
 function regionalMountain(city){
  // Approximate Andean ridge axis. Coastal and inland cities use the same compass.
@@ -1703,7 +1712,7 @@ function drawShops(){
     const detailed=!structuralKinds.has(kind);
     const cx=shop?Math.floor(shop.x/90):0,cz=shop?Math.floor(shop.z/90):0;
     const key=kind+'_'+color+(detailed?'_detail_'+cx+'_'+cz:'');
-    if(!batches.has(key))batches.set(key,{color,geo:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:kind==='tradeDress'?dress:kind==='tradeSculpt'?sculpt:kind==='tradeBar'?bar:kind.startsWith('pizza')||kind==='tradeRound'?disc:box,entries:[],detailed,
+    if(!batches.has(key))batches.set(key,{kind,color,geo:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:kind==='tradeDress'?dress:kind==='tradeSculpt'?sculpt:kind==='tradeBar'?bar:kind.startsWith('pizza')||kind==='tradeRound'?disc:box,entries:[],detailed,
       chunk:{x:(cx+.5)*90,z:(cz+.5)*90}});
     let rotation=0;
     if(shop){rotation=facadeAngle(shop);
@@ -2070,6 +2079,9 @@ function drawShops(){
     if(!shopMaterials.has(batch.color))
       shopMaterials.set(batch.color,new THREE.MeshStandardMaterial({color:batch.color,side:THREE.FrontSide,roughness:.77,metalness:.02,flatShading:false}));
     const mesh=new THREE.InstancedMesh(batch.geo,shopMaterials.get(batch.color),batch.entries.length);
+    const largeSurface=/^(body|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof)$/.test(batch.kind);
+    mesh.castShadow=largeSurface;
+    mesh.receiveShadow=largeSurface||batch.kind==='shopPaving';
     for(let i=0;i<batch.entries.length;i++){
       const e=batch.entries[i];dummy.position.set(e.x,e.y,e.z);dummy.rotation.set(0,e.rotation,0);
       dummy.scale.set(e.w,e.h,e.d);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);
