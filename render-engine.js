@@ -10,7 +10,7 @@
  const shadowInterval=1000/12;
  const frameTimes=new Float32Array(240);
  let frames=0,metrics=null;
- let maxRatio=1,lastFrame=0,averageFrame=16.7,samples=0;
+ let maxRatio=1,lastFrame=0,averageFrame=16.7,slowFrames=0,fastFrames=0;
  function setup(scene,camera,renderer){
   renderer.useLegacyLights=false;
   renderer.shadowMap.enabled=true;
@@ -45,13 +45,17 @@
   if(elapsed>0&&elapsed<1000&&!document.hidden){
    const sample=Math.min(elapsed,180);
    averageFrame+=(sample-averageFrame)*.06;
-   if(++samples>=(averageFrame>27?30:90)){
-    const ratio=renderer.getPixelRatio();
-    const minimum=Math.min(.78,maxRatio);
-    const next=averageFrame>27?Math.max(minimum,ratio-.15):
-      averageFrame<18?Math.min(maxRatio,ratio+.10):ratio;
+   slowFrames=sample>27?slowFrames+1:0;
+   fastFrames=sample<18?fastFrames+1:0;
+   const ratio=renderer.getPixelRatio();
+   if(slowFrames>=30&&averageFrame>27){
+    const next=Math.max(Math.min(.78,maxRatio),ratio-.15);
     if(next!==ratio)renderer.setPixelRatio(next);
-    samples=0;
+    slowFrames=0;
+   }else if(fastFrames>=90&&averageFrame<18){
+    const next=Math.min(maxRatio,ratio+.10);
+    if(next!==ratio)renderer.setPixelRatio(next);
+    fastFrames=0;
    }
   }
   if(sun && (shadowDirty||now-lastShadow>=shadowInterval)){
