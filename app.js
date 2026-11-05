@@ -3285,6 +3285,28 @@ function renderAllHouses(selected){
     // a second gabled front pavilion, covered veranda, roof dormer and
     // generous upper balcony, all sharing the original footprint.
     if(premium){
+      const frontage=z+depth/2;
+      const bronze=0x4c3b30;
+      place('premiumDoorLintel',boxGeo,capital,h,x,2.19,frontage+.13,1.62,.21,.21);
+      for(const side of [-1,1]){
+        const sx=x+side*coreW*.28;
+        place('premiumWallLanternStem',boxGeo,bronze,h,x+side*.90,1.99,frontage+.24,.12,.31,.20);
+        place('premiumWallLanternGlass',boxGeo,0xffcf74,h,x+side*.90,1.85,frontage+.29,.17,.20,.17);
+        place('premiumWindowBox',boxGeo,0x985639,h,sx,.99,frontage+.28,.93,.23,.34);
+        place('premiumWindowPlant',domeGeo,0x588534,h,sx,1.13,frontage+.31,.81,.26,.30);
+        for(const offset of [-.24,0,.24]){
+          place('premiumWindowFlower',domeGeo,0xd45676,h,sx+offset,1.25,frontage+.37,.16,.15,.16);
+        }
+        if(levels>1){
+          const railY=3.52;
+          place('premiumBalconyDeck',boxGeo,stone,h,sx,3.12,frontage+.37,1.65,.17,.72);
+          place('premiumBalconyRail',boxGeo,bronze,h,sx,railY+.27,frontage+.70,1.65,.07,.07);
+          for(const baluster of [-.74,-.37,0,.37,.74]){
+            place('premiumBalconyBaluster',boxGeo,bronze,h,sx+baluster,railY,frontage+.70,.055,.55,.055);
+          }
+        }
+      }
+      place('premiumEntryPaving',boxGeo,stone,h,x,.085,frontage+1.35,1.68,.10,1.18);
       // Keep the front wall and roof as ONE continuous volume. The old
       // pavilion was pushed through the main facade and produced a roof
       // intersecting the house, with windows embedded in its geometry.
