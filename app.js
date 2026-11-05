@@ -2950,11 +2950,11 @@ const HOUSE_TIERS=[
  {min:0,name:'Monolocale',levels:1},
  {min:100,name:'Casa piccola',levels:2},
  {min:500,name:'Villetta',levels:3},
- {min:1500,name:'Palazzina',levels:5},
- {min:4000,name:'Condominio',levels:9},
- {min:10000,name:'Torre residenziale',levels:17},
- {min:25000,name:'Grattacielo',levels:30},
- {min:60000,name:'Grattacielo monumentale',levels:48}
+ {min:1500,name:'Palazzina',levels:4},
+ {min:4000,name:'Condominio',levels:5},
+ {min:10000,name:'Torre residenziale',levels:7},
+ {min:25000,name:'Grattacielo',levels:9},
+ {min:60000,name:'Grattacielo monumentale',levels:12}
 ];
 function houseTier(points){
  let tier=0;for(let i=1;i<HOUSE_TIERS.length;i++)if(points>=HOUSE_TIERS[i].min)tier=i;
@@ -3135,16 +3135,13 @@ function renderAllHouses(selected){
       const info=HOUSE_TIERS[tier];
       // Architectural visual scale: retain the real tier and progression,
       // but keep most homes within a coherent neighborhood skyline.
-      const urbanSeed=tier;
-      const levels=tier===3?3+urbanSeed%2:tier===4?4+urbanSeed%2:
-        tier===5?5+urbanSeed%2:tier===6?7+urbanSeed%3:
-        10+urbanSeed%4;
+      const levels=info.levels;
       const wall=housePaint(h).wall;
       const trim=housePaint(h).roof;
       const height=levels*2.55+1.8,x=h.x,z=h.z;
       // No parcel decorations: landscaping unlocks at one point.
       place('towerBase',boxGeo,wall,h,x,height/2,z,footW,height,footD);
-      if(tier<=5&&urbanSeed%5<3){
+      if(tier===3||tier===5){
         // Pitched tile roofs alternate with parapet terraces.
         place('apartmentTiledRoof',roofGeo,trim,h,x,height-.04,z,
           (footW+.42)/2,Math.max(1.35,footW*.15),(footD+.42)/2);
@@ -3318,7 +3315,7 @@ function renderAllHouses(selected){
     const family=0; // One coherent gabled-house family for all 3 low-rise tiers
     const scale=1; // Identical dimensions for all homes at this tier
     const width=footW,depth=footD;
-    const levels=tier===0?1:tier===1?2:3;
+    const levels=HOUSE_TIERS[tier].levels;
     const height=1.2+levels*2.35;
     const wall=housePaint(h).wall;
     const roof=housePaint(h).roof;
@@ -4396,6 +4393,10 @@ $('find').onclick=()=>{
  map.setView([currentCity.lat,currentCity.lng],13);
  enter();flyToWorld(h,{distance:62,elevation:1.05});showCard(h);
 };
+for(const option of $('demoScore').options){
+ const tier=HOUSE_TIERS.find(entry=>entry.min===Number(option.value));
+ if(tier)option.textContent=tier.min.toLocaleString('it-IT')+' punti · '+tier.name+' ('+tier.levels+(tier.levels===1?' piano)':' piani)');
+}
 const citySelect=$('citySelect');
 if(citySelect)citySelect.onchange=()=>selectCity(citySelect.value,true);
 map.on('zoomend moveend',onZoom);
@@ -4518,7 +4519,7 @@ function updateResidentMatrix(i){
  }
 }
 // Every avatar follows the walkable ring inside its own parcel.
-// The inner building footprint is a forbidden zone, even at 48 floors.
+// The inner building footprint is a forbidden zone, at every evolution tier.
 function residentWalkPoint(a,t){
  const b=a.bounds, margin=.95;
  if(!residentBatches){
