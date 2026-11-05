@@ -2367,6 +2367,23 @@ function drawRoadNetwork(selected){
     const south=roadEdges.has(`v:${c}:${r+1}`);
     const west=roadEdges.has(`h:${c}:${r}`);
     const east=roadEdges.has(`h:${c+1}:${r}`);
+    // Compact signals and bollards sit beyond the crosswalk ends.
+    if(north&&south&&west&&east&&(isAvenueV(c)||isAvenueH(r))){
+      for(const side of [-1,1]){
+        const px=x+side*(vW/2+.78),pz=z+side*(hW/2+.78);
+        mark(.22,3.10,.22,px,1.79,pz,0x344340);
+        mark(.40,.23,.40,px,.39,pz,0x737d75);
+        const sx=px-side*.29;
+        mark(.36,.91,.29,sx,3.28,pz,0x2c3635);
+        for(const face of [-1,1]){
+          const sz=pz+face*.153;
+          mark(.17,.17,.025,sx,3.57,sz,0xe94c40);
+          mark(.17,.17,.025,sx,3.29,sz,0x845d31);
+          mark(.17,.17,.025,sx,3.01,sz,0x325a43);
+        }
+      }
+    }
+
     // Approach segments run to the intersection centre, so each zebra
     // starts just beyond the perpendicular carriageway edge.
     for(const side of [-1,1]){
