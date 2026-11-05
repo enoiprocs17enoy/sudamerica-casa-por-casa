@@ -1726,8 +1726,13 @@ function drawShops(){
     // are spatially batched so only the visible nearby shops are detailed.
     const detailed=!structuralKinds.has(kind);
     const cx=shop?Math.floor(shop.x/90):0,cz=shop?Math.floor(shop.z/90):0;
-    const key=kind+'_'+color+(detailed?'_detail_'+cx+'_'+cz:'');
-    if(!batches.has(key))batches.set(key,{kind,color,geo:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:kind==='tradeDress'?dress:kind==='tradeSculpt'?sculpt:kind==='tradeBar'?bar:kind.startsWith('pizza')||kind==='tradeRound'?disc:box,entries:[],detailed,
+    const geometry=kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:
+      kind==='tradeDress'?dress:kind==='tradeSculpt'?sculpt:kind==='tradeBar'?bar:
+      kind.startsWith('pizza')||kind==='tradeRound'?disc:box;
+    const casts=/^(body|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof)$/.test(kind);
+    const receives=casts||kind==='shopPaving';
+    const key=[geometry.id,color,casts,receives,detailed?cx:'all',detailed?cz:'all'].join(':');
+    if(!batches.has(key))batches.set(key,{color,geo:geometry,casts,receives,entries:[],detailed,
       chunk:{x:(cx+.5)*90,z:(cz+.5)*90}});
     let rotation=0;
     if(shop){rotation=facadeAngle(shop);
@@ -2094,9 +2099,8 @@ function drawShops(){
     if(!shopMaterials.has(batch.color))
       shopMaterials.set(batch.color,new THREE.MeshStandardMaterial({color:batch.color,side:THREE.FrontSide,roughness:.77,metalness:.02,flatShading:false}));
     const mesh=new THREE.InstancedMesh(batch.geo,shopMaterials.get(batch.color),batch.entries.length);
-    const largeSurface=/^(body|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof)$/.test(batch.kind);
-    mesh.castShadow=largeSurface;
-    mesh.receiveShadow=largeSurface||batch.kind==='shopPaving';
+    mesh.castShadow=batch.casts;
+    mesh.receiveShadow=batch.receives;
     for(let i=0;i<batch.entries.length;i++){
       const e=batch.entries[i];dummy.position.set(e.x,e.y,e.z);dummy.rotation.set(0,e.rotation,0);
       dummy.scale.set(e.w,e.h,e.d);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);
