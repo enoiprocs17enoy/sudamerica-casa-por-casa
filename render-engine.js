@@ -7,6 +7,8 @@
  const shadowCenter=new THREE.Vector3(Infinity,0,Infinity);
  let sun=null,lastShadow=-Infinity;
  const shadowInterval=1000/12;
+ const frameTimes=new Float32Array(240);
+ let frames=0,metrics=null;
  let maxRatio=1,lastFrame=0,averageFrame=16.7,samples=0;
  function setup(scene,camera,renderer){
   renderer.useLegacyLights=false;
@@ -32,8 +34,11 @@
  }
  function render(scene,camera,renderer){
   const now=performance.now();
-  const elapsed=now-lastFrame;
+  const elapsed=lastFrame?now-lastFrame:0;
   lastFrame=now;
+  if(elapsed>0&&!document.hidden){
+   frameTimes[frames++%frameTimes.length]=elapsed;
+  }
   if(elapsed>0&&elapsed<150&&!document.hidden){
    averageFrame+=(elapsed-averageFrame)*.06;
    if(++samples>=90){
@@ -61,6 +66,15 @@
   }
   renderer.setRenderTarget(null);
   renderer.render(scene,camera);
+  const {calls,triangles}=renderer.info.render;
+  metrics={calls,triangles,pixelRatio:renderer.getPixelRatio()};
  }
- window.SudamericaRender8={setup,render,resize:function(){}};
+ function performanceSnapshot(){
+  const samples=Math.min(frames,frameTimes.length);
+  if(!samples||!metrics)return null;
+  const values=frameTimes.slice(0,samples).sort();
+  return {...metrics,samples,medianFrameMs:values[Math.floor((samples-1)*.5)],
+   p95FrameMs:values[Math.ceil(samples*.95)-1]};
+ }
+ window.SudamericaRender8={setup,render,resize:function(){},performanceSnapshot};
 })();
