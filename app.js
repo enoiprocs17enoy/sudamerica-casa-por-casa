@@ -1792,11 +1792,13 @@ function drawShops(){
     }
     const pizzeria=shape===2&&shop.id%24===14;
     if(shape!==0&&!pizzeria){
-      const badgeY=height+2.05,badgeZ=front+.28;
+      const sculptureScale=shape===8||shape===10?1.70:1.42;
+      const badgeY=height+2.43,badgeZ=front+.32;
       const mark=(dx,dy,width,markHeight,color,kind='tradeMark',dz=0,depth=.38)=>{
-        put(kind,color,shop,x+dx,badgeY+dy,badgeZ+dz,width,markHeight,depth);
+        put(kind,color,shop,x+dx*sculptureScale,badgeY+dy*sculptureScale,
+          badgeZ+dz*sculptureScale,width*sculptureScale,markHeight*sculptureScale,depth*sculptureScale);
       };
-      put('tradeMark',trim,shop,x,height+.94,badgeZ,.26,1.85,.22);
+      put('tradeMark',trim,shop,x,height+1.07,badgeZ,.30,2.15,.28);
       const ivory=shape===1?0xffc45c:0xffe9c3;
       if(shape===1){ // Shopping cart
         const metal=0xffc45c;
