@@ -1807,6 +1807,12 @@ function drawShops(){
     }
     if(progress.premium){
       put('shopPremiumCornice',0xf2dfbf,shop,x,height-.12,front+.14,w,.25,.34);
+      put('shopPremiumRearCornice',0xf2dfbf,shop,x,height-.12,z-d/2-.12,w,.25,.31);
+      for(const side of [-1,1]){
+        const sideX=x+side*(w/2+.12);
+        put('shopPremiumSideCornice',0xf2dfbf,shop,sideX,height-.12,z,.31,.25,d+.22);
+        put('shopPremiumSidePilaster',0xf2dfbf,shop,sideX,height*.47,z-d*.40,.26,height*.89,.29);
+      }
       for(const side of [-1,1]){
         const px=x+side*w*.44;
         put('shopPremiumPilaster',0xf2dfbf,shop,px,height*.47,front+.16,.29,height*.89,.28);
@@ -3604,26 +3610,39 @@ function renderAllHouses(selected){
       }
     }
   }
+  const renderBatches=new Map();
   for(const [key,batch] of batches.entries()){
+    const texture=/(roof|gable|hip|towerTop|cornice)/i.test(key)?'roof':
+      /(wall|body|towerBase|wing|topSetback|penthouse|bay|longWing)/i.test(key)?'wall':'';
+    const normalStrength=/(roof|gable|hip)/i.test(key)?.88:.56;
+    const roughness=/(window|glass|mullion)/i.test(key)?.26:/roof/i.test(key)?.79:.87;
+    const metalness=/(mullion|sconce|handle)/i.test(key)?.48:.02;
+    const casts=/(gardenTree|towerBase|towerRoof|towerMain|towerMid|homeMain|homeWing|homeRoof|homeCore|homeWall|towerWall|towerBody|mainBody|wingBody|mainRoof|gable|hipRoof)/i.test(key);
+    const receives=casts||/(facade|pier|window|door|balcony|pilaster)/i.test(key);
+    const profile=[batch.geo.id,texture,normalStrength,roughness,metalness,casts,receives].join(':');
+    if(!renderBatches.has(profile))renderBatches.set(profile,{
+      geo:batch.geo,texture,normalStrength,roughness,metalness,casts,receives,entries:[]
+    });
+    const output=renderBatches.get(profile).entries;
+    for(const entry of batch.entries)output.push({...entry,color:batch.color});
+  }
+  const tint=new THREE.Color();
+  for(const batch of renderBatches.values()){
     const mesh=new THREE.InstancedMesh(batch.geo,new THREE.MeshStandardMaterial({
-     color:batch.color,
-     map:/(Roof|roof|gable|hip|flatRoof|towerTop|cornice)/i.test(key)?homePattern('roof'):/(Wall|body|towerBase|wing|topSetback|penthouse|bay|longWing)/i.test(key)?homePattern('wall'):null,
-     normalMap:/(Roof|roof|gable|hip|flatRoof|towerTop|cornice)/i.test(key)?homeNormalPattern('roof'):/(Wall|body|towerBase|wing|topSetback|penthouse|bay|longWing)/i.test(key)?homeNormalPattern('wall'):null,
-     normalScale:/(Roof|roof|gable|hip)/.test(key)?new THREE.Vector2(.88,.88):new THREE.Vector2(.56,.56),
-     side:batch.geo===roofGeo?THREE.DoubleSide:THREE.FrontSide,
-     roughness:/(Window|Glass|Mullion)/i.test(key)?.26:/(Roof|roof)/i.test(key)?.79:.87,
-     metalness:/(Mullion|Sconce|Handle)/i.test(key)?.48:.02,
-     flatShading:false
+      color:0xffffff,
+      map:batch.texture?homePattern(batch.texture):null,
+      normalMap:batch.texture?homeNormalPattern(batch.texture):null,
+      normalScale:new THREE.Vector2(batch.normalStrength,batch.normalStrength),
+      side:batch.geo===roofGeo?THREE.DoubleSide:THREE.FrontSide,
+      roughness:batch.roughness,
+      metalness:batch.metalness
     }),batch.entries.length);
-    if(/mainBody|wingBody|towerBase|towerMain|towerMid|homeCore|homeWingBody|homeMain|gable|hipRoof|towerRoof/i.test(key)){
-      mesh.castShadow=true;
-      mesh.receiveShadow=true;
-    }
-    if(/gardenTree|towerBase|towerRoof|homeMain|homeWing|homeRoof|homeCore|homeWall|towerWall|towerBody|mainBody|wingBody|mainRoof/i.test(key)){mesh.castShadow=true;mesh.receiveShadow=true;}
+    mesh.castShadow=batch.casts;
+    mesh.receiveShadow=batch.receives;
     mesh.userData.homes=batch.entries.map(e=>e.h);
     batch.entries.forEach((e,i)=>{
       dummy.position.set(e.x,e.y,e.z);dummy.rotation.set(0,e.rotation,0);
-      dummy.scale.set(e.w,e.height,e.d);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);
+      dummy.scale.set(e.w,e.height,e.d);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix); mesh.setColorAt(i,tint.setHex(e.color));
     });
     mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();group.add(mesh);
     if(batch.entries[0].h)houseMeshes.push(mesh);
