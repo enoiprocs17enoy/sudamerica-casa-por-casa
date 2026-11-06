@@ -1438,7 +1438,7 @@ let lastRenderedFrame=0;
 function animate(now=0){
   if(!renderer)return;
   requestAnimationFrame(animate);
-  if(!active)return;
+  if(!active||document.hidden)return;
   // Cap expensive large-city rendering at 30 FPS; smaller towns stay at 60.
   const minInterval=1000/(homes.length>=2000?30:60);
   const elapsed=now-lastRenderedFrame;
@@ -1482,7 +1482,7 @@ function streetSurfaceMaterial(color){
      '#include <color_fragment>',
      '#include <color_fragment>\n'+(asphalt?
        'vec2 grain=floor(citySurface.xz*36.); float fleck=fract(sin(dot(grain,vec2(27.1,61.7)))*43758.5); float detail=1.-smoothstep(.012,.043,max(length(dFdx(citySurface.xz)),length(dFdy(citySurface.xz)))); diffuseColor.rgb*=1.+(fleck-.5)*.21*detail;':
-       'vec2 slab=citySurface.xz*vec2(2.4,1.9); slab.x+=mod(floor(slab.y),2.)*.5; vec2 edge=min(fract(slab),1.-fract(slab)); float seam=smoothstep(.015,.055,min(edge.x,edge.y)); diffuseColor.rgb*=mix(.70,1.04,seam);'));
+       'vec2 slab=citySurface.xz*vec2(2.4,1.9); slab.x+=mod(floor(slab.y),2.)*.5; vec2 edge=min(fract(slab),1.-fract(slab)); float pixel=max(length(dFdx(citySurface.xz)),length(dFdy(citySurface.xz))); float jointWidth=max(.025,pixel*2.4); float seam=smoothstep(.015,.015+jointWidth,min(edge.x,edge.y)); float detail=1.-smoothstep(.055,.19,pixel); diffuseColor.rgb*=mix(1.,mix(.70,1.04,seam),detail);'));
  };
  material.customProgramCacheKey=()=>asphalt?'city-asphalt':'city-pavers';
  streetSurfaceMaterials.set(color,material);
@@ -2188,6 +2188,36 @@ function drawShops(){
       }
     }
     if(seed%3===0)put('side',style.glass,shop,x+w/2+.1,height*.55,z, .2,1.6,d*.45);
+    if(progress.premium&&shape===2){
+      const terraceX=x+w/2+1.19,terraceZ=z-d*.17;
+      put('shopDiningDeck',0xbd9a74,shop,terraceX,.15,terraceZ,2.48,.23,4.55);
+      for(const end of [-1,1]){
+        const postZ=terraceZ+end*2.04;
+        put('shopPergolaPost',trim,shop,terraceX+1.04,1.65,postZ,.17,2.92,.17);
+        put('shopPergolaBeam',trim,shop,terraceX,3.08,postZ,2.50,.19,.23);
+        put('shopDiningTable',0xd0a36e,shop,terraceX,.98,terraceZ+end*1.16,1.06,.14,.84);
+        put('shopDiningPedestal',0x4a483f,shop,terraceX,.55,terraceZ+end*1.16,.19,.80,.19);
+      }
+      for(let slat=-3;slat<=3;slat++)
+        put('shopPergolaSlat',slat%2?0xe3b88b:trim,shop,terraceX+slat*.34,3.22,terraceZ,.14,.14,4.30);
+    }
+    if(progress.premium&&(shape===9||shape===10)){
+      const hotel=shape===10;
+      const rear=z-d/2;
+      for(const level of hotel?[.32,.61,.82]:[.33]){
+        const windowY=height*level;
+        for(const bay of [-1,1]){
+          const windowX=x+bay*w*.23,windowZ=z+bay*d*.23;
+          put('displayGlass',glass,shop,windowX,windowY,rear-.066,w*.29,hotel?1.28:1.62,.15);
+          put('shopPremiumSill',trim,shop,windowX,windowY-.85,rear-.13,w*.33,.15,.30);
+          for(const side of [-1,1]){
+            const sideX=x+side*(w/2+.066);
+            put('displayGlass',glass,shop,sideX,windowY,windowZ,.15,hotel?1.28:1.62,d*.29);
+            put('shopPremiumSill',trim,shop,sideX+side*.06,windowY-.85,windowZ,.30,.15,d*.33);
+          }
+        }
+      }
+    }
 
   }
   const material=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.77,metalness:.02});
