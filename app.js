@@ -1010,8 +1010,11 @@ const shopPurchases=[];
 const shopProgress=new Map();
 try {
  const saved=JSON.parse(localStorage.getItem('sudamerica-shop-progress')||'[]');
- for(const [key,value] of saved){
-  if(Number.isFinite(value?.points)&&value.points>=0)shopProgress.set(key,value);
+ if(Array.isArray(saved))for(const entry of saved){
+  if(!Array.isArray(entry))continue;
+  const [key,value]=entry;
+  if(typeof key==='string'&&Number.isFinite(value?.points)&&value.points>=0)
+   shopProgress.set(key,{points:value.points,premium:value.premium===true});
  }
 }catch{}
 function shopProgressFor(shop){
@@ -4670,6 +4673,7 @@ function v45Balloon(i,home){
  g.position.set(x,i===0?36:48+(i%4)*6,z);group.add(g);
  return {g,i,ownerId:home.id,baseY:g.position.y,x,z};
 }
+const BIRD_BOB=.9, BALLOON_BOB=2, BALLOON_SWAY_X=5, BALLOON_SWAY_Z=4;
 // Flight paths use a fixed safe altitude for the entire orbit.
 function flightClearance(group){
  const cellSize=24, heights=new Map();
@@ -4740,7 +4744,7 @@ function createV4Life(selected){
   for(let j=0;j<birdsInFlock;j++){
    const i=flock*5+j;
    const bird=v45Bird(i,centerX+(j-2)*5,centerZ+(j%2?4:-4),phase+j*.09);
-   bird.altitude=Math.max(22+bird.i%6*3,clearance(bird.x,bird.z,bird.rx+3,bird.rz+3)+4);
+   bird.altitude=Math.max(22+bird.i%6*3,clearance(bird.x,bird.z,bird.rx+3,bird.rz+3)+BIRD_BOB+3.1);
    bird.g.position.y=bird.altitude;
    life.birds.push(bird);
   }
@@ -4752,7 +4756,7 @@ function createV4Life(selected){
   const h=selected[spreadIndex(i,balloonCount,selected.length)];
   const balloon=v45Balloon(i,h);
   const scale=balloon.g.scale.x;
-  balloon.baseY=Math.max(balloon.baseY,clearance(balloon.x,balloon.z,5+4*scale,4+4*scale)+7*scale+3);
+  balloon.baseY=Math.max(balloon.baseY,clearance(balloon.x,balloon.z,BALLOON_SWAY_X+4*scale,BALLOON_SWAY_Z+4*scale)+7*scale+BALLOON_BOB+1);
   balloon.g.position.y=balloon.baseY;
   life.balloons.push(balloon);
  }
@@ -4841,14 +4845,14 @@ function animateLife(t){if(!active||!v4.motion)return;
   const vx=Math.cos(ang)*b.rx*.21,vz=-Math.sin(ang)*b.rz*.21;
   b.g.position.x=b.x+Math.sin(ang)*b.rx;
   b.g.position.z=b.z+Math.cos(ang)*b.rz;
-  b.g.position.y=b.altitude+Math.sin(t*1.6+b.i)*.9;
+  b.g.position.y=b.altitude+Math.sin(t*1.6+b.i)*BIRD_BOB;
   b.g.rotation.set(0,Math.atan2(-vx,-vz),Math.sin(ang)*.08);
   for(const wing of b.wings)wing.pivot.rotation.z=wing.side*(.05+Math.sin(t*4.7+b.i)*.32);
  }
  for(const b of life.balloons){
-  b.g.position.y=b.baseY+Math.sin(t*.45+b.i)*2;
-  b.g.position.x=b.x+Math.sin(t*.13+b.i)*5;
-  b.g.position.z=b.z+Math.cos(t*.11+b.i)*4;
+  b.g.position.y=b.baseY+Math.sin(t*.45+b.i)*BALLOON_BOB;
+  b.g.position.x=b.x+Math.sin(t*.13+b.i)*BALLOON_SWAY_X;
+  b.g.position.z=b.z+Math.cos(t*.11+b.i)*BALLOON_SWAY_Z;
   b.g.rotation.y=t*.08;
  }
 }
