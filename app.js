@@ -1417,9 +1417,10 @@ function animate(now=0){
   requestAnimationFrame(animate);
   if(!active)return;
   // Cap expensive large-city rendering at 30 FPS; smaller towns stay at 60.
-  const minInterval=homes.length>=2000?32:15;
-  if(now-lastRenderedFrame<minInterval)return;
-  lastRenderedFrame=now;
+  const minInterval=1000/(homes.length>=2000?30:60);
+  const elapsed=now-lastRenderedFrame;
+  if(elapsed+.001<minInterval)return;
+  lastRenderedFrame+=Math.floor((elapsed+.001)/minInterval)*minInterval;
   const t=now*.001;
   updateProgressiveDetails();
   updateRoadDetailLOD(now);
@@ -3614,6 +3615,7 @@ function renderAllHouses(selected){
     }
   }
   const renderBatches=new Map();
+  const spatialBatches=selected.length>=2000;
   for(const [key,batch] of batches.entries()){
     const texture=/(roof|gable|hip|towerTop|cornice)/i.test(key)?'roof':
       /(wall|body|towerBase|wing|topSetback|penthouse|bay|longWing)/i.test(key)?'wall':'';
@@ -3623,15 +3625,19 @@ function renderAllHouses(selected){
     const casts=/(gardenTree|towerBase|towerRoof|towerMain|towerMid|homeMain|homeWing|homeRoof|homeCore|homeWall|towerWall|towerBody|mainBody|wingBody|mainRoof|gable|hipRoof)/i.test(key);
     const receives=casts||/(facade|pier|window|door|balcony|pilaster)/i.test(key);
     const profile=[batch.geo.id,texture,normalStrength,roughness,metalness,casts,receives].join(':');
-    if(!renderBatches.has(profile))renderBatches.set(profile,{
-      geo:batch.geo,texture,normalStrength,roughness,metalness,casts,receives,entries:[]
-    });
-    const output=renderBatches.get(profile).entries;
-    for(const entry of batch.entries)output.push({...entry,color:batch.color});
+    for(const entry of batch.entries){
+      // Dense cities cull whole neighborhoods instead of submitting every house.
+      const key=spatialBatches?profile+':'+Math.floor(entry.h.x/184)+':'+Math.floor(entry.h.z/184):profile;
+      if(!renderBatches.has(key))renderBatches.set(key,{
+        profile,geo:batch.geo,texture,normalStrength,roughness,metalness,casts,receives,entries:[]
+      });
+      renderBatches.get(key).entries.push({...entry,color:batch.color});
+    }
   }
   const tint=new THREE.Color();
+  const materials=new Map();
   for(const batch of renderBatches.values()){
-    const mesh=new THREE.InstancedMesh(batch.geo,new THREE.MeshStandardMaterial({
+    if(!materials.has(batch.profile))materials.set(batch.profile,new THREE.MeshStandardMaterial({
       color:0xffffff,
       map:batch.texture?homePattern(batch.texture):null,
       normalMap:batch.texture?homeNormalPattern(batch.texture):null,
@@ -3639,7 +3645,8 @@ function renderAllHouses(selected){
       side:batch.geo===roofGeo?THREE.DoubleSide:THREE.FrontSide,
       roughness:batch.roughness,
       metalness:batch.metalness
-    }),batch.entries.length);
+    }));
+    const mesh=new THREE.InstancedMesh(batch.geo,materials.get(batch.profile),batch.entries.length);
     mesh.castShadow=batch.casts;
     mesh.receiveShadow=batch.receives;
     mesh.userData.homes=batch.entries.map(e=>e.h);
