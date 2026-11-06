@@ -39,14 +39,15 @@
   const now=performance.now();
   const elapsed=lastFrame?now-lastFrame:0;
   lastFrame=now;
-  if(elapsed>0&&!document.hidden){
+  if(document.hidden||elapsed>=1000){
+   slowFrames=0;
+   fastFrames=0;
+  }else if(elapsed>0){
    frameTimes[frames++%frameTimes.length]=elapsed;
-  }
-  if(elapsed>0&&elapsed<1000&&!document.hidden){
    const sample=Math.min(elapsed,180)*16/Math.max(16,frameInterval);
    averageFrame+=(sample-averageFrame)*.06;
    slowFrames=sample>27?slowFrames+1:0;
-   fastFrames=sample<18?fastFrames+1:0;
+   fastFrames=sample<24?fastFrames+1:0;
    const ratio=renderer.getPixelRatio();
    if(slowFrames>=30&&averageFrame>27){
     const next=Math.max(Math.min(.78,maxRatio),ratio-.15);
