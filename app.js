@@ -1391,11 +1391,11 @@ function updateRoadDetailLOD(now){
   mesh.visible=roadDetailFrustum.intersectsSphere(roadDetailSphere);
  }
 }
-// Commercial LOD: each 180m chunk has independently culled decorative
+// Commercial LOD: each 90m chunk has independently culled decorative
 // meshes. The shop silhouette, roof, windows and entrance stay visible.
 let shopDetailMeshes=[],lastShopDetailUpdate=0;
 const shopDetailFrustum=new THREE.Frustum(),shopDetailMatrix=new THREE.Matrix4();
-const shopDetailSphere=new THREE.Sphere(new THREE.Vector3(),82);
+const shopDetailSphere=new THREE.Sphere();
 function updateShopDetailLOD(now){
  if(!shopDetailMeshes.length||now-lastShopDetailUpdate<180)return;
  lastShopDetailUpdate=now;
@@ -1407,7 +1407,7 @@ function updateShopDetailLOD(now){
  for(const mesh of shopDetailMeshes){
   const c=mesh.userData.shopDetailChunk;
   if((c.x-target.x)**2+(c.z-target.z)**2>limit){mesh.visible=false;continue;}
-  shopDetailSphere.center.set(c.x,3,c.z);
+  shopDetailSphere.copy(mesh.boundingSphere).applyMatrix4(mesh.matrixWorld);
   mesh.visible=shopDetailFrustum.intersectsSphere(shopDetailSphere);
  }
 }
@@ -4246,7 +4246,9 @@ function showOwnerCard(h,kind='casa',selected=null){
  const title=kind==='negozio'?selected?.business||'Negozio':kind==='mongolfiera'?'Mongolfiera':kind==='persona'?'Personaggio':'Casa';
  if(kind==='negozio'&&selected){
   const progress=shopProgressFor(selected);
-  info.textContent=title+' · '+currentCity.name+' · '+progress.points.toLocaleString('it-IT')+' punti';
+  const level=houseTier(progress.points)+1;
+  info.textContent=title+' · '+currentCity.name+' · Livello '+level+'/'+HOUSE_TIERS.length+
+   ' · '+progress.points.toLocaleString('it-IT')+' punti · '+(progress.premium?'Premium':'Base');
  }else info.innerHTML='<b>'+title+' · '+currentCity.name+'</b><p>⭐ '+h.points.toLocaleString('it-IT')+' punti</p><p>🌿 Giardino: '+(h.points<1?'non sbloccato':GARDEN_CATALOG[0].options[housePlant(h)]+' · '+(isPremiumHouse(h)?4:2)+' piante')+'</p><p>🎨 Colore: '+housePaint(h).name+'</p><p>🏗️ '+tier.name+' · '+tier.levels+' piani</p><p>🎨 Design: '+(isPremiumHouse(h)?'Premium (abbonamento demo)':'Gratis')+'</p><p>🏠 Casa #'+String(h.id).padStart(5,'0')+'</p>';
  details.appendChild(info);
  if(kind==='negozio'&&selected){
