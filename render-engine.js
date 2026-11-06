@@ -3,7 +3,7 @@
    no blur, downsampling or dark screen-space filters. */
 (function(){
  'use strict';
- const target=new THREE.Vector3(),direction=new THREE.Vector3(),offset=new THREE.Vector3(-155,205,115);
+ const target=new THREE.Vector3(),direction=new THREE.Vector3(),offset=new THREE.Vector3(-155,156,115);
  const shadowCenter=new THREE.Vector3(Infinity,0,Infinity);
  let sun=null,lastShadow=-Infinity;
  let shadowDirty=true,previousCity=null;
@@ -20,7 +20,7 @@
   renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure=1.13;
+  renderer.toneMappingExposure=1.04;
   scene.traverse(function(o){
    if(o.isDirectionalLight&&!sun){
     sun=o;sun.castShadow=true;
@@ -28,7 +28,7 @@
     const c=sun.shadow.camera;
     c.left=-114;c.right=114;c.top=114;c.bottom=-114;c.near=1;c.far=750;
     c.updateProjectionMatrix();
-    sun.shadow.bias=-0.00014;sun.shadow.normalBias=.032;
+    sun.shadow.bias=-0.00014;sun.shadow.normalBias=.022;
     sun.shadow.radius=3;
    }
   });
