@@ -1768,15 +1768,15 @@ function drawShops(){
       kind.startsWith('pizza')||kind==='tradeRound'?disc:box;
     const casts=/^(body|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof)$/.test(kind);
     const receives=casts||kind==='shopPaving';
-    const key=[geometry.id,color,casts,receives,detailed?cx:'all',detailed?cz:'all'].join(':');
-    if(!batches.has(key))batches.set(key,{color,geo:geometry,casts,receives,entries:[],detailed,
+    const key=[geometry.id,casts,receives,detailed?cx:'all',detailed?cz:'all'].join(':');
+    if(!batches.has(key))batches.set(key,{geo:geometry,casts,receives,entries:[],detailed,
       chunk:{x:(cx+.5)*90,z:(cz+.5)*90}});
     let rotation=0;
     if(shop){rotation=facadeAngle(shop);
       const dx=x-shop.x,dz=z-shop.z,ca=Math.cos(rotation),sa=Math.sin(rotation);
       x=shop.x+dx*ca+dz*sa;z=shop.z-dx*sa+dz*ca;
     }
-    batches.get(key).entries.push({shop,x,y,z,w,h,d,rotation});
+    batches.get(key).entries.push({shop,color,x,y,z,w,h,d,rotation});
   }
   for(const shop of shopPurchases){
     const style=shopStyles[shop.id%shopStyles.length];
@@ -2137,16 +2137,15 @@ function drawShops(){
     if(seed%3===0)put('side',style.glass,shop,x+w/2+.1,height*.55,z, .2,1.6,d*.45);
 
   }
-  const shopMaterials=new Map();
+  const material=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.77,metalness:.02});
+  const instanceColor=new THREE.Color();
   for(const batch of batches.values()){
-    if(!shopMaterials.has(batch.color))
-      shopMaterials.set(batch.color,new THREE.MeshStandardMaterial({color:batch.color,side:THREE.FrontSide,roughness:.77,metalness:.02,flatShading:false}));
-    const mesh=new THREE.InstancedMesh(batch.geo,shopMaterials.get(batch.color),batch.entries.length);
+    const mesh=new THREE.InstancedMesh(batch.geo,material,batch.entries.length);
     mesh.castShadow=batch.casts;
     mesh.receiveShadow=batch.receives;
     for(let i=0;i<batch.entries.length;i++){
       const e=batch.entries[i];dummy.position.set(e.x,e.y,e.z);dummy.rotation.set(0,e.rotation,0);
-      dummy.scale.set(e.w,e.h,e.d);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);
+      dummy.scale.set(e.w,e.h,e.d);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix); mesh.setColorAt(i,instanceColor.setHex(e.color));
     }
     mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();group.add(mesh);
     if(batch.detailed){
@@ -3179,8 +3178,9 @@ function renderAllHouses(selected){
       // Architectural visual scale: retain the real tier and progression,
       // but keep most homes within a coherent neighborhood skyline.
       const levels=info.levels;
-      const wall=housePaint(h).wall;
-      const trim=housePaint(h).roof;
+      const paint=housePaint(h);
+      const wall=premium?coordinatedHouseColor(paint.wall,0xfff5df,.58):paint.wall;
+      const trim=premium?coordinatedHouseColor(paint.roof,0x14554c,.76):paint.roof;
       const height=levels*2.55+1.8,x=h.x,z=h.z;
       // No parcel decorations: landscaping unlocks at one point.
       place('towerBase',boxGeo,wall,h,x,height/2,z,footW,height,footD);
@@ -3244,6 +3244,9 @@ function renderAllHouses(selected){
         for(const face of [-1,1]){
           place('premiumTowerBaseBand',boxGeo,stone,h,x,2.92,z+face*(footD/2+.10),footW+.12,.18,.26);
           place('premiumTowerCrownBand',boxGeo,stone,h,x,height-.16,z+face*(footD/2+.10),footW+.12,.26,.27);
+          const sideX=x+face*(footW/2+.10);
+          place('premiumTowerSideBaseBand',boxGeo,stone,h,sideX,2.92,z,.26,.18,footD+.12);
+          place('premiumTowerSideCrownBand',boxGeo,stone,h,sideX,height-.16,z,.27,.26,footD+.12);
         }
 
       }
@@ -3360,8 +3363,9 @@ function renderAllHouses(selected){
     const width=footW,depth=footD;
     const levels=HOUSE_TIERS[tier].levels;
     const height=1.2+levels*2.35;
-    const wall=housePaint(h).wall;
-    const roof=housePaint(h).roof;
+    const paint=housePaint(h);
+    const wall=premium?coordinatedHouseColor(paint.wall,0xfff5df,.58):paint.wall;
+    const roof=premium?coordinatedHouseColor(paint.roof,0x14554c,.76):paint.roof;
     const x=h.x,z=h.z;
     const lawn=0x84ac82;
     // v5.8.1: low-rise homes are genuinely composed from two masses.
@@ -3419,6 +3423,12 @@ function renderAllHouses(selected){
       const bronze=0x4c3b30;
       place('premiumDoorLintel',boxGeo,capital,h,x,2.19,frontage+.13,1.62,.21,.21);
       for(const side of [-1,1]){
+        const pierX=x+side*coreW*.465;
+        place('premiumFacadePier',boxGeo,stone,h,pierX,height*.49,frontage+.11,.27,height*.91,.24);
+        place('premiumFacadeCapital',boxGeo,capital,h,pierX,height*.955,frontage+.14,.39,.19,.31);
+        place('premiumFacadePlinth',boxGeo,plinth,h,pierX,.25,frontage+.14,.41,.42,.31);
+      }
+      for(const side of [-1,1]){
         const sx=x+side*coreW*.28;
         place('premiumWallLanternStem',boxGeo,bronze,h,x+side*.90,1.99,frontage+.24,.12,.31,.20);
         place('premiumWallLanternGlass',boxGeo,0xffcf74,h,x+side*.90,1.85,frontage+.29,.17,.20,.17);
@@ -3437,6 +3447,12 @@ function renderAllHouses(selected){
         }
       }
       place('premiumEntryPaving',boxGeo,stone,h,x,.085,frontage+1.35,1.68,.10,1.18);
+      const rear=z+coreZ-coreD/2;
+      for(const side of [-1,1]){
+        const rearX=x+side*coreW*.455;
+        place('premiumRearPilaster',boxGeo,stone,h,rearX,height*.49,rear-.10,.25,height*.91,.21);
+        place('premiumRearCapital',boxGeo,capital,h,rearX,height*.955,rear-.13,.36,.18,.29);
+      }
       // Keep the front wall and roof as ONE continuous volume. The old
       // pavilion was pushed through the main facade and produced a roof
       // intersecting the house, with windows embedded in its geometry.
