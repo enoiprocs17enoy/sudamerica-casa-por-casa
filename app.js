@@ -1814,22 +1814,41 @@ function drawShops(){
     const d=[7.4,12.9,9.4,9.4,7.4,6.8,11.6,7.9,14.2,11.2,10.5,9.4][shape]*(.9+rnd(seed*37+3)*.12);
     const height=[4.2,5.1,5.2,6.4,4.7,4.0,5.0,4.5,9.0,6.8,12.2,4.3][shape]*(.88+rnd(seed*41+2)*.22)*(district==='centro'?1.08:1);
     const x=shop.x,z=shop.z;
-    put('shopPaving',[0xaba99f,0xb8b5a9,0x9ba9a8][seed%3],shop,x,.055,z,17.7,.06,17.5);
-    put('body',style.walls,shop,x,height/2,z,w,height,d);
-    const front=z+d/2, trim=style.trim, glass=style.glass;
     const progress=shopProgressFor(shop);
+    const wallColor=progress.premium?coordinatedHouseColor(style.walls,0xffe8c5,shape===1?.68:.32):style.walls;
+    const paving=progress.premium?0xc7ad8b:[0xaba99f,0xb8b5a9,0x9ba9a8][seed%3];
+    put('shopPaving',paving,shop,x,.055,z,17.7,.06,17.5);
+    put('body',wallColor,shop,x,height/2,z,w,height,d);
+    const front=z+d/2, trim=style.trim, glass=style.glass;
     const stage=houseTier(progress.points);
     for(let floor=0;floor<stage;floor++){
       const width=w*(.86-floor*.045),depth=d*(.72-floor*.043);
       const centerZ=z-d*.08, floorY=height+.46+floor*2.65;
-      put('shopUpperBody',style.walls,shop,x,floorY+1.325,centerZ,width,2.65,depth);
+      put('shopUpperBody',wallColor,shop,x,floorY+1.325,centerZ,width,2.65,depth);
       put('shopUpperCap',trim,shop,x,floorY+2.58,centerZ,width+.23,.19,depth+.23);
+      if(progress.premium){
+        put('shopUpperCap',shape===1?0xb09b74:trim,shop,x,floorY+.18,centerZ,width+.28,.23,depth+.28);
+        for(const side of [-1,1]){
+          const corner=x+side*(width/2-.07);
+          for(const face of [-1,1])
+            put('shopUpperSill',shape===1?0xdccba6:0xf2dfbf,shop,corner,floorY+1.38,centerZ+face*(depth/2-.07),.30,2.38,.30);
+        }
+      }
       for(const face of [-1,1])for(const column of [-1,0,1]){
         const wx=x+column*width*.28,wz=centerZ+face*(depth/2+.052);
         put('shopUpperGlass',glass,shop,wx,floorY+1.42,wz,width*.19,1.28,.10);
         if(progress.premium){
           put('shopUpperSill',0xf2dfbf,shop,wx,floorY+.73,wz+face*.09,width*.23,.16,.25);
           put('shopUpperMullion',0xf2dfbf,shop,wx,floorY+1.42,wz+face*.09,.07,1.28,.08);
+        }
+      }
+      for(const side of [-1,1]){
+        const sideX=x+side*(width/2+.052);
+        for(const column of [-1,1]){
+          const sideZ=centerZ+column*depth*.24;
+          put('shopUpperGlass',glass,shop,sideX,floorY+1.42,sideZ,.10,1.28,depth*.22);
+          if(progress.premium)
+            put('shopUpperSill',0xf2dfbf,shop,sideX+side*.09,floorY+.73,sideZ,.25,.16,depth*.26);
         }
       }
     }
