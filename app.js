@@ -1076,6 +1076,7 @@ function createHomes(n){
 }
 // Visual release 6.7.0: procedural atmosphere with no external assets.
 const coastalDirections={"ar-mar-del-plata":[1.426,3],"ar-buenos-aires":[2.173,3],"uy-montevideo":[0.06,3],"cl-valparaiso":[-2.445,3],"br-rio":[0.726,3],"br-salvador":[-1.19,3],"pe-lima":[-0.985,10],"co-cartagena":[-1.656,6],"ve-caracas":[-3.011,16],"gy-georgetown":[3.115,3],"sr-paramaribo":[-3.038,10],"ar-la-plata":[2.67,10],"ar-bahia-blanca":[0.224,10],"ar-necochea":[0.306,6],"ar-puerto-madryn":[1.833,3],"ar-trelew":[0.954,24],"ar-comodoro-rivadavia":[0.999,3],"ar-rio-gallegos":[1.739,3],"ar-ushuaia":[1.193,3],"br-santos":[0.449,3],"br-niteroi":[-0.043,6],"br-vitoria":[1.32,3],"br-vila-velha":[1.128,3],"br-florianopolis":[1.706,3],"br-joinville":[1.571,35],"br-itajai":[1.771,3],"br-criciuma":[0.68,24],"br-porto-alegre":[-0.222,3],"br-pelotas":[1.702,16],"br-rio-grande":[1.026,3],"br-belem":[-3.11,16],"br-macapa":[1.608,3],"br-sao-luis":[-2.134,3],"br-fortaleza":[2.816,3],"br-natal":[1.931,3],"br-joao-pessoa":[1.789,6],"br-recife":[1.099,3],"br-olinda":[1.203,3],"br-maceio":[0.553,3],"br-aracaju":[1.076,3],"cl-concepcion":[-1.904,6],"cl-talcahuano":[-1.642,3],"cl-valdivia":[-2.001,16],"cl-puerto-montt":[0.07,3],"cl-punta-arenas":[1.125,3],"cl-antofagasta":[-1.471,3],"cl-iquique":[-1.702,3],"cl-arica":[-1.309,3],"cl-la-serena":[-1.687,3],"cl-coquimbo":[-1.859,3],"cl-vina-del-mar":[-2.057,3],"uy-maldonado":[-0.183,6],"uy-punta-del-este":[0.131,3],"uy-colonia-del-sacramento":[-0.486,3],"pe-trujillo":[-0.759,6],"pe-chiclayo":[-0.881,16],"pe-chimbote":[-0.991,3],"ec-manta":[-2.947,3],"ec-portoviejo":[-2.487,24],"ec-machala":[-2.326,6],"ec-esmeraldas":[-3.065,3],"co-barranquilla":[-3.091,16],"co-santa-marta":[-2.233,3],"co-sincelejo":[-2.225,35],"co-riohacha":[-2.638,3],"co-buenaventura":[-1.194,3],"ve-maracaibo":[0.777,6],"ve-maracay":[-3.011,35],"ve-puerto-la-cruz":[-2.471,3],"ve-barcelona":[-2.447,6],"ve-cumana":[-2.72,3],"ve-coro":[3.12,10],"ve-puerto-cabello":[-3.127,3],"gy-new-amsterdam":[2.957,3],"sr-lelydorp":[3.142,35],"sr-nieuw-nickerie":[-3.045,3],"br-sao-vicente":[0.393,3],"br-duque-de-caxias":[0.169,10],"br-teresopolis":[0.524,24],"br-serra-espirito-santo":[1.178,24],"br-sao-jose-santa-catarina":[1.31,6],"br-jaragua-do-sul":[1.215,3],"br-balneario-camboriu":[1.702,3],"br-capao-do-leao":[1.293,6],"br-ananindeua":[-2.662,3],"br-sao-jose-de-ribamar":[-3.012,3],"br-caucaia":[2.618,3],"br-jaboatao-dos-guararapes":[1.194,3],"br-lauro-de-freitas":[0.378,3],"br-parnamirim-rio-grande-do-norte":[1.882,10],"br-bayeux":[1.29,6],"br-rio-largo":[0.882,3],"br-praia-grande-sao-paulo":[0.722,3],"br-nova-iguacu":[0.126,6],"br-cariacica":[1.036,3],"br-palhoca":[1.893,3],"br-camboriu":[1.856,24],"br-sao-lourenco-do-sul":[1.44,24],"br-marituba":[2.752,3],"br-paco-do-lumiar":[-0.512,3],"br-maracanau":[2.733,3],"br-olinda-pernambuco":[1.309,3],"br-camacari":[0.545,3],"br-sao-goncalo-do-amarante-rn":[1.833,3],"br-santa-rita-paraiba":[1.898,3],"br-marechal-deodoro":[0.782,10],"br-sao-cristovao-sergipe":[0.785,3],"br-santo-andre":[0.297,24],"br-guaruja":[0.273,3],"br-cacapava":[0.262,35],"br-sao-joao-de-meriti":[0.042,3],"br-viana-espirito-santo":[1.178,3],"br-biguacu":[1.152,3],"br-guaramirim":[1.674,6],"br-navegantes":[1.833,35],"br-viamao":[0.725,3],"br-benevides":[-2.88,24],"br-raposa-maranhao":[1.332,3],"br-eusebio":[2.733,3],"br-paulista-pernambuco":[1.28,16],"br-simoes-filho":[0.441,3],"br-macaiba":[1.833,3],"br-cabedelo":[1.833,3],"br-barra-dos-coqueiros":[0.916,16],"br-cubatao":[0.3,3],"br-belford-roxo":[0.022,3],"br-santo-amaro-da-imperatriz":[1.411,3],"br-araquari":[1.103,3],"br-pomerode":[1.702,35],"br-penha-santa-catarina":[1.702,35],"br-alcantara-maranhao":[-2.904,6],"br-aquiraz":[2.618,3],"br-camaragibe":[1.348,24],"br-dias-d-avila":[0.182,3],"br-extremoz":[1.833,35],"br-conde-paraiba":[1.62,3],"br-satuba":[0.929,6],"br-itaporanga-d-ajuda":[0.87,10],"br-bertioga":[0.902,3],"br-nilopolis":[0.924,10],"br-aracruz":[1.064,3],"ar-avellaneda":[2.542,3],"ar-miramar":[1.26,3],"ar-punta-alta":[-0.181,16],"ar-caleta-olivia":[1.089,16],"ar-lanus":[1.963,35],"ar-balcarce":[1.029,6],"ar-sarmiento":[1.647,6],"ar-lomas-de-zamora":[-0.802,3],"ar-mar-chiquita":[1.26,3],"ar-rada-tilly":[1.047,6],"ar-quilmes":[2.405,3],"ar-villa-gesell":[1.255,10],"ar-tornquist":[0.524,24],"ar-las-heras-santa-cruz":[1.146,24],"ar-berazategui":[0.739,3],"ar-pinamar":[1.02,10],"ar-pico-truncado":[0.906,6],"ar-florencio-varela":[2.618,3],"ar-dolores":[1.024,16],"cl-quilpue":[-1.639,10],"cl-chiguayante":[-1.895,16],"cl-puerto-varas":[-1.047,24],"cl-tocopilla":[-1.647,24],"cl-alto-hospicio":[-1.767,3],"cl-puerto-natales":[1.309,3],"cl-villa-alemana":[-1.183,6],"cl-san-pedro-de-la-paz":[-1.934,16],"cl-calbuco":[0.454,10],"cl-mejillones":[-1.833,35],"cl-pozo-almonte":[-1.702,24],"cl-porvenir-chile":[-1.399,3],"cl-concon":[-1.721,3],"cl-hualpen":[-1.833,3],"cl-ancud":[1.105,3],"cl-taltal":[-1.317,10],"cl-pica-chile":[-1.44,3],"cl-puerto-williams":[1.195,10],"cl-quillota":[-1.833,3],"cl-coronel-chile":[-2.03,16],"cl-castro-chile":[0.682,16],"cl-maria-elena":[-1.106,10],"cl-huara":[-1.633,16],"cl-cerro-sombrero":[-1.468,3],"cl-la-calera":[-1.833,3],"pe-callao":[-0.718,3],"pe-la-esperanza-peru":[-0.797,3],"pe-lambayeque":[-0.876,6],"pe-ventanilla":[-0.718,3],"pe-ferrenafe":[-0.797,3],"pe-san-juan-de-lurigancho":[-0.771,10],"pe-victor-larco-herrera":[-0.916,6],"pe-comas":[-1.349,3],"pe-huanchaco":[-0.785,35],"co-soledad-atlantico":[2.861,10],"co-turbaco":[-1.963,3],"co-malambo":[-2.487,3],"co-arjona-bolivar":[-1.634,3],"co-puerto-colombia":[-3.011,3],"co-magangue":[-1.797,16],"co-galapa":[-3.011,3],"ve-petare":[-2.88,35],"ve-san-francisco-zulia":[2.021,3],"ve-guarenas":[-2.981,16],"ve-cabimas":[-0.55,3],"ve-cagua":[-2.997,3],"ve-guatire":[3.142,35],"ve-ciudad-ojeda":[-1.047,3],"ve-guacara":[2.88,35],"ve-la-victoria-aragua":[-3.011,24],"ve-los-teques":[-3.011,3],"ec-montecristi-ecuador":[-2.437,10],"ec-jaramijo":[-2.094,3],"ec-bahia-de-caraquez":[-2.191,3],"uy-las-piedras":[0,35],"uy-san-carlos":[-0.382,3],"uy-carmelo":[2.225,3],"uy-la-paz-uruguay":[-0.393,3],"uy-piriapolis":[-0.262,3],"uy-nueva-palmira":[-0.857,3],"gy-bartica":[2.501,10],"gy-anna-regina":[2.946,3],"gy-vreed-en-hoop":[2.498,3],"sr-south-drain":[2.317,3],"sr-domburg-suriname":[3.077,16],"sr-groningen-suriname":[2.88,3],"ar-felix-u-camet":[1.342,3]};
+const plataEstuary=new Set(['ar-buenos-aires','ar-quilmes','ar-avellaneda','ar-berazategui','ar-la-plata','uy-montevideo','uy-colonia-del-sacramento']);
 let releaseSky=null;
 
 // East is +X and north is -Z, matching the city compass.
@@ -1100,13 +1101,25 @@ function buildRegionalLandscape(houses){
  }
  shore+=85+(coast?.[1]||0)*12;
  if(coast){
+  const estuary=plataEstuary.has(city.id);
   const sea=new THREE.Mesh(new THREE.PlaneGeometry(14500,7000),
-   new THREE.MeshStandardMaterial({color:0x277d9c,roughness:.39,metalness:.08}));
+   new THREE.MeshStandardMaterial({color:estuary?0x887a57:0x277d9c,roughness:estuary?.61:.39,metalness:estuary?0:.08}));
   sea.rotation.set(-Math.PI/2,0,angle);
   sea.position.set(east*(shore+3500),-.065,south*(shore+3500));
   group.add(sea);
-  const beach=new THREE.Mesh(new THREE.PlaneGeometry(14500,17),
-   new THREE.MeshStandardMaterial({color:0xd4bd88,roughness:.91}));
+  const beachGeometry=new THREE.PlaneGeometry(14500,17,1,4);
+  const beachVertices=beachGeometry.attributes.position;
+  const beachColors=new Float32Array(beachVertices.count*3);
+  const drySand=new THREE.Color(estuary?0x9d8d63:0xd4bd88);
+  const wetSand=new THREE.Color(estuary?0x655b42:0x8c795a);
+  const sand=new THREE.Color();
+  for(let i=0;i<beachVertices.count;i++){
+   const wetness=Math.max(0,(8.5-beachVertices.getY(i))/17);
+   sand.copy(drySand).lerp(wetSand,wetness*wetness).toArray(beachColors,i*3);
+  }
+  beachGeometry.setAttribute('color',new THREE.BufferAttribute(beachColors,3));
+  const beach=new THREE.Mesh(beachGeometry,
+   new THREE.MeshStandardMaterial({vertexColors:true,roughness:.91}));
   beach.rotation.copy(sea.rotation);
   beach.position.set(east*(shore-8.5),-.056,south*(shore-8.5));
   group.add(beach);
@@ -1154,24 +1167,32 @@ function buildRegionalLandscape(houses){
 
 
  const candidates=[];
- for(let i=0;i<2100;i++){
-  const x=minX-520+rnd(i*31+city.lng)*(maxX-minX+1040);
-  const z=minZ-520+rnd(i*51+city.lat)*(maxZ-minZ+1040);
-  const margin=28;
-  let nearDevelopment=false;
-  for(let col=Math.round((x-margin)/BLOCK_X);col<=Math.round((x+margin)/BLOCK_X);col++){
-   for(let row=Math.round((z-margin)/BLOCK_Z);row<=Math.round((z+margin)/BLOCK_Z);row++){
-    if(cleared.has(col+':'+row))nearDevelopment=true;
+ const spacing=32;
+ for(let col=Math.floor((minX-520)/spacing);col<=Math.ceil((maxX+520)/spacing);col++){
+  for(let row=Math.floor((minZ-520)/spacing);row<=Math.ceil((maxZ+520)/spacing);row++){
+  const i=col*73856093^row*19349663;
+  const x=(col+rnd(i+city.lng))*spacing;
+  const z=(row+rnd(i+city.lat+37))*spacing;
+   const margin=28;
+   let nearDevelopment=false;
+   for(let col=Math.round((x-margin)/BLOCK_X);col<=Math.round((x+margin)/BLOCK_X);col++){
+    for(let row=Math.round((z-margin)/BLOCK_Z);row<=Math.round((z+margin)/BLOCK_Z);row++){
+     if(cleared.has(col+':'+row))nearDevelopment=true;
+    }
    }
+   if(nearDevelopment)continue;
+   if(coast&&x*east+z*south>shore-30)continue;
+   const grove=Math.sin(x*.018)*Math.cos(z*.021);
+   if(rnd(i*79)>.63+grove*.31)continue;
+   candidates.push({x,z,i,y:Math.max(0,terrainHeight(x,z)-.15)});
   }
-  if(nearDevelopment)continue;
-  if(coast&&x*east+z*south>shore-30)continue;
-  const grove=Math.sin(x*.018)*Math.cos(z*.021);
-  if(rnd(i*79)>.63+grove*.31)continue;
-  candidates.push({x,z,i,y:Math.max(0,terrainHeight(x,z)-.15)});
  }
- const canopy=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,1),
-  new THREE.MeshStandardMaterial({roughness:1}),candidates.length);
+ const canopyMaterial=new THREE.MeshStandardMaterial({roughness:1});
+ const nearTown=({x,z})=>x>=minX-180&&x<=maxX+180&&z>=minZ-180&&z<=maxZ+180;
+ const nearCount=candidates.filter(nearTown).length;
+ const canopies=[nearCount,candidates.length-nearCount].map((count,index)=>
+  new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,index===0?1:0),canopyMaterial,count));
+ const canopyIndices=[0,0];
  const trunks=new THREE.InstancedMesh(new THREE.CylinderGeometry(.35,.62,1,6),
   new THREE.MeshStandardMaterial({color:0x645039,roughness:1}),candidates.length);
  const dummy=new THREE.Object3D();
@@ -1188,12 +1209,14 @@ function buildRegionalLandscape(houses){
   dummy.scale.set(size*(tall?.52:.88),size*(tall?1.20:.72),size*(tall?.52:.83));
   dummy.rotation.y=rnd(i*87)*Math.PI;
   dummy.updateMatrix();
-  canopy.setMatrixAt(index,dummy.matrix);
-  canopy.setColorAt(index,color.setHSL(.22+rnd(i*31)*.10,.30+rnd(i*47)*.27,.21+rnd(i*12)*.16));
+  const detail=nearTown({x,z})?0:1;
+  const canopy=canopies[detail],canopyIndex=canopyIndices[detail]++;
+  canopy.setMatrixAt(canopyIndex,dummy.matrix);
+  canopy.setColorAt(canopyIndex,color.setHSL(.22+rnd(i*31)*.10,.30+rnd(i*47)*.27,.21+rnd(i*12)*.16));
  });
- canopy.computeBoundingSphere();
+ for(const canopy of canopies)canopy.computeBoundingSphere();
  trunks.computeBoundingSphere();
- group.add(trunks,canopy);
+ group.add(trunks,...canopies.filter(canopy=>canopy.count>0));
 }
 function regionalMountain(city){
  // Approximate Andean ridge axis. Coastal and inland cities use the same compass.
@@ -1437,6 +1460,7 @@ function disposeGroup() {
   if (!group) return;
   const geometries=new Set(),materials=new Set();
   group.traverse(o=>{
+    if(o.isInstancedMesh)o.dispose();
     if(o.geometry)geometries.add(o.geometry);
     if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>materials.add(m));
   });
@@ -1503,7 +1527,7 @@ function addTree(x,z,seed,scale=1,flowering=false) {
  canopy.position.set(x,(height-.1)*scale,z);
  canopy.castShadow=true;
  canopy.receiveShadow=true;
- canopy.computeBoundingSphere();
+ for(const canopy of canopies)canopy.computeBoundingSphere();
  group.add(canopy);
 }
 
@@ -3687,7 +3711,7 @@ function clearCloseDetails(){
  if(!nearDetailGroup)return;
  const old=nearDetailGroup;nearDetailGroup=null;
  old.parent?.remove(old);
- old.traverse(o=>{if(o.material)o.material.dispose()});
+ old.traverse(o=>{if(o.isInstancedMesh)o.dispose();if(o.material)o.material.dispose()});
  // Shared geometries are deliberately retained.
 }
 // Compact handcrafted procedural bushes; all four are original and use
