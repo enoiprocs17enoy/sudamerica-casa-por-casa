@@ -1217,6 +1217,32 @@ function buildRegionalLandscape(houses){
  for(const canopy of canopies)canopy.computeBoundingSphere();
  trunks.computeBoundingSphere();
  group.add(trunks,...canopies.filter(canopy=>canopy.count>0));
+ // Sparse geometry per tree keeps the outer landscape populated at horizon scale.
+ const distant=[];
+ const horizon=5920,step=86;
+ for(let gx=-horizon;gx<horizon;gx+=step){
+  for(let gz=-horizon;gz<horizon;gz+=step){
+   const seed=gx*131+gz*379;
+   const x=gx+rnd(seed+11)*step,z=gz+rnd(seed+31)*step;
+   if(x>=minX-510&&x<=maxX+510&&z>=minZ-510&&z<=maxZ+510)continue;
+   if(coast&&x*east+z*south>shore-35)continue;
+   const grove=Math.sin(x*.003)*Math.cos(z*.004);
+   if(rnd(seed+71)>.84+grove*.14)continue;
+   distant.push({x,z,seed});
+  }
+ }
+ const forest=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,0),canopyMaterial,distant.length);
+ distant.forEach(({x,z,seed},index)=>{
+  const size=8+rnd(seed+91)*12;
+  dummy.position.set(x,terrainHeight(x,z)+size*.65,z);
+  dummy.rotation.set(0,rnd(seed+103)*Math.PI,0);
+  dummy.scale.set(size*.8,size,size*.76);
+  dummy.updateMatrix();
+  forest.setMatrixAt(index,dummy.matrix);
+  forest.setColorAt(index,color.setHSL(.22+rnd(seed+27)*.07,.34,.20+rnd(seed+53)*.14));
+ });
+ forest.computeBoundingSphere();
+ group.add(forest);
 }
 function regionalMountain(city){
  // Approximate Andean ridge axis. Coastal and inland cities use the same compass.
@@ -1269,7 +1295,7 @@ function installReleaseSky(){
  }`});
  releaseSky=new THREE.Mesh(new THREE.SphereGeometry(3000,32,20),mat);releaseSky.frustumCulled=false;releaseSky.renderOrder=-1000;scene.add(releaseSky);
 }
-function makeScene(){if(!window.THREE){$('status').textContent='Motore 3D non caricato. Verifica Internet e ricarica.';return false}scene=new THREE.Scene();scene.background=new THREE.Color(0x9bc9e7);scene.fog=new THREE.FogExp2(0xb4d1e2,.000048);installReleaseSky();camera=new THREE.PerspectiveCamera(53,1,2,8000);renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=false;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=0.98;$('threeLayer').appendChild(renderer.domElement);scene.add(new THREE.HemisphereLight(0xcde6ff,0xb8a98c,1.48));let sun=new THREE.DirectionalLight(0xffeed5,3.05);sun.position.set(130,240,90);scene.add(sun);if(window.SudamericaRender8)SudamericaRender8.setup(scene,camera,renderer);let ground=new THREE.Mesh(new THREE.PlaneGeometry(12000,12000),new THREE.MeshStandardMaterial({color:0xc8d5ae,roughness:1,map:homePattern('grass')}));ground.rotation.x=-Math.PI/2;ground.position.y=-.12;ground.receiveShadow=true;scene.add(ground);group=new THREE.Group();scene.add(group);raycaster=new THREE.Raycaster();let canvas=renderer.domElement;
+function makeScene(){if(!window.THREE){$('status').textContent='Motore 3D non caricato. Verifica Internet e ricarica.';return false}scene=new THREE.Scene();scene.background=new THREE.Color(0x9bc9e7);scene.fog=new THREE.FogExp2(0xb4d1e2,.000048);installReleaseSky();camera=new THREE.PerspectiveCamera(53,1,2,8000);renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=false;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=0.98;$('threeLayer').appendChild(renderer.domElement);scene.add(new THREE.HemisphereLight(0xc2dbff,0xb5a082,.96));let sun=new THREE.DirectionalLight(0xffe2b8,3.35);sun.position.set(130,240,90);scene.add(sun);if(window.SudamericaRender8)SudamericaRender8.setup(scene,camera,renderer);let ground=new THREE.Mesh(new THREE.PlaneGeometry(12000,12000),new THREE.MeshStandardMaterial({color:0xc8d5ae,roughness:1,map:homePattern('grass')}));ground.rotation.x=-Math.PI/2;ground.position.y=-.12;ground.receiveShadow=true;scene.add(ground);group=new THREE.Group();scene.add(group);raycaster=new THREE.Raycaster();let canvas=renderer.domElement;
 // Earth-style navigation: left drag pans the ground, right drag or Shift
 // rotates/tilts, wheel zooms toward the cursor, two fingers pan/pinch/rotate.
 canvas.style.touchAction='none';
@@ -1527,7 +1553,7 @@ function addTree(x,z,seed,scale=1,flowering=false) {
  canopy.position.set(x,(height-.1)*scale,z);
  canopy.castShadow=true;
  canopy.receiveShadow=true;
- for(const canopy of canopies)canopy.computeBoundingSphere();
+ canopy.computeBoundingSphere();
  group.add(canopy);
 }
 
@@ -1810,19 +1836,169 @@ function drawShops(){
     const style=shopStyles[shop.id%shopStyles.length];
     const seed=shop.id,district=districtStyle(shop.block);
     const shape=shop.id%shopStyles.length;
-    const w=[7.2,14.5,12.2,8.5,8.1,6.4,12.9,7.7,16.2,12.8,11.4,13.1][shape]*(.87+rnd(seed*31+8)*.16);
-    const d=[7.4,12.9,9.4,9.4,7.4,6.8,11.6,7.9,14.2,11.2,10.5,9.4][shape]*(.9+rnd(seed*37+3)*.12);
-    const height=[4.2,5.1,5.2,6.4,4.7,4.0,5.0,4.5,9.0,6.8,12.2,4.3][shape]*(.88+rnd(seed*41+2)*.22)*(district==='centro'?1.08:1);
-    const x=shop.x,z=shop.z;
     const progress=shopProgressFor(shop);
+    const stage=houseTier(progress.points);
+    const growth=stage/7;
+    const towerFloors=shape===10?stage:0;
+    const width=[7.2,14.5,12.2,8.5,8.1,6.4,12.9,7.7,16.2,12.8,11.4,13.1][shape]*(.87+rnd(seed*31+8)*.16);
+    const depth=[7.4,12.9,9.4,9.4,7.4,6.8,11.6,7.9,14.2,11.2,10.5,9.4][shape]*(.9+rnd(seed*37+3)*.12);
+    const widthGrowth=[.76,.15,.28,.64,.42,.80,.24,.57,.12,.30,.23,.22][shape];
+    const depthGrowth=[.78,.44,.62,.67,.54,.65,.51,.68,.34,.56,.38,.62][shape];
+    const heightGrowth=[.27,.26,.23,.52,.29,.36,.22,.33,.32,.29,.12,.22][shape];
+    const w=stage?Math.min(shape===2?14.5:17,width*(1+growth*widthGrowth)):width;
+    const d=depth*(1+growth*depthGrowth);
+    const height=[4.2,5.1,5.2,6.4,4.7,4.0,5.0,4.5,9.0,6.8,12.2,4.3][shape]*(.88+rnd(seed*41+2)*.22)*(district==='centro'?1.08:1)*(1+growth*heightGrowth);
+    const x=shop.x,z=shop.z;
     const wallColor=progress.premium?coordinatedHouseColor(style.walls,0xffe8c5,shape===1?.68:.32):style.walls;
     const paving=progress.premium?0xc7ad8b:[0xaba99f,0xb8b5a9,0x9ba9a8][seed%3];
     put('shopPaving',paving,shop,x,.055,z,17.7,.06,17.5);
     put('body',wallColor,shop,x,height/2,z,w,height,d);
     const front=z+d/2, trim=style.trim, glass=style.glass;
-    const stage=houseTier(progress.points);
-    for(let floor=0;floor<stage;floor++){
-      const width=w*(.86-floor*.045),depth=d*(.72-floor*.043);
+    if(stage>=2&&(shape===0||shape===3)){
+      const library=shape===3;
+      const annexWidth=w*(library?.82:.72);
+      const annexDepth=2.0+growth*3.1;
+      const annexHeight=height*(library?.77:.57);
+      const annexZ=z-d/2-annexDepth/2+.08;
+      put('body',wallColor,shop,x,annexHeight/2,annexZ,annexWidth,annexHeight,annexDepth);
+      put('roof',trim,shop,x,annexHeight+.12,annexZ,annexWidth+.24,.24,annexDepth+.20);
+      const back=annexZ-annexDepth/2;
+      for(const bay of [-1,0,1]){
+        const bx=x+bay*annexWidth*.28;
+        put('displayGlass',glass,shop,bx,annexHeight*.49,back-.07,annexWidth*.20,annexHeight*.55,.16);
+      }
+      if(library&&stage>=4){
+        const porchWidth=w*.77;
+        put('roof',trim,shop,x,3.30,front+.83,porchWidth,.27,1.76);
+        put('shopPaving',0xd9c7a8,shop,x,.19,front+.81,porchWidth,.20,1.91);
+        for(const bay of [-.43,-.15,.15,.43])
+          put('body',0xe9d9bb,shop,x+bay*porchWidth,1.74,front+1.46,.27,2.96,.27);
+      }
+      if(!library&&stage>=4){
+        put('shopPaving',0xbc9876,shop,x,.15,back-1.4,annexWidth,.17,2.75);
+        for(const side of [-1,1]){
+          const tx=x+side*annexWidth*.25;
+          put('shopDiningPedestal',trim,shop,tx,.60,back-1.47,.22,.84,.22);
+          put('shopDiningTable',0xf4dab1,shop,tx,1.04,back-1.47,1.18,.13,.94);
+          if(stage>=6){
+            put('shopPergolaPost',trim,shop,tx,1.65,back-2.45,.14,2.99,.14);
+            put('shopPergolaBeam',trim,shop,tx,3.13,back-1.31,.16,.18,2.50);
+          }
+        }
+      }
+    }
+    if(stage>=2&&(shape===1||shape===2||shape===8)){
+      const cinema=shape===8,restaurant=shape===2;
+      const extensionWidth=w*(cinema?.91:restaurant?.76:.88);
+      const extensionDepth=2.4+growth*4.2;
+      const rear=z-d/2;
+      const extensionZ=rear-extensionDepth/2+.10;
+      const extensionHeight=height*(cinema?.88:restaurant?.69:.53);
+      put('body',wallColor,shop,x,extensionHeight/2,extensionZ,extensionWidth,extensionHeight,extensionDepth);
+      put('roof',trim,shop,x,extensionHeight+.13,extensionZ,extensionWidth+.28,.26,extensionDepth+.28);
+      const back=extensionZ-extensionDepth/2;
+      if(restaurant){
+        for(const bay of [-1,0,1]){
+          put('displayGlass',glass,shop,x+bay*extensionWidth*.27,extensionHeight*.51,back-.08,extensionWidth*.19,extensionHeight*.56,.17);
+        }
+        if(stage>=4){
+          put('shopPaving',0xc19b76,shop,x,.16,back-1.65,extensionWidth,.20,3.25);
+          for(const side of [-1,1]){
+            const tx=x+side*extensionWidth*.25;
+            put('shopDiningTable',0xf0ca91,shop,tx,1.08,back-1.59,1.18,.14,.95);
+            put('shopDiningPedestal',trim,shop,tx,.60,back-1.59,.23,.83,.23);
+          }
+        }
+      }else if(cinema){
+        for(const side of [-1,1]){
+          const edge=x+side*(extensionWidth/2+.10);
+          put('body',trim,shop,edge,extensionHeight*.52,extensionZ,.24,extensionHeight*.91,extensionDepth*.68);
+        }
+        if(stage>=4){
+          put('body',0x333c56,shop,x,extensionHeight*.57,back-.14,extensionWidth*.69,extensionHeight*.50,.30);
+          put('displayGlass',0xe9be71,shop,x,extensionHeight*.57,back-.31,extensionWidth*.58,.16,.10);
+        }
+      }else{
+        for(const bay of [-1,0,1])
+          put('garageGate',0x637578,shop,x+bay*extensionWidth*.29,1.38,back-.09,extensionWidth*.24,2.65,.19);
+        if(stage>=4)
+          put('roof',trim,shop,x,3.04,back-.87,extensionWidth+.16,.21,1.82);
+      }
+    }
+    if(stage>=2&&shape>=4&&shape<=7){
+      const rear=z-d/2;
+      const annexDepth=2.1+growth*3.7;
+      const annexZ=rear-annexDepth/2+.08;
+      const annexW=w*[.76,.89,.92,.75][shape-4];
+      const annexH=height*[.63,.83,.73,.59][shape-4];
+      put('body',wallColor,shop,x,annexH/2,annexZ,annexW,annexH,annexDepth);
+      put('roof',trim,shop,x,annexH+.13,annexZ,annexW+.24,.26,annexDepth+.24);
+      const back=annexZ-annexDepth/2;
+      if(shape===4){
+        put('entryDoorGlass',glass,shop,x,1.25,back-.12,1.63,2.44,.17);
+        for(const side of [-1,1])
+          put('displayGlass',glass,shop,x+side*annexW*.31,1.78,back-.08,annexW*.22,1.29,.16);
+        if(stage>=4)put('roof',0xe5f0dc,shop,x,2.77,back-.63,annexW*.73,.22,1.36);
+      }else if(shape===5){
+        for(const side of [-1,1]){
+          put('displayGlass',glass,shop,x+side*annexW*.24,annexH*.52,back-.08,annexW*.40,annexH*.62,.18);
+          if(stage>=4)
+            put('body',trim,shop,x+side*annexW*.44,annexH*.50,back-.20,.25,annexH,.33);
+        }
+      }else if(shape===6){
+        for(const side of [-1,1])
+          put('garageGate',0x657374,shop,x+side*annexW*.24,annexH*.43,back-.08,annexW*.40,annexH*.83,.17);
+        if(stage>=4)put('roof',trim,shop,x,annexH+.10,back-.99,annexW,.24,2.01);
+      }else{
+        for(const side of [-1,1])
+          put('displayGlass',glass,shop,x+side*annexW*.25,annexH*.56,back-.08,annexW*.29,annexH*.45,.17);
+        if(stage>=4){
+          const chimney=annexH*.67;
+          put('body',0xb97955,shop,x+annexW*.27,annexH+chimney/2,annexZ,.60,chimney,.65);
+          put('roof',0x6a5245,shop,x+annexW*.27,annexH+chimney,annexZ,.78,.16,.81);
+        }
+      }
+    }
+    if(stage>=2&&shape===9){
+      const hallWidth=w*.88,hallDepth=2.7+growth*4.0;
+      const hallHeight=height*.72,hallZ=z-d/2-hallDepth/2+.08;
+      put('body',wallColor,shop,x,hallHeight/2,hallZ,hallWidth,hallHeight,hallDepth);
+      put('roof',trim,shop,x,hallHeight+.17,hallZ,hallWidth+.22,.34,hallDepth+.23);
+      for(const side of [-1,1]){
+        const bx=x+side*(hallWidth/2+.06);
+        put('displayGlass',glass,shop,bx,hallHeight*.53,hallZ,.15,hallHeight*.56,hallDepth*.75);
+        if(stage>=4)
+          put('shopUpperCap',trim,shop,bx,hallHeight*.24,hallZ,.23,.17,hallDepth*.82);
+      }
+    }
+    if(stage>=2&&shape===11){
+      const stalls=stage>=6?3:stage>=4?2:1;
+      const stallWidth=w*.24,stallZ=z-d/2-2.22;
+      for(let i=0;i<stalls;i++){
+        const sx=x+(i-(stalls-1)/2)*w*.29;
+        put('shopPaving',0xc6ac89,shop,sx,.14,stallZ,stallWidth+.34,.18,3.82);
+        put('body',0xb88a62,shop,sx,.66,stallZ-.58,stallWidth,.91,.90);
+        for(const side of [-1,1])
+          put('shopPergolaPost',trim,shop,sx+side*stallWidth*.45,1.56,stallZ,.14,2.83,.14);
+        put('roof',i%2?0xbd6954:trim,shop,sx,3.08,stallZ,stallWidth+.36,.23,3.40);
+      }
+    }
+    if(stage>=2&&shape===10){
+      const lobbyWidth=w*.84,lobbyDepth=1.32+growth*1.40;
+      const lobbyZ=front+lobbyDepth/2-.08;
+      put('shopPaving',0xd2bd9d,shop,x,.17,lobbyZ,lobbyWidth+.34,.19,lobbyDepth+.25);
+      put('roof',trim,shop,x,3.48,lobbyZ,lobbyWidth+.42,.24,lobbyDepth+.28);
+      for(const side of [-1,1]){
+        const px=x+side*lobbyWidth*.43;
+        put('body',wallColor,shop,px,1.83,lobbyZ+lobbyDepth*.37,.30,3.06,.32);
+        if(stage>=4)
+          put('displayGlass',glass,shop,px,1.80,lobbyZ,.12,2.83,lobbyDepth*.78);
+      }
+    }
+    const widthTaper=.019;
+    const depthTaper=.020;
+    for(let floor=0;floor<towerFloors;floor++){
+      const width=w*(.86-floor*widthTaper),depth=d*(.72-floor*depthTaper);
       const centerZ=z-d*.08, floorY=height+.46+floor*2.65;
       put('shopUpperBody',wallColor,shop,x,floorY+1.325,centerZ,width,2.65,depth);
       put('shopUpperCap',trim,shop,x,floorY+2.58,centerZ,width+.23,.19,depth+.23);
@@ -2124,67 +2300,73 @@ function drawShops(){
     // v6.4.3: category-specific BUILDING silhouettes. These are roof/side
     // structures, not extra canopies piled in front of the windows.
     // All fine details are tagged by put() for existing shop chunk LOD.
-    const rooftop=height+.52;
+    const rooftop=towerFloors?height+.485+towerFloors*2.65:height+.52;
+    const roofWidth=towerFloors?.86-(stage-1)*widthTaper:1;
+    const roofDepth=towerFloors?.72-(stage-1)*depthTaper:1;
+    const roofCenter=towerFloors?z-d*.08:z;
+    const roofPut=(kind,color,shop,px,py,pz,pw,ph,pd)=>{
+      put(kind,color,shop,x+(px-x)*roofWidth,py,roofCenter+(pz-z)*roofDepth,pw*roofWidth,ph,pd*roofDepth);
+    };
     if(shape===0){ // Cafe: chimney and small rooftop pergola.
-      put('cafeChimney',0x9b6552,shop,x-w*.30,rooftop+.38,z-d*.18,.58,.78,.58);
+      roofPut('cafeChimney',0x9b6552,shop,x-w*.30,rooftop+.38,z-d*.18,.58,.78,.58);
       for(const side of [-1,1])
-        put('cafePergolaPost',0x7d5845,shop,x+side*w*.25,rooftop+.30,z,.12,.60,.12);
-      put('cafePergolaBeam',0xb88a60,shop,x,rooftop+.64,z,w*.55,.12,.20);
+        roofPut('cafePergolaPost',0x7d5845,shop,x+side*w*.25,rooftop+.30,z,.12,.60,.12);
+      roofPut('cafePergolaBeam',0xb88a60,shop,x,rooftop+.64,z,w*.55,.12,.20);
     }else if(shape===1){ // Supermarket: roof service units, loading dock.
       for(const side of [-1,1])
-        put('superRoofVent',0x809596,shop,x+side*w*.23,rooftop+.36,z,.90,.62,1.12);
+        roofPut('superRoofVent',0x809596,shop,x+side*w*.23,rooftop+.36,z,.90,.62,1.12);
       put('superLoading',0x74898a,shop,x+w/2+.09,1.60,z-d*.13,.15,2.55,2.65);
       put('superLoadingTrim',0xcbd0c8,shop,x+w/2+.20,3.00,z-d*.13,.18,.20,2.86);
     }else if(shape===2){ // Restaurant: tall extraction stack and tiled roof strip.
-      put('restaurantFlue',0x827f77,shop,x+w*.30,rooftop+.86,z-d*.19,.42,1.70,.42);
-      put('restaurantFlueCap',0x535953,shop,x+w*.30,rooftop+1.74,z-d*.19,.66,.14,.66);
-      put('restaurantRoofBand',0x9d654c,shop,x,rooftop-.06,z,w*.73,.14,d*.72);
+      roofPut('restaurantFlue',0x827f77,shop,x+w*.30,rooftop+.86,z-d*.19,.42,1.70,.42);
+      roofPut('restaurantFlueCap',0x535953,shop,x+w*.30,rooftop+1.74,z-d*.19,.66,.14,.66);
+      roofPut('restaurantRoofBand',0x9d654c,shop,x,rooftop-.06,z,w*.73,.14,d*.72);
     }else if(shape===3){ // Bookshop: pitched central pediment and tall shelves on side.
-      put('bookshopCornice',0x92765b,shop,x,rooftop+.05,front-.17,w*.70,.28,.32);
-      put('bookshopPediment',0xc4a784,shop,x,rooftop+.45,front-.19,w*.40,.62,.30);
+      roofPut('bookshopCornice',0x92765b,shop,x,rooftop+.05,front-.17,w*.70,.28,.32);
+      roofPut('bookshopPediment',0xc4a784,shop,x,rooftop+.45,front-.19,w*.40,.62,.30);
       for(let i=0;i<3;i++)
         put('bookshopSideShelf',0x8d6a4c,shop,x+w/2+.15,1.05+i*.78,z,.15,.10,d*.50);
     }else if(shape===4){ // Pharmacy: rooftop cross visible from far away.
-      put('pharmacyRoofCrossV',0x31a869,shop,x,rooftop+.92,z,.35,1.75,.35);
-      put('pharmacyRoofCrossH',0x31a869,shop,x,rooftop+1.02,z,1.30,.35,.35);
-      put('pharmacyWhiteBase',0xe2eee5,shop,x,rooftop+.09,z,1.45,.24,1.03);
+      roofPut('pharmacyRoofCrossV',0x31a869,shop,x,rooftop+.92,z,.35,1.75,.35);
+      roofPut('pharmacyRoofCrossH',0x31a869,shop,x,rooftop+1.02,z,1.30,.35,.35);
+      roofPut('pharmacyWhiteBase',0xe2eee5,shop,x,rooftop+.09,z,1.45,.24,1.03);
     }else if(shape===5){ // Fashion: upper display band and projecting side frame.
-      put('fashionCrown',0x4c465b,shop,x,rooftop+.17,z,w*.77,.43,d*.72);
-      put('fashionCrownInset',0xd6b3bc,shop,x,rooftop+.42,front-.12,w*.49,.22,.18);
+      roofPut('fashionCrown',0x4c465b,shop,x,rooftop+.17,z,w*.77,.43,d*.72);
+      roofPut('fashionCrownInset',0xd6b3bc,shop,x,rooftop+.42,front-.12,w*.49,.22,.18);
       for(const side of [-1,1])
         put('fashionFin',0x5b5165,shop,x+side*w*.46,height*.50,z,.18,height*.96,d*.72);
     }else if(shape===6){ // Workshop: roof sawtooth vents and service flue.
       for(let i=0;i<3;i++){
-        put('garageVentHousing',0x71838a,shop,x+(i-1)*w*.24,rooftop+.30,z,.95,.56,1.60);
-        put('garageVentTop',0xb0b6ae,shop,x+(i-1)*w*.24,rooftop+.62,z,.99,.12,1.70);
+        roofPut('garageVentHousing',0x71838a,shop,x+(i-1)*w*.24,rooftop+.30,z,.95,.56,1.60);
+        roofPut('garageVentTop',0xb0b6ae,shop,x+(i-1)*w*.24,rooftop+.62,z,.99,.12,1.70);
       }
-      put('garagePipe',0x5c696c,shop,x-w*.38,rooftop+.74,z-d*.28,.27,1.38,.27);
+      roofPut('garagePipe',0x5c696c,shop,x-w*.38,rooftop+.74,z-d*.28,.27,1.38,.27);
     }else if(shape===7){ // Bakery: two brick chimneys and warm cornice.
       for(const side of [-1,1]){
-        put('bakeryChimney',0xb96e52,shop,x+side*w*.25,rooftop+.59,z-d*.15,.62,1.10,.60);
-        put('bakeryChimneyCap',0x695c52,shop,x+side*w*.25,rooftop+1.18,z-d*.15,.78,.13,.76);
+        roofPut('bakeryChimney',0xb96e52,shop,x+side*w*.25,rooftop+.59,z-d*.15,.62,1.10,.60);
+        roofPut('bakeryChimneyCap',0x695c52,shop,x+side*w*.25,rooftop+1.18,z-d*.15,.78,.13,.76);
       }
-      put('bakeryRoofTrim',0xd49b6a,shop,x,rooftop-.07,front-.15,w*.78,.18,.28);
+      roofPut('bakeryRoofTrim',0xd49b6a,shop,x,rooftop-.07,front-.15,w*.78,.18,.28);
     }else if(shape===8){ // Cinema: roof projector tower, bold marquee fins.
-      put('cinemaProjection',0x28384e,shop,x,rooftop+.80,z-d*.14,w*.35,1.46,d*.32);
-      put('cinemaProjectionCap',0x486078,shop,x,rooftop+1.59,z-d*.14,w*.39,.16,d*.35);
+      roofPut('cinemaProjection',0x28384e,shop,x,rooftop+.80,z-d*.14,w*.35,1.46,d*.32);
+      roofPut('cinemaProjectionCap',0x486078,shop,x,rooftop+1.59,z-d*.14,w*.39,.16,d*.35);
       for(const side of [-1,1])
         put('cinemaMarqueeFin',0xf0c876,shop,x+side*w*.43,signY+.10,front+.38,.18,1.10,.55);
     }else if(shape===9){ // Gym: rooftop skylight and facade side bands.
       for(const side of [-1,1]){
-        put('gymSkylight',0x83b8c0,shop,x+side*w*.24,rooftop+.17,z,1.70,.24,d*.53);
-        put('gymSkylightEdge',0x3f6f68,shop,x+side*w*.24,rooftop+.33,z,1.85,.08,d*.55);
+        roofPut('gymSkylight',0x83b8c0,shop,x+side*w*.24,rooftop+.17,z,1.70,.24,d*.53);
+        roofPut('gymSkylightEdge',0x3f6f68,shop,x+side*w*.24,rooftop+.33,z,1.85,.08,d*.55);
       }
     }else if(shape===10){ // Hotel: unmistakable rooftop penthouse + canopy.
-      put('hotelPenthouse',style.walls,shop,x,rooftop+.91,z-d*.09,w*.58,1.75,d*.60);
-      put('hotelPenthouseRoof',trim,shop,x,rooftop+1.87,z-d*.09,w*.62,.20,d*.64);
+      roofPut('hotelPenthouse',style.walls,shop,x,rooftop+.91,z-d*.09,w*.58,1.75,d*.60);
+      roofPut('hotelPenthouseRoof',trim,shop,x,rooftop+1.87,z-d*.09,w*.62,.20,d*.64);
       for(const side of [-1,1])
-        put('hotelPenthouseWindow',glass,shop,x+side*w*.17,rooftop+.96,front-d*.22,1.05,.92,.11);
+        roofPut('hotelPenthouseWindow',glass,shop,x+side*w*.17,rooftop+.96,front-d*.22,1.05,.92,.11);
     }else{ // Market: open stall canopy modules above the roof.
       for(const side of [-1,1]){
-        put('marketRoofAwning',side<0?0xd29b5b:0x6c9e83,shop,
+        roofPut('marketRoofAwning',side<0?0xd29b5b:0x6c9e83,shop,
           x+side*w*.23,rooftop+.19,z, w*.38,.29,d*.61);
-        put('marketRoofCap',0xe3d5ad,shop,x+side*w*.23,rooftop+.38,z,w*.40,.08,d*.64);
+        roofPut('marketRoofCap',0xe3d5ad,shop,x+side*w*.23,rooftop+.38,z,w*.40,.08,d*.64);
       }
     }
     if(seed%3===0)put('side',style.glass,shop,x+w/2+.1,height*.55,z, .2,1.6,d*.45);
@@ -3729,6 +3911,38 @@ function renderAllHouses(selected){
     });
     mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();group.add(mesh);
     if(batch.entries[0].h)houseMeshes.push(mesh);
+  }
+  if(selected.length){
+    const contactGeo=new THREE.PlaneGeometry(1,1);
+    contactGeo.rotateX(-Math.PI/2);
+    const contactMaterial=new THREE.ShaderMaterial({
+      transparent:true,depthWrite:false,
+      vertexShader:`
+        varying vec2 groundUv;
+        void main(){
+          groundUv=uv;
+          gl_Position=projectionMatrix*modelViewMatrix*instanceMatrix*vec4(position,1.);
+        }`,
+      fragmentShader:`
+        varying vec2 groundUv;
+        void main(){
+          vec2 edge=abs(groundUv-.5)*2.;
+          float shade=1.-smoothstep(.54,1.,max(edge.x,edge.y));
+          gl_FragColor=vec4(.085,.075,.045,shade*.24);
+        }`
+    });
+    const contacts=new THREE.InstancedMesh(contactGeo,contactMaterial,selected.length);
+    selected.forEach((home,index)=>{
+      const footprint=houseFootprint(home,houseTier(home.points));
+      const angle=facadeAngle(home);
+      dummy.position.set(home.x+Math.sin(angle)*footprint.offsetZ,.061,home.z+Math.cos(angle)*footprint.offsetZ);
+      dummy.rotation.set(0,angle,0);
+      dummy.scale.set(footprint.width*1.09,1,footprint.depth*1.08);
+      dummy.updateMatrix();
+      contacts.setMatrixAt(index,dummy.matrix);
+    });
+    contacts.computeBoundingSphere();
+    group.add(contacts);
   }
 }
 
