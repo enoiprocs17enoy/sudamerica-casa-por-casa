@@ -1427,7 +1427,7 @@ function animate(now=0){
   animateLife(t);
   updateAvatarLabels(t);
   if(releaseSky)releaseSky.position.copy(camera.position);
-  if(window.SudamericaRender8)SudamericaRender8.render(scene,camera,renderer);
+  if(window.SudamericaRender8)SudamericaRender8.render(scene,camera,renderer,minInterval);
   else renderer.render(scene,camera);
 }
 const walls = [0xd98972,0xb4d8b3,0xdca1ad,0x89b9df,0xc6a7de,0xe6b768,0x9bc9bd,0xd9a184,0xbac8d5];
@@ -4203,9 +4203,10 @@ function pick(e){
  if(closest){showPersonCard(closest);return;}
  // Balloon and shop picking uses screen-space hit zones; the meshes are
  // batched or composite and cannot reliably be picked by a single ray.
+ const projected=new THREE.Vector3();
  function screenDistance(x,y,z){
-  const v=new THREE.Vector3(x,y,z).project(camera);
-  if(v.z<0||v.z>1)return Infinity;
+  const v=projected.set(x,y,z).project(camera);
+  if(v.z< -1||v.z>1)return Infinity;
   return Math.hypot((v.x+1)*r.width/2-click.x,(1-v.y)*r.height/2-click.y);
  }
  let balloonHit=null,balloonD=32;
