@@ -33,7 +33,7 @@
    }
   });
  }
- function render(scene,camera,renderer){
+ function render(scene,camera,renderer,frameInterval=16){
   const city=scene.children.find(child=>child.name==='city-geometry');
   if(city!==previousCity){shadowDirty=true;previousCity=city;}
   const now=performance.now();
@@ -43,7 +43,7 @@
    frameTimes[frames++%frameTimes.length]=elapsed;
   }
   if(elapsed>0&&elapsed<1000&&!document.hidden){
-   const sample=Math.min(elapsed,180);
+   const sample=Math.min(elapsed,180)*16/Math.max(16,frameInterval);
    averageFrame+=(sample-averageFrame)*.06;
    slowFrames=sample>27?slowFrames+1:0;
    fastFrames=sample<18?fastFrames+1:0;
