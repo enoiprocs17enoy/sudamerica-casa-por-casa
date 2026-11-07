@@ -1,4 +1,4 @@
-# Piazze e verifiche — v8.8.9
+# Piazze e verifiche — v8.8.10
 
 ## Revisione dello spazio e degli arredi — v8.8.8
 
@@ -54,3 +54,7 @@ Queste proiezioni e verifiche CPU non sostituiscono il controllo WebGL della cit
 Aggiunto un livello separato di fontane, statue e percorsi con fonti e stato di verifica. I 69 elementi registrati comprendono 12 voci di riferimento (incluse le quattro figure appartenenti alla Pirámide), 11 archetipi cartografici e 46 elementi ancora privi di modello specifico. Questi ultimi non vengono sostituiti con statue inventate. Il pannello della piazza mostra la distinzione. Metodo, fonti e limiti in METODO_PIAZZE.md.
 
 Verificati 262 disegni, incluso il ripiego: 206.229 parti dentro il lotto, massimo 108.683 triangoli e 56 gruppi di disegno. Verificate matrici finite, spazio riservato ai monumenti, menu con 29 obiettivi e importazione di una piazza futura. Esaminate proiezioni geometriche dei nuovi monumenti da due lati: non sono un test WebGL. La pubblicazione Netlify resta bloccata dai crediti esauriti; GitHub e ZIP contengono questa versione.
+
+## Verifiche v8.8.10
+
+Rivisti i mantelli e i basamenti. Verificati 17 tipi indipendenti di dettaglio con raggi da quattro direzioni e geometrie finite. Test di lotto su 262 disegni: 206.516 parti, massimo 108.743 triangoli e 56 gruppi. Controllate proiezioni CPU da tre lati per Mar del Plata, Córdoba, Salta e Tucumán. Restano i limiti della verifica WebGL e della pubblicazione Netlify descritti sopra. Questa revisione non dichiara corrette tutte le piazze.
