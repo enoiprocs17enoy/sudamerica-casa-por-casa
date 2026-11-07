@@ -5460,7 +5460,7 @@ function rebuild(){
  if(errors.length){
   let warning=document.getElementById('cityErrorNotice');
   if(!warning){warning=document.createElement('div');warning.id='cityErrorNotice';warning.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99999;background:#722;color:white;padding:12px;border-radius:8px;max-width:70vw;font:13px Arial';document.body.appendChild(warning)}
-  warning.textContent='v8.8.9 · '+errors.join(' | ');
+  warning.textContent='v8.8.10 · '+errors.join(' | ');
  }else{document.getElementById('cityErrorNotice')?.remove()}
 }
 function renderMilestones(){
@@ -6177,11 +6177,13 @@ function openSquareDetailPanel(){
  const features=profile.landmarks||[];
  if(!features.length){const empty=document.createElement('p');empty.textContent='Le fonti disponibili non descrivono ancora statue e fontane di questa piazza.';body.append(empty);}
  for(const feature of features){
-  const row=document.createElement('div');row.className='civicObjective '+(feature.status==='needs-model'?'pending':'achieved');
+  const row=document.createElement('div');row.className='civicObjective '+(feature.status==='needs-model'?'pending':'documented');
   const name=document.createElement('strong');name.textContent=feature.name;
   const state=document.createElement('span');state.textContent=feature.status==='needs-model'?'Presenza mappata · forma 3D da completare':feature.status==='reference-model'?'Riferimento documentato · modello 3D stilizzato':'Tipologia mappata · modello 3D da verificare nei dettagli';row.append(name,state);
+  if(feature.description){const description=document.createElement('p');description.textContent=feature.description;row.append(description);}
+  if(feature.evidence){const evidence=document.createElement('small');evidence.textContent='Posizione: '+(feature.evidence.position==='mapped-point'?'cartografia':feature.evidence.position)+' · orientamento e dettagli fini ancora da verificare';row.append(evidence);}
   const url=feature.reference||feature.source;
-  if(url&&/^https:\/\/(www\.)?(openstreetmap\.org|buenosaires\.gob\.ar|turismomardelplata\.gob\.ar|syv\.web\.unq\.edu\.ar|target2\.promperu\.gob\.pe|montevideo\.gub\.uy|quito-turismo\.gob\.ec|idpc\.gov\.co|santiagoturismo\.cl)\//.test(url)){const source=document.createElement('a');source.href=url;source.target='_blank';source.rel='noopener';source.textContent='Fonte';row.append(source);}
+  if(url&&/^https:\/\/(www\.)?(respira\.cordoba\.gob\.ar|prensa\.municipalidadsalta\.gob\.ar|tucumanturismo\.gob\.ar|openstreetmap\.org|buenosaires\.gob\.ar|turismomardelplata\.gob\.ar|syv\.web\.unq\.edu\.ar|target2\.promperu\.gob\.pe|montevideo\.gub\.uy|quito-turismo\.gob\.ec|idpc\.gov\.co|santiagoturismo\.cl)\//.test(url)){const source=document.createElement('a');source.href=url;source.target='_blank';source.rel='noopener';source.textContent='Fonte';row.append(source);}
   body.append(row);
  }
  const back=document.createElement('button');back.textContent='Torna agli obiettivi';back.onclick=()=>openPublicWorks();body.append(back);
