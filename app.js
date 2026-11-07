@@ -1951,7 +1951,7 @@ function drawCivicBuilding(zone,b){
    box(0xffe4a5,px,height,pz,.065,.70,.013);
   }
  };
- let labelZ=.17,labelY=4,labelColor=0x315d72;
+ let labelColor=0x315d72;
  if(kind==='hospital'||kind==='clinic'){
   const hospital=kind==='hospital',white=0xe8efea,blue=0x398caa;
   const roof=building(0,-.14,.75,.22,hospital?4:1,white,blue);
@@ -1967,7 +1967,7 @@ function drawCivicBuilding(zone,b){
    for(const side of [-1,1])box(0xf1e0a2,side*.035,tower+.17,-.27,.010,.025,.038);
    for(const side of [-1,1])box(0x819b9b,side*.22,roof+.65,-.15,.08,1.02,.037);
   }
-  labelY=3.82;labelZ=.19;labelColor=0xa73b40;
+  labelColor=0xa73b40;
  }else if(kind==='police'||kind==='fire'){
   const fire=kind==='fire',accent=fire?0xb74935:0x315e91;
   building(0,-.14,.80,.24,2,fire?0xe3c9b2:0xe0e7e6,accent);
@@ -1985,7 +1985,7 @@ function drawCivicBuilding(zone,b){
    cross(0,5.4,-.005,1.55,0xe1c36d);
   }
   canopy(0,3.8,.032,.39,.07,accent);
-  labelZ=.073;labelY=4.35;labelColor=accent;
+  labelColor=accent;
  }else if(kind==='school'||kind==='nursery'||kind==='university'){
   const university=kind==='university',nursery=kind==='nursery',accent=university?0x537e78:0xbc6b48;
   building(0,-.23,.80,.16,university?4:nursery?1:2,0xe6d4ad,accent);
@@ -2004,7 +2004,7 @@ function drawCivicBuilding(zone,b){
    }
    if(nursery)round(0xe4c26c,0,.50,.35,3.4,.22);
   }
-  labelZ=-.133;labelY=3.2;labelColor=accent;
+  labelColor=accent;
  }else if(kind==='townhall'||kind==='courthouse'||kind==='museum'||kind==='library'){
   const civic=kind==='townhall',justice=kind==='courthouse',museum=kind==='museum';
   const roof=building(0,-.16,.78,.27,justice?3:museum?2:3,0xe3d9c6,0x6d8b87);
@@ -2020,7 +2020,7 @@ function drawCivicBuilding(zone,b){
    for(const side of [-1,1])box(0x6b9b9e,side*.16,roof+.21,-.16,.20,.22,.16,true);
   }
   box(0xcbb99d,0,.19,.21,.62,.14,.20);
-  labelZ=.055;labelY=4.4;
+  
  }else if(['football','stadium','baseball','sports'].includes(kind)){
   const stadium=kind==='stadium';
   field(kind==='baseball'?'baseball':'football');
@@ -2036,7 +2036,7 @@ function drawCivicBuilding(zone,b){
    building(0,-.37,.60,.09,2,0xd3dbce,0x498e9d);
    box(0x699cab,0,.28,.31,.44,.14,.14);
   }
-  labelZ=.29;labelY=3.25;labelColor=0x3f776b;
+  labelColor=0x3f776b;
  }else if(kind==='pool'){
   building(0,-.30,.76,.14,2,0xe6e1cf,0x3a8ba6);
   box(0xe2d5bb,0,.30,.02,.70,.25,.45);
@@ -2046,7 +2046,7 @@ function drawCivicBuilding(zone,b){
    box(0xf4e1a5,lane,.64,.245,.045,.35,.019);
   }
   for(const side of [-1,1])canopy(side*.39,2.9,.025,.10,.40,0xd7b46c);
-  labelZ=-.205;labelY=3.25;labelColor=0x2d8b9f;
+  labelColor=0x2d8b9f;
  }else if(kind==='bus'||kind==='station'){
   const rail=kind==='station';
   building(-.28,-.17,.24,.26,2,0xded1b6,0x3b7d89);
@@ -2064,7 +2064,7 @@ function drawCivicBuilding(zone,b){
     box(0xadd6dd,side,2.00,.10,.105,.75,.12,true);
    }
   }
-  labelZ=-.018;labelY=3.35;
+  
  }else if(kind==='water'||kind==='waterworks'||kind==='power'||kind==='recycling'){
   building(0,-.31,.62,.12,1,0xd7dfcf,0x527c86);
   if(kind==='water'){
@@ -2094,7 +2094,7 @@ function drawCivicBuilding(zone,b){
    }
    canopy(0,3.8,.08,.88,.24,0x587d6f);
   }
-  labelZ=-.225;labelY=3.30;labelColor=0x427c72;
+  labelColor=0x427c72;
  }else if(kind==='gardens'||kind==='botanical'){
   box(0x719e64,0,.17,0,.92,.17,.91);
   box(0xc8b99b,0,.30,0,.075,.10,.86);
@@ -2112,7 +2112,7 @@ function drawCivicBuilding(zone,b){
     box(0xd08c49,side*.25,.85,.24,.13,.13,.07);
    }
   }
-  labelZ=.35;labelY=2.45;labelColor=0x4e815e;
+  labelColor=0x4e815e;
  }else if(kind==='mall'||kind==='theatre'){
   const theatre=kind==='theatre',accent=theatre?0xa2554b:0x54889e;
   building(0,-.13,.80,.36,theatre?3:2,0xdfccb1,accent);
@@ -2124,7 +2124,7 @@ function drawCivicBuilding(zone,b){
   }else{
    for(const side of [-1,1])add('dome',0x74acb5,side*.20,7.65,-.13,w*.18,2.2,d*.12);
   }
-  labelZ=.184;labelY=3.55;labelColor=accent;
+  labelColor=accent;
  }else if(kind==='heliport'){
   building(-.29,-.22,.23,.20,2,0xd9dfd4,0x4e7e8f);
   round(0x657f83,0,.26,.08,Math.min(w*.39,d*.23),.34);
@@ -2133,7 +2133,7 @@ function drawCivicBuilding(zone,b){
   for(const side of [-1,1])box(0xf1dd9a,side*.078,.53,.08,.020,.025,.105);
   for(const side of [-1,1])for(const end of [-1,1])
    round(0xf1c66b,side*.35,.55,.08+end*.17,.20,.24);
-  labelZ=-.10;labelY=3.25;labelColor=0x3d778b;
+  labelColor=0x3d778b;
  }else throw Error('Modello pubblico mancante '+kind);
  box(0xccbca1,0,.16,.37,.10,.10,.24);
  // A landscaped public forecourt is part of every service.
@@ -2157,9 +2157,29 @@ function drawCivicBuilding(zone,b){
   mesh.castShadow=type!=='glass';mesh.receiveShadow=true;
   mesh.userData.publicKind=kind;group.add(mesh);
  }
- const labelMaterial=new THREE.MeshBasicMaterial({map:billboardTexture([zone.name.toUpperCase(),'SERVIZI PUBBLICI',zone.at+' CASE'],'#'+labelColor.toString(16).padStart(6,'0')),side:THREE.DoubleSide});
- const label=new THREE.Mesh(new THREE.PlaneGeometry(Math.min(w*.43,16),2.7),labelMaterial);
- label.position.set(b.x,labelY,b.z+labelZ*d);label.userData.publicKind=kind;group.add(label);
+ // An independent street-facing sign keeps lettering clear of roofs and canopies.
+ const signWidth=Math.min(w*.56,24),signHeight=signWidth/4,signBottom=4.8;
+ const signZ=b.z+d*.465,signY=signBottom+signHeight/2;
+ const labelMaterial=new THREE.MeshBasicMaterial({
+  map:billboardTexture([zone.name.toUpperCase(),'SERVIZI PUBBLICI',zone.at+' CASE'],'#'+labelColor.toString(16).padStart(6,'0'),{wide:true}),
+  side:THREE.FrontSide,toneMapped:false});
+ const signData={publicKind:kind,civicSign:true,label:zone.name};
+ const labelGeometry=new THREE.PlaneGeometry(signWidth,signHeight);
+ for(const rear of [false,true]){
+  const label=new THREE.Mesh(labelGeometry,labelMaterial);
+  label.position.set(b.x,signY,signZ+(rear?-.16:.16));
+  label.rotation.y=rear?Math.PI:0;Object.assign(label.userData,signData);group.add(label);
+ }
+ const structureMaterial=new THREE.MeshStandardMaterial({color:0x33494f,roughness:.8});
+ const frame=new THREE.Mesh(new THREE.BoxGeometry(signWidth+.18,signHeight+.18,.24),structureMaterial);
+ frame.position.set(b.x,signY,signZ);frame.castShadow=true;frame.receiveShadow=true;
+ Object.assign(frame.userData,{publicKind:kind,civicSignFrame:true});group.add(frame);
+ for(const side of [-1,1]){
+  const post=new THREE.Mesh(new THREE.BoxGeometry(.22,signBottom,.22),structureMaterial);
+  post.position.set(b.x+side*signWidth*.45,signBottom/2,signZ);
+  post.castShadow=true;post.receiveShadow=true;
+  Object.assign(post.userData,{publicKind:kind,civicSignPost:true});group.add(post);
+ }
  return true;
 }
 
@@ -2997,19 +3017,41 @@ function drawShops(){
 // Billboard marketing in permanently reserved, currently unoccupied lots.
 // The panels disappear automatically when a shop is bought or a public
 // milestone unlocks. They are contained entirely within their reserved plots.
-function billboardTexture(lines,background){
+function billboardTexture(lines,background,options={}){
  const canvas=document.createElement('canvas');
- canvas.width=512;canvas.height=256;
+ const width=1024,height=options.wide?256:512;
+ canvas.width=width;canvas.height=height;
  const ctx=canvas.getContext('2d');
- ctx.fillStyle=background;ctx.fillRect(0,0,512,256);
- ctx.fillStyle='#ffffff';ctx.fillRect(12,12,488,232);
- ctx.fillStyle=background;ctx.fillRect(20,20,472,216);
- ctx.fillStyle='#ffffff';ctx.textAlign='center';
- ctx.font='bold 45px Arial';ctx.fillText(lines[0],256,91);
- ctx.font='bold 30px Arial';ctx.fillText(lines[1],256,146);
- ctx.font='24px Arial';ctx.fillText(lines[2],256,197);
+ ctx.fillStyle=background;ctx.fillRect(0,0,width,height);
+ ctx.strokeStyle='#ffffff';ctx.lineWidth=5;ctx.strokeRect(16,16,width-32,height-32);
+ ctx.fillStyle='#ffffff';ctx.textAlign='center';ctx.textBaseline='middle';
+ const safeWidth=width-96;
+ function text(value,y,size,bold=true){
+  const content=String(value||'');
+  ctx.font=(bold?'bold ':'')+size+'px Arial';
+  const measured=ctx.measureText(content).width;
+  if(measured>safeWidth){size=Math.max(1,Math.floor(size*safeWidth/measured));ctx.font=(bold?'bold ':'')+size+'px Arial';}
+  ctx.fillText(content,width/2,y);
+ }
+ if(options.wide){
+  const words=String(lines[0]||'').split(/\s+/),rows=[''];
+  ctx.font='bold 48px Arial';
+  for(const word of words){const i=rows.length-1,test=(rows[i]+' '+word).trim();
+   if(rows[i]&&ctx.measureText(test).width>safeWidth)rows.push(word);else rows[i]=test;
+  }
+  if(rows.length>2){let split=1,best=Infinity;for(let i=1;i<words.length;i++){
+   const score=Math.max(ctx.measureText(words.slice(0,i).join(' ')).width,ctx.measureText(words.slice(i).join(' ')).width);
+   if(score<best){best=score;split=i;}}
+   rows.splice(0,rows.length,words.slice(0,split).join(' '),words.slice(split).join(' '));
+  }
+  if(rows.length===1)text(rows[0],88,52);else{ text(rows[0],64,48);text(rows[1],116,48); }
+  text(lines[1],172,29);text(lines[2],216,26,false);
+ }else{
+  text(lines[0],170,80);text(lines[1],285,60);text(lines[2],395,48,false);
+ }
  const texture=new THREE.CanvasTexture(canvas);
  texture.colorSpace=THREE.SRGBColorSpace;
+ texture.anisotropy=Math.min(8,(typeof renderer!=='undefined'?renderer?.capabilities?.getMaxAnisotropy?.():1)||1);
  return texture;
 }
 function drawReservedBillboards(selected){
@@ -3054,7 +3096,7 @@ function drawReservedBillboards(selected){
   const geo=new THREE.PlaneGeometry(1,1);
   // Two independently oriented faces: text reads normally from either side.
   // DoubleSide alone would mirror the lettering when viewed from behind.
-  const mat=new THREE.MeshBasicMaterial({map:type.texture,side:THREE.FrontSide,transparent:false,depthWrite:true});
+  const mat=new THREE.MeshBasicMaterial({map:type.texture,side:THREE.FrontSide,transparent:false,depthWrite:true,toneMapped:false});
   const mesh=new THREE.InstancedMesh(geo,mat,items.length);
   const rearMesh=new THREE.InstancedMesh(geo,mat,items.length);
   const posts=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshLambertMaterial({color:0x6c6961}),items.length*2);
@@ -3068,7 +3110,10 @@ function drawReservedBillboards(selected){
    const px=it.x+dz*sa,pz=it.z+dz*ca;
    const y=height+2.2;
    // A sign is optional: reject invalid placement without aborting buildings.
-   if(!isInsideParcel(px,pz,width,.3,it.b)) {
+   const footprintWidth=Math.abs(width*ca)+Math.abs(.3*sa);
+   const footprintDepth=Math.abs(width*sa)+Math.abs(.3*ca);
+   const blocked=[...occupiedHouseBounds,...occupiedShopBounds,...occupiedPublicBounds].some(other=>overlapsRect(px,pz,footprintWidth,footprintDepth,other,.5));
+   if(blocked||!isInsideParcel(px,pz,footprintWidth,footprintDepth,it.b)) {
      dummy.position.set(0,-9999,0);dummy.scale.set(0,0,0);dummy.updateMatrix();
      mesh.setMatrixAt(i,dummy.matrix);
      rearMesh.setMatrixAt(i,dummy.matrix);
@@ -5052,7 +5097,7 @@ function rebuild(){
  if(errors.length){
   let warning=document.getElementById('cityErrorNotice');
   if(!warning){warning=document.createElement('div');warning.id='cityErrorNotice';warning.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99999;background:#722;color:white;padding:12px;border-radius:8px;max-width:70vw;font:13px Arial';document.body.appendChild(warning)}
-  warning.textContent='v8.8.4 · '+errors.join(' | ');
+  warning.textContent='v8.8.5 · '+errors.join(' | ');
  }else{document.getElementById('cityErrorNotice')?.remove()}
 }
 function renderMilestones(){
