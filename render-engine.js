@@ -26,7 +26,7 @@
     sun=o;sun.castShadow=true;
     sun.shadow.mapSize.set(2048,2048);
     const c=sun.shadow.camera;
-    c.left=-114;c.right=114;c.top=114;c.bottom=-114;c.near=1;c.far=750;
+    c.left=-114;c.right=114;c.top=210;c.bottom=-114;c.near=1;c.far=750;
     c.updateProjectionMatrix();
     sun.shadow.bias=-0.00014;sun.shadow.normalBias=.022;
     sun.shadow.radius=3;
