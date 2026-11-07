@@ -1,4 +1,4 @@
-# Piazze e verifiche — v8.8.8
+# Piazze e verifiche — v8.8.9
 
 ## Revisione dello spazio e degli arredi — v8.8.8
 
@@ -24,7 +24,7 @@ I contorni e i percorsi provengono da OpenStreetMap; le dimensioni sono ridotte 
 
 I dati cartografici possono omettere alberi, arredi e aiuole. Gli alberi puntuali sono usati quando disponibili; dove mancano, una parte della vegetazione è collocata sulle aiuole mappate come integrazione grafica. Questa integrazione non è una misura reale delle posizioni dei singoli alberi. Non è stata verificata manualmente la scelta della piazza principale per ogni città. I candidati centrali non vanno presentati come ricostruzioni complete certificate.
 
-Ogni piazza porta il nome della città su entrambe le facce del cartello. Monumenti e statue principali restano separati dalle piazze iniziali e legati alle opere. La piazza predefinita ha due fasce verdi laterali e una pavimentazione centrale semplice; rimossi i percorsi diagonali sovrapposti.
+Ogni piazza porta il nome della città su entrambe le facce del cartello. Le statue storiche documentate che appartengono alla piazza vengono ora integrate nel suo disegno; le altre opere pubbliche mantengono i propri obiettivi. La piazza predefinita ha due fasce verdi laterali e una pavimentazione centrale semplice; rimossi i percorsi diagonali sovrapposti.
 
 Per le città nuove, il resolver legge dati vettoriali OpenFreeMap, cerca una piazza nominata con un contorno utilizzabile e ne importa le geometrie disponibili. Le risposte vengono salvate localmente; in caso di dati assenti o rete non disponibile resta la piazza predefinita. Il risultato automatico resta un candidato da verificare come piazza principale.
 
@@ -48,3 +48,9 @@ Riferimenti municipali usati: Buenos Aires https://buenosaires.gob.ar/gcaba_hist
 Generate e controllate tutte le 261 geometrie: coordinate finite, pannelli con il nome della città, assenza di auto-ombre sulle pavimentazioni. Tutti i 261 asset hanno planimetrie distinte. Controllata la generazione di una piazza futura usando un vero tassello vettoriale, oltre a cache, deduplicazione e ripiego senza rete. Confrontate 18 proiezioni geometriche di nove città.
 
 Queste proiezioni e verifiche CPU non sostituiscono il controllo WebGL della città completa, che resta da completare. Restano valide le modifiche della v8.8.6 a nickname, selezione delle superfici, menu Trova e obiettivi pubblici.
+
+## Dettagli documentati — v8.8.9
+
+Aggiunto un livello separato di fontane, statue e percorsi con fonti e stato di verifica. I 69 elementi registrati comprendono 12 voci di riferimento (incluse le quattro figure appartenenti alla Pirámide), 11 archetipi cartografici e 46 elementi ancora privi di modello specifico. Questi ultimi non vengono sostituiti con statue inventate. Il pannello della piazza mostra la distinzione. Metodo, fonti e limiti in METODO_PIAZZE.md.
+
+Verificati 262 disegni, incluso il ripiego: 206.229 parti dentro il lotto, massimo 108.683 triangoli e 56 gruppi di disegno. Verificate matrici finite, spazio riservato ai monumenti, menu con 29 obiettivi e importazione di una piazza futura. Esaminate proiezioni geometriche dei nuovi monumenti da due lati: non sono un test WebGL. La pubblicazione Netlify resta bloccata dai crediti esauriti; GitHub e ZIP contengono questa versione.
