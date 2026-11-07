@@ -1,6 +1,16 @@
-# Piazze e verifiche — v8.8.7
+# Piazze e verifiche — v8.8.8
 
-## Cosa è cambiato
+## Revisione dello spazio e degli arredi — v8.8.8
+
+La piazza occupa ora tutto il lotto con una base pavimentata, una passeggiata perimetrale e terrazze arredate negli spazi residui. La planimetria centrale viene ruotata per adattare il suo asse lungo al lotto e scalata uniformemente; i rapporti dimensionali dei dati originali non vengono deformati. Per Buenos Aires la superficie del nucleo cartografico è 2,96 volte quella della versione precedente. L’orientamento della piazza rispetto al nord reale può quindi cambiare.
+
+Bordure e cordoli hanno spessore 3D. Aiuole rialzate, fioriture lungo i bordi verdi, sedute a listelli con braccioli, lampioni, cestini, alberi con chiome composte e pergolati completano lo spazio. Questi elementi integrativi servono all’adattamento della piazza alla città virtuale e non vanno considerati una misura di tutti gli arredi reali. Dove sono disponibili, vengono utilizzate le posizioni cartografiche degli alberi, con un massimo di 72 alberi per piazza. Il cartello è largo al massimo 8 metri, basso e laterale, invece del precedente pannello centrale da circa 24 metri.
+
+Anche le piazze predefinite usano questo sistema di dettaglio. Restano indicate come piazze civiche predefinite, con il nome della città.
+
+Verificati 262 modelli (261 mappati più quello predefinito): 197.866 parti restano nei lotti; il modello più complesso conta 104.579 triangoli e il massimo è 43 gruppi di disegno. Le superfici alla stessa quota e con lo stesso materiale vengono unite. Sono limiti geometrici verificati, non misure di FPS nel browser.
+
+## Cosa è cambiato nella base cartografica
 
 La v8.8.6 applicava arredi e giardini generici anche a contorni diversi. La v8.8.7 include un archivio di 261 planimetrie distinte e disegna i contorni, le superfici verdi, le superfici pedonali e i percorsi disponibili nei dati cartografici. Non aggiunge quattro aiuole uguali a ogni piazza.
 
