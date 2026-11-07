@@ -121,3 +121,5 @@ button:hover{filter:brightness(1.065)}
 .civicObjective{display:grid;gap:9px;padding:14px;margin:10px 0;border:1px solid #8caaaa66;border-radius:12px;background:#153b4b}.civicObjective strong{font-size:16px}.civicObjective span{font-size:13px;color:#d8e7e7}.civicObjective.pending{background:#233a46;color:#c5d1d6}.civicObjective.achieved{border-left:4px solid #63d3a3}.civicObjective.current{outline:2px solid #f2ca70}.civicObjective progress{width:100%;height:10px;accent-color:#63d3a3}.civicObjective button{justify-self:start;min-height:40px}#v4Body>input[type=search],#v4Body>select{box-sizing:border-box;width:100%;margin:6px 0;padding:12px;background:#102c3c;color:#fff;border:1px solid #a2bbc6;border-radius:8px}.v4Nav{max-width:calc(100% - 24px)}
 
 .squareAttribution{display:none}.city-view .squareAttribution{display:block;position:absolute;right:8px;bottom:104px;z-index:7;background:#123342e8;color:#e3edf1;padding:4px 7px;border-radius:4px;font-size:10px}
+
+.squareAttribution a{color:inherit}
