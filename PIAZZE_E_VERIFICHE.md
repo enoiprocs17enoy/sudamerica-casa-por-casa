@@ -1,41 +1,40 @@
-# Piazze, ricerca edifici e leggibilità — v8.8.6
+# Piazze e verifiche — v8.8.7
 
-Ogni città, anche nuova, riceve una piazza e il cartello con il proprio nome su entrambi i lati. Anche le piazzette di quartiere riportano il nome della città. Le posizioni di case, negozi e lotti pubblici non cambiano.
+## Cosa è cambiato
 
-## Piazze reali e piazza predefinita
+La v8.8.6 applicava arredi e giardini generici anche a contorni diversi. La v8.8.7 include un archivio di 261 planimetrie distinte e disegna i contorni, le superfici verdi, le superfici pedonali e i percorsi disponibili nei dati cartografici. Non aggiunge quattro aiuole uguali a ogni piazza.
 
-Otto città hanno un profilo basato su fonti municipali/turistiche: Buenos Aires, Mar del Plata, Quilmes, Santiago, Lima, Manaus, Montevideo e Quito. Sono rappresentazioni adattate al lotto del gioco, non ricostruzioni misurate complete.
+Sono state controllate e corrette in modo specifico le associazioni di Buenos Aires (Plaza de Mayo), Mar del Plata (Plaza San Martín), Quilmes (Parque General José de San Martín), Lima (Plaza Mayor), Santiago (Plaza de Armas), Bogotá (Plaza de Bolívar), Montevideo (Plaza Independencia) e Quito (Plaza Grande). Manaus usa la geometria di Praça São Sebastião / Largo de São Sebastião.
 
-Per una città senza profilo, entrando nel 3D viene cercata una piazza nominata nei dati OpenStreetMap vicini alle coordinate della città. Si privilegiano le piazze e i nomi che indicano centralità. Questo criterio non certifica che il luogo trovato sia la piazza principale ufficiale. Un contorno chiuso valido viene riprodotto in scala uniforme nel lotto; arredi e vegetazione sono generati. Le coordinate del catalogo segnate come non verificate non avviano ricerche, per evitare di attribuire luoghi errati.
+La copertura è 214/234 città selezionabili. Le altre 451 voci del catalogo hanno coordinate già marcate come non verificate e non sono selezionabili. Il totale di 261 geometrie include 47 candidati di queste voci: non certifica una copertura di quasi tutte le 685 piazze principali. Vedere COPERTURA_PIAZZE.md per stato e fonte di ciascuna città.
 
-Se non ci sono dati adatti, la rete è assente o il servizio non risponde, viene mantenuta la piazza civica predefinita con il nome della città. Il caricamento avviene in secondo piano, con una richiesta alla volta e salvataggio locale dei risultati. Non blocca l'ingresso nel 3D. Una risposta arrivata dopo il cambio di città non modifica quella attualmente aperta.
+## Precisione e limiti
 
-I monumenti principali non vengono collocati automaticamente nella piazza iniziale: restano separati dagli spazi pubblici iniziali e legati alle opere.
+I contorni e i percorsi provengono da OpenStreetMap; le dimensioni sono ridotte uniformemente per rientrare nel lotto permanente, senza deformare il rapporto tra larghezza e profondità. Le posizioni di case e attività non cambiano.
 
-Dati cartografici: © OpenStreetMap contributors, ODbL — https://www.openstreetmap.org/copyright
-Servizio di interrogazione: https://overpass-api.de/api/interpreter
+I dati cartografici possono omettere alberi, arredi e aiuole. Gli alberi puntuali sono usati quando disponibili; dove mancano, una parte della vegetazione è collocata sulle aiuole mappate come integrazione grafica. Questa integrazione non è una misura reale delle posizioni dei singoli alberi. Non è stata verificata manualmente la scelta della piazza principale per ogni città. I candidati centrali non vanno presentati come ricostruzioni complete certificate.
 
-## Fonti dei profili
+Ogni piazza porta il nome della città su entrambe le facce del cartello. Monumenti e statue principali restano separati dalle piazze iniziali e legati alle opere. La piazza predefinita ha due fasce verdi laterali e una pavimentazione centrale semplice; rimossi i percorsi diagonali sovrapposti.
 
-- Buenos Aires: https://buenosaires.gob.ar/gcaba_historico/plaza-de-mayo
-- Mar del Plata: https://turismomardelplata.gob.ar/ASP/SP/audioguias-extendida.htm
-- Quilmes: https://www.quilmes.gov.ar/noticias/noticia.php?id_noti=3298
-- Santiago: https://www.santiagoturismo.cl/es/plaza-de-armas/
-- Lima: https://visitalima.pe/experiencia/plaza-mayor-de-lima/
-- Manaus: https://www.manaus.am.gov.br/turismo/o-que-ver-e-fazer-em-manaus/
-- Montevideo: https://www.descubrimontevideo.uy/plaza-independencia?page=8
-- Quito: https://visitquito.ec/es/rutas-de-la-ciudad/
+Per le città nuove, il resolver legge dati vettoriali OpenFreeMap, cerca una piazza nominata con un contorno utilizzabile e ne importa le geometrie disponibili. Le risposte vengono salvate localmente; in caso di dati assenti o rete non disponibile resta la piazza predefinita. Il risultato automatico resta un candidato da verificare come piazza principale.
 
-## Altre modifiche comprese
+## Difetto delle righe diagonali
 
-- Nickname con altezza di 34 pixel sullo schermo e riduzione delle sovrapposizioni.
-- Selezione delle attività tramite le superfici 3D e identificazione delle singole istanze; restano selezionabili case e strutture pubbliche.
-- Menu Trova con ricerca per nome, nickname e numero; collegamenti per raggiungere e aprire gli edifici.
-- Le strutture pubbliche aprono gli obiettivi, distinguendo quelli raggiunti e quelli mancanti.
-- Maggiori dettagli delle facciate, dei mezzi di servizio, degli arredi e delle attrezzature specifiche.
+Separati i materiali di pavimentazione e i dettagli che proiettano ombra: le superfici sottili delle piazze non proiettano più ombre su se stesse. Corretto il distacco delle superfici sovrapposte e adattato il bias delle ombre all'estensione effettiva della mappa. La conferma visiva WebGL nel browser resta da eseguire.
 
-## Verifiche effettivamente eseguite
+## Fonti e licenze
 
-Verificati generazione e cartelli per tutte le 685 città del catalogo e una città futura di prova; contorni cartografici validi/errati, deduplicazione delle richieste, cache e comportamento offline con risposte simulate. Verificate 2.992 intersezioni reali Three.js sulle attività nelle otto evoluzioni, gratuite e Premium; controllati obiettivi, ricerca, nickname e ingombri.
+Dati © OpenStreetMap contributors, ODbL: https://www.openstreetmap.org/copyright
+Schema vettoriale © OpenMapTiles: https://openmaptiles.org/
+Fornitura vettoriale OpenFreeMap: https://openfreemap.org/
+Versione dei vettori utilizzata: 20261101_080013_pt.
+Metadati geografici Wikidata, CC0: https://www.wikidata.org/
+Le singole fonti geometriche sono elencate in COPERTURA_PIAZZE.md. Sono stati scaricati 721 tasselli, circa 48,65 MiB, con al massimo quattro richieste contemporanee; nel pacchetto vengono distribuite solo le geometrie estratte, non l'archivio dei tasselli.
 
-Non è stato possibile completare la verifica WebGL nel browser: il controllo della finestra è stato bloccato nelle sessioni precedenti; il browser separato di prova non è riuscito ad avviarsi in questo ambiente. I test con risposte cartografiche simulate non verificano la disponibilità del servizio Overpass o la copertura reale di ogni città. Prestazioni FPS e resa visiva completa restano da verificare.
+Riferimenti municipali usati: Buenos Aires https://buenosaires.gob.ar/gcaba_historico/plaza-de-mayo ; Mar del Plata https://turismomardelplata.gob.ar/ASP/SP/audioguias-extendida.htm ; Quilmes https://www.quilmes.gov.ar/noticias/noticia.php?id_noti=3298 ; Santiago https://www.santiagoturismo.cl/es/plaza-de-armas/ ; Lima https://visitalima.pe/experiencia/plaza-mayor-de-lima/ ; Manaus https://www.manaus.am.gov.br/turismo/o-que-ver-e-fazer-em-manaus/ ; Montevideo https://www.descubrimontevideo.uy/plaza-independencia?page=8 ; Quito https://visitquito.ec/es/rutas-de-la-ciudad/ .
+
+## Verifiche
+
+Generate e controllate tutte le 261 geometrie: coordinate finite, pannelli con il nome della città, assenza di auto-ombre sulle pavimentazioni. Tutti i 261 asset hanno planimetrie distinte. Controllata la generazione di una piazza futura usando un vero tassello vettoriale, oltre a cache, deduplicazione e ripiego senza rete. Confrontate 18 proiezioni geometriche di nove città.
+
+Queste proiezioni e verifiche CPU non sostituiscono il controllo WebGL della città completa, che resta da completare. Restano valide le modifiche della v8.8.6 a nickname, selezione delle superfici, menu Trova e obiettivi pubblici.
