@@ -1234,7 +1234,7 @@ async function ensureCitySquare(city){
 }
 function citySquareProfile(city){
  const bundled=typeof window!=='undefined'&&window.CITY_SQUARE_DATA?.[city.id];
- if(bundled)return {...bundled,realGeometry:true,stone:0xc9bda7,green:0x638d4c,palm:false};
+ if(bundled){const profile={...bundled,realGeometry:true,stone:0xc9bda7,green:0x638d4c,palm:false};return window.SquareDetails?window.SquareDetails.enrich(profile,city):profile;}
  const profiles={
   'ar-buenos-aires':{name:'Plaza de Mayo',layout:'axial',stone:0xd8cbc0,green:0x6e9a58,palm:true,source:'https://buenosaires.gob.ar/gcaba_historico/plaza-de-mayo'},
   'ar-mar-del-plata':{name:'Plaza San Martín',layout:'garden',stone:0xd8d1c3,green:0x639457,palm:false,source:'https://turismomardelplata.gob.ar/ASP/SP/audioguias-extendida.htm'},
@@ -1246,7 +1246,7 @@ function citySquareProfile(city){
   'ec-quito':{name:'Plaza Grande',layout:'formal',stone:0xcbbbac,green:0x497b50,palm:true,source:'https://visitquito.ec/es/rutas-de-la-ciudad/'}
  };
  const record=citySquareRecords()[city.id]?.square;
- if(record?.realGeometry&&Array.isArray(record.outline)&&record.outline.length>=4&&record.outline.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.z)))return {...record,stone:0xc9bda7,green:0x638d4c,palm:false};
+ if(record?.realGeometry&&Array.isArray(record.outline)&&record.outline.length>=4&&record.outline.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.z)))return window.SquareDetails?window.SquareDetails.enrich({...record,stone:0xc9bda7,green:0x638d4c,palm:false},city):{...record,stone:0xc9bda7,green:0x638d4c,palm:false};
  if(record&&typeof record.name==='string'&&Array.isArray(record.outline)&&record.outline.length>=4&&record.outline.length<=800&&record.outline.every(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.z))&&/^https:\/\/www\.openstreetmap\.org\/way\/\d+$/.test(record.source))return {layout:'mapped',stone:0xcbbda6,green:0x67965b,palm:Math.abs(city.lat)<24,...record};
  if(profiles[city.id])return {...profiles[city.id],documented:true};
  const seed=Array.from(city.id).reduce((n,c)=>(Math.imul(n,31)+c.charCodeAt(0))>>>0,17);
@@ -1278,6 +1278,8 @@ function fitSquareToParcel(profile,b){
 }
 function drawSurveyedCitySquare(profile,b){
  const fit=fitSquareToParcel(profile,b),root=profile.outline,scale=fit.scale;
+ const detailPlan=typeof window!=='undefined'&&window.SquareDetails?window.SquareDetails.prepare(profile,fit,b,currentCity):null;
+ const clearDetail=(x,z,r=0)=>!detailPlan||detailPlan.clear(x,z,r);
  const project=p=>{const q=fit.point(p);return new THREE.Vector2(q.x,-q.z);};
  const surfaceBatches=new Map(),batches=new Map(),dummy=new THREE.Object3D(),geometries={box:new THREE.BoxGeometry(1,1,1),round:new THREE.CylinderGeometry(.5,.5,1,12),leaf:new THREE.IcosahedronGeometry(1,1),ring:new THREE.TorusGeometry(.35,.045,6,16)};
  const put=(type,color,x,y,z,w,h,d,angle=0,casts=true)=>{
@@ -1319,24 +1321,36 @@ function drawSurveyedCitySquare(profile,b){
   for(let flower=0;flower<count&&blooms<100;flower++){
    let distance=(flower+.5)*perimeter/count,edge=0;while(edge<lengths.length-1&&distance>lengths[edge])distance-=lengths[edge++];
    const a=points[edge],c=points[edge+1],t=distance/Math.max(.001,lengths[edge]),x=(a.x+(c.x-a.x)*t)*.93+centre.x*.07,z=(a.z+(c.z-a.z)*t)*.93+centre.z*.07;
+   if(!clearDetail(x,z,.35))continue;
    put('leaf',0x567d3e,x,.75,z,.24,.18,.24);
    for(let petal=0;petal<4;petal++){const angle=petal*Math.PI/2;put('leaf',[0xe5aecf,0xf1cd7a,0xe9dbca][blooms%3],x+Math.sin(angle)*.085,.95,z+Math.cos(angle)*.085,.09,.055,.09);}
    blooms++;
   }
  }
- for(const line of profile.paths||[])for(let i=1;i<line.length;i++)segment(fit.point(line[i-1]),fit.point(line[i]),0xe4d3b4,Math.max(.40,Math.min(1.15,scale*3)),.06,.56);
+ const routes=profile.walkwayDetails?.length?profile.walkwayDetails:(profile.paths||[]).map(points=>({points}));
+ for(const route of routes)for(let i=1;i<route.points.length;i++){
+  const a=fit.point(route.points[i-1]),c=fit.point(route.points[i]),width=Math.max(.65,Math.min(1.8,(route.widthMeters||3)*scale));
+  const color=/asphalt/i.test(route.surface||'')?0x9a9b90:/concrete/i.test(route.surface||'')?0xd1cdc0:0xe4d3b4;
+  segment(a,c,color,width,.09,.56);
+  const dx=c.x-a.x,dz=c.z-a.z,length=Math.hypot(dx,dz);if(length<.03)continue;
+  for(const side of [-1,1]){const nx=-dz/length*width*.5*side,nz=dx/length*width*.5*side;segment({x:a.x+nx,z:a.z+nz},{x:c.x+nx,z:c.z+nz},0xc3b59d,.08,.12,.57);}
+ }
+
  const bench=(x,z,angle=0)=>{
+  if(!clearDetail(x,z,1.45))return;
   const ca=Math.cos(angle),sa=Math.sin(angle),part=(color,dx,y,dz,w,h,d)=>box(color,x+dx*ca+dz*sa,y,z-dx*sa+dz*ca,w,h,d,angle);
   for(let slat=-2;slat<=2;slat++)part(0xad7950,0,.88,slat*.115,2.1,.10,.087);
   for(let slat=0;slat<3;slat++)part(0xb88a57,0,1.14+slat*.14,-.30,2.1,.10,.08);
   for(const side of [-1,1]){part(0x344d48,side*.78,.59,0,.12,.62,.55);part(0x344d48,side*1.02,1.07,.02,.08,.14,.58);part(0x344d48,side*1.02,.98,-.22,.08,.50,.08);}
  };
  const lamp=(x,z)=>{
+  if(!clearDetail(x,z,.35))return;
   put('round',0x314b48,x,2.38,z,.13,4,.13);put('round',0x425b51,x,.54,z,.34,.30,.34);
   box(0x314b48,x,4.53,z,.52,.10,.52);box(0xffdda0,x,4.32,z,.32,.34,.32);box(0x314b48,x,4.08,z,.45,.09,.45);
   for(const side of [-1,1])box(0x314b48,x+side*.17,4.31,z,.045,.42,.045);
  };
  const planter=(x,z,seed)=>{
+  if(!clearDetail(x,z,1.55))return;
   box(0xd8c5a5,x,.56,z,1.40,.38,2.6,0,false);box(0x675a3d,x,.79,z,1.15,.09,2.34,0,false);
   for(let k=0;k<7;k++){
    const dx=Math.sin(k*9+seed)*.39,dz=(k-3)*.31;put('leaf',0x577e3e,x+dx,.99,z+dz,.28,.29,.28);
@@ -1356,6 +1370,7 @@ function drawSurveyedCitySquare(profile,b){
  const maxTrees=Math.min(72,treePositions.length);
  for(let i=0;i<maxTrees;i++){
   const p=treePositions[Math.floor(i*treePositions.length/maxTrees)],x=p.x,z=p.z;
+  if(!clearDetail(x,z,1.65))continue;
   if(palmCity){
    put('round',0x88704e,x,2.75,z,.22,4.8,.22);
    for(let leaf=0;leaf<9;leaf++){const a=leaf*Math.PI*2/9;put('leaf',leaf%2?0x547f43:0x6c9048,x+Math.sin(a)*.64,5.21+Math.sin(a*2)*.12,z+Math.cos(a)*.64,.24,.13,1.2,a);}
@@ -1394,6 +1409,7 @@ function drawSurveyedCitySquare(profile,b){
   batch.parts.forEach((p,i)=>{dummy.position.set(b.x+p.x,p.y,b.z+p.z);dummy.rotation.set(0,p.angle,0);dummy.scale.set(p.w,p.h,p.d);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);});
   mesh.computeBoundingSphere();mesh.castShadow=batch.casts;mesh.receiveShadow=true;mesh.userData.citySquareDetail=profile.name;mesh.userData.squareBatch= batch.type;group.add(mesh);
  }
+ if(detailPlan){window.SquareDetails.render(detailPlan,group,b);group.userData.squareLandmarkCount=detailPlan.items.length;}
  group.userData.squareFit={angle:fit.angle,width:fit.width,depth:fit.depth,scale:fit.scale};
  addCitySquareNameSign(profile,b);return true;
 }
@@ -5444,7 +5460,7 @@ function rebuild(){
  if(errors.length){
   let warning=document.getElementById('cityErrorNotice');
   if(!warning){warning=document.createElement('div');warning.id='cityErrorNotice';warning.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99999;background:#722;color:white;padding:12px;border-radius:8px;max-width:70vw;font:13px Arial';document.body.appendChild(warning)}
-  warning.textContent='v8.8.8 · '+errors.join(' | ');
+  warning.textContent='v8.8.9 · '+errors.join(' | ');
  }else{document.getElementById('cityErrorNotice')?.remove()}
 }
 function renderMilestones(){
@@ -6155,9 +6171,27 @@ function animateLife(t){if(!active||!v4.motion)return;
  }
 }
 function publicStepStatus(step){return {unlocked:count>=step.at,remaining:Math.max(0,step.at-count)};}
+function openSquareDetailPanel(){
+ const panel=$('v4Panel'),body=$('v4Body'),profile=citySquareProfile(currentCity);panel.hidden=false;$('v4Title').textContent=profile.name;body.replaceChildren();
+ const intro=document.createElement('p');intro.textContent='Ricostruzione 3D stilizzata: la planimetria e gli elementi documentati sono affiancati da arredi di integrazione.';body.append(intro);
+ const features=profile.landmarks||[];
+ if(!features.length){const empty=document.createElement('p');empty.textContent='Le fonti disponibili non descrivono ancora statue e fontane di questa piazza.';body.append(empty);}
+ for(const feature of features){
+  const row=document.createElement('div');row.className='civicObjective '+(feature.status==='needs-model'?'pending':'achieved');
+  const name=document.createElement('strong');name.textContent=feature.name;
+  const state=document.createElement('span');state.textContent=feature.status==='needs-model'?'Presenza mappata · forma 3D da completare':feature.status==='reference-model'?'Riferimento documentato · modello 3D stilizzato':'Tipologia mappata · modello 3D da verificare nei dettagli';row.append(name,state);
+  const url=feature.reference||feature.source;
+  if(url&&/^https:\/\/(www\.)?(openstreetmap\.org|buenosaires\.gob\.ar|turismomardelplata\.gob\.ar|syv\.web\.unq\.edu\.ar|target2\.promperu\.gob\.pe|montevideo\.gub\.uy|quito-turismo\.gob\.ec|idpc\.gov\.co|santiagoturismo\.cl)\//.test(url)){const source=document.createElement('a');source.href=url;source.target='_blank';source.rel='noopener';source.textContent='Fonte';row.append(source);}
+  body.append(row);
+ }
+ const back=document.createElement('button');back.textContent='Torna agli obiettivi';back.onclick=()=>openPublicWorks();body.append(back);
+}
 function openPublicWorks(selected=null){
  const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;$('v4Title').textContent=selected?.name||'Strutture e obiettivi';body.replaceChildren();
  const summary=document.createElement('p');summary.textContent=currentCity.name+' · '+count.toLocaleString('it-IT')+' case · '+PUBLIC_STEPS.filter(s=>publicStepStatus(s).unlocked).length+'/'+PUBLIC_STEPS.length+' obiettivi raggiunti';body.append(summary);
+ if(!selected||selected.kind==='park'){
+  const details=document.createElement('button');details.textContent='Statue, fontane e dettagli della piazza';details.onclick=openSquareDetailPanel;body.append(details);
+ }
  const search=document.createElement('input');search.type='search';search.placeholder='Cerca una struttura…';search.setAttribute('aria-label','Cerca strutture pubbliche');body.append(search);
  const list=document.createElement('div');body.append(list);
  const render=()=>{
