@@ -1,4 +1,4 @@
-# Mondo — v9.0.0
+# Mondo — v9.0.1
 
 La mappa è estesa a tutti i continenti. Il catalogo GeoNames cities500 importato il 7 novembre 2026 contiene 236.953 località distribuite in 246 paesi e territori. Include località con oltre 500 abitanti o sedi amministrative; non è l'elenco di ogni villaggio o insediamento esistente sulla Terra. Gli estremi polari sono limitati dalla proiezione Mercatore della mappa; l'Antartide non ha un normale catalogo di città popolose.
 
@@ -22,7 +22,7 @@ Le piazze mondiali usano il resolver cartografico esistente e un ripiego nominat
 
 Estrarre tutto lo ZIP e servire la cartella con un server HTTP oppure pubblicarla come sito statico. La cartella world-cities è necessaria. Aprire index.html con file:// non permette normalmente i caricamenti dei paesi. Il catalogo compresso richiede un browser moderno con DecompressionStream.
 
-La mappa dettagliata dai livelli di zoom 6–19 usa le tessere standard OpenStreetMap, con attribuzione visibile. Non vengono precaricate né incluse nello ZIP; senza rete resta la base geografica semplificata. Uso: https://operations.osmfoundation.org/policies/tiles/ .
+Dalla v9.0.1 la mappa non usa più tessere stradali reali. Rimangono le terre emerse Natural Earth e la rete stilizzata descritta in RETE_STILIZZATA.md.
 
 Per le 633 località di orientamento sono inclusi anche i nomi alternativi GeoNames: per esempio Roma/Rome e Tokyo/東京. Per le altre località la ricerca usa nome principale e traslitterazione; non include tutte le traduzioni in ogni lingua.
 ## Verifiche della v9.0.0

@@ -813,7 +813,7 @@ function updateCitySelection(){
  const name=$('currentCityName');if(name)name.textContent=currentCity.name;
  const overview=$('cityOverview');
  if(overview)overview.textContent=`${(window.WorldAtlas?.meta.total||CITY_CATALOG.length).toLocaleString('it-IT')} località nel catalogo · ${window.WorldAtlas?.countries.size||13} paesi e territori · simulazione · ${currentCity.residents.toLocaleString('it-IT')} in ${currentCity.name} · ${currentCity.points.toLocaleString('it-IT')} punti città · ${count.toLocaleString('it-IT')} case 3D caricate`;
- refreshCityMarkers();
+ refreshCityMarkers();window.WorldRoads?.refresh();
 }
 function selectCity(id,fly=false){
  const next=window.WorldAtlas?.byId.get(id)||CITY_CATALOG.find(c=>c.id===id);
@@ -1480,8 +1480,12 @@ let releaseSky=null;
 let regionalWaterUniform=null;
 
 // East is +X and north is -Z, matching the city compass.
+function worldCityCells(selected=homes){
+ const cells=new Map();for(const h of selected){const p=spiralCell(h.blockIndex);cells.set(p.col+':'+p.row,p);}for(const shop of shopPurchases){const p=spiralCell(shop.block);cells.set(p.col+':'+p.row,p);}for(const zone of publicZones()){const p=spiralCell(zone.block);cells.set(p.col+':'+p.row,p);}return [...cells.values()];
+}
 function buildRegionalLandscape(houses){
  const city=currentCity;
+ const roadPlan=typeof window!=='undefined'&&window.WorldRoads&&window.WorldAtlas?window.WorldRoads.cityPlan(city,worldCityCells(houses),window.WorldAtlas):null;
  regionalWaterUniform=null;
  const coast=coastalDirections[city.id]||city.coast;
  const angle=coast?.[0]||0;
@@ -1617,6 +1621,7 @@ function buildRegionalLandscape(houses){
 
 
 
+ if(roadPlan)window.WorldRoads.draw3D(roadPlan,group,terrainHeight,(x,z)=>!coast||x*east+z*south<shore-20);
  const candidates=[],spacing=48,horizon=5920;
  for(let col=Math.floor(-horizon/spacing);col<=Math.ceil(horizon/spacing);col++){
   for(let row=Math.floor(-horizon/spacing);row<=Math.ceil(horizon/spacing);row++){
@@ -1626,7 +1631,7 @@ function buildRegionalLandscape(houses){
    for(let c=Math.round((x-28)/BLOCK_X);c<=Math.round((x+28)/BLOCK_X);c++)
     for(let r=Math.round((z-28)/BLOCK_Z);r<=Math.round((z+28)/BLOCK_Z);r++)
      if(cleared.has(c+':'+r))developedHere=true;
-   if(developedHere||coast&&x*east+z*south>shore-35)continue;
+   if(developedHere||coast&&x*east+z*south>shore-35||roadPlan&&window.WorldRoads.distanceToRoad(x,z,roadPlan)<18)continue;
    const gap=Math.hypot(Math.max(minX-x,0,x-maxX),Math.max(minZ-z,0,z-maxZ));
    const transition=Math.max(0,Math.min(1,gap/1500));
    const density=.16+.73*transition*transition*(3-2*transition);
@@ -5467,7 +5472,7 @@ function rebuild(){
  if(errors.length){
   let warning=document.getElementById('cityErrorNotice');
   if(!warning){warning=document.createElement('div');warning.id='cityErrorNotice';warning.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99999;background:#722;color:white;padding:12px;border-radius:8px;max-width:70vw;font:13px Arial';document.body.appendChild(warning)}
-  warning.textContent='v9.0.0 · '+errors.join(' | ');
+  warning.textContent='v9.0.1 · '+errors.join(' | ');
  }else{document.getElementById('cityErrorNotice')?.remove()}
 }
 function renderMilestones(){
@@ -5675,7 +5680,7 @@ function showShopCard(shop){showOwnerCard(ownerForShop(shop),'negozio',shop)}
 function showBalloonCard(balloon){showOwnerCard(homes.find(h=>h.id===balloon.ownerId)||homes[0],'mongolfiera',balloon)}
 function showPersonCard(a){showOwnerCard(a.home,'persona')}
 function showCard(h){showOwnerCard(h,'casa')}
-function enter(){if(!threeReady&&!makeScene())return;active=true;document.body.classList.add("city-view");$('threeLayer').classList.add('active');$('threeLayer').style.opacity=1;map.dragging.disable();map.scrollWheelZoom.disable();rebuild();updateCamera();resize();void ensureCitySquare(currentCity)}
+function enter(){if(!active&&window.WorldRoads){const p=WorldRoads.cityPlan(currentCity,worldCityCells(),WorldAtlas);azimuth=0;elevation=1.12;distance=Math.min(3500,Math.max(360,(Math.max(p.bounds.maxX-p.bounds.minX,p.bounds.maxZ-p.bounds.minZ))*.85));}if(!threeReady&&!makeScene())return;active=true;document.body.classList.add("city-view");$('threeLayer').classList.add('active');$('threeLayer').style.opacity=1;map.dragging.disable();map.scrollWheelZoom.disable();rebuild();updateCamera();resize();void ensureCitySquare(currentCity)}
 function back(){clearAvatarLabels();active=false;document.body.classList.remove("city-view");$('threeLayer').style.opacity=0;$('threeLayer').classList.remove('active');$('card').style.display='none';map.dragging.enable();map.scrollWheelZoom.enable();$('status').textContent='Mappa geografica · le città sono posizionate con coordinate reali'}
 function onZoom(){
  const nearest=cityAtMapCenter();
