@@ -125,3 +125,6 @@ button:hover{filter:brightness(1.065)}
 .squareAttribution a{color:inherit}
 
 #worldDirectory select,#worldDirectory input{width:100%;margin-bottom:8px}#worldDirectory button{width:100%;margin:6px 0 12px}#worldDirectory .small{min-height:2.5em}
+
+/* Keep the map visible above the scrollable controls on narrow screens. */
+@media(max-width:720px){body{overflow:hidden}.layout{height:calc(100dvh - 56px);grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(300px,58dvh) minmax(0,1fr);overflow:hidden}.layout>.mapwrap{grid-row:1;min-height:0;height:auto}.layout>aside{grid-row:2;min-height:0;overflow:auto;overscroll-behavior:contain}}

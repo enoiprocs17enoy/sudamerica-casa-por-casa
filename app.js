@@ -4323,8 +4323,8 @@ function homePattern(kind){
   const img=ctx.createImageData(512,512);
   for(let y=0;y<512;y++)for(let x=0;x<512;x++){
    const n=rnd(x*1.719+y*31.79),m=rnd(x*.39+y*.81);
-   const wave=Math.sin(x*.037+y*.051)*4;
-   const v=(n-.5)*24+(m-.5)*9+wave;
+   // Non-periodic grain avoids diagonal bands across the repeated ground texture.
+   const v=(n-.5)*24+(m-.5)*9;
    const i=(y*512+x)*4;
    img.data[i]=Math.max(0,141+v);
    img.data[i+1]=Math.max(0,171+v);
@@ -5472,7 +5472,7 @@ function rebuild(){
  if(errors.length){
   let warning=document.getElementById('cityErrorNotice');
   if(!warning){warning=document.createElement('div');warning.id='cityErrorNotice';warning.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99999;background:#722;color:white;padding:12px;border-radius:8px;max-width:70vw;font:13px Arial';document.body.appendChild(warning)}
-  warning.textContent='v9.0.2 · '+errors.join(' | ');
+  warning.textContent='v9.0.3 · '+errors.join(' | ');
  }else{document.getElementById('cityErrorNotice')?.remove()}
 }
 function renderMilestones(){
@@ -5692,7 +5692,7 @@ function onZoom(){
  }else if(active)back();
 }
 function setCount(n){
- count=n;cityStates.get(currentCity.id).count=n;
+ count=n;syncPopulationControls();cityStates.get(currentCity.id).count=n;
  homes=createHomes(n);
  $('counter').textContent=n.toLocaleString('it-IT');
  $('v4Population').textContent=n.toLocaleString('it-IT');
