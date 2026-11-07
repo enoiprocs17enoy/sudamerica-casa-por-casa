@@ -3,7 +3,7 @@ const $=id=>document.getElementById(id),MDP=[-38.0055,-57.5426],BA=[-34.6037,-58
 const map=L.map('map',{zoomSnap:.25,zoomDelta:.5,minZoom:1,maxZoom:19,maxBounds:[[-85.05,-180],[85.05,180]],maxBoundsViscosity:.8,preferCanvas:true}).setView([15,0],2);
 // Accurate Natural Earth / GSHHG land outlines (offline bundled). No guessed
 // continent polygon and no dependency on an external atlas download.
-const geo=L.geoJSON(window.WORLD_LAND||window.CONTINENT_LAND,{style:{color:'#729d7b',weight:.75,fillColor:'#d4e8c9',fillOpacity:1},interactive:false}).addTo(map);
+const geo=L.geoJSON(window.WORLD_LAND_DETAIL||window.WORLD_LAND||window.CONTINENT_LAND,{style:{color:'#729d7b',weight:.75,fillColor:'#d4e8c9',fillOpacity:1},interactive:false}).addTo(map);
 // South American demo cities. Geographic markers use real coordinates;
 // each 3D city is a separately generated virtual city, not satellite imagery.
 const CITY_CATALOG=[
@@ -5472,7 +5472,7 @@ function rebuild(){
  if(errors.length){
   let warning=document.getElementById('cityErrorNotice');
   if(!warning){warning=document.createElement('div');warning.id='cityErrorNotice';warning.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99999;background:#722;color:white;padding:12px;border-radius:8px;max-width:70vw;font:13px Arial';document.body.appendChild(warning)}
-  warning.textContent='v9.0.1 · '+errors.join(' | ');
+  warning.textContent='v9.0.2 · '+errors.join(' | ');
  }else{document.getElementById('cityErrorNotice')?.remove()}
 }
 function renderMilestones(){
@@ -5680,7 +5680,7 @@ function showShopCard(shop){showOwnerCard(ownerForShop(shop),'negozio',shop)}
 function showBalloonCard(balloon){showOwnerCard(homes.find(h=>h.id===balloon.ownerId)||homes[0],'mongolfiera',balloon)}
 function showPersonCard(a){showOwnerCard(a.home,'persona')}
 function showCard(h){showOwnerCard(h,'casa')}
-function enter(){if(!active&&window.WorldRoads){const p=WorldRoads.cityPlan(currentCity,worldCityCells(),WorldAtlas);azimuth=0;elevation=1.12;distance=Math.min(3500,Math.max(360,(Math.max(p.bounds.maxX-p.bounds.minX,p.bounds.maxZ-p.bounds.minZ))*.85));}if(!threeReady&&!makeScene())return;active=true;document.body.classList.add("city-view");$('threeLayer').classList.add('active');$('threeLayer').style.opacity=1;map.dragging.disable();map.scrollWheelZoom.disable();rebuild();updateCamera();resize();void ensureCitySquare(currentCity)}
+function enter(){if(!active&&window.WorldRoads){WorldRoads.sync();const p=WorldRoads.cityPlan(currentCity,worldCityCells(),WorldAtlas);azimuth=0;elevation=1.12;distance=Math.min(3500,Math.max(360,(Math.max(p.bounds.maxX-p.bounds.minX,p.bounds.maxZ-p.bounds.minZ))*.85));}if(!threeReady&&!makeScene())return;active=true;document.body.classList.add("city-view");$('threeLayer').classList.add('active');$('threeLayer').style.opacity=1;map.dragging.disable();map.scrollWheelZoom.disable();rebuild();updateCamera();resize();void ensureCitySquare(currentCity)}
 function back(){clearAvatarLabels();active=false;document.body.classList.remove("city-view");$('threeLayer').style.opacity=0;$('threeLayer').classList.remove('active');$('card').style.display='none';map.dragging.enable();map.scrollWheelZoom.enable();$('status').textContent='Mappa geografica · le città sono posizionate con coordinate reali'}
 function onZoom(){
  const nearest=cityAtMapCenter();
