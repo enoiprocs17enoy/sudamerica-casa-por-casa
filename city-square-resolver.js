@@ -21,7 +21,16 @@ function select(city,layers,tile){
   const convert=path=>path.map(p=>({x:(p[0]-centre[0])*mpu,z:(p[1]-centre[1])*mpu})),surfaces=[],paths=[];
   for(const lname of ['landcover','transportation','water'])for(const feature of layers[lname]?.features||[]){if(feature.type!==3||feature.id===f.id)continue;if(lname==='landcover'&&feature.props.class!=='grass'||lname==='transportation'&&feature.props.class!=='path')continue;const filtered=feature.paths.filter(p=>p.length>=4&&p.every(v=>inside(v,ring)));if(filtered.length)surfaces.push({kind:lname==='landcover'?'lawn':lname==='water'?'water':'paving',rings:filtered.map(convert)});}
   for(const feature of layers.transportation?.features||[]){if(feature.type!==2||feature.props.class!=='path')continue;for(const line of feature.paths){let part=[];for(const p of line){if(inside(p,ring))part.push(p);else{if(part.length>1)paths.push(convert(part));part=[];}}if(part.length>1)paths.push(convert(part));}}
-  return {name:f.props.name,base:parent.props.class==='grass'?'lawn':'paving',outline:convert(ring),holes:rings.slice(1).map(convert),surfaces,paths,source:'https://www.openstreetmap.org/'+(f.id%10===3?'relation':f.id%10===2?'way':'node')+'/'+Math.floor(f.id/10),documented:true,realGeometry:true,layout:'survey',selection:'central-square-candidate'};
+  const landmarks=[];
+  for(const poi of layers.poi?.features||[]){
+   if(poi.type!==1||!['monument','artwork','fountain'].includes(poi.props.class)&&poi.props.subclass!=='fountain')continue;
+   const point=poi.paths[0]?.[0];if(!point||!inside(point,ring))continue;
+   const position=convert([point])[0],name=poi.props.name||'Opera mappata';
+   const model=window.SquareDetails?.classify(name,poi.props)||(poi.props.subclass==='fountain'?'fountain':'unclassified');
+   const type=poi.id%10===3?'relation':poi.id%10===2?'way':'node',id=Math.floor(poi.id/10);
+   landmarks.push({id:type+':'+id,name,...position,model,kind:model==='fountain'?'fountain':'artwork',status:model==='unclassified'?'needs-model':'mapped-archetype',source:'https://www.openstreetmap.org/'+type+'/'+id});
+  }
+  return {landmarks,detailSchema:2,name:f.props.name,base:parent.props.class==='grass'?'lawn':'paving',outline:convert(ring),holes:rings.slice(1).map(convert),surfaces,paths,source:'https://www.openstreetmap.org/'+(f.id%10===3?'relation':f.id%10===2?'way':'node')+'/'+Math.floor(f.id/10),documented:true,realGeometry:true,layout:'survey',selection:'central-square-candidate'};
  }
  return null;
 }
