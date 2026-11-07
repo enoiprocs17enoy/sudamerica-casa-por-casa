@@ -1867,6 +1867,15 @@ function drawShops(){
         const bx=x+bay*annexWidth*.28;
         put('displayGlass',glass,shop,bx,annexHeight*.49,back-.07,annexWidth*.20,annexHeight*.55,.16);
       }
+      if(library&&progress.premium){
+        for(const side of [-1,1]){
+          const wingX=x+side*(annexWidth/2+.08);
+          put('displayGlass',glass,shop,wingX,annexHeight*.55,annexZ,.17,annexHeight*.60,annexDepth*.74);
+          for(const bay of [-.39,0,.39])
+            put('body',0xe8d7ba,shop,wingX+side*.10,annexHeight*.50,annexZ+bay*annexDepth,.24,annexHeight*.92,.22);
+        }
+        put('roof',0xd8c8aa,shop,x,annexHeight*.23,back-.13,annexWidth+.12,.20,.31);
+      }
       if(library&&stage>=4){
         const porchWidth=w*.77;
         put('roof',trim,shop,x,3.30,front+.83,porchWidth,.27,1.76);
@@ -1939,6 +1948,13 @@ function drawShops(){
         for(const side of [-1,1])
           put('displayGlass',glass,shop,x+side*annexW*.31,1.78,back-.08,annexW*.22,1.29,.16);
         if(stage>=4)put('roof',0xe5f0dc,shop,x,2.77,back-.63,annexW*.73,.22,1.36);
+        if(progress.premium){
+          for(const side of [-1,1]){
+            const wingX=x+side*(annexW/2+.08);
+            put('displayGlass',glass,shop,wingX,annexH*.56,annexZ,.17,annexH*.48,annexDepth*.70);
+            put('body',0xe5f0dc,shop,wingX+side*.09,annexH*.27,annexZ,.24,.18,annexDepth*.77);
+          }
+        }
       }else if(shape===5){
         for(const side of [-1,1]){
           put('displayGlass',glass,shop,x+side*annexW*.24,annexH*.52,back-.08,annexW*.40,annexH*.62,.18);
@@ -1981,6 +1997,13 @@ function drawShops(){
         for(const side of [-1,1])
           put('shopPergolaPost',trim,shop,sx+side*stallWidth*.45,1.56,stallZ,.14,2.83,.14);
         put('roof',i%2?0xbd6954:trim,shop,sx,3.08,stallZ,stallWidth+.36,.23,3.40);
+        if(progress.premium){
+          for(const stripe of [-1,0,1]){
+            const stripeW=(stallWidth+.36)/5;
+            put('roof',0xf4d7a0,shop,sx+stripe*stripeW*1.67,3.215,stallZ,stripeW,.08,3.43);
+          }
+          put('displayGlass',0xffd998,shop,sx,2.82,stallZ-1.35,stallWidth*.73,.09,.09);
+        }
       }
     }
     if(stage>=2&&shape===10){
