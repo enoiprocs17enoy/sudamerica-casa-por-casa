@@ -1078,10 +1078,12 @@ function createHomes(n){
 const coastalDirections={"ar-mar-del-plata":[1.426,3],"ar-buenos-aires":[2.173,3],"uy-montevideo":[0.06,3],"cl-valparaiso":[-2.445,3],"br-rio":[0.726,3],"br-salvador":[-1.19,3],"pe-lima":[-0.985,10],"co-cartagena":[-1.656,6],"ve-caracas":[-3.011,16],"gy-georgetown":[3.115,3],"sr-paramaribo":[-3.038,10],"ar-la-plata":[2.67,10],"ar-bahia-blanca":[0.224,10],"ar-necochea":[0.306,6],"ar-puerto-madryn":[1.833,3],"ar-trelew":[0.954,24],"ar-comodoro-rivadavia":[0.999,3],"ar-rio-gallegos":[1.739,3],"ar-ushuaia":[1.193,3],"br-santos":[0.449,3],"br-niteroi":[-0.043,6],"br-vitoria":[1.32,3],"br-vila-velha":[1.128,3],"br-florianopolis":[1.706,3],"br-joinville":[1.571,35],"br-itajai":[1.771,3],"br-criciuma":[0.68,24],"br-porto-alegre":[-0.222,3],"br-pelotas":[1.702,16],"br-rio-grande":[1.026,3],"br-belem":[-3.11,16],"br-macapa":[1.608,3],"br-sao-luis":[-2.134,3],"br-fortaleza":[2.816,3],"br-natal":[1.931,3],"br-joao-pessoa":[1.789,6],"br-recife":[1.099,3],"br-olinda":[1.203,3],"br-maceio":[0.553,3],"br-aracaju":[1.076,3],"cl-concepcion":[-1.904,6],"cl-talcahuano":[-1.642,3],"cl-valdivia":[-2.001,16],"cl-puerto-montt":[0.07,3],"cl-punta-arenas":[1.125,3],"cl-antofagasta":[-1.471,3],"cl-iquique":[-1.702,3],"cl-arica":[-1.309,3],"cl-la-serena":[-1.687,3],"cl-coquimbo":[-1.859,3],"cl-vina-del-mar":[-2.057,3],"uy-maldonado":[-0.183,6],"uy-punta-del-este":[0.131,3],"uy-colonia-del-sacramento":[-0.486,3],"pe-trujillo":[-0.759,6],"pe-chiclayo":[-0.881,16],"pe-chimbote":[-0.991,3],"ec-manta":[-2.947,3],"ec-portoviejo":[-2.487,24],"ec-machala":[-2.326,6],"ec-esmeraldas":[-3.065,3],"co-barranquilla":[-3.091,16],"co-santa-marta":[-2.233,3],"co-sincelejo":[-2.225,35],"co-riohacha":[-2.638,3],"co-buenaventura":[-1.194,3],"ve-maracaibo":[0.777,6],"ve-maracay":[-3.011,35],"ve-puerto-la-cruz":[-2.471,3],"ve-barcelona":[-2.447,6],"ve-cumana":[-2.72,3],"ve-coro":[3.12,10],"ve-puerto-cabello":[-3.127,3],"gy-new-amsterdam":[2.957,3],"sr-lelydorp":[3.142,35],"sr-nieuw-nickerie":[-3.045,3],"br-sao-vicente":[0.393,3],"br-duque-de-caxias":[0.169,10],"br-teresopolis":[0.524,24],"br-serra-espirito-santo":[1.178,24],"br-sao-jose-santa-catarina":[1.31,6],"br-jaragua-do-sul":[1.215,3],"br-balneario-camboriu":[1.702,3],"br-capao-do-leao":[1.293,6],"br-ananindeua":[-2.662,3],"br-sao-jose-de-ribamar":[-3.012,3],"br-caucaia":[2.618,3],"br-jaboatao-dos-guararapes":[1.194,3],"br-lauro-de-freitas":[0.378,3],"br-parnamirim-rio-grande-do-norte":[1.882,10],"br-bayeux":[1.29,6],"br-rio-largo":[0.882,3],"br-praia-grande-sao-paulo":[0.722,3],"br-nova-iguacu":[0.126,6],"br-cariacica":[1.036,3],"br-palhoca":[1.893,3],"br-camboriu":[1.856,24],"br-sao-lourenco-do-sul":[1.44,24],"br-marituba":[2.752,3],"br-paco-do-lumiar":[-0.512,3],"br-maracanau":[2.733,3],"br-olinda-pernambuco":[1.309,3],"br-camacari":[0.545,3],"br-sao-goncalo-do-amarante-rn":[1.833,3],"br-santa-rita-paraiba":[1.898,3],"br-marechal-deodoro":[0.782,10],"br-sao-cristovao-sergipe":[0.785,3],"br-santo-andre":[0.297,24],"br-guaruja":[0.273,3],"br-cacapava":[0.262,35],"br-sao-joao-de-meriti":[0.042,3],"br-viana-espirito-santo":[1.178,3],"br-biguacu":[1.152,3],"br-guaramirim":[1.674,6],"br-navegantes":[1.833,35],"br-viamao":[0.725,3],"br-benevides":[-2.88,24],"br-raposa-maranhao":[1.332,3],"br-eusebio":[2.733,3],"br-paulista-pernambuco":[1.28,16],"br-simoes-filho":[0.441,3],"br-macaiba":[1.833,3],"br-cabedelo":[1.833,3],"br-barra-dos-coqueiros":[0.916,16],"br-cubatao":[0.3,3],"br-belford-roxo":[0.022,3],"br-santo-amaro-da-imperatriz":[1.411,3],"br-araquari":[1.103,3],"br-pomerode":[1.702,35],"br-penha-santa-catarina":[1.702,35],"br-alcantara-maranhao":[-2.904,6],"br-aquiraz":[2.618,3],"br-camaragibe":[1.348,24],"br-dias-d-avila":[0.182,3],"br-extremoz":[1.833,35],"br-conde-paraiba":[1.62,3],"br-satuba":[0.929,6],"br-itaporanga-d-ajuda":[0.87,10],"br-bertioga":[0.902,3],"br-nilopolis":[0.924,10],"br-aracruz":[1.064,3],"ar-avellaneda":[2.542,3],"ar-miramar":[1.26,3],"ar-punta-alta":[-0.181,16],"ar-caleta-olivia":[1.089,16],"ar-lanus":[1.963,35],"ar-balcarce":[1.029,6],"ar-sarmiento":[1.647,6],"ar-lomas-de-zamora":[-0.802,3],"ar-mar-chiquita":[1.26,3],"ar-rada-tilly":[1.047,6],"ar-quilmes":[2.405,3],"ar-villa-gesell":[1.255,10],"ar-tornquist":[0.524,24],"ar-las-heras-santa-cruz":[1.146,24],"ar-berazategui":[0.739,3],"ar-pinamar":[1.02,10],"ar-pico-truncado":[0.906,6],"ar-florencio-varela":[2.618,3],"ar-dolores":[1.024,16],"cl-quilpue":[-1.639,10],"cl-chiguayante":[-1.895,16],"cl-puerto-varas":[-1.047,24],"cl-tocopilla":[-1.647,24],"cl-alto-hospicio":[-1.767,3],"cl-puerto-natales":[1.309,3],"cl-villa-alemana":[-1.183,6],"cl-san-pedro-de-la-paz":[-1.934,16],"cl-calbuco":[0.454,10],"cl-mejillones":[-1.833,35],"cl-pozo-almonte":[-1.702,24],"cl-porvenir-chile":[-1.399,3],"cl-concon":[-1.721,3],"cl-hualpen":[-1.833,3],"cl-ancud":[1.105,3],"cl-taltal":[-1.317,10],"cl-pica-chile":[-1.44,3],"cl-puerto-williams":[1.195,10],"cl-quillota":[-1.833,3],"cl-coronel-chile":[-2.03,16],"cl-castro-chile":[0.682,16],"cl-maria-elena":[-1.106,10],"cl-huara":[-1.633,16],"cl-cerro-sombrero":[-1.468,3],"cl-la-calera":[-1.833,3],"pe-callao":[-0.718,3],"pe-la-esperanza-peru":[-0.797,3],"pe-lambayeque":[-0.876,6],"pe-ventanilla":[-0.718,3],"pe-ferrenafe":[-0.797,3],"pe-san-juan-de-lurigancho":[-0.771,10],"pe-victor-larco-herrera":[-0.916,6],"pe-comas":[-1.349,3],"pe-huanchaco":[-0.785,35],"co-soledad-atlantico":[2.861,10],"co-turbaco":[-1.963,3],"co-malambo":[-2.487,3],"co-arjona-bolivar":[-1.634,3],"co-puerto-colombia":[-3.011,3],"co-magangue":[-1.797,16],"co-galapa":[-3.011,3],"ve-petare":[-2.88,35],"ve-san-francisco-zulia":[2.021,3],"ve-guarenas":[-2.981,16],"ve-cabimas":[-0.55,3],"ve-cagua":[-2.997,3],"ve-guatire":[3.142,35],"ve-ciudad-ojeda":[-1.047,3],"ve-guacara":[2.88,35],"ve-la-victoria-aragua":[-3.011,24],"ve-los-teques":[-3.011,3],"ec-montecristi-ecuador":[-2.437,10],"ec-jaramijo":[-2.094,3],"ec-bahia-de-caraquez":[-2.191,3],"uy-las-piedras":[0,35],"uy-san-carlos":[-0.382,3],"uy-carmelo":[2.225,3],"uy-la-paz-uruguay":[-0.393,3],"uy-piriapolis":[-0.262,3],"uy-nueva-palmira":[-0.857,3],"gy-bartica":[2.501,10],"gy-anna-regina":[2.946,3],"gy-vreed-en-hoop":[2.498,3],"sr-south-drain":[2.317,3],"sr-domburg-suriname":[3.077,16],"sr-groningen-suriname":[2.88,3],"ar-felix-u-camet":[1.342,3]};
 const plataEstuary=new Set(['ar-buenos-aires','ar-quilmes','ar-avellaneda','ar-berazategui','ar-la-plata','uy-montevideo','uy-colonia-del-sacramento']);
 let releaseSky=null;
+let regionalWaterUniform=null;
 
 // East is +X and north is -Z, matching the city compass.
 function buildRegionalLandscape(houses){
  const city=currentCity;
+ regionalWaterUniform=null;
  const coast=coastalDirections[city.id];
  const angle=coast?.[0]||0;
  const east=Math.sin(angle),south=Math.cos(angle);
@@ -1102,10 +1104,28 @@ function buildRegionalLandscape(houses){
  shore+=85+(coast?.[1]||0)*12;
  if(coast){
   const estuary=plataEstuary.has(city.id);
-  const sea=new THREE.Mesh(new THREE.PlaneGeometry(14500,7000),
-   new THREE.MeshStandardMaterial({color:estuary?0x887a57:0x277d9c,roughness:estuary?.61:.39,metalness:estuary?0:.08}));
+
+  regionalWaterUniform={value:0};
+  const waterMaterial=new THREE.MeshStandardMaterial({
+   color:estuary?0x887a57:0x277d9c,roughness:estuary?.61:.33,metalness:estuary?0:.08
+  });
+  waterMaterial.onBeforeCompile=shader=>{
+   shader.uniforms.waterTime=regionalWaterUniform;
+   shader.uniforms.waterShore={value:shore};
+   shader.uniforms.waterDirection={value:new THREE.Vector2(east,south)};
+   shader.vertexShader='uniform float waterTime; varying vec3 waterWorld;\n'+shader.vertexShader.replace(
+    '#include <begin_vertex>',
+    '#include <begin_vertex>\nwaterWorld=(modelMatrix*vec4(position,1.)).xyz; transformed.z+=.12*sin(waterWorld.x*.014+waterTime*.8)*cos(waterWorld.z*.011-waterTime*.6);');
+   shader.fragmentShader='uniform float waterTime; uniform float waterShore; uniform vec2 waterDirection; varying vec3 waterWorld;\n'+shader.fragmentShader.replace(
+    '#include <color_fragment>',
+    '#include <color_fragment>\nfloat seaward=dot(waterWorld.xz,waterDirection)-waterShore; if(seaward<0.)discard; float footprint=max(length(dFdx(waterWorld.xz)),length(dFdy(waterWorld.xz))); float detail=1.-smoothstep(1.,9.,footprint); float ripple=sin(waterWorld.x*.73+waterWorld.z*.39-waterTime*1.8)*sin(waterWorld.z*.48-waterTime*.9); float foam=pow(max(0.,sin(seaward*.66-waterTime*1.3)),10.)*(1.-smoothstep(0.,16.,seaward)); diffuseColor.rgb*=1.+ripple*.12*detail; diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.76,.87,.84),foam*.45*detail);');
+  };
+  waterMaterial.customProgramCacheKey=()=> 'regional-animated-water';
+  const sea=new THREE.Mesh(new THREE.PlaneGeometry(32000,24000,192,96),waterMaterial);
+  sea.userData.regionalWater=true;
   sea.rotation.set(-Math.PI/2,0,angle);
-  sea.position.set(east*(shore+3500),-.065,south*(shore+3500));
+  sea.position.set(east*(shore+12000),.16,south*(shore+12000));
+
   group.add(sea);
   const beachGeometry=new THREE.PlaneGeometry(14500,17,1,4);
   const beachVertices=beachGeometry.attributes.position;
@@ -1132,19 +1152,24 @@ function buildRegionalLandscape(houses){
  if(mountain.strength>.12){
   const axisX=Math.sin(mountain.angle),axisZ=Math.cos(mountain.angle);
   const edge=Math.max(minX*axisX,maxX*axisX)+Math.max(minZ*axisZ,maxZ*axisZ);
-  const ridgeWidth=Math.min(6800,Math.max(1700,maxZ-minZ+1200));
-  const ridgeDepth=560;
-  const terrain=new THREE.PlaneGeometry(ridgeWidth,ridgeDepth,108,18);
+  const ridgeWidth=24000;
+  const ridgeDepth=12000;
+  const terrain=new THREE.PlaneGeometry(ridgeWidth,ridgeDepth,240,112);
   terrain.rotateX(-Math.PI/2);
   const position=terrain.attributes.position;
   const colors=[];
   const groundTint=new THREE.Color();
   const seed=city.lat*17+city.lng*9;
+
   function elevation(u,v){
    if(Math.abs(u)>ridgeWidth/2||Math.abs(v)>ridgeDepth/2)return 0;
-   const fade=Math.sin(Math.PI*(v/ridgeDepth+.5));
-   const ridge=.55+.24*Math.sin(u*.012+seed)+.16*Math.cos(u*.031-v*.015);
-   return fade*fade*Math.max(.15,ridge)*mountain.strength*235;
+   const inland=v+ridgeDepth/2;
+   const rise=1-Math.exp(-Math.max(0,inland)/640);
+   const ridges=.42+.30*Math.pow(Math.sin(u*.0031+inland*.0017+seed),2)
+     +.24*Math.pow(Math.cos(u*.0067-inland*.0023),2);
+   const crags=.80+.20*Math.sin(u*.021+inland*.012)*Math.cos(u*.014-inland*.017);
+   const altitude=220+Math.min(inland,5400)*.22;
+   return rise*ridges*crags*mountain.strength*altitude;
   }
   terrainHeight=(x,z)=>elevation(axisZ*x-axisX*z,axisX*x+axisZ*z-edge-160-ridgeDepth*.5);
 
@@ -1156,12 +1181,18 @@ function buildRegionalLandscape(houses){
    const dry=coast&&x*east+z*south>=shore-19;
    const y=dry?-.15:peak-.14;
    position.setXYZ(index,x,y,z);
-   groundTint.setHSL(.22-Math.min(.15,peak/900),.26,.29+Math.min(.25,peak/370));
+   
+   const rock=Math.max(0,Math.min(1,(peak-110)/360));
+   groundTint.set(0x506b45).lerp(new THREE.Color(0x737c80),rock);
+   if(peak>620)groundTint.lerp(new THREE.Color(0xe8eeed),Math.min(.92,(peak-620)/430));
+
    colors.push(groundTint.r,groundTint.g,groundTint.b);
   }
   terrain.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
   terrain.computeVertexNormals();
   const foothills=new THREE.Mesh(terrain,new THREE.MeshStandardMaterial({vertexColors:true,roughness:1}));
+  foothills.receiveShadow=true;
+  foothills.userData.regionalMountain=true;
   group.add(foothills);
  }
 
@@ -1471,6 +1502,7 @@ function animate(now=0){
   if(elapsed+.001<minInterval)return;
   lastRenderedFrame+=Math.floor((elapsed+.001)/minInterval)*minInterval;
   const t=now*.001;
+  if(regionalWaterUniform)regionalWaterUniform.value=t;
   updateProgressiveDetails();
   updateRoadDetailLOD(now);
   updateShopDetailLOD(now);
@@ -1809,7 +1841,7 @@ function drawShops(){
   bar.rotateZ(Math.PI/2);
   const cup=new THREE.CylinderGeometry(.5,.34,1,20);
   const handle=new THREE.TorusGeometry(.32,.10,8,18);
-  const structuralKinds=new Set(['cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeMark','tradeRound','tradeDress','tradeSculpt','tradeBar','shopPaving','shopUpperBody','shopUpperGlass','shopUpperCap','body','roof','hotelRoof','cinemaRoof',
+  const structuralKinds=new Set(['evolutionSignatureHall','evolutionSignatureHallWindow','evolutionSignatureHallSide','evolutionEntranceCanopy','evolutionEntranceColumn','evolutionUpperWindow','evolutionSideWindow','evolutionRoofTerrace','evolutionTerraceRail','evolutionTerraceSideRail','evolutionTerracePavilion','evolutionTerracePavilionPost','evolutionGrandEntrance','evolutionGrandPier','cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeMark','tradeRound','tradeDress','tradeSculpt','tradeBar','shopPaving','shopUpperBody','shopUpperGlass','shopUpperCap','body','roof','hotelRoof','cinemaRoof',
       'garageRoof','superRoof','displayGlass','entryDoor','entryDoorGlass',
       'signFascia','signInset','garageGate','cinemaParapet','hotelUpperWindow']);
   function put(kind,color,shop,x,y,z,w,h,d){
@@ -1820,7 +1852,7 @@ function drawShops(){
     const geometry=kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:
       kind==='tradeDress'?dress:kind==='tradeSculpt'?sculpt:kind==='tradeBar'?bar:
       kind.startsWith('pizza')||kind==='tradeRound'?disc:box;
-    const casts=/^(body|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof)$/.test(kind);
+    const casts=/^(body|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof|evolutionSignatureHall|evolutionEntranceCanopy|evolutionEntranceColumn|evolutionRoofTerrace|evolutionTerracePavilion|evolutionGrandEntrance|evolutionGrandPier)$/.test(kind);
     const receives=casts||kind==='shopPaving';
     const key=[geometry.id,casts,receives,detailed?cx:'all',detailed?cz:'all'].join(':');
     if(!batches.has(key))batches.set(key,{geo:geometry,casts,receives,entries:[],detailed,
@@ -1838,8 +1870,7 @@ function drawShops(){
     const shape=shop.id%shopStyles.length;
     const progress=shopProgressFor(shop);
     const stage=houseTier(progress.points);
-    const growth=stage/7;
-    const towerFloors=shape===10?stage:0;
+    const growth=[0,.25,.52,.68,.79,.88,.95,1][stage];
     const width=[7.2,14.5,12.2,8.5,8.1,6.4,12.9,7.7,16.2,12.8,11.4,13.1][shape]*(.87+rnd(seed*31+8)*.16);
     const depth=[7.4,12.9,9.4,9.4,7.4,6.8,11.6,7.9,14.2,11.2,10.5,9.4][shape]*(.9+rnd(seed*37+3)*.12);
     const widthGrowth=[.76,.15,.28,.64,.42,.80,.24,.57,.12,.30,.23,.22][shape];
@@ -1847,13 +1878,101 @@ function drawShops(){
     const heightGrowth=[.27,.26,.23,.52,.29,.36,.22,.33,.32,.29,.12,.22][shape];
     const w=stage?Math.min(shape===2?14.5:17,width*(1+growth*widthGrowth)):width;
     const d=depth*(1+growth*depthGrowth);
-    const height=[4.2,5.1,5.2,6.4,4.7,4.0,5.0,4.5,9.0,6.8,12.2,4.3][shape]*(.88+rnd(seed*41+2)*.22)*(district==='centro'?1.08:1)*(1+growth*heightGrowth);
+
+    const baseHeight=[4.2,5.1,5.2,6.4,4.7,4.0,5.0,4.5,9.0,6.8,4.6,4.3][shape]
+      *(.88+rnd(seed*41+2)*.22)*(district==='centro'?1.08:1);
+    const height=shape===10?baseHeight+stage*3.35:baseHeight*(1+growth*heightGrowth)+(stage>=3?2.8:0);
+
     const x=shop.x,z=shop.z;
     const wallColor=progress.premium?coordinatedHouseColor(style.walls,0xffe8c5,shape===1?.68:.32):style.walls;
     const paving=progress.premium?0xc7ad8b:[0xaba99f,0xb8b5a9,0x9ba9a8][seed%3];
     put('shopPaving',paving,shop,x,.055,z,17.7,.06,17.5);
     put('body',wallColor,shop,x,height/2,z,w,height,d);
     const front=z+d/2, trim=style.trim, glass=style.glass;
+
+    if(stage>=1){
+      const canopyDepth=shape===0||shape===2||shape===7?4.15:shape===6?2.75:2.15;
+      const canopyWidth=w*(shape===8?.90:.82);
+      const canopyY=shape===8?3.55:3.04;
+      put('evolutionEntranceCanopy',trim,shop,x,canopyY,front+canopyDepth*.43,canopyWidth,.24,canopyDepth);
+      for(const side of [-1,1])
+        put('evolutionEntranceColumn',wallColor,shop,x+side*canopyWidth*.48,canopyY*.50,front+canopyDepth*.80,.18,canopyY-.12,.18);
+      if(shape===7){
+        for(const side of [-1,1]){
+          const tx=x+side*w*.29,tz=front+3.25;
+          put('evolutionOutdoorTable',0xc69b68,shop,tx,1.02,tz,1.14,.14,.91);
+          put('evolutionOutdoorTableLeg',trim,shop,tx,.56,tz,.22,.82,.22);
+          for(const chairSide of [-1,1]){
+            put('evolutionOutdoorChair',trim,shop,tx+chairSide*.78,.55,tz,.42,.12,.46);
+            put('evolutionOutdoorChairBack',trim,shop,tx+chairSide*.92,.86,tz,.12,.59,.48);
+          }
+        }
+      }else if(shape!==0&&shape!==2){
+        for(const side of [-1,1])
+          put('evolutionEntrancePlanter',0x66894b,shop,x+side*canopyWidth*.46,.40,front+3.05,.72,.65,.72);
+      }
+    }
+    if(stage>=3&&shape!==10){
+      const upperY=height-1.36;
+      for(const side of [-1,1]){
+        for(const bay of [-1,0,1]){
+          put('evolutionUpperWindow',glass,shop,x+bay*w*.29,upperY,z+side*(d/2+.065),w*.21,1.51,.15);
+          put('evolutionSideWindow',glass,shop,x+side*(w/2+.065),upperY,z+bay*d*.28,.15,1.51,d*.20);
+        }
+        put('evolutionStoreyBand',trim,shop,x,height-2.80,z+side*(d/2+.10),w+.18,.18,.24);
+        put('evolutionSideStoreyBand',trim,shop,x+side*(w/2+.10),height-2.80,z,.24,.18,d+.18);
+      }
+    }
+    if(stage>=4&&shape!==10){
+      const deckY=height+.50;
+      put('evolutionRoofTerrace',0xbca68b,shop,x,deckY,z,w*.94,.14,d*.94);
+      for(const side of [-1,1]){
+        put('evolutionTerraceRail',trim,shop,x,deckY+.94,z+side*d*.465,w*.95,.10,.10);
+        put('evolutionTerraceSideRail',trim,shop,x+side*w*.465,deckY+.94,z,.10,.10,d*.95);
+        for(const bay of [-.42,-.21,0,.21,.42]){
+          put('evolutionTerraceBaluster',trim,shop,x+bay*w,deckY+.49,z+side*d*.465,.07,.91,.07);
+          put('evolutionTerraceSideBaluster',trim,shop,x+side*w*.465,deckY+.49,z+bay*d,.07,.91,.07);
+        }
+        const seatX=x+side*w*.27;
+        put('evolutionTerraceSeat',0xd8bb8b,shop,seatX,deckY+.49,z+d*.16,w*.19,.16,1.03);
+      }
+    }
+    if(stage>=5&&shape!==10){
+      const pavilionY=height+3.05;
+      const pavilionWidth=w*(stage>=6?.82:.50);
+      const pavilionDepth=d*(stage>=6?.43:.25);
+      const pavilionZ=z-d*.22;
+      put('evolutionTerracePavilion',trim,shop,x,pavilionY,pavilionZ,pavilionWidth,.25,pavilionDepth);
+      for(const side of [-1,1])for(const face of [-1,1])
+        put('evolutionTerracePavilionPost',wallColor,shop,x+side*pavilionWidth*.46,height+1.75,pavilionZ+face*pavilionDepth*.43,.18,2.48,.18);
+    }
+    if(stage>=6){
+      const gardenZ=front+4.46;
+      for(const side of [-1,1]){
+        const gardenX=x+side*w*.37;
+        put('evolutionGardenBox',0xdec9a6,shop,gardenX,.35,gardenZ,1.45,.55,1.15);
+        put('evolutionGardenHedge',0x53804c,shop,gardenX,.91,gardenZ,1.31,.72,1.02);
+        put('evolutionGardenLamp',trim,shop,gardenX,2.14,gardenZ,.15,2.08,.15);
+        put('evolutionGardenLantern',0xffd798,shop,gardenX,3.22,gardenZ,.35,.38,.35);
+      }
+    }
+    if(stage>=7){
+
+      if(shape!==10){
+        const hallZ=z-d*.22,hallWidth=w*.66,hallDepth=d*.35;
+        put('evolutionSignatureHall',wallColor,shop,x,height+1.77,hallZ,hallWidth,2.40,hallDepth);
+        for(const side of [-1,1]){
+          put('evolutionSignatureHallWindow',glass,shop,x+side*hallWidth*.25,height+1.90,hallZ+hallDepth/2+.07,hallWidth*.32,1.22,.15);
+          put('evolutionSignatureHallSide',glass,shop,x+side*(hallWidth/2+.07),height+1.90,hallZ,.15,1.22,hallDepth*.67);
+        }
+      }
+
+      const portalWidth=w*.55;
+      put('evolutionGrandEntrance',wallColor,shop,x,3.65,front+.35,portalWidth,.46,.72);
+      for(const side of [-1,1])
+        put('evolutionGrandPier',trim,shop,x+side*portalWidth*.47,1.84,front+.35,.36,3.30,.56);
+    }
+
     if(stage>=2&&(shape===0||shape===3)){
       const library=shape===3;
       const annexWidth=w*(library?.82:.72);
@@ -1876,14 +1995,14 @@ function drawShops(){
         }
         put('roof',0xd8c8aa,shop,x,annexHeight*.23,back-.13,annexWidth+.12,.20,.31);
       }
-      if(library&&stage>=4){
+      if(library&&stage>=2){
         const porchWidth=w*.77;
         put('roof',trim,shop,x,3.30,front+.83,porchWidth,.27,1.76);
         put('shopPaving',0xd9c7a8,shop,x,.19,front+.81,porchWidth,.20,1.91);
         for(const bay of [-.43,-.15,.15,.43])
           put('body',0xe9d9bb,shop,x+bay*porchWidth,1.74,front+1.46,.27,2.96,.27);
       }
-      if(!library&&stage>=4){
+      if(!library&&stage>=2){
         put('shopPaving',0xbc9876,shop,x,.15,back-1.4,annexWidth,.17,2.75);
         for(const side of [-1,1]){
           const tx=x+side*annexWidth*.25;
@@ -1910,7 +2029,7 @@ function drawShops(){
         for(const bay of [-1,0,1]){
           put('displayGlass',glass,shop,x+bay*extensionWidth*.27,extensionHeight*.51,back-.08,extensionWidth*.19,extensionHeight*.56,.17);
         }
-        if(stage>=4){
+        if(stage>=2){
           put('shopPaving',0xc19b76,shop,x,.16,back-1.65,extensionWidth,.20,3.25);
           for(const side of [-1,1]){
             const tx=x+side*extensionWidth*.25;
@@ -2018,36 +2137,18 @@ function drawShops(){
           put('displayGlass',glass,shop,px,1.80,lobbyZ,.12,2.83,lobbyDepth*.78);
       }
     }
-    const widthTaper=.019;
-    const depthTaper=.020;
-    for(let floor=0;floor<towerFloors;floor++){
-      const width=w*(.86-floor*widthTaper),depth=d*(.72-floor*depthTaper);
-      const centerZ=z-d*.08, floorY=height+.46+floor*2.65;
-      put('shopUpperBody',wallColor,shop,x,floorY+1.325,centerZ,width,2.65,depth);
-      put('shopUpperCap',trim,shop,x,floorY+2.58,centerZ,width+.23,.19,depth+.23);
-      if(progress.premium){
-        put('shopUpperCap',shape===1?0xb09b74:trim,shop,x,floorY+.18,centerZ,width+.28,.23,depth+.28);
+
+    if(shape===10){
+      for(let floor=0;floor<=stage;floor++){
+        const levelY=3.70+floor*3.35;
+        if(levelY+1>height)continue;
         for(const side of [-1,1]){
-          const corner=x+side*(width/2-.07);
-          for(const face of [-1,1])
-            put('shopUpperSill',shape===1?0xdccba6:0xf2dfbf,shop,corner,floorY+1.38,centerZ+face*(depth/2-.07),.30,2.38,.30);
-        }
-      }
-      for(const face of [-1,1])for(const column of [-1,0,1]){
-        const wx=x+column*width*.28,wz=centerZ+face*(depth/2+.052);
-        put('shopUpperGlass',glass,shop,wx,floorY+1.42,wz,width*.19,1.28,.10);
-        if(progress.premium){
-          put('shopUpperSill',0xf2dfbf,shop,wx,floorY+.73,wz+face*.09,width*.23,.16,.25);
-          put('shopUpperMullion',0xf2dfbf,shop,wx,floorY+1.42,wz+face*.09,.07,1.28,.08);
-        }
-      }
-      for(const side of [-1,1]){
-        const sideX=x+side*(width/2+.052);
-        for(const column of [-1,1]){
-          const sideZ=centerZ+column*depth*.24;
-          put('shopUpperGlass',glass,shop,sideX,floorY+1.42,sideZ,.10,1.28,depth*.22);
-          if(progress.premium)
-            put('shopUpperSill',0xf2dfbf,shop,sideX+side*.09,floorY+.73,sideZ,.25,.16,depth*.26);
+          for(const bay of [-1,0,1]){
+            put('hotelUpperWindow',glass,shop,x+bay*w*.29,levelY,z+side*(d/2+.07),w*.20,1.79,.15);
+            put('hotelUpperWindow',glass,shop,x+side*(w/2+.07),levelY,z+bay*d*.28,.15,1.79,d*.20);
+          }
+          put('evolutionStoreyBand',trim,shop,x,levelY+1.23,z+side*(d/2+.09),w+.10,.16,.22);
+          put('evolutionSideStoreyBand',trim,shop,x+side*(w/2+.09),levelY+1.23,z,.22,.16,d+.10);
         }
       }
     }
@@ -2246,7 +2347,7 @@ function drawShops(){
       put('hotelRoof',trim,shop,x,height+.25,z,w+.35,.46,d+.35);
       put('hotelTopBand',trim,shop,x,height-.53,front+.13,w*.86,.25,.22);
       for(const side of [-1,1]){
-        put('hotelUpperWindow',glass,shop,x+side*w*.27,height*.77,front+.12,1.35,1.55,.12);
+        put('hotelEntryTransom',glass,shop,x+side*w*.27,2.74,front+.12,1.35,.63,.12);
         put('hotelUpperSill',trim,shop,x+side*w*.27,height*.77-.83,front+.20,1.48,.12,.19);
         put('hotelColumn',0xc5b7a5,shop,x+side*1.45,1.45,front+1.05,.23,2.9,.23);
       }
@@ -2266,7 +2367,7 @@ function drawShops(){
     }else{
       put('roof',trim,shop,x,height+.23,z,w+.40,.45,d+.40);
     }
-    if(shape===0){ // Café terrace, counter and chalkboard.
+    if(shape===0&&stage>=1){ // Café terrace, counter and chalkboard.
       for(const side of [-1,1]){
         const tx=x+side*w*.34;
         put('cafeTableTop',0x426c64,shop,tx,.80,front+1.39,.78,.09,.78);
@@ -2276,7 +2377,7 @@ function drawShops(){
       }
       put('cafeChalkboardFrame',0xa2764a,shop,x-1.48,.58,front+1.14,.59,1.06,.25);
       put('cafeChalkboard',0x293733,shop,x-1.48,.63,front+1.28,.47,.76,.035);
-    }else if(shape===2){ // Restaurant terrace with set tables and a timber pergola.
+    }else if(shape===2&&stage>=1){ // Restaurant terrace with set tables and a timber pergola.
       const patioZ=front+1.72, canopy=0x814439;
       put('restaurantTerrace',0xc29979,shop,x,.11,patioZ,w*.94,.17,2.95);
       for(const side of [-1,1]){
@@ -2288,13 +2389,11 @@ function drawShops(){
           put('restaurantChairSeat',0x7b4d32,shop,tx,.46,patioZ+end*.84,.53,.12,.50);
           put('restaurantChairBack',0x9f653e,shop,tx,.69,patioZ+end*1.05,.55,.54,.09);
         }
-        put('restaurantPergolaPost',canopy,shop,x+side*w*.46,1.41,front+2.97,.17,2.62,.17);
+
         put('restaurantPlanter',0xa55e42,shop,x+side*w*.43,.30,front+2.95,.74,.49,.51);
         put('restaurantPlant',0x638d39,shop,x+side*w*.43,.60,front+2.95,.61,.35,.42);
       }
-      put('restaurantPergolaBeam',canopy,shop,x,2.75,front+2.97,w*.95,.18,.19);
-      for(let slat=0;slat<8;slat++)
-        put('restaurantPergolaSlat',canopy,shop,x+(slat-3.5)*w*.125,2.84,front+1.63,.13,.11,2.80);
+
     }else if(shape===3){ // Bookshop: the only storefront with book shelves.
       for(const side of [-1,1])for(let j=0;j<3;j++)
         {
@@ -2323,10 +2422,10 @@ function drawShops(){
     // v6.4.3: category-specific BUILDING silhouettes. These are roof/side
     // structures, not extra canopies piled in front of the windows.
     // All fine details are tagged by put() for existing shop chunk LOD.
-    const rooftop=towerFloors?height+.485+towerFloors*2.65:height+.52;
-    const roofWidth=towerFloors?.86-(stage-1)*widthTaper:1;
-    const roofDepth=towerFloors?.72-(stage-1)*depthTaper:1;
-    const roofCenter=towerFloors?z-d*.08:z;
+    const rooftop=height+.52;
+    const roofWidth=1;
+    const roofDepth=1;
+    const roofCenter=z;
     const roofPut=(kind,color,shop,px,py,pz,pw,ph,pd)=>{
       put(kind,color,shop,x+(px-x)*roofWidth,py,roofCenter+(pz-z)*roofDepth,pw*roofWidth,ph,pd*roofDepth);
     };
@@ -3467,8 +3566,8 @@ function renderAllHouses(selected){
       // but keep most homes within a coherent neighborhood skyline.
       const levels=info.levels;
       const paint=housePaint(h);
-      const wall=premium?coordinatedHouseColor(paint.wall,0xfff5df,.58):paint.wall;
-      const trim=premium?coordinatedHouseColor(paint.roof,0x14554c,.76):paint.roof;
+      const wall=paint.wall;
+      const trim=paint.roof;
       const height=levels*2.55+1.8,x=h.x,z=h.z;
       // No parcel decorations: landscaping unlocks at one point.
       place('towerBase',boxGeo,wall,h,x,height/2,z,footW,height,footD);
@@ -3652,8 +3751,8 @@ function renderAllHouses(selected){
     const levels=HOUSE_TIERS[tier].levels;
     const height=1.2+levels*2.35;
     const paint=housePaint(h);
-    const wall=premium?coordinatedHouseColor(paint.wall,0xfff5df,.58):paint.wall;
-    const roof=premium?coordinatedHouseColor(paint.roof,0x14554c,.76):paint.roof;
+    const wall=paint.wall;
+    const roof=paint.roof;
     const x=h.x,z=h.z;
     const lawn=0x84ac82;
     // v5.8.1: low-rise homes are genuinely composed from two masses.
@@ -4482,7 +4581,7 @@ function rebuild(){
  if(errors.length){
   let warning=document.getElementById('cityErrorNotice');
   if(!warning){warning=document.createElement('div');warning.id='cityErrorNotice';warning.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99999;background:#722;color:white;padding:12px;border-radius:8px;max-width:70vw;font:13px Arial';document.body.appendChild(warning)}
-  warning.textContent='v6.8.0 · '+errors.join(' | ');
+  warning.textContent='v8.8.2 · '+errors.join(' | ');
  }else{document.getElementById('cityErrorNotice')?.remove()}
 }
 function renderMilestones(){
@@ -4625,7 +4724,7 @@ function showOwnerCard(h,kind='casa',selected=null){
    option.value=String(i);option.textContent=paint.name+' · pareti e tetto';
    colorPicker.appendChild(option);
   });
-  colorPicker.value=String(colorOverrides.get(scoreOverrideKey(h.cityId,h.id))??(h.id%HOUSE_PAINTS.length));
+  colorPicker.value=String(colorOverrides.get(scoreOverrideKey(h.cityId,h.id))??0);
   colorPicker.onchange=()=>applyDemoHouseColor(h.id,Number(colorPicker.value));
   const gardenProgress=document.createElement('div');gardenProgress.className='garden-unlocks';
   const gardenTitle=document.createElement('strong');
