@@ -1196,11 +1196,172 @@ function shopLot(id){
     owner:'',
     business:id%24===14?'Pizzeria':shopStyles[id%shopStyles.length]?.name||'Negozio'};
 }
+function citySquareRecords(){
+ if(citySquareRecords.cache)return citySquareRecords.cache;
+ try{const stored=JSON.parse(localStorage.getItem('sudamerica-city-squares-v1')||'{}');citySquareRecords.cache=stored&&typeof stored==='object'&&!Array.isArray(stored)?stored:{};}catch{citySquareRecords.cache={};}
+ return citySquareRecords.cache;
+}
+function squareFromMap(city,elements){
+ const valid=[];
+ for(const element of elements||[]){
+  if(element.type!=='way'||!Number.isSafeInteger(element.id)||element.id<=0||typeof element.tags?.name!=='string'||!element.tags.name.trim()||element.tags.name.length>200||!Array.isArray(element.geometry)||element.geometry.length<4)continue;
+  if(element.tags.place!=='square'&&!(element.tags.highway==='pedestrian'&&element.tags.area==='yes'))continue;
+  const ring=element.geometry;if(ring.length>800||!ring.every(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lon)))continue;
+  if(Math.abs(ring[0].lat-ring.at(-1).lat)>1e-6||Math.abs(ring[0].lon-ring.at(-1).lon)>1e-6)continue;
+  const cos=Math.cos(city.lat*Math.PI/180),points=ring.map(p=>({x:(p.lon-city.lng)*111320*cos,z:-(p.lat-city.lat)*111320}));
+  const xs=points.map(p=>p.x),zs=points.map(p=>p.z),minX=Math.min(...xs),maxX=Math.max(...xs),minZ=Math.min(...zs),maxZ=Math.max(...zs);
+  const width=maxX-minX,depth=maxZ-minZ;if(width<8||depth<8||width>1500||depth>1500)continue;
+  const area=Math.abs(points.reduce((sum,p,i)=>{const q=points[(i+1)%points.length];return sum+p.x*q.z-q.x*p.z;},0)/2);
+  if(area<100||area>250000)continue;
+  const range=Math.hypot((minX+maxX)/2,(minZ+maxZ)/2);
+  if(range>3500)continue;
+  const central=/principal|central|armas|mayor|independencia|matriz|grande/i.test(element.tags.name);
+  const score=(element.tags.place==='square'?10000:0)+(central?1800:0)-range;
+  valid.push({score,name:element.tags.name,outline:points.map(p=>({x:p.x-(minX+maxX)/2,z:p.z-(minZ+maxZ)/2})),source:'https://www.openstreetmap.org/way/'+element.id,osm:true,documented:true});
+ }
+ valid.sort((a,b)=>b.score-a.score);return valid[0]||null;
+}
+async function ensureCitySquare(city){
+ if(!city||!Number.isFinite(city.lat)||!Number.isFinite(city.lng)||Math.abs(city.lat)>90||Math.abs(city.lng)>180||city.geoVerified===false)return;
+ const records=citySquareRecords(),existing=records[city.id];
+ if(existing&&existing.retryAfter>Date.now())return;
+ if(citySquareProfile(city).source&&!existing)return;
+ const pending=ensureCitySquare.pending||(ensureCitySquare.pending=new Map());if(pending.has(city.id))return pending.get(city.id);
+ const job=async()=>{
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),18000);
+  try{
+   const query='[out:json][timeout:12];(way(around:3500,'+city.lat+','+city.lng+')["place"="square"]["name"];way(around:1800,'+city.lat+','+city.lng+')["highway"="pedestrian"]["area"="yes"]["name"];);out body geom 80;';
+   const response=await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:new URLSearchParams({data:query}),signal:controller.signal});
+   if(!response.ok)throw Error('Map data unavailable');
+   const data=await response.json(),square=squareFromMap(city,data.elements);
+   records[city.id]={square,retryAfter:Date.now()+(square?90:7)*86400000};
+   if(square&&currentCity.id===city.id&&active){rebuild();renderMilestones();}
+  }catch{records[city.id]={square:null,retryAfter:Date.now()+86400000};}
+  finally{
+   clearTimeout(timer);pending.delete(city.id);
+   try{localStorage.setItem('sudamerica-city-squares-v1',JSON.stringify(records));}catch{}
+  }
+ };
+ // One request at a time: visiting another city never blocks navigation.
+ const queue=ensureCitySquare.queue||Promise.resolve();const task=queue.then(job);ensureCitySquare.queue=task.catch(()=>{});pending.set(city.id,task);return task;
+}
+
+function citySquareProfile(city){
+ const profiles={
+  'ar-buenos-aires':{name:'Plaza de Mayo',layout:'axial',stone:0xd8cbc0,green:0x6e9a58,palm:true,source:'https://buenosaires.gob.ar/gcaba_historico/plaza-de-mayo'},
+  'ar-mar-del-plata':{name:'Plaza San Martín',layout:'garden',stone:0xd8d1c3,green:0x639457,palm:false,source:'https://turismomardelplata.gob.ar/ASP/SP/audioguias-extendida.htm'},
+  'ar-quilmes':{name:'Plaza San Martín',layout:'diagonal',stone:0xcbb4a0,green:0x699c5a,palm:false,source:'https://www.quilmes.gov.ar/noticias/noticia.php?id_noti=3298'},
+  'cl-santiago':{name:'Plaza de Armas',layout:'groves',stone:0xcec9bd,green:0x60925d,palm:true,source:'https://www.santiagoturismo.cl/es/plaza-de-armas/'},
+  'pe-lima':{name:'Plaza Mayor',layout:'formal',stone:0xc6b59c,green:0x5c934d,palm:true,source:'https://visitalima.pe/experiencia/plaza-mayor-de-lima/'},
+  'br-manaus':{name:'Largo de São Sebastião',layout:'wave',stone:0xd9d5c8,green:0x4b8656,palm:false,source:'https://www.manaus.am.gov.br/turismo/o-que-ver-e-fazer-em-manaus/'},
+  'uy-montevideo':{name:'Plaza Independencia',layout:'axial',stone:0xc4beb0,green:0x749361,palm:true,source:'https://www.descubrimontevideo.uy/plaza-independencia?page=8'},
+  'ec-quito':{name:'Plaza Grande',layout:'formal',stone:0xcbbbac,green:0x497b50,palm:true,source:'https://visitquito.ec/es/rutas-de-la-ciudad/'}
+ };
+ const record=citySquareRecords()[city.id]?.square;
+ if(record&&typeof record.name==='string'&&Array.isArray(record.outline)&&record.outline.length>=4&&record.outline.length<=800&&record.outline.every(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.z))&&/^https:\/\/www\.openstreetmap\.org\/way\/\d+$/.test(record.source))return {layout:'mapped',stone:0xcbbda6,green:0x67965b,palm:Math.abs(city.lat)<24,...record};
+ if(profiles[city.id])return {...profiles[city.id],documented:true};
+ const seed=Array.from(city.id).reduce((n,c)=>(Math.imul(n,31)+c.charCodeAt(0))>>>0,17);
+ return {name:'Piazza civica di '+city.name,layout:['garden','diagonal','groves','formal','axial'][seed%5],stone:0xcbbda6,green:0x67965b,palm:Math.abs(city.lat)<24,seed,documented:false};
+}
+function drawCitySquare(zone,b){
+ const profile=citySquareProfile(currentCity),w=b.width,d=b.depth,parts=[],transform=new THREE.Object3D();
+ const seed=profile.seed||Array.from(currentCity.id).reduce((n,c)=>n+c.charCodeAt(0),0);
+ let outline=null;
+ if(profile.outline){
+  const sx=Math.max(...profile.outline.map(p=>Math.abs(p.x))),sz=Math.max(...profile.outline.map(p=>Math.abs(p.z)));
+  const scale=Math.min(w*.45/Math.max(1,sx),d*.45/Math.max(1,sz));
+  outline=profile.outline.map(p=>({x:p.x*scale,z:p.z*scale}));
+ }
+ const inside=(x,z)=>{if(!outline)return true;let yes=false;for(let i=0,j=outline.length-1;i<outline.length;j=i++){
+  const a=outline[i],b=outline[j];if((a.z>z)!==(b.z>z)&&x<(b.x-a.x)*(z-a.z)/(b.z-a.z)+a.x)yes=!yes;
+ }return yes;};
+ const put=(type,color,x,y,z,sx,sy,sz,angle=0)=>{
+  if(outline&&![[x,z],[x-sx/2,z-sz/2],[x+sx/2,z+sz/2],[x-sx/2,z+sz/2],[x+sx/2,z-sz/2]].every(([px,pz])=>inside(px,pz)))return;
+  parts.push({type,color,x:b.x+x,y,z:b.z+z,sx,sy,sz,angle});
+ };
+ const box=(color,fx,y,fz,fw,h,fd,angle=0)=>put('box',color,fx*w,y,fz*d,fw*w,h,fd*d,angle);
+ if(outline){
+  const shape=new THREE.Shape();outline.forEach((p,i)=>i?shape.lineTo(p.x,-p.z):shape.moveTo(p.x,-p.z));shape.closePath();
+  const paving=new THREE.Mesh(new THREE.ShapeGeometry(shape),new THREE.MeshStandardMaterial({color:profile.stone,roughness:.9,side:THREE.DoubleSide}));
+  paving.rotation.x=-Math.PI/2;paving.position.set(b.x,.30,b.z);paving.receiveShadow=true;
+  paving.userData.citySquare={name:profile.name,documented:true,source:profile.source};group.add(paving);
+ }else box(profile.stone,0,.20,0,.96,.16,.97);
+ const lawn=profile.layout!=='wave';
+ if(lawn)for(const side of [-1,1])for(const end of [-1,1]){
+  const x=side*.265,z=end*.235;
+  box(0xe4dacc,x,.31,z,.30,.18,.29);
+  box(profile.green,x,.43,z,.28,.12,.28);
+  for(let k=0;k<7;k++){
+   const xx=x+(k-3)*.032;box(k%2?0xd9bb67:0xd18ba1,xx,.55,z+end*.12,.015,.22,.012);
+  }
+ }
+ box(profile.stone,0,.45,0,.10,.10,.93);box(profile.stone,0,.45,0,.91,.10,.08);
+ if(profile.layout==='diagonal')for(const side of [-1,1])
+  put('box',0xe8ddcc,0,.48,side*d*.22,w*.055,.07,d*.46,side*.36);
+ if(profile.layout==='wave')for(let row=-16;row<=16;row++)for(let col=-8;col<=8;col++){
+  const x=col*w*.052,z=row*d*.026;
+  const dark=Math.sin(col*.68+row*.47)>.40;
+  put('box',dark?0x4e5c5e:0xdedacc,x,.31,z,w*.051,.04,d*.025);
+ }
+ if(profile.layout==='groves')for(let i=0;i<5;i++)box(0xa9b18e,(i-2)*.16,.46,.07,.005,.03,.76);
+ if(profile.layout==='garden')for(let i=0;i<3;i++){
+  const z=(i-1)*.23;
+  box(0xb8a887,0,.47,z,.43,.05,.035);
+ }
+ // Street furniture and tree alleys, not the city's unlockable principal monument.
+ const treeRows=profile.layout==='axial'?6:4;
+ for(const side of [-1,1])for(let i=0;i<treeRows;i++){
+  const x=side*w*.40,z=(-.38+i*.76/(treeRows-1))*d;
+  if(profile.palm){
+   put('trunk',0x8c7350,x,3.2,z,.18,6,.18);
+   for(let leaf=0;leaf<8;leaf++){
+    const angle=leaf*Math.PI/4;
+    put('leaf',0x507f49,x+Math.sin(angle)*1.1,6.5,z+Math.cos(angle)*1.1,.42,.30,2.6,angle);
+   }
+  }else{
+   put('trunk',0x786044,x,2.1,z,.24,3.8,.24);
+   put('crown',profile.green,x,4.8,z,2.15+(seed%3)*.15,2.0,2.15);
+  }
+  if(i%2===0){
+   const bx=side*w*.30;
+   for(let slat=-2;slat<=2;slat++)put('box',0xa67c50,bx,.83,z+slat*.13,2.7,.11,.10);
+   put('box',0xb48c5e,bx,1.20,z-.42,2.7,.48,.12);
+   for(const leg of [-1,1])put('box',0x38524d,bx+leg*1,.48,z,.16,.65,.68);
+  }
+ }
+ for(const side of [-1,1])for(const end of [-1,1]){
+  const x=side*w*.32,z=end*d*.42;
+  put('box',0x354e4c,x,2.5,z,.14,4.6,.14);
+  put('box',0xffdf9b,x,4.9,z,.55,.36,.55);
+  put('box',0x354e4c,x,5.15,z,.64,.13,.64);
+ }
+ // Keep the centre open: statues, obelisks and landmark fountains belong to milestones.
+ const geometries={box:new THREE.BoxGeometry(1,1,1),trunk:new THREE.CylinderGeometry(1,1,1,8),crown:new THREE.IcosahedronGeometry(1,1),leaf:new THREE.SphereGeometry(1,8,5)};
+ const batches=new Map();for(const part of parts){if(!batches.has(part.type))batches.set(part.type,[]);batches.get(part.type).push(part);}
+ for(const [type,items] of batches){
+  const mesh=new THREE.InstancedMesh(geometries[type],new THREE.MeshStandardMaterial({color:0xffffff,roughness:.88}),items.length);
+  items.forEach((p,i)=>{transform.position.set(p.x,p.y,p.z);transform.rotation.set(0,p.angle,0);transform.scale.set(p.sx,p.sy,p.sz);transform.updateMatrix();mesh.setMatrixAt(i,transform.matrix);mesh.setColorAt(i,new THREE.Color(p.color));});
+  mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();mesh.castShadow=true;mesh.receiveShadow=true;
+  mesh.userData.citySquare={name:profile.name,documented:profile.documented,source:profile.source||null};group.add(mesh);
+ }
+ // Every square, including automatic/default ones, always displays its city.
+ const signWidth=Math.min(w*.60,25),signHeight=signWidth/4,signZ=b.z+d*.466;
+ const material=new THREE.MeshBasicMaterial({map:billboardTexture([currentCity.name.toUpperCase(),profile.documented?profile.name:'PIAZZA CIVICA','PIAZZA PRINCIPALE'],'#234f63',{wide:true}),side:THREE.FrontSide,toneMapped:false});
+ const geo=new THREE.PlaneGeometry(signWidth,signHeight);
+ for(const rear of [false,true]){
+  const label=new THREE.Mesh(geo,material);label.position.set(b.x,3+signHeight/2,signZ+(rear?-.08:.08));label.rotation.y=rear?Math.PI:0;
+  label.userData.citySquareName=currentCity.name;group.add(label);
+ }
+ const poleMaterial=new THREE.MeshStandardMaterial({color:0x344e4e,roughness:.8});
+ for(const side of [-1,1]){const post=new THREE.Mesh(new THREE.BoxGeometry(.18,3,.18),poleMaterial);post.position.set(b.x+side*signWidth*.43,1.5,signZ);post.castShadow=true;group.add(post);}
+ return true;
+}
+
 function publicZones(){
   const zones=[];
   for(let i=0;i<PUBLIC_STEPS.length;i++){
     const step=PUBLIC_STEPS[i];
-    if(count>=step.at)zones.push({...step,block:facilityBlock(i)});
+    if(count>=step.at)zones.push({...step,name:i===0?citySquareProfile(currentCity).name:step.name,block:facilityBlock(i)});
   }
   for(let i=PUBLIC_STEPS.length;count>=6000+(i-PUBLIC_STEPS.length)*1000;i++){
     const step=PUBLIC_STEPS[(i*5+3)%PUBLIC_STEPS.length];
@@ -1898,6 +2059,24 @@ function drawCivicBuilding(zone,b){
      box(0x42869e,fx+face*(fw/2+.002),y,fz+((bay+.5)/bays-.5)*fd,.004,1.64,fd*.64/bays,true);
    }
   }
+  // Recessed frames, sills and corner masonry give each facade real depth.
+  const frame=0xe6dfcf;
+  for(let level=0;level<floors;level++){
+   const y=1.92+level*3.5,columns=Math.max(2,Math.floor(fw*w/4.3));
+   for(const face of [-1,1])for(let column=0;column<columns;column++){
+    const wx=fx+((column+.5)/columns-.5)*fw,ww=fw*.66/columns;
+    for(const edge of [-1,1])box(frame,wx+edge*(ww/2+.0015),y,fz+face*(fd/2+.003),.003,1.88,.006);
+    box(frame,wx,y+.93,fz+face*(fd/2+.003),ww+.007,.13,.006);
+    if(floors<=3)box(trim,wx,y+.99,fz+face*(fd/2+.006),ww+.012,.10,.012);
+   }
+   if(level>0)for(const face of [-1,1])box(0xd6cdbc,fx,level*3.5+.30,fz+face*(fd/2+.002),fw+.008,.13,.007);
+  }
+  for(const side of [-1,1]){
+   box(frame,fx+side*(fw/2-.009),height/2+.2,fz,.014,height,fd+.008);
+   box(trim,fx+side*(fw/2+.003),height+.66,fz,.008,.34,fd+.018);
+   box(trim,fx,height+.66,fz+side*(fd/2+.003),fw+.018,.34,.005);
+   box(0x6d807f,fx+side*(fw/2-.018),height/2+.2,fz+fd/2+.005,.004,height,.004);
+  }
   return height+.54;
  };
  const canopy=(fx,y,fz,fw,fd,trim)=>{
@@ -1914,6 +2093,15 @@ function drawCivicBuilding(zone,b){
   box(0x315d75,fx,1.95,fz-.007,.046,.68,.033,true);
   for(const side of [-1,1])for(const end of [-1,1])
    add('wheel',0x303c42,fx+side*.031,.57,fz+end*.020,.47,.23,.47);
+  box(0x385f6d,fx,1.57,fz+.029,.048,.41,.002,true);
+  box(0xc6d6d4,fx,.66,fz+.032,.057,.16,.004);
+  box(0x384d51,fx,1.03,fz+.032,.024,.23,.002);
+  for(const side of [-1,1]){
+   box(0xffe2a0,fx+side*.021,1.13,fz+.033,.009,.22,.003);
+   box(0xd2453b,fx+side*.021,1.07,fz-.032,.008,.23,.003);
+   box(0x557983,fx+side*.030,1.12,fz,.002,.68,.0015);
+   box(0xc8d5d4,fx+side*.030,1.44,fz-.004,.002,.07,.006);
+  }
   if(emergency){
    box(0xe95046,fx-.015,2.42,fz,.022,.23,.006);
    box(0x409edf,fx+.015,2.42,fz,.022,.23,.006);
@@ -1922,6 +2110,8 @@ function drawCivicBuilding(zone,b){
  const frontDoor=(fx,fz,width=.10)=>{
   box(0x294f65,fx,1.48,fz,width,2.65,.006,true);
   box(0xe8dfcc,fx,2.96,fz,width+.02,.21,.009);
+  box(0xc9d6d0,fx,1.47,fz+.004,.003,2.5,.003);
+  for(const side of [-1,1])box(0xe9d7aa,fx+side*.018,1.45,fz+.007,.003,.40,.002);
  };
  const columns=(fz,fw,y=3.4)=>{
   for(const x of [-.42,-.21,0,.21,.42])round(0xe7ddc6,x*fw,y/2+.23,fz,.30,y);
@@ -2136,6 +2326,100 @@ function drawCivicBuilding(zone,b){
   labelColor=0x3d778b;
  }else throw Error('Modello pubblico mancante '+kind);
  box(0xccbca1,0,.16,.37,.10,.10,.24);
+ // Facility-specific furnishings, separate from the shared architectural trim.
+ if(['hospital','clinic'].includes(kind)){
+  for(const side of [-1,1]){
+   // Ambulance bay markings and red crosses on the vehicles.
+   for(let stripe=-1;stripe<=1;stripe++)box(0xf2e2a4,side*.22+stripe*.047,.215,.34,.003,.02,.19);
+   cross(side*.22,1.23,.372,.64,0xc94746);
+   box(0x2f5666,side*.31,1.0,.16,.035,1.6,.018);
+  }
+ }else if(kind==='fire'){
+  for(const side of [-1,1])box(0x788985,.30+side*.028,9.1,-.217,.005,15.4,.004);
+  for(let rung=0;rung<15;rung++)box(0xd2d6cd,.30,2.2+rung*.98,-.215,.060,.09,.004);
+  for(const side of [-1,1])box(0xe3ce99,side*.22,2.65,.22,.035,.20,.042);
+ }else if(kind==='police'){
+  for(const side of [-1,1]){
+   box(0x315e91,side*.22,1.18,.252,.050,.29,.003);
+   box(0xe7d398,side*.22,1.20,.254,.013,.18,.002);
+  }
+ }else if(['school','nursery','university'].includes(kind)){
+  for(const side of [-1,1]){
+   box(0xeadbb9,side*.18,.33,.17,.09,.30,.06);
+   box(0x6e9c65,side*.18,.55,.17,.08,.18,.05);
+  }
+  if(kind!=='university'){
+   box(0x477f9a,.12,1.35,.25,.045,.10,.06,false,.16);
+   box(0xdab75e,.12,2.15,.215,.05,.16,.03);
+   for(let rung=0;rung<4;rung++)box(0xb64f42,.12,.45+rung*.41,.20,.045,.08,.005);
+  }
+ }else if(['library','museum','townhall','courthouse'].includes(kind)){
+  for(const side of [-1,1]){
+   box(0xddd1b6,side*.22,.49,.22,.065,.65,.045);
+   if(kind==='museum')add('dome',side<0?0xb58b5d:0x799794,side*.22,.82,.22,.9,1.9,.9);
+   else box(0x477b81,side*.22,1.6,.22,.052,1.5,.006);
+  }
+ }else if(['football','stadium','baseball','sports'].includes(kind)){
+  if(kind!=='baseball')for(const side of [-1,1]){
+   for(let wire=-4;wire<=4;wire++)box(0xdbe3d4,wire*.023,1.26,-.06+side*.254,.001,1.9,.001);
+   for(let wire=0;wire<5;wire++)box(0xdbe3d4,0,.42+wire*.39,-.06+side*.254,.19,.025,.001);
+   for(const post of [-1,1])box(0xe2e8dc,post*.096,2.09,-.06+side*.246,.003,.08,.020);
+  }
+  for(const side of [-1,1])for(let row=0;row<3;row++)for(let seat=0;seat<14;seat++)
+   box(row%2?0x4c8498:0xe1bf63,side*(.36+row*.025),.78+row*.62,-.27+seat*.032,.018,.16,.022);
+ }else if(kind==='pool'){
+  for(const lane of [-.18,-.06,.06,.18])for(let buoy=0;buoy<16;buoy++)
+   round(buoy%2?0xf1c86d:0xdce8df,lane,.59,-.15+buoy*.023,.10,.11);
+  for(const side of [-1,1]){
+   for(const post of [-1,1])box(0xc3d6d4,side*.27+post*.014,.95,.20,.004,1.0,.004);
+   for(let rung=0;rung<3;rung++)box(0xc3d6d4,side*.27,.65+rung*.23,.20,.032,.06,.004);
+  }
+ }else if(kind==='station'||kind==='bus'){
+  for(const fx of [-.02,.21]){
+   for(let pane=0;pane<7;pane++){
+    const z=kind==='station'?-.022+pane*.040:.05+pane*.016;
+    for(const side of [-1,1])box(0x28566d,fx+side*.061,2.19,z,.003,.64,.003);
+   }
+   box(0xe5c77b,fx,1.3,kind==='station'?.254:.179,.074,.19,.003);
+  }
+ }else if(['water','waterworks','power','recycling'].includes(kind)){
+  for(const side of [-1,1]){
+   box(0x748d8a,side*.40,.96,.025,.007,1.4,.50);
+   for(let rail=0;rail<12;rail++)box(0xb5c3b6,side*.40,1.65,-.20+rail*.042,.011,.18,.002);
+  }
+  if(kind==='recycling')for(let i=0;i<5;i++){
+   const fx=(i-2)*.16;
+   box(0x344f4c,fx,1.64,.137,.060,.22,.002);
+   for(const side of [-1,1])add('wheel',0x354b45,fx+side*.042,.40,.12,.23,.15,.23);
+  }
+ }else if(kind==='botanical'||kind==='gardens'){
+  for(const side of [-1,1])for(let bed=0;bed<7;bed++){
+   const fx=side*.25,fz=.025+bed*.035;
+   box(0x7d6345,fx,.31,fz,.15,.23,.018);
+   for(const plant of [-1,0,1])add('dome',bed%2?0xbb80af:0xe6c86d,fx+plant*.035,.48,fz,.45,.48,.45);
+  }
+ }else if(kind==='mall'||kind==='theatre'){
+  for(const side of [-1,1]){
+   box(0xe7d8bc,side*.31,.80,.23,.065,1.2,.035);
+   box(kind==='theatre'?0xb46d55:0x5b8d6d,side*.31,1.7,.23,.052,.62,.023);
+  }
+  for(const side of [-1,1])box(0xd8c094,side*.08,1.05,.12,.003,1.8,.004);
+ }else if(kind==='heliport'){
+  for(let light=0;light<12;light++){
+   const angle=light*Math.PI/6;
+   round(0xffd989,Math.cos(angle)*.34,.68,.08+Math.sin(angle)*.155,.14,.20);
+  }
+ }
+
+ // Detailed seating and litter bins stay outside the central accessible path.
+ for(const side of [-1,1]){
+  const fx=side*.33,fz=.405;
+  for(let slat=-2;slat<=2;slat++)box(0xa87648,fx,.75,fz+slat*.0025,.14,.10,.0018);
+  for(const leg of [-1,1])box(0x354c48,fx+leg*.052,.43,fz,.004,.58,.014);
+  for(const slat of [0,1])box(0xb78550,fx,1.05+slat*.20,fz-.011,.14,.13,.002);
+  box(0x3f6d61,side*.425,.72,.425,.026,1.0,.016);
+  box(0x263d3a,side*.425,1.25,.425,.028,.12,.018);
+ }
  // A landscaped public forecourt is part of every service.
  for(const side of [-1,1]){
   const px=side*.43,pz=.40;
@@ -2190,6 +2474,7 @@ function drawSpecial(zone){
   const w=b.width,d=b.depth,kind=zone.kind;
   assertInsideParcel('Edificio pubblico '+kind,x,z,w,d,b);
   addBox(w,.10,d,x,.07,z,kind==='park'?0x86b77d:0xd0c7b7);
+  if(kind==='park'){drawCitySquare(zone,b);return;}
   if(drawCivicBuilding(zone,b))return;
   if(kind==='park'){
     for(const side of [-1,1]){
@@ -3006,6 +3291,7 @@ function drawShops(){
       const e=batch.entries[i];dummy.position.set(e.x,e.y,e.z);dummy.rotation.set(0,e.rotation,0);
       dummy.scale.set(e.w,e.h,e.d);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix); mesh.setColorAt(i,instanceColor.setHex(e.color));
     }
+    mesh.userData.shops=batch.entries.map(entry=>entry.shop);
     mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();group.add(mesh);
     if(batch.detailed){
       mesh.userData.shopDetailChunk=batch.chunk;
@@ -3564,7 +3850,10 @@ function drawRoadNetwork(selected){
     items.forEach((e,i)=>{fdummy.position.set(e.x,e.y,e.z);fdummy.scale.set(e.w,e.h,e.d);fdummy.rotation.set(0,0,0);fdummy.updateMatrix();mesh.setMatrixAt(i,fdummy.matrix)});
     mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();group.add(mesh);
   }
-  for(const zone of publicZones())drawSpecial(zone);
+  for(const zone of publicZones()){
+    const first=group.children.length;drawSpecial(zone);
+    for(const mesh of group.children.slice(first))mesh.userData.publicZone=zone;
+  }
   drawShops();
   try{drawReservedBillboards(selected)}catch(e){console.warn("Cartelloni ignorati:",e)}
   // Street-level variation is generated alongside the road hierarchy.
@@ -3711,6 +4000,7 @@ function addSignaturePlazas(selected){
   if(!batches.has(key))batches.set(key,{geo:type==='crown'?crown:type==='taper'?taper:type==='water'?water:cube,color,items:[]});
   batches.get(key).items.push({x,y,z,w,h,d,rot});
  }
+ const citySigns=[];
  let built=0;
  for(const block of blocks){
   // A neighborhood plaza in roughly every 13 occupied blocks; capped for speed.
@@ -3731,24 +4021,30 @@ function addSignaturePlazas(selected){
    put('box',0x334c53,x+side*3.95,1.65,z+3.5,.15,3.3,.15);
    put('crown',0xffedbc,x+side*3.95,3.45,z+3.5,.40,.44,.40);
   }
-  // Small civic landmark and reflecting fountain, with genuine 3D massing.
-  if(block%26===0){
-   put('box',0xc5bba9,x,.39,z,2.35,.45,2.35);
-   put('box',0xece4d5,x,.82,z,1.45,.50,1.45);
-   put('taper',0xe6dfd1,x,2.15,z,1.0,2.45,1.0);
-   put('crown',0xf7eee0,x,3.50,z,.48,.52,.48);
-  }else{
+  if(decorationAllowed(x,z+4.15,3.4,.16))citySigns.push({x,z:z+4.15});
+  // Neighborhood fountains do not duplicate milestone monuments.
    put('water',0xc7b9a1,x,.43,z,2.8,.42,2.8);
    put('water',0x62bdd6,x,.67,z,2.45,.10,2.45);
    put('water',0xe9e3d7,x,1.0,z,.32,.65,.32);
    put('crown',0xa4e6ed,x,1.62,z,.42,.62,.42);
-  }
  }
  for(const batch of batches.values()){
   const mesh=new THREE.InstancedMesh(batch.geo,new THREE.MeshStandardMaterial({color:batch.color,roughness:.75,metalness:0}),batch.items.length);
   batch.items.forEach((e,i)=>{dummy.position.set(e.x,e.y,e.z);dummy.rotation.set(0,e.rot,0);dummy.scale.set(e.w,e.h,e.d);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix)});
   mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();group.add(mesh);
  }
+ const texture=billboardTexture([currentCity.name.toUpperCase(),'PIAZZA DI QUARTIERE',''],'#234f63',{wide:true});
+ if(!citySigns.length){texture.dispose();return;}
+ const mat=new THREE.MeshBasicMaterial({map:texture,side:THREE.FrontSide,toneMapped:false});
+ const signGeo=new THREE.PlaneGeometry(3.4,.85);
+ for(const rear of [false,true]){
+  const labels=new THREE.InstancedMesh(signGeo,mat,citySigns.length);
+  citySigns.forEach((sign,i)=>{dummy.position.set(sign.x,2.1,sign.z+(rear?-.04:.04));dummy.rotation.set(0,rear?Math.PI:0,0);dummy.scale.set(1,1,1);dummy.updateMatrix();labels.setMatrixAt(i,dummy.matrix);});
+  labels.computeBoundingSphere();labels.userData.citySquareName=currentCity.name;group.add(labels);
+ }
+ const posts=new THREE.InstancedMesh(new THREE.BoxGeometry(.12,1.7,.12),new THREE.MeshStandardMaterial({color:0x344e4e}),citySigns.length*2);
+ citySigns.forEach((sign,i)=>{for(const side of [-1,1]){dummy.position.set(sign.x+side*1.35,.85,sign.z);dummy.rotation.set(0,0,0);dummy.scale.set(1,1,1);dummy.updateMatrix();posts.setMatrixAt(i*2+(side+1)/2,dummy.matrix);}});
+ posts.computeBoundingSphere();posts.castShadow=true;group.add(posts);
 }
 
 function drawCityLife(selected){
@@ -5087,6 +5383,7 @@ function rebuild(){
   cover(parcel.x,parcel.z,parcel.width+12,parcel.depth+12);
  }
  if(Number.isFinite(shadowBounds.minX))group.userData.cityShadowBounds=shadowBounds;
+ group.userData.pickables=group.children.filter(mesh=>mesh.userData.shops||mesh.userData.homes||mesh.userData.home||mesh.userData.publicZone);
  const builtGroup=group,builtHouseMeshes=houseMeshes;
  group=previousGroup;
  try{disposeGroup();scene.remove(previousGroup)}catch(err){console.error('Pulizia scena',err)}
@@ -5097,7 +5394,7 @@ function rebuild(){
  if(errors.length){
   let warning=document.getElementById('cityErrorNotice');
   if(!warning){warning=document.createElement('div');warning.id='cityErrorNotice';warning.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99999;background:#722;color:white;padding:12px;border-radius:8px;max-width:70vw;font:13px Arial';document.body.appendChild(warning)}
-  warning.textContent='v8.8.5 · '+errors.join(' | ');
+  warning.textContent='v8.8.6 · '+errors.join(' | ');
  }else{document.getElementById('cityErrorNotice')?.remove()}
 }
 function renderMilestones(){
@@ -5120,46 +5417,42 @@ function renderMilestones(){
   const stats=$('shopStats');if(stats)stats.textContent=`${shopPurchases.length.toLocaleString('it-IT')} negozi · lotti misti`;
 }
 function updateDensity(){/* Houses remain visible regardless of camera zoom. */}
+function resolveStructureHit(hit){
+ if(!hit)return null;
+ const data=hit.object.userData;
+ if(data.publicZone)return {type:'public',ref:data.publicZone,distance:hit.distance};
+ if(data.shops){const ref=data.shops[hit.instanceId];if(ref)return {type:'shop',ref,distance:hit.distance};}
+ const home=data.homes?.[hit.instanceId]||data.home;
+ return home?{type:'home',ref:home,distance:hit.distance}:null;
+}
 function pick(e){
  const r=renderer.domElement.getBoundingClientRect();
  const pointer=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
  raycaster.setFromCamera(pointer,camera);
- // Avatars are small, so select by their projected screen position,
- // with a minimum touch-friendly radius. No need to click a tiny mesh.
+ const candidates=group.userData.pickables||houseMeshes;
+ const hits=raycaster.intersectObjects(candidates.filter(mesh=>mesh.visible),false);
+ const structure=hits.map(resolveStructureHit).find(Boolean);
  const click=new THREE.Vector2(e.clientX-r.left,e.clientY-r.top);
  let closest=null,best=23;
  for(const a of life.people){
   const center=new THREE.Vector3(a.g.position.x,a.g.position.y+2.2,a.g.position.z);
-  if(center.distanceTo(camera.position)>260)continue;
-  const projected=center.clone().project(camera);
-  if(projected.z<0||projected.z>1)continue;
-  const sx=(projected.x+1)*r.width/2,sy=(1-projected.y)*r.height/2;
-  const d=Math.hypot(sx-click.x,sy-click.y);
+  const range=center.distanceTo(camera.position);
+  if(range>260||structure&&range>structure.distance+1)continue;
+  const projected=center.project(camera);
+  if(projected.z< -1||projected.z>1)continue;
+  const d=Math.hypot((projected.x+1)*r.width/2-click.x,(1-projected.y)*r.height/2-click.y);
   if(d<best){best=d;closest=a;}
  }
  if(closest){showPersonCard(closest);return;}
- // Balloon and shop picking uses screen-space hit zones; the meshes are
- // batched or composite and cannot reliably be picked by a single ray.
- const projected=new THREE.Vector3();
- function screenDistance(x,y,z){
-  const v=projected.set(x,y,z).project(camera);
-  if(v.z< -1||v.z>1)return Infinity;
-  return Math.hypot((v.x+1)*r.width/2-click.x,(1-v.y)*r.height/2-click.y);
- }
- let balloonHit=null,balloonD=32;
+ let balloon=null,balloonDistance=Infinity;
  for(const b of life.balloons){
-  const d=screenDistance(b.g.position.x,b.g.position.y,b.g.position.z);
-  if(d<balloonD){balloonD=d;balloonHit=b;}
+  const hit=raycaster.intersectObject(b.g,true)[0];
+  if(hit&&hit.distance<balloonDistance){balloon=b;balloonDistance=hit.distance;}
  }
- if(balloonHit){showBalloonCard(balloonHit);return;}
- let shopHit=null,shopD=32;
- for(const sh of shopPurchases){
-  const d=screenDistance(sh.x,4,sh.z);
-  if(d<shopD){shopD=d;shopHit=sh;}
- }
- if(shopHit){showShopCard(shopHit);return;}
- const hits=raycaster.intersectObjects(houseMeshes,false);
- if(hits.length)showCard(hits[0].object.userData.homes[hits[0].instanceId]);
+ if(balloon&&(!structure||balloonDistance<structure.distance)){showBalloonCard(balloon);return;}
+ if(structure?.type==='public'){openPublicWorks(structure.ref);return;}
+ if(structure?.type==='shop'){showShopCard(structure.ref);return;}
+ if(structure?.type==='home')showCard(structure.ref);
 }
 function ownerForShop(shop){
  return homes.find(h=>h.id===shop.ownerId)||homes[0]||null;
@@ -5309,7 +5602,7 @@ function showShopCard(shop){showOwnerCard(ownerForShop(shop),'negozio',shop)}
 function showBalloonCard(balloon){showOwnerCard(homes.find(h=>h.id===balloon.ownerId)||homes[0],'mongolfiera',balloon)}
 function showPersonCard(a){showOwnerCard(a.home,'persona')}
 function showCard(h){showOwnerCard(h,'casa')}
-function enter(){if(!threeReady&&!makeScene())return;active=true;document.body.classList.add("city-view");$('threeLayer').classList.add('active');$('threeLayer').style.opacity=1;map.dragging.disable();map.scrollWheelZoom.disable();rebuild();updateCamera();resize()}
+function enter(){if(!threeReady&&!makeScene())return;active=true;document.body.classList.add("city-view");$('threeLayer').classList.add('active');$('threeLayer').style.opacity=1;map.dragging.disable();map.scrollWheelZoom.disable();rebuild();updateCamera();resize();void ensureCitySquare(currentCity)}
 function back(){clearAvatarLabels();active=false;document.body.classList.remove("city-view");$('threeLayer').style.opacity=0;$('threeLayer').classList.remove('active');$('card').style.display='none';map.dragging.enable();map.scrollWheelZoom.enable();$('status').textContent='Mappa geografica · le città sono posizionate con coordinate reali'}
 function onZoom(){
  const nearest=cityAtMapCenter();
@@ -5706,16 +5999,22 @@ function createV4Life(selected){
 const avatarLabels=new Map();
 let lastLabelUpdate=0;
 function makeAvatarLabel(name){
- const canvas=document.createElement('canvas');canvas.width=384;canvas.height=90;
+ const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=192;
  const ctx=canvas.getContext('2d');
- ctx.fillStyle='rgba(20,46,62,.89)';
- ctx.beginPath();ctx.roundRect(8,7,368,72,19);ctx.fill();
- ctx.font='bold 33px system-ui,Arial';ctx.textAlign='center';ctx.textBaseline='middle';
- ctx.fillStyle='#ffffff';ctx.fillText('@'+name,192,44,350);
+ ctx.fillStyle='rgba(8,27,42,.96)';ctx.beginPath();ctx.roundRect(8,8,1008,176,30);ctx.fill();
+ ctx.strokeStyle='#d3e8ec';ctx.lineWidth=5;ctx.stroke();
+ const text='@'+name;let font=84;ctx.font='bold '+font+'px Arial';
+ if(ctx.measureText(text).width>944){font=Math.floor(font*944/ctx.measureText(text).width);ctx.font='bold '+font+'px Arial';}
+ ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#ffffff';ctx.fillText(text,512,98);
  const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
- const material=new THREE.SpriteMaterial({map:texture,transparent:true,depthTest:true,depthWrite:false});
- const sprite=new THREE.Sprite(material);sprite.scale.set(5.8,1.36,1);
- sprite.userData.isAvatarLabel=true;group.add(sprite);return sprite;
+ const material=new THREE.SpriteMaterial({map:texture,transparent:true,depthTest:true,depthWrite:false,toneMapped:false});
+ const sprite=new THREE.Sprite(material);sprite.userData.isAvatarLabel=true;group.add(sprite);return sprite;
+}
+function sizeAvatarLabel(label){
+ const height=renderer.domElement.clientHeight||renderer.domElement.getBoundingClientRect().height||720;
+ const cameraDepth=new THREE.Vector3().copy(label.position).applyMatrix4(camera.matrixWorldInverse);
+ const worldHeight=2*Math.max(.1,-cameraDepth.z)*Math.tan(THREE.MathUtils.degToRad(camera.fov)/2)*34/height;
+ label.scale.set(worldHeight*1024/192,worldHeight,1);
 }
 function clearAvatarLabels(){
  for(const sprite of avatarLabels.values()){
@@ -5737,15 +6036,24 @@ function updateAvatarLabels(t){
   if(dist<125&&frustum.containsPoint(new THREE.Vector3(pos.x,pos.y+3.8,pos.z)))near.push({a,dist});
  }
  near.sort((a,b)=>a.dist-b.dist);
- const visible=new Set(near.slice(0,65).map(v=>v.a.home.id));
+ const labelRects=[],chosen=[],view=renderer.domElement.getBoundingClientRect();
+ for(const item of near){
+  const p=new THREE.Vector3(item.a.g.position.x,item.a.g.position.y+4,item.a.g.position.z).project(camera);
+  const x=(p.x+1)*view.width/2,y=(1-p.y)*view.height/2;
+  const rect={left:x-94,right:x+94,top:y-21,bottom:y+21};
+  if(rect.left<0||rect.right>view.width||rect.top<0||rect.bottom>view.height)continue;
+  if(labelRects.some(r=>rect.left<r.right&&rect.right>r.left&&rect.top<r.bottom&&rect.bottom>r.top))continue;
+  labelRects.push(rect);chosen.push(item);if(chosen.length>=28)break;
+ }
+ const visible=new Set(chosen.map(v=>v.a.home.id));
  for(const [id,sprite] of avatarLabels)if(!visible.has(id)){
   sprite.parent?.remove(sprite);sprite.material.map.dispose();sprite.material.dispose();avatarLabels.delete(id);
  }
- for(const {a} of near.slice(0,65)){
+ for(const {a} of chosen){
   const id=a.home.id;
   let label=avatarLabels.get(id);
   if(!label){label=makeAvatarLabel(a.home.user);avatarLabels.set(id,label);}
-  label.position.set(a.g.position.x,a.g.position.y+3.1,a.g.position.z);
+  label.position.set(a.g.position.x,a.g.position.y+4,a.g.position.z);sizeAvatarLabel(label);
  }
 }
 let lastPeopleTick=0;
@@ -5772,7 +6080,7 @@ function animateLife(t){if(!active||!v4.motion)return;
    a.gait=a.mode===0?0:Math.sin(walkPhase+a.phase);
    updateResidentMatrix(a.i);
    const label=avatarLabels.get(a.home.id);
-   if(label)label.position.set(a.g.position.x,a.g.position.y+3.1,a.g.position.z);
+   if(label){label.position.set(a.g.position.x,a.g.position.y+4,a.g.position.z);sizeAvatarLabel(label);}
   }
   if(residentBatches)for(const mesh of residentBatches.meshes)mesh.instanceMatrix.needsUpdate=true;
   if(window.v49Focus){
@@ -5796,7 +6104,58 @@ function animateLife(t){if(!active||!v4.motion)return;
   b.g.rotation.y=t*.08;
  }
 }
+function publicStepStatus(step){return {unlocked:count>=step.at,remaining:Math.max(0,step.at-count)};}
+function openPublicWorks(selected=null){
+ const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;$('v4Title').textContent=selected?.name||'Strutture e obiettivi';body.replaceChildren();
+ const summary=document.createElement('p');summary.textContent=currentCity.name+' · '+count.toLocaleString('it-IT')+' case · '+PUBLIC_STEPS.filter(s=>publicStepStatus(s).unlocked).length+'/'+PUBLIC_STEPS.length+' obiettivi raggiunti';body.append(summary);
+ const search=document.createElement('input');search.type='search';search.placeholder='Cerca una struttura…';search.setAttribute('aria-label','Cerca strutture pubbliche');body.append(search);
+ const list=document.createElement('div');body.append(list);
+ const render=()=>{
+  list.replaceChildren();let phase='';const zones=publicZones(),query=search.value.trim().toLocaleLowerCase('it');
+  for(const step of PUBLIC_STEPS){
+   if(query&&!step.name.toLocaleLowerCase('it').includes(query))continue;
+   if(step.phase!==phase){phase=step.phase;const h=document.createElement('h3');h.textContent=phase;list.append(h);}
+   const state=publicStepStatus(step),row=document.createElement('div');row.className='civicObjective '+(state.unlocked?'achieved':'pending');
+   if(selected?.kind===step.kind)row.classList.add('current');
+   const title=document.createElement('strong');title.textContent=(state.unlocked?'✓ ':'🔒 ')+step.name;
+   const detail=document.createElement('span');detail.textContent=step.at.toLocaleString('it-IT')+' case · '+(state.unlocked?'Raggiunto':state.remaining.toLocaleString('it-IT')+' case mancanti');
+   const progress=document.createElement('progress');progress.max=Math.max(1,step.at);progress.value=step.at?Math.min(count,step.at):1;progress.setAttribute('aria-label',step.name);
+   row.append(title,detail,progress);
+   const available=zones.filter(z=>z.kind===step.kind);
+   for(const zone of available){const button=document.createElement('button');button.textContent='📍 Trova '+zone.name;
+    button.onclick=()=>{const b=facilityBounds(zone.block);flyToWorld({x:b.x,y:4,z:b.z},{distance:120,elevation:1.0});panel.hidden=true;$('status').textContent=zone.name;};row.append(button);}
+   list.append(row);
+  }
+  if(!list.children.length){const empty=document.createElement('p');empty.textContent='Nessuna struttura trovata.';list.append(empty);}
+ };
+ search.oninput=render;render();
+}
+function openCityDirectory(){
+ const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;$('v4Title').textContent='Trova nella città';body.replaceChildren();
+ const search=document.createElement('input');search.type='search';search.placeholder='Nome, nickname o numero…';search.setAttribute('aria-label','Cerca edifici');
+ const type=document.createElement('select');for(const [value,label] of [['all','Tutti gli edifici'],['public','Strutture pubbliche'],['shop','Attività'],['home','Case']]){const opt=document.createElement('option');opt.value=value;opt.textContent=label;type.append(opt);}
+ const list=document.createElement('div'),info=document.createElement('p'),more=document.createElement('button');more.textContent='Mostra altri risultati';body.append(search,type,info,list,more);
+ const records=[...publicZones().map(zone=>({type:'public',name:zone.name,ref:zone})),...shopPurchases.map(shop=>({type:'shop',name:shop.business+' #'+(shop.id+1)+' · @'+(ownerForShop(shop)?.user||''),ref:shop})),...homes.map(home=>({type:'home',name:'Casa #'+home.id+' · @'+home.user,ref:home}))];
+ let limit=60;
+ const render=()=>{list.replaceChildren();const q=search.value.trim().toLocaleLowerCase('it');const matching=records.filter(record=>(type.value==='all'||record.type===type.value)&&(!q||record.name.toLocaleLowerCase('it').includes(q)));
+  info.textContent=matching.length+' risultati';for(const record of matching.slice(0,limit)){
+   const row=document.createElement('div');row.className='civicObjective achieved';const label=document.createElement('strong');label.textContent=record.name;
+   const button=document.createElement('button');button.textContent='📍 Raggiungi e apri';button.onclick=()=>{
+    if(!active)enter();
+    const ref=record.ref,b=record.type==='public'?facilityBounds(ref.block):ref;
+    const height=record.type==='home'?HOUSE_TIERS[houseTier(ref.points)].levels*3.15:5;
+    flyToWorld({x:b.x,y:Math.max(3,height*.4),z:b.z},{distance:record.type==='public'?120:Math.max(65,height*1.8),elevation:1});
+    if(record.type==='public')openPublicWorks(ref);else{panel.hidden=true;if(record.type==='shop')showShopCard(ref);else showCard(ref);}
+   };row.append(label,button);list.append(row);
+  }
+  more.hidden=matching.length<=limit;
+ };
+ search.oninput=type.onchange=()=>{limit=60;render();};more.onclick=()=>{limit+=60;render();};render();
+}
+
 function openV4(tab){
+ if(tab==='works'){openPublicWorks();return;}
+ if(tab==='directory'){openCityDirectory();return;}
  const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;
  const titles={shop:'Tienda',home:'La mia casa',avatar:'Il mio personaggio',world:'Mondo',ranking:'Ranking',works:'Obras'};
  $('v4Title').textContent=titles[tab];
@@ -5805,7 +6164,7 @@ function openV4(tab){
  if(tab==='avatar')body.innerHTML=`<p>Un personaggio gratuito per ogni casa. In questa demo puoi individuare il personaggio di @${homes[0]?.user||'pioniere'}.</p><label>Colore della pelle <input type="color" id="v4Skin" value="${v4.skin}"></label><label>Vestiti <input type="color" id="v4Shirt" value="${v4.shirt}"></label><button id="v4FindAvatar">📍 Trova il mio personaggio</button>`;
  if(tab==='world')body.innerHTML=`<p>Esplora ${currentCity.name} con la telecamera libera.</p><button id="v4Enter">🌎 Entra nel 3D</button><button id="v4Overview">🧭 Panoramica</button><label><input type="checkbox" id="v4Motion" ${v4.motion?'checked':''}> Animazioni ambientali</label>`;
  if(tab==='ranking')body.innerHTML=homes.slice(0,10).map((h,i)=>`<div class="v4Rank"><span>${i+1}. @${h.user}</span><b>${h.points} ⭐</b></div>`).join('');
- if(tab==='works')body.innerHTML=PUBLIC_STEPS.map(st=>`<div class="v4Rank"><span>${count>=st.at?'✓':'🔒'} ${st.name}</span><b>${st.at} case</b></div>`).join('');
+
  const wire=(id,fn)=>{if($(id))$(id).onclick=fn};
  // The demo has no login: its first resident is @Carlos75.
  // Use a safe elevated overview rather than placing the camera inside
