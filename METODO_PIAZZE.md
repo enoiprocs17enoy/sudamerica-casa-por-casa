@@ -40,3 +40,13 @@ Dati © OpenStreetMap contributors, ODbL: https://www.openstreetmap.org/copyrigh
 ## Verifica e limiti
 
 Test di generazione e ingombro su 261 piazze più il ripiego, controllo dei modelli da due lati mediante proiezioni CPU, trasformazioni finite, prenotazione dello spazio e navigazione degli obiettivi. Questi controlli non sostituiscono un test del sito completo in un browser WebGL. Tale test non è stato possibile nell'ambiente corrente. Vedere PIAZZE_E_VERIFICHE.md per metriche e limiti della versione.
+
+## Revisione di coerenza — v8.8.10
+
+Separati nei dati identità, posizione e forma. Nessuna piazza è marcata come ricostruzione completa. A Mar del Plata resta il monumento di Perlotti in piedi: il cavaliere appartiene al Parque San Martín. Il vecchio volume convesso del mantello è sostituito da una superficie sottile con pieghe e bordo mosso; la base ha un profilo roccioso e tre pannelli a rilievo, ancora interpretati.
+
+Aggiunti modelli documentati per Córdoba (San Martín a cavallo), Salta (Arenales e quindici figure alla base), Tucumán (Libertà con catene spezzate, senza scudo). Aggiunta un’interpretazione del Calendario floral nella posizione mappata a Mar del Plata, con anno corrente e fioriture. Le figure minori della Pirámide hanno un panneggio classico e non ripetono tutte gli attributi della Libertà sommitale. I loro attributi individuali non sono ancora riprodotti fedelmente.
+
+Fonti aggiuntive: https://respira.cordoba.gob.ar/portfolio/plaza-san-martin/ ; https://prensa.municipalidadsalta.gob.ar/plaza-9-de-julio-quedo-habilitada-la-primera-etapa-de-las-obras-de-refaccion-y-puesta-en-valor/ ; https://www.tucumanturismo.gob.ar/articulos/articulo/486/huellas-inmortales-un-recorrido-por-obras-escultoricas-emblematicas-de-tucuman .
+
+Inventario aggiornato: 70 voci, di cui 15 documentate (incluse quattro sottofigure), 12 archetipi e 43 senza modello. Vedere INVENTARIO_PIAZZE.md. Il controllo di una fonte descrittiva non equivale a un rilievo fotografico; l’orientamento rimane da verificare.
