@@ -1,9 +1,9 @@
 
 const $=id=>document.getElementById(id),MDP=[-38.0055,-57.5426],BA=[-34.6037,-58.3816],CORD=[-31.4201,-64.1888];
-const map=L.map('map',{zoomSnap:.25,zoomDelta:.5,minZoom:3,maxZoom:19,maxBounds:[[-60,-84],[15,-31]],maxBoundsViscosity:1,preferCanvas:true}).setView([-23,-61],4);
+const map=L.map('map',{zoomSnap:.25,zoomDelta:.5,minZoom:1,maxZoom:19,maxBounds:[[-85.05,-180],[85.05,180]],maxBoundsViscosity:.8,preferCanvas:true}).setView([15,0],2);
 // Accurate Natural Earth / GSHHG land outlines (offline bundled). No guessed
 // continent polygon and no dependency on an external atlas download.
-const geo=L.geoJSON(window.CONTINENT_LAND,{style:{color:'#729d7b',weight:.75,fillColor:'#d4e8c9',fillOpacity:1},interactive:false}).addTo(map);
+const geo=L.geoJSON(window.WORLD_LAND||window.CONTINENT_LAND,{style:{color:'#729d7b',weight:.75,fillColor:'#d4e8c9',fillOpacity:1},interactive:false}).addTo(map);
 // South American demo cities. Geographic markers use real coordinates;
 // each 3D city is a separately generated virtual city, not satellite imagery.
 const CITY_CATALOG=[
@@ -708,6 +708,7 @@ CITY_CATALOG.forEach((c,i)=>{
  c.pop=Math.max(1,Math.min(5000,Math.round(c.residents*.10)));
 });
 CITY_CATALOG.sort((a,b)=>b.points-a.points);
+if(window.WorldAtlas)WorldAtlas.extend(CITY_CATALOG);
 let currentCity=CITY_CATALOG.find(c=>c.id==='ar-mar-del-plata');
 const scoreOverrides=new Map();
 // Demo-only subscription state per city and owner. No payments or backend.
@@ -763,28 +764,32 @@ const cities=L.layerGroup().addTo(map);
 const cityPinIcon=L.divIcon({className:'south-city-pin',html:'<span></span>',iconSize:[22,22],iconAnchor:[11,11]});
 const cityMarkers=new Map();
 function cityZoomLevel(city){
+ if(city.realPopulation!=null){const n=city.realPopulation;return n>=5000000?1:n>=1000000?3:n>=200000?4:n>=50000?5:n>=10000?7:n>=2000?9:11;}
  const r=city.residents;
  return r>=60000?3:r>=28000?4:r>=14000?5:r>=6500?6:r>=2600?7:r>=900?8:9;
 }
 function refreshCityMarkers(){
  const zoom=map.getZoom();
  const bounds=map.getBounds().pad(.16);
- const selected=[];
+ const selected=[],pixelBuckets=new Map();
  const visibleIds=new Set();
  // Largest point totals first; declutter overlapping city pins.
- for(const city of CITY_CATALOG){
+ for(const city of (window.WorldAtlas?WorldAtlas.visible(bounds):CITY_CATALOG)){
+  if(selected.length>=450&&city.id!==currentCity.id)continue;
   if(city.geoVerified===false)continue;
   if(city.id!==currentCity.id && (zoom<cityZoomLevel(city)||!bounds.contains([city.lat,city.lng])))continue;
   const pixel=map.latLngToContainerPoint([city.lat,city.lng]);
   const gap=zoom<5?37:zoom<7?30:zoom<9?23:15;
-  if(city.id!==currentCity.id && selected.some(pt=>Math.hypot(pt.x-pixel.x,pt.y-pixel.y)<gap))continue;
-  selected.push(pixel);
+  const px=Math.floor(pixel.x/gap),py=Math.floor(pixel.y/gap);let overlaps=false;for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++)for(const pt of pixelBuckets.get((px+dx)+':'+(py+dy))||[])if(Math.hypot(pt.x-pixel.x,pt.y-pixel.y)<gap)overlaps=true;
+  if(city.id!==currentCity.id&&overlaps)continue;
+  const pixelKey=px+':'+py;if(!pixelBuckets.has(pixelKey))pixelBuckets.set(pixelKey,[]);pixelBuckets.get(pixelKey).push(pixel);selected.push(pixel);
   visibleIds.add(city.id);
   let marker=cityMarkers.get(city.id);
   if(!marker){
+   const tooltip=document.createElement('span');tooltip.textContent=city.name+' · '+city.residents.toLocaleString('it-IT')+' abitanti simulati';
    marker=L.marker([city.lat,city.lng],{icon:cityPinIcon,zIndexOffset:1000,
     title:city.name+' · '+city.country}).bindTooltip(
-     city.name+' · '+city.residents.toLocaleString('it-IT')+' abitanti simulati',{direction:'top'});
+     tooltip,{direction:'top'});
    marker.on('click',()=>selectCity(city.id,true));
    cityMarkers.set(city.id,marker);
   }
@@ -795,7 +800,7 @@ function refreshCityMarkers(){
    el.style.zIndex=String(city.id===currentCity.id?9999:Math.max(1,Math.round(city.points/1000)));
   }
  }
- for(const [id,marker] of cityMarkers)if(!visibleIds.has(id))cities.removeLayer(marker);
+ for(const [id,marker] of cityMarkers)if(!visibleIds.has(id)){cities.removeLayer(marker);cityMarkers.delete(id);}
 }
 map.on('zoomend moveend',refreshCityMarkers);
 function updateCitySelection(){
@@ -803,19 +808,20 @@ function updateCitySelection(){
   const marker=cityMarkers.get(city.id);
   if(marker?.getElement())marker.getElement().classList.toggle('active-city',city.id===currentCity.id);
  }
- const select=$('citySelect');if(select)select.value=currentCity.id;
+ const select=$('citySelect');if(select){if(![...select.options].some(o=>o.value===currentCity.id)){const option=document.createElement('option');option.value=currentCity.id;option.textContent=currentCity.name;select.append(option);}select.value=currentCity.id;}
  const label=$('cityLabel');if(label)label.textContent=currentCity.name+' · '+currentCity.country;
  const name=$('currentCityName');if(name)name.textContent=currentCity.name;
  const overview=$('cityOverview');
- if(overview)overview.textContent=`${CITY_CATALOG.filter(c=>c.geoVerified!==false).length} città posizionate · ${CITY_CATALOG.filter(c=>c.geoVerified===false).length} da verificare · ${CONTINENT_RESIDENTS.toLocaleString('it-IT')} abitanti virtuali · ${currentCity.residents.toLocaleString('it-IT')} in ${currentCity.name} · ${currentCity.points.toLocaleString('it-IT')} punti città · ${count.toLocaleString('it-IT')} case 3D caricate`;
+ if(overview)overview.textContent=`${(window.WorldAtlas?.meta.total||CITY_CATALOG.length).toLocaleString('it-IT')} località nel catalogo · ${window.WorldAtlas?.countries.size||13} paesi e territori · simulazione · ${currentCity.residents.toLocaleString('it-IT')} in ${currentCity.name} · ${currentCity.points.toLocaleString('it-IT')} punti città · ${count.toLocaleString('it-IT')} case 3D caricate`;
  refreshCityMarkers();
 }
 function selectCity(id,fly=false){
- const next=CITY_CATALOG.find(c=>c.id===id);
+ const next=window.WorldAtlas?.byId.get(id)||CITY_CATALOG.find(c=>c.id===id);
  if(!next||next.geoVerified===false)return;
  if(active)back();
  currentCity=next;
- const state=cityStates.get(id);
+ if(!cityStates.has(next.id))cityStates.set(next.id,{count:next.pop,shops:Math.max(1,Math.round(next.pop/28)),balloons:Math.min(8,Math.max(1,Math.floor(next.pop/380)))});
+ const state=cityStates.get(next.id);
  count=state.count;
  shopPurchases.length=0;
  for(let i=0;i<state.shops;i++)shopPurchases.push(shopLot(i));
@@ -835,7 +841,7 @@ function selectCity(id,fly=false){
 }
 function cityAtMapCenter(){
  const center=map.getCenter();
- return CITY_CATALOG.reduce((best,c)=>{
+ return (window.WorldAtlas?WorldAtlas.visible(map.getBounds().pad(.5)):CITY_CATALOG).filter(c=>c.geoVerified!==false).reduce((best,c)=>{
   const d=map.distance(center,[c.lat,c.lng]);
   return !best||d<best.distance?{city:c,distance:d}:best;
  },null);
@@ -1192,7 +1198,7 @@ function shopLot(id){
   const pos=plotPosition(block,slot);
   assertInsideParcel('Negozio '+id,pos.x,pos.z,17,18,pos);
   return {id,...pos,
-    ownerId:Math.max(1,Math.min(count,1+Math.floor(rnd(id*127+CITY_CATALOG.indexOf(currentCity)*19)*Math.max(1,count)))),
+    ownerId:Math.max(1,Math.min(count,1+Math.floor(rnd(id*127+(currentCity.catalogOrdinal??CITY_CATALOG.indexOf(currentCity))*19)*Math.max(1,count)))),
     owner:'',
     business:id%24===14?'Pizzeria':shopStyles[id%shopStyles.length]?.name||'Negozio'};
 }
@@ -1443,7 +1449,7 @@ const simulatedComments=[
 ];
 function demoResidentPoints(i,cityId){
  if(simulatedComments.some(comment=>comment.cityId===cityId&&comment.residentId===i+1))return 0;
- const citySeed=CITY_CATALOG.findIndex(c=>c.id===cityId)+1;
+ const citySeed=(window.WorldAtlas?.byId.get(cityId)?.catalogOrdinal??CITY_CATALOG.findIndex(c=>c.id===cityId))+1;
  const r=rnd((i+1)*71+citySeed*107);
  const magnitude=rnd((i+1)*31+citySeed*43);
  if(r<.40)return Math.floor(magnitude*500);
@@ -1463,7 +1469,7 @@ function createHomes(n){
       user:simulatedComments.find(comment=>comment.cityId===currentCity.id&&comment.residentId===i+1)?.user??(i===0?(currentCity.id==='ar-mar-del-plata'?'Carlos75':'pionero_'+currentCity.id.replace(/[^a-z]/g,'')):i===1?'Lucia_'+currentCity.id.slice(0,2):i===2?'Mateo_'+currentCity.id.slice(0,2):'usuario_'+String(i+1).padStart(5,'0')),
       points:scoreOverrides.get(scoreOverrideKey(currentCity.id,i+1))??demoResidentPoints(i,currentCity.id),
       district:Math.max(Math.abs(pos.col),Math.abs(pos.row)),
-      variant:(Math.floor(rnd(i+30)*9)+CITY_CATALOG.indexOf(currentCity))%9,type:(Math.floor(rnd(i+40)*7)+CITY_CATALOG.indexOf(currentCity))%7,garden:rnd(i+231+CITY_CATALOG.indexOf(currentCity)*31)>.24});
+      variant:(Math.floor(rnd(i+30)*9)+(currentCity.catalogOrdinal??CITY_CATALOG.indexOf(currentCity)))%9,type:(Math.floor(rnd(i+40)*7)+(currentCity.catalogOrdinal??CITY_CATALOG.indexOf(currentCity)))%7,garden:rnd(i+231+(currentCity.catalogOrdinal??CITY_CATALOG.indexOf(currentCity))*31)>.24});
   }
   return result;
 }
@@ -1477,7 +1483,7 @@ let regionalWaterUniform=null;
 function buildRegionalLandscape(houses){
  const city=currentCity;
  regionalWaterUniform=null;
- const coast=coastalDirections[city.id];
+ const coast=coastalDirections[city.id]||city.coast;
  const angle=coast?.[0]||0;
  const east=Math.sin(angle),south=Math.cos(angle);
  let minX=0,maxX=0,minZ=0,maxZ=0,shore=0;
@@ -1662,6 +1668,7 @@ function buildRegionalLandscape(houses){
 
 }
 function regionalMountain(city){
+ if(typeof window!=='undefined'&&window.WorldAtlas)return window.WorldAtlas.mountain(city);
  // Approximate Andean ridge axis. Coastal and inland cities use the same compass.
  const ridge=[[-56,-70],[-47,-73],[-39,-71],[-33,-70],[-25,-68],[-18,-69],[-12,-75],[-5,-79],[0,-78],[6,-75],[10,-72]];
  for(let i=1;i<ridge.length;i++){
@@ -5460,7 +5467,7 @@ function rebuild(){
  if(errors.length){
   let warning=document.getElementById('cityErrorNotice');
   if(!warning){warning=document.createElement('div');warning.id='cityErrorNotice';warning.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99999;background:#722;color:white;padding:12px;border-radius:8px;max-width:70vw;font:13px Arial';document.body.appendChild(warning)}
-  warning.textContent='v8.8.10 · '+errors.join(' | ');
+  warning.textContent='v9.0.0 · '+errors.join(' | ');
  }else{document.getElementById('cityErrorNotice')?.remove()}
 }
 function renderMilestones(){

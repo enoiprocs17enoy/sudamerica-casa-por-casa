@@ -123,3 +123,5 @@ button:hover{filter:brightness(1.065)}
 .squareAttribution{display:none}.city-view .squareAttribution{display:block;position:absolute;right:8px;bottom:104px;z-index:7;background:#123342e8;color:#e3edf1;padding:4px 7px;border-radius:4px;font-size:10px}
 
 .squareAttribution a{color:inherit}
+
+#worldDirectory select,#worldDirectory input{width:100%;margin-bottom:8px}#worldDirectory button{width:100%;margin:6px 0 12px}#worldDirectory .small{min-height:2.5em}
