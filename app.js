@@ -1255,161 +1255,156 @@ function citySquareProfile(city){
 function addCitySquareNameSign(profile,b){
  const w=b.width,d=b.depth;
   // Every square, including automatic/default ones, always displays its city.
- const signWidth=Math.min(w*.60,25),signHeight=signWidth/4,signZ=b.z+d*.466;
+ const signWidth=Math.min(w*.20,8.0),signHeight=signWidth/4,signZ=b.z+d*.466;
  const material=new THREE.MeshBasicMaterial({map:billboardTexture([currentCity.name.toUpperCase(),profile.documented?profile.name:'PIAZZA CIVICA','PIAZZA PRINCIPALE'],'#234f63',{wide:true}),side:THREE.FrontSide,toneMapped:false});
  const geo=new THREE.PlaneGeometry(signWidth,signHeight);
  for(const rear of [false,true]){
-  const label=new THREE.Mesh(geo,material);label.position.set(b.x,3+signHeight/2,signZ+(rear?-.08:.08));label.rotation.y=rear?Math.PI:0;
+  const label=new THREE.Mesh(geo,material);label.position.set(b.x-w*.26,1.30+signHeight/2,signZ+(rear?-.08:.08));label.rotation.y=rear?Math.PI:0;
   label.userData.citySquareName=currentCity.name;group.add(label);
  }
  const poleMaterial=new THREE.MeshStandardMaterial({color:0x344e4e,roughness:.8});
- for(const side of [-1,1]){const post=new THREE.Mesh(new THREE.BoxGeometry(.18,3,.18),poleMaterial);post.position.set(b.x+side*signWidth*.43,1.5,signZ);post.castShadow=true;group.add(post);}
+ for(const side of [-1,1]){const post=new THREE.Mesh(new THREE.BoxGeometry(.14,1.30,.14),poleMaterial);post.position.set(b.x-w*.26+side*signWidth*.43,.65,signZ);post.castShadow=true;group.add(post);}
 
 }
+function fitSquareToParcel(profile,b){
+ const root=profile.outline,angles=[0,Math.PI/2];
+ for(let i=1;i<root.length;i++){const a=root[i-1],c=root[i];if(Math.hypot(c.x-a.x,c.z-a.z)>.1){const angle=Math.atan2(c.z-a.z,c.x-a.x);angles.push(-angle,Math.PI/2-angle);}}
+ let best;
+ for(const angle of angles){const ca=Math.cos(angle),sa=Math.sin(angle),points=root.map(p=>({x:p.x*ca-p.z*sa,z:p.x*sa+p.z*ca}));
+ const minX=Math.min(...points.map(p=>p.x)),maxX=Math.max(...points.map(p=>p.x)),minZ=Math.min(...points.map(p=>p.z)),maxZ=Math.max(...points.map(p=>p.z));
+ const scale=Math.min((b.width-10)/Math.max(.1,maxX-minX),(b.depth-14)/Math.max(.1,maxZ-minZ));
+ if(!best||scale>best.scale)best={angle,ca,sa,scale,cx:(minX+maxX)/2,cz:(minZ+maxZ)/2,width:(maxX-minX)*scale,depth:(maxZ-minZ)*scale};}
+ best.point=p=>({x:(p.x*best.ca-p.z*best.sa-best.cx)*best.scale,z:(p.x*best.sa+p.z*best.ca-best.cz)*best.scale});return best;
+}
 function drawSurveyedCitySquare(profile,b){
- const root=profile.outline;
- const minX=Math.min(...root.map(p=>p.x)),maxX=Math.max(...root.map(p=>p.x)),minZ=Math.min(...root.map(p=>p.z)),maxZ=Math.max(...root.map(p=>p.z));
- const cx=(minX+maxX)/2,cz=(minZ+maxZ)/2,scale=Math.min(b.width*.90/(maxX-minX),b.depth*.90/(maxZ-minZ));
- const project=p=>new THREE.Vector2((p.x-cx)*scale,-(p.z-cz)*scale);
- const polygon=(rings,color,y)=>{
-  if(!rings?.length)return;
-  const shapes=[];let shape;
-  const firstSign=Math.sign(THREE.ShapeUtils.area(rings[0].map(project)));
-  for(const ring of rings){if(ring.length<4)continue;const points=ring.map(project),sign=Math.sign(THREE.ShapeUtils.area(points));
-   if(!shape||sign===firstSign){shape=new THREE.Shape(points);shapes.push(shape);}else shape.holes.push(new THREE.Path(points));
-  }
-  if(!shapes.length)return;
-  const mesh=new THREE.Mesh(new THREE.ShapeGeometry(shapes),new THREE.MeshStandardMaterial({color,roughness:.93,side:THREE.DoubleSide}));
-  mesh.rotation.x=-Math.PI/2;mesh.position.set(b.x,y,b.z);mesh.receiveShadow=true;mesh.castShadow=false;
-  mesh.userData.citySquare={name:profile.name,documented:true,source:profile.source,realGeometry:true};group.add(mesh);
+ const fit=fitSquareToParcel(profile,b),root=profile.outline,scale=fit.scale;
+ const project=p=>{const q=fit.point(p);return new THREE.Vector2(q.x,-q.z);};
+ const surfaceBatches=new Map(),batches=new Map(),dummy=new THREE.Object3D(),geometries={box:new THREE.BoxGeometry(1,1,1),round:new THREE.CylinderGeometry(.5,.5,1,12),leaf:new THREE.IcosahedronGeometry(1,1),ring:new THREE.TorusGeometry(.35,.045,6,16)};
+ const put=(type,color,x,y,z,w,h,d,angle=0,casts=true)=>{
+  if(x-w/2< -b.width/2+.15||x+w/2>b.width/2-.15||z-d/2< -b.depth/2+.15||z+d/2>b.depth/2-.15)return;
+  const key=type+':'+color+':'+casts;if(!batches.has(key))batches.set(key,{type,color,casts,parts:[]});batches.get(key).parts.push({x,y,z,w,h,d,angle});
  };
- // A map-derived footprint and map-derived interior, without generic garden beds.
- polygon([root,...(profile.holes||[])],profile.base==='lawn'?0x749757:0xc9bda7,.30);
- (profile.surfaces||[]).forEach(surface=>polygon(surface.rings,surface.kind==='lawn'?0x638d4c:surface.kind==='water'?0x479fb4:0xd5c9b5,surface.kind==='lawn'?.38:surface.kind==='water'?.40:.42));
- const positions=[];
- for(const line of profile.paths||[])for(let i=1;i<line.length;i++){
-  const a=project(line[i-1]),c=project(line[i]),dx=c.x-a.x,dy=c.y-a.y,len=Math.hypot(dx,dy);if(len<.03)continue;
-  const half=Math.max(.10,Math.min(.42,1.5*scale)),nx=-dy/len*half,ny=dx/len*half;
-  const points=[[a.x+nx,a.y+ny],[a.x-nx,a.y-ny],[c.x+nx,c.y+ny],[c.x+nx,c.y+ny],[a.x-nx,a.y-ny],[c.x-nx,c.y-ny]];
-  for(const [x,y]of points)positions.push(x,y,0);
+ const box=(color,x,y,z,w,h,d,angle=0,casts=true)=>put('box',color,x,y,z,w,h,d,angle,casts);
+ const segment=(a,c,color,width,height,y)=>{
+  const dx=c.x-a.x,dz=c.z-a.z,length=Math.hypot(dx,dz);if(length<.02)return;
+  put('box',color,(a.x+c.x)/2,y,(a.z+c.z)/2,width,height,length,Math.atan2(dx,dz),false);
+ };
+ const border=(ring,color,width,height,y)=>{for(let i=1;i<ring.length;i++)segment(fit.point(ring[i-1]),fit.point(ring[i]),color,width,height,y);};
+ const polygon=(rings,color,y,raised=false)=>{
+  if(!rings?.length)return;const shapes=[];let shape;
+  const firstSign=Math.sign(THREE.ShapeUtils.area(rings[0].map(project)));
+  for(const ring of rings){if(ring.length<4)continue;const points=ring.map(project),sign=Math.sign(THREE.ShapeUtils.area(points));if(!shape||sign===firstSign){shape=new THREE.Shape(points);shapes.push(shape);}else shape.holes.push(new THREE.Path(points));}
+  if(!shapes.length)return;
+  const key=color+':'+y;if(!surfaceBatches.has(key))surfaceBatches.set(key,{color,y,geometries:[]});surfaceBatches.get(key).geometries.push(new THREE.ShapeGeometry(shapes));
+  if(raised)for(const ring of rings)border(ring,0xd9cebb,.16,.22,y-.06);
+ };
+ // The full permanent parcel is an architectural plaza, not an empty green backing sheet.
+ box(0xc8bcaa,0,.22,0,b.width-.50,.22,b.depth-.50,0,false);
+ for(const side of [-1,1]){
+  box(0xe8deca,side*(b.width/2-.42),.39,0,.28,.30,b.depth-.70,0,false);
+  box(0xe8deca,0,.39,side*(b.depth/2-.42),b.width-.70,.30,.28,0,false);
+  box(0xa9947a,side*(b.width/2-4.1),.345,0,.18,.025,b.depth-2.2,0,false);
  }
- if(positions.length){
+ for(let z=-b.depth/2+4;z<b.depth/2-2;z+=4.5)for(const side of [-1,1])box(0xb1a18b,side*(b.width/2-2.35),.345,z,3.3,.02,.05,0,false);
+ polygon([root,...(profile.holes||[])],profile.base==='lawn'?0x76965c:0xd2c5ad,.42);
+ border(root,0xe5d8bd,.30,.24,.43);
+ for(const surface of profile.surfaces||[]){const lawn=surface.kind==='lawn',water=surface.kind==='water';polygon(surface.rings,lawn?0x63894c:water?0x319bb5:0xded1b7,lawn?.57:water?.53:.49,lawn||water);}
+ // Distribute the flower budget around each bed rather than filling only the first edge.
+ const lawns=(profile.surfaces||[]).filter(surface=>surface.kind==='lawn'&&surface.rings?.[0]?.length>3);
+ let blooms=0;const perBed=Math.max(1,Math.min(24,Math.floor(100/Math.max(1,lawns.length))));
+ for(const surface of lawns){
+  const ring=surface.rings[0],points=ring.map(fit.point),centre=points.reduce((p,q)=>({x:p.x+q.x/points.length,z:p.z+q.z/points.length}),{x:0,z:0});
+  const lengths=[];let perimeter=0;for(let i=1;i<points.length;i++){const length=Math.hypot(points[i].x-points[i-1].x,points[i].z-points[i-1].z);lengths.push(length);perimeter+=length;}
+  if(perimeter<2)continue;const count=Math.min(perBed,Math.max(1,Math.floor(perimeter/1.4)));
+  for(let flower=0;flower<count&&blooms<100;flower++){
+   let distance=(flower+.5)*perimeter/count,edge=0;while(edge<lengths.length-1&&distance>lengths[edge])distance-=lengths[edge++];
+   const a=points[edge],c=points[edge+1],t=distance/Math.max(.001,lengths[edge]),x=(a.x+(c.x-a.x)*t)*.93+centre.x*.07,z=(a.z+(c.z-a.z)*t)*.93+centre.z*.07;
+   put('leaf',0x567d3e,x,.75,z,.24,.18,.24);
+   for(let petal=0;petal<4;petal++){const angle=petal*Math.PI/2;put('leaf',[0xe5aecf,0xf1cd7a,0xe9dbca][blooms%3],x+Math.sin(angle)*.085,.95,z+Math.cos(angle)*.085,.09,.055,.09);}
+   blooms++;
+  }
+ }
+ for(const line of profile.paths||[])for(let i=1;i<line.length;i++)segment(fit.point(line[i-1]),fit.point(line[i]),0xe4d3b4,Math.max(.40,Math.min(1.15,scale*3)),.06,.56);
+ const bench=(x,z,angle=0)=>{
+  const ca=Math.cos(angle),sa=Math.sin(angle),part=(color,dx,y,dz,w,h,d)=>box(color,x+dx*ca+dz*sa,y,z-dx*sa+dz*ca,w,h,d,angle);
+  for(let slat=-2;slat<=2;slat++)part(0xad7950,0,.88,slat*.115,2.1,.10,.087);
+  for(let slat=0;slat<3;slat++)part(0xb88a57,0,1.14+slat*.14,-.30,2.1,.10,.08);
+  for(const side of [-1,1]){part(0x344d48,side*.78,.59,0,.12,.62,.55);part(0x344d48,side*1.02,1.07,.02,.08,.14,.58);part(0x344d48,side*1.02,.98,-.22,.08,.50,.08);}
+ };
+ const lamp=(x,z)=>{
+  put('round',0x314b48,x,2.38,z,.13,4,.13);put('round',0x425b51,x,.54,z,.34,.30,.34);
+  box(0x314b48,x,4.53,z,.52,.10,.52);box(0xffdda0,x,4.32,z,.32,.34,.32);box(0x314b48,x,4.08,z,.45,.09,.45);
+  for(const side of [-1,1])box(0x314b48,x+side*.17,4.31,z,.045,.42,.045);
+ };
+ const planter=(x,z,seed)=>{
+  box(0xd8c5a5,x,.56,z,1.40,.38,2.6,0,false);box(0x675a3d,x,.79,z,1.15,.09,2.34,0,false);
+  for(let k=0;k<7;k++){
+   const dx=Math.sin(k*9+seed)*.39,dz=(k-3)*.31;put('leaf',0x577e3e,x+dx,.99,z+dz,.28,.29,.28);
+   const color=[0xd99ac4,0xf2cc72,0xf5d9d4][(k+seed)%3];for(let petal=0;petal<4;petal++){const a=petal*Math.PI/2;put('leaf',color,x+dx+Math.sin(a)*.095,1.20,z+dz+Math.cos(a)*.095,.10,.065,.10);}
+  }
+ };
+ // Detailed perimeter promenade integrates irregular map footprints into the street block.
+ for(const side of [-1,1])for(let i=0;i<7;i++){
+  const z=-b.depth*.36+i*b.depth*.12,x=side*(b.width/2-2.1);
+  if(i%2===0)lamp(x,z);else{planter(x,z,i);bench(side*(b.width/2-4.1),z,side*Math.PI/2);}
+ }
+ // Mapped planting is retained; sparse sources receive complementary planting in the promenade.
+ const palmCity=['uy-montevideo','pe-lima','cl-santiago','ec-quito','br-manaus','br-brasilia'].includes(currentCity.id);
+ const treePositions=[];
+ for(const p of profile.trees||[]){const q=fit.point(p);if(Math.abs(q.x)<b.width/2-2&&Math.abs(q.z)<b.depth/2-3)treePositions.push(q);}
+ if(!treePositions.length)for(const side of [-1,1])for(let i=0;i<5;i++)treePositions.push({x:side*(b.width/2-3.5),z:-b.depth*.32+i*b.depth*.16});
+ const maxTrees=Math.min(72,treePositions.length);
+ for(let i=0;i<maxTrees;i++){
+  const p=treePositions[Math.floor(i*treePositions.length/maxTrees)],x=p.x,z=p.z;
+  if(palmCity){
+   put('round',0x88704e,x,2.75,z,.22,4.8,.22);
+   for(let leaf=0;leaf<9;leaf++){const a=leaf*Math.PI*2/9;put('leaf',leaf%2?0x547f43:0x6c9048,x+Math.sin(a)*.64,5.21+Math.sin(a*2)*.12,z+Math.cos(a)*.64,.24,.13,1.2,a);}
+  }else{
+   put('round',0x75583d,x,1.95,z,.25,3.15,.25);
+   for(let lobe=0;lobe<6;lobe++){const a=lobe*Math.PI*.8;put('leaf',[0x517b3e,0x67894a,0x789952][lobe%3],x+Math.sin(a)*.56,3.75+(lobe%3)*.36,z+Math.cos(a)*.48,.76,.85,.73,a);}
+  }
+ }
+ // Extra space around square or compact outlines becomes furnished terraces.
+ const gap=(b.depth-fit.depth)/2;
+ if(gap>12)for(const side of [-1,1]){
+  const z=side*(fit.depth/2+gap*.51);
+  box(0xdccbb0,0,.40,z,12,.10,6.5,0,false);
+  for(const x of [-4.7,4.7])bench(x,z,side<0?0:Math.PI);
+  for(const x of [-7,7])planter(x,z,3);
+  if(side<0){
+   for(const x of [-5.7,5.7])for(const dz of [-2.6,2.6])box(0x92724e,x,2.03,z+dz,.20,3.3,.20);
+   for(let slat=-8;slat<=8;slat++)box(slat%2?0xc8a778:0xb48a5f,slat*.70,3.79,z,.16,.17,5.9);
+   for(const dz of [-2.75,2.75])box(0x98744c,0,3.61,z+dz,12,.20,.24);
+  }
+ }
+ for(const side of [-1,1]){
+  const x=side*(b.width/2-2.1),z=b.depth*.405;
+  put('round',0x42796a,x,.90,z,.56,1.1,.56);put('round',0x2e5149,x,1.50,z,.63,.12,.63);
+ }
+ // Merge equal-height surfaces so a detailed plan does not create dozens of draw calls.
+ for(const surface of surfaceBatches.values()){
+  const positions=[];
+  for(const source of surface.geometries){const expanded=source.index?source.toNonIndexed():source;for(const value of expanded.attributes.position.array)positions.push(value);if(expanded!==source)expanded.dispose();source.dispose();}
   const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geometry.computeVertexNormals();
-  const paths=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({color:0xd7c9b0,roughness:.95,side:THREE.DoubleSide}));paths.rotation.x=-Math.PI/2;paths.position.set(b.x,.46,b.z);paths.receiveShadow=true;paths.castShadow=false;paths.userData.citySquarePaths=profile.name;group.add(paths);
+  const mesh=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({color:surface.color,roughness:surface.color===0x319bb5?.20:.88,metalness:surface.color===0x319bb5?.16:0,side:THREE.DoubleSide}));mesh.rotation.x=-Math.PI/2;mesh.position.set(b.x,surface.y,b.z);mesh.receiveShadow=true;mesh.castShadow=false;
+  mesh.userData.citySquare={name:profile.name,documented:Boolean(profile.documented),source:profile.source||null,realGeometry:Boolean(profile.realGeometry),localDesign:Boolean(profile.localDesign)};group.add(mesh);
  }
- // Individually mapped trees and benches, when those details exist in the source.
- const dummy=new THREE.Object3D();
- const palmCity=['uy-montevideo','pe-lima','cl-santiago','ec-quito','br-manaus'].includes(currentCity.id);
- const treePoints=[...(profile.trees||[])];
- if(!treePoints.length){
-  for(const surface of profile.surfaces||[]){
-   if(surface.kind!=='lawn')continue;const ring=surface.rings[0];if(!ring?.length)continue;
-   const area=Math.abs(THREE.ShapeUtils.area(ring.map(p=>new THREE.Vector2(p.x,p.z))));if(area<70)continue;
-   const x=ring.reduce((n,p)=>n+p.x,0)/ring.length,z=ring.reduce((n,p)=>n+p.z,0)/ring.length;
-   treePoints.push({x,z,inferred:true});if(treePoints.length>=32)break;
-  }
+ for(const batch of batches.values()){
+  const mesh=new THREE.InstancedMesh(geometries[batch.type],new THREE.MeshStandardMaterial({color:batch.color,roughness:.83}),batch.parts.length);
+  batch.parts.forEach((p,i)=>{dummy.position.set(b.x+p.x,p.y,b.z+p.z);dummy.rotation.set(0,p.angle,0);dummy.scale.set(p.w,p.h,p.d);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);});
+  mesh.computeBoundingSphere();mesh.castShadow=batch.casts;mesh.receiveShadow=true;mesh.userData.citySquareDetail=profile.name;mesh.userData.squareBatch= batch.type;group.add(mesh);
  }
- if(palmCity&&treePoints.length){
-  const trunk=new THREE.InstancedMesh(new THREE.CylinderGeometry(.10,.16,4.8,8),new THREE.MeshStandardMaterial({color:0x8b7251,roughness:1}),treePoints.length);
-  const leaves=new THREE.InstancedMesh(new THREE.SphereGeometry(1,8,4),new THREE.MeshStandardMaterial({color:0x4f7b48,roughness:.9}),treePoints.length*8);
-  treePoints.forEach((p,i)=>{
-   const x=b.x+(p.x-cx)*scale,z=b.z+(p.z-cz)*scale;
-   dummy.position.set(x,2.7,z);dummy.rotation.set(0,0,0);dummy.scale.set(1,1,1);dummy.updateMatrix();trunk.setMatrixAt(i,dummy.matrix);
-   for(let leaf=0;leaf<8;leaf++){const angle=leaf*Math.PI/4;dummy.position.set(x+Math.sin(angle)*.65,5.3,z+Math.cos(angle)*.65);dummy.rotation.set(-.15,angle,0);dummy.scale.set(.25,.13,1.3);dummy.updateMatrix();leaves.setMatrixAt(i*8+leaf,dummy.matrix);}
-  });
-  for(const mesh of [trunk,leaves]){mesh.computeBoundingSphere();mesh.castShadow=true;mesh.receiveShadow=true;mesh.userData.citySquareDetail=profile.name;group.add(mesh);}
- }
- for(const [type,points]of [['tree',palmCity?[]:treePoints],['bench',profile.benches||[]]]){
-  if(!points.length)continue;
-  const specs=type==='tree'?[{geo:new THREE.CylinderGeometry(.12,.19,2.6,7),color:0x796245,y:1.6},{geo:new THREE.IcosahedronGeometry(Math.min(1.05,Math.max(.45,scale*4)),1),color:0x4f7f49,y:3.25}]:[{geo:new THREE.BoxGeometry(1.6,.14,.45),color:0xa67d51,y:.65},{geo:new THREE.BoxGeometry(1.6,.55,.12),color:0xa67d51,y:.96,z:-.20}];
-  for(const spec of specs){const mesh=new THREE.InstancedMesh(spec.geo,new THREE.MeshStandardMaterial({color:spec.color,roughness:.86}),points.length);
-   points.forEach((p,i)=>{dummy.position.set(b.x+(p.x-cx)*scale,spec.y,b.z+(p.z-cz)*scale+(spec.z||0));dummy.rotation.set(0,0,0);dummy.scale.setScalar(1);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);});
-   mesh.computeBoundingSphere();mesh.castShadow=true;mesh.receiveShadow=true;mesh.userData.citySquareDetail=profile.name;group.add(mesh);
-  }
- }
+ group.userData.squareFit={angle:fit.angle,width:fit.width,depth:fit.depth,scale:fit.scale};
  addCitySquareNameSign(profile,b);return true;
 }
 
 function drawCitySquare(zone,b){
- const profile=citySquareProfile(currentCity),w=b.width,d=b.depth,parts=[],transform=new THREE.Object3D();
+ const profile=citySquareProfile(currentCity);
  if(profile.realGeometry)return drawSurveyedCitySquare(profile,b);
- const seed=profile.seed||Array.from(currentCity.id).reduce((n,c)=>n+c.charCodeAt(0),0);
- let outline=null;
- if(profile.outline){
-  const sx=Math.max(...profile.outline.map(p=>Math.abs(p.x))),sz=Math.max(...profile.outline.map(p=>Math.abs(p.z)));
-  const scale=Math.min(w*.45/Math.max(1,sx),d*.45/Math.max(1,sz));
-  outline=profile.outline.map(p=>({x:p.x*scale,z:p.z*scale}));
- }
- const inside=(x,z)=>{if(!outline)return true;let yes=false;for(let i=0,j=outline.length-1;i<outline.length;j=i++){
-  const a=outline[i],b=outline[j];if((a.z>z)!==(b.z>z)&&x<(b.x-a.x)*(z-a.z)/(b.z-a.z)+a.x)yes=!yes;
- }return yes;};
- const put=(type,color,x,y,z,sx,sy,sz,angle=0)=>{
-  if(outline&&![[x,z],[x-sx/2,z-sz/2],[x+sx/2,z+sz/2],[x-sx/2,z+sz/2],[x+sx/2,z-sz/2]].every(([px,pz])=>inside(px,pz)))return;
-  parts.push({type,color,x:b.x+x,y,z:b.z+z,sx,sy,sz,angle,casts:type!=='box'||sy>.25});
- };
- const box=(color,fx,y,fz,fw,h,fd,angle=0)=>put('box',color,fx*w,y,fz*d,fw*w,h,fd*d,angle);
- if(outline){
-  const shape=new THREE.Shape();outline.forEach((p,i)=>i?shape.lineTo(p.x,-p.z):shape.moveTo(p.x,-p.z));shape.closePath();
-  const paving=new THREE.Mesh(new THREE.ShapeGeometry(shape),new THREE.MeshStandardMaterial({color:profile.stone,roughness:.9,side:THREE.DoubleSide}));
-  paving.rotation.x=-Math.PI/2;paving.position.set(b.x,.30,b.z);paving.receiveShadow=true;
-  paving.userData.citySquare={name:profile.name,documented:true,source:profile.source};group.add(paving);
- }else box(profile.stone,0,.20,0,.96,.16,.97);
- if(!outline&&profile.layout!=='wave'){
-  for(const side of [-1,1]){
-   box(0xe4dacc,side*.31,.39,0,.19,.12,.72);
-   box(profile.green,side*.31,.48,0,.17,.06,.70);
-   for(let flower=0;flower<10;flower++)box(flower%2?0xd8b96c:0xbb7bab,side*.31,.62,-.31+flower*.069,.08,.16,.012);
-  }
- }
- if(profile.layout==='wave')for(let row=-16;row<=16;row++)for(let col=-8;col<=8;col++){
-  const x=col*w*.052,z=row*d*.026;
-  const dark=Math.sin(col*.68+row*.47)>.40;
-  put('box',dark?0x4e5c5e:0xdedacc,x,.31,z,w*.051,.04,d*.025);
- }
- if(profile.layout==='groves')for(let i=0;i<5;i++)box(0xa9b18e,(i-2)*.16,.46,.07,.005,.03,.76);
- if(profile.layout==='garden')for(let i=0;i<3;i++){
-  const z=(i-1)*.23;
-  box(0xb8a887,0,.47,z,.43,.05,.035);
- }
- // Street furniture and tree alleys, not the city's unlockable principal monument.
- const treeRows=profile.layout==='axial'?6:4;
- for(const side of [-1,1])for(let i=0;i<treeRows;i++){
-  const x=side*w*.40,z=(-.38+i*.76/(treeRows-1))*d;
-  if(profile.palm){
-   put('trunk',0x8c7350,x,3.2,z,.18,6,.18);
-   for(let leaf=0;leaf<8;leaf++){
-    const angle=leaf*Math.PI/4;
-    put('leaf',0x507f49,x+Math.sin(angle)*1.1,6.5,z+Math.cos(angle)*1.1,.42,.30,2.6,angle);
-   }
-  }else{
-   put('trunk',0x786044,x,2.1,z,.24,3.8,.24);
-   put('crown',profile.green,x,4.8,z,2.15+(seed%3)*.15,2.0,2.15);
-  }
-  if(i%2===0){
-   const bx=side*w*.30;
-   for(let slat=-2;slat<=2;slat++)put('box',0xa67c50,bx,.83,z+slat*.13,2.7,.11,.10);
-   put('box',0xb48c5e,bx,1.20,z-.42,2.7,.48,.12);
-   for(const leg of [-1,1])put('box',0x38524d,bx+leg*1,.48,z,.16,.65,.68);
-  }
- }
- for(const side of [-1,1])for(const end of [-1,1]){
-  const x=side*w*.32,z=end*d*.42;
-  put('box',0x354e4c,x,2.5,z,.14,4.6,.14);
-  put('box',0xffdf9b,x,4.9,z,.55,.36,.55);
-  put('box',0x354e4c,x,5.15,z,.64,.13,.64);
- }
- // Keep the centre open: statues, obelisks and landmark fountains belong to milestones.
- const geometries={box:new THREE.BoxGeometry(1,1,1),trunk:new THREE.CylinderGeometry(1,1,1,8),crown:new THREE.IcosahedronGeometry(1,1),leaf:new THREE.SphereGeometry(1,8,5)};
- const batches=new Map();for(const part of parts){const key=part.type+':'+part.casts;if(!batches.has(key))batches.set(key,[]);batches.get(key).push(part);}
- for(const [,items] of batches){
-  const type=items[0].type;
-  const mesh=new THREE.InstancedMesh(geometries[type],new THREE.MeshStandardMaterial({color:0xffffff,roughness:.88}),items.length);
-  items.forEach((p,i)=>{transform.position.set(p.x,p.y,p.z);transform.rotation.set(0,p.angle,0);transform.scale.set(p.sx,p.sy,p.sz);transform.updateMatrix();mesh.setMatrixAt(i,transform.matrix);mesh.setColorAt(i,new THREE.Color(p.color));});
-  mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();mesh.castShadow=items[0].casts;mesh.receiveShadow=true;
-  mesh.userData.citySquare={name:profile.name,documented:profile.documented,source:profile.source||null};group.add(mesh);
- }
- addCitySquareNameSign(profile,b);
- return true;
+ const w=b.width-10,d=b.depth-14;
+ const rectangle=(cx,cz,width,depth)=>[{x:cx-width/2,z:cz-depth/2},{x:cx+width/2,z:cz-depth/2},{x:cx+width/2,z:cz+depth/2},{x:cx-width/2,z:cz+depth/2},{x:cx-width/2,z:cz-depth/2}];
+ const surfaces=[-1,1].map(side=>({kind:'lawn',rings:[rectangle(side*w*.30,0,w*.22,d*.70)]}));
+ return drawSurveyedCitySquare({name:'Piazza civica di '+currentCity.name,outline:rectangle(0,0,w,d),surfaces,paths:[],trees:[],benches:[],base:'paving',documented:false,realGeometry:false,localDesign:true},b);
 }
 
 function publicZones(){
@@ -5449,7 +5444,7 @@ function rebuild(){
  if(errors.length){
   let warning=document.getElementById('cityErrorNotice');
   if(!warning){warning=document.createElement('div');warning.id='cityErrorNotice';warning.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99999;background:#722;color:white;padding:12px;border-radius:8px;max-width:70vw;font:13px Arial';document.body.appendChild(warning)}
-  warning.textContent='v8.8.7 · '+errors.join(' | ');
+  warning.textContent='v8.8.8 · '+errors.join(' | ');
  }else{document.getElementById('cityErrorNotice')?.remove()}
 }
 function renderMilestones(){
