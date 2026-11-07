@@ -1109,19 +1109,23 @@ function buildRegionalLandscape(houses){
   const waterMaterial=new THREE.MeshStandardMaterial({
    color:estuary?0x887a57:0x277d9c,roughness:estuary?.61:.33,metalness:estuary?0:.08
   });
+
+  const waterClock=regionalWaterUniform;
   waterMaterial.onBeforeCompile=shader=>{
-   shader.uniforms.waterTime=regionalWaterUniform;
+   shader.uniforms.waterTime=waterClock;
    shader.uniforms.waterShore={value:shore};
    shader.uniforms.waterDirection={value:new THREE.Vector2(east,south)};
-   shader.vertexShader='uniform float waterTime; varying vec3 waterWorld;\n'+shader.vertexShader.replace(
+   shader.vertexShader='varying vec3 waterWorld;\n'+shader.vertexShader.replace(
     '#include <begin_vertex>',
-    '#include <begin_vertex>\nwaterWorld=(modelMatrix*vec4(position,1.)).xyz; transformed.z+=.12*sin(waterWorld.x*.014+waterTime*.8)*cos(waterWorld.z*.011-waterTime*.6);');
+    '#include <begin_vertex>\nwaterWorld=(modelMatrix*vec4(position,1.)).xyz;');
    shader.fragmentShader='uniform float waterTime; uniform float waterShore; uniform vec2 waterDirection; varying vec3 waterWorld;\n'+shader.fragmentShader.replace(
     '#include <color_fragment>',
-    '#include <color_fragment>\nfloat seaward=dot(waterWorld.xz,waterDirection)-waterShore; if(seaward<0.)discard; float footprint=max(length(dFdx(waterWorld.xz)),length(dFdy(waterWorld.xz))); float detail=1.-smoothstep(1.,9.,footprint); float ripple=sin(waterWorld.x*.73+waterWorld.z*.39-waterTime*1.8)*sin(waterWorld.z*.48-waterTime*.9); float foam=pow(max(0.,sin(seaward*.66-waterTime*1.3)),10.)*(1.-smoothstep(0.,16.,seaward)); diffuseColor.rgb*=1.+ripple*.12*detail; diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.76,.87,.84),foam*.45*detail);');
+    '#include <color_fragment>\nfloat seaward=dot(waterWorld.xz,waterDirection)-waterShore; if(seaward<0.)discard; float footprint=max(length(dFdx(waterWorld.xz)),length(dFdy(waterWorld.xz))); float detail=1.-smoothstep(.7,4.,footprint); float phaseA=dot(waterWorld.xz,vec2(.83,.55))*.94-waterTime*1.05; float phaseB=dot(waterWorld.xz,vec2(-.42,.91))*1.37-waterTime*.76+sin(phaseA*.31)*.42; float ripple=sin(phaseA)*.65+sin(phaseB)*.35; float alongShore=dot(waterWorld.xz,vec2(-waterDirection.y,waterDirection.x)); float foamPhase=seaward*.48-waterTime*.88+sin(alongShore*.08)*.63; float foam=pow(max(0.,sin(foamPhase)),14.)*(1.-smoothstep(0.,10.,seaward)); diffuseColor.rgb*=1.+ripple*.045*detail; diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.68,.81,.80),foam*.24*detail);');
+   shader.fragmentShader=shader.fragmentShader.replace('#include <normal_fragment_maps>',
+    '#include <normal_fragment_maps>\nvec3 waveNormal=normalize(vec3(-cos(phaseA)*.025*detail,1.,-cos(phaseB)*.018*detail)); normal=normalize((viewMatrix*vec4(waveNormal,0.)).xyz);');
   };
   waterMaterial.customProgramCacheKey=()=> 'regional-animated-water';
-  const sea=new THREE.Mesh(new THREE.PlaneGeometry(32000,24000,192,96),waterMaterial);
+  const sea=new THREE.Mesh(new THREE.PlaneGeometry(32000,24000),waterMaterial);
   sea.userData.regionalWater=true;
   sea.rotation.set(-Math.PI/2,0,angle);
   sea.position.set(east*(shore+12000),.16,south*(shore+12000));
@@ -1158,13 +1162,19 @@ function buildRegionalLandscape(houses){
   terrain.rotateX(-Math.PI/2);
   const position=terrain.attributes.position;
   const colors=[];
+  const uv=terrain.attributes.uv;
+  const meadow=new THREE.Color(0xc8d5ae),foothillGreen=new THREE.Color(0x8ba778);
+  const stone=new THREE.Color(0x737c80),snow=new THREE.Color(0xe8eeed);
   const groundTint=new THREE.Color();
   const seed=city.lat*17+city.lng*9;
 
   function elevation(u,v){
    if(Math.abs(u)>ridgeWidth/2||Math.abs(v)>ridgeDepth/2)return 0;
    const inland=v+ridgeDepth/2;
-   const rise=1-Math.exp(-Math.max(0,inland)/640);
+   const start=90*Math.sin(u*.004+seed)+42*Math.sin(u*.009-seed);
+   const approach=Math.max(0,Math.min(1,(inland-start)/1100));
+   const toe=Math.max(0,Math.min(1,inland/280));
+   const rise=approach*approach*(3-2*approach)*toe*toe*(3-2*toe);
    const ridges=.42+.30*Math.pow(Math.sin(u*.0031+inland*.0017+seed),2)
      +.24*Math.pow(Math.cos(u*.0067-inland*.0023),2);
    const crags=.80+.20*Math.sin(u*.021+inland*.012)*Math.cos(u*.014-inland*.017);
@@ -1181,16 +1191,26 @@ function buildRegionalLandscape(houses){
    const dry=coast&&x*east+z*south>=shore-19;
    const y=dry?-.15:peak-.14;
    position.setXYZ(index,x,y,z);
+   uv.setXY(index,.5+x/12000,.5-z/12000);
    
    const rock=Math.max(0,Math.min(1,(peak-110)/360));
-   groundTint.set(0x506b45).lerp(new THREE.Color(0x737c80),rock);
-   if(peak>620)groundTint.lerp(new THREE.Color(0xe8eeed),Math.min(.92,(peak-620)/430));
+   groundTint.copy(meadow).lerp(foothillGreen,Math.min(1,peak/170)).lerp(stone,rock);
+   if(peak>620)groundTint.lerp(snow,Math.min(.92,(peak-620)/430));
 
    colors.push(groundTint.r,groundTint.g,groundTint.b);
   }
   terrain.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
   terrain.computeVertexNormals();
-  const foothills=new THREE.Mesh(terrain,new THREE.MeshStandardMaterial({vertexColors:true,roughness:1}));
+
+  const mountainMaterial=new THREE.MeshStandardMaterial({vertexColors:true,roughness:1,map:homePattern('grass')});
+  mountainMaterial.onBeforeCompile=shader=>{
+   shader.vertexShader='varying float mountainAltitude;\n'+shader.vertexShader.replace('#include <begin_vertex>',
+    '#include <begin_vertex>\nmountainAltitude=position.y;');
+   shader.fragmentShader='varying float mountainAltitude;\n'+shader.fragmentShader.replace('#include <map_fragment>',
+    '#ifdef USE_MAP\nvec4 terrainTexel=texture2D(map,vMapUv); diffuseColor*=mix(terrainTexel,vec4(1.),smoothstep(80.,220.,mountainAltitude));\n#endif');
+  };
+  mountainMaterial.customProgramCacheKey=()=> 'continuous-mountain-meadow';
+  const foothills=new THREE.Mesh(terrain,mountainMaterial);
   foothills.receiveShadow=true;
   foothills.userData.regionalMountain=true;
   group.add(foothills);
@@ -1229,7 +1249,7 @@ function buildRegionalLandscape(houses){
  const dummy=new THREE.Object3D();
  const color=new THREE.Color();
  candidates.forEach(({x,z,i,y},index)=>{
-  const size=3+rnd(i*21)*5;
+  const size=rnd(i*21)<.72?3+rnd(i*21+9)*5:8+rnd(i*21+9)*5;
   const trunkHeight=size*.71;
   dummy.position.set(x,y+trunkHeight*.5,z);
   dummy.scale.set(size*.20,trunkHeight,size*.20);
@@ -1250,7 +1270,7 @@ function buildRegionalLandscape(houses){
  group.add(trunks,...canopies.filter(canopy=>canopy.count>0));
  // Sparse geometry per tree keeps the outer landscape populated at horizon scale.
  const distant=[];
- const horizon=5920,step=86;
+ const horizon=5920,step=64;
  for(let gx=-horizon;gx<horizon;gx+=step){
   for(let gz=-horizon;gz<horizon;gz+=step){
    const seed=gx*131+gz*379;
@@ -1262,18 +1282,28 @@ function buildRegionalLandscape(houses){
    distant.push({x,z,seed});
   }
  }
+ const forestTrunks=new THREE.InstancedMesh(trunks.geometry,trunks.material,distant.length);
  const forest=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,0),canopyMaterial,distant.length);
+
  distant.forEach(({x,z,seed},index)=>{
-  const size=8+rnd(seed+91)*12;
-  dummy.position.set(x,terrainHeight(x,z)+size*.65,z);
-  dummy.rotation.set(0,rnd(seed+103)*Math.PI,0);
-  dummy.scale.set(size*.8,size,size*.76);
+  const size=rnd(seed*21)<.72?3+rnd(seed*21+9)*5:8+rnd(seed*21+9)*5;
+  const ground=Math.max(0,terrainHeight(x,z)-.15),trunkHeight=size*.71;
+  dummy.position.set(x,ground+trunkHeight*.5,z);
+  dummy.rotation.set(0,0,0);
+  dummy.scale.set(size*.20,trunkHeight,size*.20);
+  dummy.updateMatrix();
+  forestTrunks.setMatrixAt(index,dummy.matrix);
+  const tall=rnd(seed*63)>.65;
+  dummy.position.set(x,ground+trunkHeight+size*.39,z);
+  dummy.rotation.y=rnd(seed*87)*Math.PI;
+  dummy.scale.set(size*(tall?.52:.88),size*(tall?1.20:.72),size*(tall?.52:.83));
   dummy.updateMatrix();
   forest.setMatrixAt(index,dummy.matrix);
-  forest.setColorAt(index,color.setHSL(.22+rnd(seed+27)*.07,.34,.20+rnd(seed+53)*.14));
+  forest.setColorAt(index,color.setHSL(.22+rnd(seed*31)*.10,.30+rnd(seed*47)*.27,.21+rnd(seed*12)*.16));
  });
+ forestTrunks.computeBoundingSphere();
  forest.computeBoundingSphere();
- group.add(forest);
+ group.add(forestTrunks,forest);
 }
 function regionalMountain(city){
  // Approximate Andean ridge axis. Coastal and inland cities use the same compass.
@@ -3379,11 +3409,11 @@ const HOUSE_TIERS=[
  {min:0,name:'Monolocale',levels:1},
  {min:100,name:'Casa piccola',levels:2},
  {min:500,name:'Villetta',levels:3},
- {min:1500,name:'Palazzina',levels:4},
- {min:4000,name:'Condominio',levels:5},
- {min:10000,name:'Torre residenziale',levels:7},
- {min:25000,name:'Grattacielo',levels:9},
- {min:60000,name:'Grattacielo monumentale',levels:12}
+ {min:1500,name:'Palazzina',levels:5},
+ {min:4000,name:'Condominio',levels:9},
+ {min:10000,name:'Torre residenziale',levels:17},
+ {min:25000,name:'Grattacielo',levels:30},
+ {min:60000,name:'Grattacielo monumentale',levels:52}
 ];
 function houseTier(points){
  let tier=0;for(let i=1;i<HOUSE_TIERS.length;i++)if(points>=HOUSE_TIERS[i].min)tier=i;
@@ -3568,11 +3598,12 @@ function renderAllHouses(selected){
       const paint=housePaint(h);
       const wall=paint.wall;
       const trim=paint.roof;
-      const height=levels*2.55+1.8,x=h.x,z=h.z;
+      const storeyHeight=3.15;
+      const height=levels*storeyHeight+1.8,x=h.x,z=h.z;
       // No parcel decorations: landscaping unlocks at one point.
       place('towerBase',boxGeo,wall,h,x,height/2,z,footW,height,footD);
-      if(tier===3||tier===5){
-        // Pitched tile roofs alternate with parapet terraces.
+      if(tier===3){
+        // Small apartment blocks keep tile roofs. Towers have open roof terraces.
         place('apartmentTiledRoof',roofGeo,trim,h,x,height-.04,z,
           (footW+.42)/2,Math.max(1.35,footW*.15),(footD+.42)/2);
         place('apartmentEave',boxGeo,0xe9d9bd,h,x,height-.13,z,
@@ -3700,7 +3731,7 @@ function renderAllHouses(selected){
       }
       // One instanced window strip per floor, visible on front and rear.
       for(let floor=0;floor<levels;floor++){
-        const wy=1.6+floor*2.55;
+        const wy=1.6+floor*storeyHeight;
         for(const side of [-1,1]){
           const wx=x+side*footW*.26, width=footW*.24;
           for(const face of [-1,1]){
@@ -3717,7 +3748,7 @@ function renderAllHouses(selected){
       }
       // Side facades must read as buildings, not solid rectangular blocks.
       for(let floor=0;floor<levels;floor++){
-        const wy=1.6+floor*2.55;
+        const wy=1.6+floor*storeyHeight;
         for(const side of [-1,1]){
           const xx=x+side*(footW/2+.06);
           for(const zz of [-footD*.27,0,footD*.27]){
@@ -3737,7 +3768,7 @@ function renderAllHouses(selected){
       if(premium){
         // Balconies are recessed within the parcel's free margin.
         for(let floor=1;floor<Math.min(levels,12);floor+=2){
-          const by=floor*2.55+.3;
+          const by=floor*storeyHeight+.3;
           place('premiumTowerBalcony',boxGeo,0xb9c7bf,h,x,by,z+footD/2+.24,footW*.50,.18,.38);
           place('premiumTowerRail',boxGeo,0x53777d,h,x,by+.42,z+footD/2+.41,footW*.50,.66,.07);
         }
@@ -4527,7 +4558,7 @@ function renderFallbackHouses(selected){
  const batches=new Map();
  for(const h of selected){
   const tier=houseTier(h.points),fp=houseFootprint(h,tier),paint=housePaint(h);
-  const levels=HOUSE_TIERS[tier].levels,height=levels*2.55;
+  const levels=HOUSE_TIERS[tier].levels,height=levels*3.15;
   const key=paint.wall;
   if(!batches.has(key))batches.set(key,[]);
   batches.get(key).push({h,fp,height});
@@ -4581,7 +4612,7 @@ function rebuild(){
  if(errors.length){
   let warning=document.getElementById('cityErrorNotice');
   if(!warning){warning=document.createElement('div');warning.id='cityErrorNotice';warning.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99999;background:#722;color:white;padding:12px;border-radius:8px;max-width:70vw;font:13px Arial';document.body.appendChild(warning)}
-  warning.textContent='v8.8.2 · '+errors.join(' | ');
+  warning.textContent='v8.8.3 · '+errors.join(' | ');
  }else{document.getElementById('cityErrorNotice')?.remove()}
 }
 function renderMilestones(){
