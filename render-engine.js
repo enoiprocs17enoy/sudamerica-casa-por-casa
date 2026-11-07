@@ -54,6 +54,9 @@
   const c=sun.shadow.camera;
   c.left=left-22;c.right=right+22;c.bottom=bottom-22;c.top=top+22;
   c.near=Math.max(1,distance-maxDepth-50);c.far=distance-minDepth+70;
+  const texel=Math.max((c.right-c.left)/sun.shadow.mapSize.x,(c.top-c.bottom)/sun.shadow.mapSize.y);
+  sun.shadow.normalBias=Math.min(.65,Math.max(.035,texel*.65));
+  sun.shadow.bias=-Math.max(.00014,texel*.35/Math.max(1,c.far-c.near));
   c.updateProjectionMatrix();sun.target.updateMatrixWorld();
  }
  function render(scene,camera,renderer,frameInterval=16){
