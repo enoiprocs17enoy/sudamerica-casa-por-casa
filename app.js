@@ -1504,52 +1504,16 @@ function buildRegionalLandscape(houses){
   minZ=Math.min(minZ,z-halfZ);maxZ=Math.max(maxZ,z+halfZ);
   shore=Math.max(shore,x*east+z*south+Math.abs(east)*halfX+Math.abs(south)*halfZ);
  }
- shore+=85+(coast?.[1]||0)*12;
- if(coast){
-  const estuary=plataEstuary.has(city.id);
-
-  regionalWaterUniform={value:0};
-  const waterMaterial=new THREE.MeshStandardMaterial({
-   color:0x277d9c,roughness:.39,metalness:.04
-  });
-
-  const waterClock=regionalWaterUniform;
-  waterMaterial.onBeforeCompile=shader=>{
-   shader.uniforms.waterTime=waterClock;
-   shader.uniforms.waterShore={value:shore};
-   shader.uniforms.waterDirection={value:new THREE.Vector2(east,south)};
-   shader.vertexShader='varying vec3 waterWorld;\n'+shader.vertexShader.replace(
-    '#include <begin_vertex>',
-    '#include <begin_vertex>\nwaterWorld=(modelMatrix*vec4(position,1.)).xyz;');
-   shader.fragmentShader='uniform float waterTime; uniform float waterShore; uniform vec2 waterDirection; varying vec3 waterWorld;\n'+shader.fragmentShader.replace(
-    '#include <color_fragment>',
-    '#include <color_fragment>\nfloat seaward=dot(waterWorld.xz,waterDirection)-waterShore; if(seaward<0.)discard; float footprint=max(length(dFdx(waterWorld.xz)),length(dFdy(waterWorld.xz))); float detail=1.-smoothstep(.7,4.,footprint); float phaseA=dot(waterWorld.xz,vec2(.83,.55))*.94-waterTime*1.05; float phaseB=dot(waterWorld.xz,vec2(-.42,.91))*1.37-waterTime*.76+sin(phaseA*.31)*.42; float ripple=sin(phaseA)*.65+sin(phaseB)*.35; float alongShore=dot(waterWorld.xz,vec2(-waterDirection.y,waterDirection.x)); float foamPhase=seaward*.48-waterTime*.88+sin(alongShore*.08)*.63; float foam=pow(max(0.,sin(foamPhase)),14.)*(1.-smoothstep(0.,10.,seaward)); diffuseColor.rgb*=1.+ripple*.045*detail; diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.68,.81,.80),foam*.24*detail);');
-   shader.fragmentShader=shader.fragmentShader.replace('#include <normal_fragment_maps>',
-    '#include <normal_fragment_maps>\nvec3 waveNormal=normalize(vec3(-cos(phaseA)*.025*detail,1.,-cos(phaseB)*.018*detail)); normal=normalize((viewMatrix*vec4(waveNormal,0.)).xyz);');
-  };
-  waterMaterial.customProgramCacheKey=()=> 'regional-animated-water';
-  const sea=new THREE.Mesh(new THREE.PlaneGeometry(32000,24000),waterMaterial);
-  sea.userData.regionalWater=true;
-  sea.rotation.set(-Math.PI/2,0,angle);
-  sea.position.set(east*(shore+12000),.16,south*(shore+12000));
-
-  group.add(sea);
-  const beachGeometry=new THREE.PlaneGeometry(14500,17,1,4);
-  const beachVertices=beachGeometry.attributes.position;
-  const beachColors=new Float32Array(beachVertices.count*3);
-  const drySand=new THREE.Color(estuary?0x9d8d63:0xd4bd88);
-  const wetSand=new THREE.Color(estuary?0x655b42:0x8c795a);
-  const sand=new THREE.Color();
-  for(let i=0;i<beachVertices.count;i++){
-   const wetness=Math.max(0,(8.5-beachVertices.getY(i))/17);
-   sand.copy(drySand).lerp(wetSand,wetness*wetness).toArray(beachColors,i*3);
-  }
-  beachGeometry.setAttribute('color',new THREE.BufferAttribute(beachColors,3));
-  const beach=new THREE.Mesh(beachGeometry,
-   new THREE.MeshStandardMaterial({vertexColors:true,roughness:.91}));
-  beach.rotation.copy(sea.rotation);
-  beach.position.set(east*(shore-8.5),-.056,south*(shore-8.5));
-  group.add(beach);
+ const region=window.WorldGeography?WorldGeography.makeRegion(city,{minX,maxX,minZ,maxZ}):null;
+ if(region){group.userData.geography=region;for(const ground of scene.children.filter(m=>m.userData.regionalGround))WorldGeography.clipMaterial(ground.material,region);}
+ const coastFrame=coast&&typeof window!=='undefined'&&window.WorldTerrain?window.WorldTerrain.coastFrame(coast,{minX,maxX,minZ,maxZ}):null;
+ shore=coastFrame?coastFrame.shore:shore+85+(coast?.[1]||0)*1000;
+ if(region?.hasWater){
+  regionalWaterUniform={value:0};const waterClock=regionalWaterUniform;
+  const material=new THREE.MeshStandardMaterial({color:0x238ba6,roughness:.43,metalness:.015});
+  material.onBeforeCompile=shader=>{shader.uniforms.waterTime=waterClock;shader.vertexShader='varying vec2 waveXZ;\n'+shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nwaveXZ=(modelMatrix*vec4(position,1.)).xz;');shader.fragmentShader='uniform float waterTime; varying vec2 waveXZ;\n'+shader.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\nfloat footprint=max(length(dFdx(waveXZ)),length(dFdy(waveXZ))); float detail=1.-smoothstep(1.,8.,footprint); float phaseA=dot(waveXZ,vec2(.83,.55))*.55-waterTime*1.05; float phaseB=dot(waveXZ,vec2(-.42,.91))*.79-waterTime*.76; float ripple=sin(phaseA)*.65+sin(phaseB)*.35; diffuseColor.rgb*=1.+ripple*.035*detail; diffuseColor.rgb=mix(vec3(.16,.53,.59),diffuseColor.rgb,smoothstep(0.,120.,-regionDistance)); float foam=pow(max(0.,sin(-regionDistance*.27-waterTime*.7+sin(waveXZ.x*.02))),12.)*(1.-smoothstep(0.,18.,-regionDistance)); diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.72,.84,.85),foam*.22*detail);');shader.fragmentShader=shader.fragmentShader.replace('#include <normal_fragment_maps>','#include <normal_fragment_maps>\nvec3 waterNormal=normalize(vec3(-cos(phaseA)*.021*detail,1.,-cos(phaseB)*.015*detail)); normal=normalize((viewMatrix*vec4(waterNormal,0.)).xyz);');};
+  WorldGeography.clipMaterial(material,region,'water');
+  const sea=new THREE.Mesh(new THREE.PlaneGeometry(100000,100000).rotateX(-Math.PI/2),material);sea.position.y=.04;sea.userData.regionalWater=true;group.add(sea);
  }
  const mountain=regionalMountain(city);
  const sky=releaseSky.material.uniforms;
@@ -1559,9 +1523,9 @@ function buildRegionalLandscape(houses){
  if(mountain.strength>.12){
   const axisX=Math.sin(mountain.angle),axisZ=Math.cos(mountain.angle);
   const edge=Math.max(minX*axisX,maxX*axisX)+Math.max(minZ*axisZ,maxZ*axisZ);
-  const ridgeWidth=24000;
-  const ridgeDepth=12000;
-  const terrain=new THREE.PlaneGeometry(ridgeWidth,ridgeDepth,240,112);
+  const ridgeWidth=100000;
+  const ridgeDepth=48000;
+  const terrain=new THREE.PlaneGeometry(24000,12000,240,112);
   terrain.rotateX(-Math.PI/2);
   const position=terrain.attributes.position;
   const colors=[];
@@ -1575,23 +1539,23 @@ function buildRegionalLandscape(houses){
    if(Math.abs(u)>ridgeWidth/2||Math.abs(v)>ridgeDepth/2)return 0;
    const inland=v+ridgeDepth/2;
    const start=90*Math.sin(u*.004+seed)+42*Math.sin(u*.009-seed);
-   const approach=Math.max(0,Math.min(1,(inland-start)/1100));
+   const approach=Math.max(0,Math.min(1,(inland-start)/2200));
    const toe=Math.max(0,Math.min(1,inland/280));
    const rise=approach*approach*(3-2*approach)*toe*toe*(3-2*toe);
-   const ridges=.42+.30*Math.pow(Math.sin(u*.0031+inland*.0017+seed),2)
-     +.24*Math.pow(Math.cos(u*.0067-inland*.0023),2);
-   const crags=.80+.20*Math.sin(u*.021+inland*.012)*Math.cos(u*.014-inland*.017);
-   const altitude=220+Math.min(inland,5400)*.22;
+   const ridges=.58+.18*Math.pow(Math.sin(u*.00032+inland*.00042+seed),2)
+     +.16*Math.pow(Math.cos(u*.00062-inland*.00035),2);
+   const crags=.98+.02*Math.sin(u*.0011+inland*.0007)*Math.cos(u*.0008-inland*.0009);
+   const altitude=220+Math.min(inland,18000)*.16;
    return rise*ridges*crags*mountain.strength*altitude;
   }
   terrainHeight=(x,z)=>elevation(axisZ*x-axisX*z,axisX*x+axisZ*z-edge-160-ridgeDepth*.5);
 
   for(let index=0;index<position.count;index++){
-   const u=position.getX(index),v=position.getZ(index);
+   const oldU=position.getX(index),oldV=position.getZ(index),absU=Math.abs(oldU),u=absU<=9600?oldU:Math.sign(oldU)*(9600+(absU-9600)/2400*40400),t=(oldV+6000)/12000,inland=t<=.7?t/.7*8400:8400+(t-.7)/.3*39600,v=inland-ridgeDepth*.5;
    const along=edge+160+ridgeDepth*.5+v;
    const x=axisX*along+axisZ*u,z=axisZ*along-axisX*u;
    const peak=elevation(u,v);
-   const dry=coast&&x*east+z*south>=shore-19;
+   const dry=region?region.landDistance(x,z)<20:coast&&x*east+z*south>=shore-19;
    const y=dry?-.15:peak-.14;
    position.setXYZ(index,x,y,z);
    uv.setXY(index,.5+x/12000,.5-z/12000);
@@ -1604,6 +1568,7 @@ function buildRegionalLandscape(houses){
   }
   terrain.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
   terrain.computeVertexNormals();
+  if(region)terrainHeight=WorldGeography.heightSampler(terrain,axisX,axisZ,edge);
 
   const mountainMaterial=new THREE.MeshStandardMaterial({vertexColors:true,roughness:1,map:homePattern('grass')});
   mountainMaterial.onBeforeCompile=shader=>{
@@ -1613,6 +1578,7 @@ function buildRegionalLandscape(houses){
     '#ifdef USE_MAP\nvec4 terrainTexel=texture2D(map,vMapUv); diffuseColor*=mix(terrainTexel,vec4(1.),smoothstep(80.,220.,mountainAltitude));\n#endif');
   };
   mountainMaterial.customProgramCacheKey=()=> 'continuous-mountain-meadow';
+  if(region)WorldGeography.clipMaterial(mountainMaterial,region,'mountain');
   const foothills=new THREE.Mesh(terrain,mountainMaterial);
   foothills.receiveShadow=true;
   foothills.userData.regionalMountain=true;
@@ -1621,7 +1587,9 @@ function buildRegionalLandscape(houses){
 
 
 
- if(roadPlan)window.WorldRoads.draw3D(roadPlan,group,terrainHeight,(x,z)=>!coast||x*east+z*south<shore-20);
+ if(roadPlan&&window.WorldTerrain)window.WorldTerrain.prepare(roadPlan,terrainHeight,region||coastFrame);
+ if(roadPlan)group.userData.roadPlan=roadPlan;
+ if(roadPlan)window.WorldRoads.draw3D(roadPlan,group,terrainHeight,(x,z)=>region?region.landDistance(x,z)>15:!coast||x*east+z*south<shore-20);
  const candidates=[],spacing=48,horizon=5920;
  for(let col=Math.floor(-horizon/spacing);col<=Math.ceil(horizon/spacing);col++){
   for(let row=Math.floor(-horizon/spacing);row<=Math.ceil(horizon/spacing);row++){
@@ -1631,15 +1599,16 @@ function buildRegionalLandscape(houses){
    for(let c=Math.round((x-28)/BLOCK_X);c<=Math.round((x+28)/BLOCK_X);c++)
     for(let r=Math.round((z-28)/BLOCK_Z);r<=Math.round((z+28)/BLOCK_Z);r++)
      if(cleared.has(c+':'+r))developedHere=true;
-   if(developedHere||coast&&x*east+z*south>shore-35||roadPlan&&window.WorldRoads.distanceToRoad(x,z,roadPlan)<18)continue;
+   if(developedHere||(region?region.landDistance(x,z)<35:coast&&x*east+z*south>shore-35)||roadPlan&&window.WorldRoads.distanceToRoad(x,z,roadPlan)<18)continue;
    const gap=Math.hypot(Math.max(minX-x,0,x-maxX),Math.max(minZ-z,0,z-maxZ));
    const transition=Math.max(0,Math.min(1,gap/1500));
    const density=.16+.73*transition*transition*(3-2*transition);
    const grove=.91+.09*Math.sin(x*.004)*Math.cos(z*.003);
-   if(rnd(i*79)>density*grove)continue;
+   const aridity=region?.aridity(x,z)||0;
+   if(rnd(i*79)>density*grove*(1-aridity*.987))continue;
    const ground=terrainHeight(x,z);
    if(ground>680)continue;
-   candidates.push({x,z,i,y:Math.max(0,ground-.15),detailed:gap<220});
+   candidates.push({x,z,i,aridity,y:Math.max(0,ground-.15),detailed:gap<220});
   }
  }
  const canopyMaterial=new THREE.MeshStandardMaterial({roughness:1});
@@ -1650,8 +1619,9 @@ function buildRegionalLandscape(houses){
  const trunks=new THREE.InstancedMesh(new THREE.CylinderGeometry(.35,.62,1,6),barkMaterial,candidates.length);
  trunks.userData.regionalForest=true;
  const dummy=new THREE.Object3D(),color=new THREE.Color(),indices=[0,0];
- candidates.forEach(({x,z,i,y,detailed},index)=>{
-  const size=rnd(i*21)<.72?3+rnd(i*21+9)*5:8+rnd(i*21+9)*5;
+ candidates.forEach(({x,z,i,y,detailed,aridity},index)=>{
+  const baseSize=rnd(i*21)<.72?3+rnd(i*21+9)*5:8+rnd(i*21+9)*5;
+  const size=baseSize*(aridity>.5?.22:1);
   const trunkHeight=size*.71;
   dummy.position.set(x,y+trunkHeight*.5,z);
   dummy.rotation.set(0,0,0);
@@ -1724,7 +1694,7 @@ function installReleaseSky(){
  }`});
  releaseSky=new THREE.Mesh(new THREE.SphereGeometry(3000,32,20),mat);releaseSky.frustumCulled=false;releaseSky.renderOrder=-1000;scene.add(releaseSky);
 }
-function makeScene(){if(!window.THREE){$('status').textContent='Motore 3D non caricato. Verifica Internet e ricarica.';return false}scene=new THREE.Scene();scene.background=new THREE.Color(0x9bc9e7);scene.fog=new THREE.FogExp2(0xb4d1e2,.000048);installReleaseSky();camera=new THREE.PerspectiveCamera(53,1,2,8000);renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=false;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=0.98;$('threeLayer').appendChild(renderer.domElement);scene.add(new THREE.HemisphereLight(0xc2dbff,0xb5a082,.96));let sun=new THREE.DirectionalLight(0xffe2b8,3.35);sun.position.set(130,240,90);scene.add(sun);if(window.SudamericaRender8)SudamericaRender8.setup(scene,camera,renderer);let ground=new THREE.Mesh(new THREE.PlaneGeometry(12000,12000),new THREE.MeshStandardMaterial({color:0xc8d5ae,roughness:1,map:homePattern('grass')}));ground.rotation.x=-Math.PI/2;ground.position.y=-.12;ground.receiveShadow=true;scene.add(ground);group=new THREE.Group();scene.add(group);raycaster=new THREE.Raycaster();let canvas=renderer.domElement;
+function makeScene(){if(!window.THREE){$('status').textContent='Motore 3D non caricato. Verifica Internet e ricarica.';return false}scene=new THREE.Scene();scene.background=new THREE.Color(0x9bc9e7);scene.fog=new THREE.FogExp2(0xb4d1e2,.000048);installReleaseSky();camera=new THREE.PerspectiveCamera(53,1,2,8000);renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=false;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=0.98;$('threeLayer').appendChild(renderer.domElement);scene.add(new THREE.HemisphereLight(0xc2dbff,0xb5a082,.96));let sun=new THREE.DirectionalLight(0xffe2b8,3.35);sun.position.set(130,240,90);scene.add(sun);if(window.SudamericaRender8)SudamericaRender8.setup(scene,camera,renderer);let ground=new THREE.Mesh(new THREE.PlaneGeometry(100000,100000),new THREE.MeshStandardMaterial({color:0xc8d5ae,roughness:1,map:homePattern('grass')}));ground.rotation.x=-Math.PI/2;ground.position.y=-.12;ground.receiveShadow=true;ground.userData.regionalGround=true;scene.add(ground);group=new THREE.Group();scene.add(group);raycaster=new THREE.Raycaster();let canvas=renderer.domElement;
 // Earth-style navigation: left drag pans the ground, right drag or Shift
 // rotates/tilts, wheel zooms toward the cursor, two fingers pan/pinch/rotate.
 canvas.style.touchAction='none';
@@ -1836,7 +1806,8 @@ function updateCamera(){
  camera.up.set(0,1,0);
  camera.lookAt(target.x,target.y,target.z);
  camera.near=Math.max(.1,Math.min(8,distance/300));
- camera.far=Math.max(8000,distance*4);
+ camera.near=Math.max(.6,Math.min(45,distance*.012));
+ camera.far=Math.max(48000,distance*5);
  camera.updateProjectionMatrix();camera.updateMatrixWorld(true);
 }
 function flyToWorld(point,opts={}){
@@ -5472,7 +5443,7 @@ function rebuild(){
  if(errors.length){
   let warning=document.getElementById('cityErrorNotice');
   if(!warning){warning=document.createElement('div');warning.id='cityErrorNotice';warning.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99999;background:#722;color:white;padding:12px;border-radius:8px;max-width:70vw;font:13px Arial';document.body.appendChild(warning)}
-  warning.textContent='v9.0.3 · '+errors.join(' | ');
+  warning.textContent='v9.1.4 · '+errors.join(' | ');
  }else{document.getElementById('cityErrorNotice')?.remove()}
 }
 function renderMilestones(){

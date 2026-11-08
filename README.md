@@ -1,3 +1,13 @@
+# Sudamérica Casa por Casa — v9.1.4
+
+Correzione geografica: sagoma terra/acqua condivisa da mare, terreno, foreste e strade; costa dettagliata vicino alla città; onde leggere senza reticolo visibile; continuazioni stradali fino all’orizzonte e anelli sulle piccole isole. Le strade montane cercano valichi e tornanti, seguendo la superficie triangolata del terreno.
+
+Terreno distinto per posizione: le ecoregioni aride ricevono un substrato sabbioso/roccioso e vegetazione rada; le altre restano verdi, con una categoria separata per la tundra. La classificazione è regionale, non un rilievo del suolo di ogni singolo lotto. Vedere GEOGRAPHY_SOURCES.md per fonti, attribuzioni e limiti.
+
+Aprire tramite un server HTTP; Leaflet e Three.js richiedono Internet come nelle versioni precedenti.
+
+---
+
 Sudamérica Casa por Casa — v7.0.0
 
 Nuovo pacchetto di direzione artistica 3D. Aggiunti realmente a Three.js: facciate di torri su quattro lati con cornici e balconi, parapetti e giardini sui tetti; camini, lucernari e fioriere sulle case; un sistema di arredo urbano istanziato con alberi multilivello, alberi in fiore, lampioni, panchine e aiuole. Conservate le funzioni di simulazione. Non è una replica esatta della concept art.
