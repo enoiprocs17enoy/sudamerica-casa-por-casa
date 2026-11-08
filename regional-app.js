@@ -1869,7 +1869,7 @@ function updateShopDetailLOD(now){
 }
 let lastRenderedFrame=0,qaFrameBudget=3;
 function animate(now=0){
-  if(!renderer)return;
+  if(!renderer||qaFrameBudget--<=0)return;
   requestAnimationFrame(animate);
   if(!active||document.hidden)return;
   // Cap expensive large-city rendering at 30 FPS; smaller towns stay at 60.
@@ -5665,6 +5665,7 @@ function showCard(h){showOwnerCard(h,'casa')}
 function enter(){if(!active&&window.WorldRoads){WorldRoads.sync();const p=WorldRoads.cityPlan(currentCity,worldCityCells(),WorldAtlas);azimuth=0;elevation=1.12;distance=Math.min(3500,Math.max(360,(Math.max(p.bounds.maxX-p.bounds.minX,p.bounds.maxZ-p.bounds.minZ))*.85));}if(!threeReady&&!makeScene())return;active=true;document.body.classList.add("city-view");$('threeLayer').classList.add('active');$('threeLayer').style.opacity=1;map.dragging.disable();map.scrollWheelZoom.disable();rebuild();updateCamera();resize();void ensureCitySquare(currentCity);void ensureRegionalCatalog(currentCity)}
 function back(){clearAvatarLabels();active=false;document.body.classList.remove("city-view");$('threeLayer').style.opacity=0;$('threeLayer').classList.remove('active');$('card').style.display='none';map.dragging.enable();map.scrollWheelZoom.enable();$('status').textContent='Mappa geografica · le città sono posizionate con coordinate reali'}
 function onZoom(){
+ if(active||suppressMapEntry)return;
  const nearest=cityAtMapCenter();
  const near=nearest&&nearest.distance<50000;
  const z=map.getZoom();
