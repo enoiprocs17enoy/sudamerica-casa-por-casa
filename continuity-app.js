@@ -758,7 +758,7 @@ function housePaint(h){
 function isPremiumHouse(h){return designOverrides.get(scoreOverrideKey(h.cityId,h.id))??false;}
 
 function scoreOverrideKey(city,id){return city+':'+id;}
-let manualCityNavigation=false;
+let manualCityNavigation=false,suppressMapEntry=false;
 const cityStates=new Map(CITY_CATALOG.map(c=>[c.id,{count:c.pop,shops:Math.max(1,Math.round(c.pop/28)),balloons:Math.min(8,Math.max(1,Math.floor(c.pop/380)))}]));
 const cities=L.layerGroup().addTo(map);
 const cityPinIcon=L.divIcon({className:'south-city-pin',html:'<span></span>',iconSize:[22,22],iconAnchor:[11,11]});
@@ -836,7 +836,7 @@ function selectCity(id,fly=false){
  target={x:-17,y:0,z:16};distance=115;azimuth=.72;elevation=.29;
  updateCitySelection();renderMilestones();
  if(fly){manualCityNavigation=true;map.flyTo([next.lat,next.lng],12,{duration:1.1});map.once('moveend',()=>{manualCityNavigation=false;});}
- else map.setView([next.lat,next.lng],12);
+ else {suppressMapEntry=true;try{map.setView([next.lat,next.lng],12);}finally{suppressMapEntry=false;}}
  $('status').textContent=`${next.name} · ${count} case demo · scegli Entra nel 3D`;
 }
 function cityAtMapCenter(){
