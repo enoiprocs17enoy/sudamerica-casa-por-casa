@@ -1168,7 +1168,7 @@ function plotBounds(block,slot){
 }
 function plotPosition(block,slot){
   const {col,row}=spiralCell(block);
-  return {block,col,row,...plotBounds(block,slot)};
+  return {block,slot,col,row,...plotBounds(block,slot)};
 }
 function isInsideParcel(x,z,w,d,b,eps=.01){
   return x-w/2>=b.left-eps&&x+w/2<=b.right+eps&&
