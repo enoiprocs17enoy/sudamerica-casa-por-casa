@@ -813,7 +813,7 @@ function updateCitySelection(){
  const label=$('cityLabel');if(label)label.textContent=currentCity.name+' · '+currentCity.country;
  const name=$('currentCityName');if(name)name.textContent=currentCity.name;
  const overview=$('cityOverview');
- if(overview)overview.textContent=window.OwnerAccess?.testMode()?`${(window.WorldAtlas?.meta.total||CITY_CATALOG.length).toLocaleString('it-IT')} località nel catalogo · ${window.WorldAtlas?.countries.size||13} paesi e territori · simulazione · ${currentCity.residents.toLocaleString('it-IT')} in ${currentCity.name} · ${currentCity.points.toLocaleString('it-IT')} punti città · ${count.toLocaleString('it-IT')} case 3D caricate`:currentCity.name+' · '+count.toLocaleString('it-IT')+' case · '+shopPurchases.length.toLocaleString('it-IT')+' attività';
+ if(overview)overview.textContent=window.OwnerAccess?.testMode()?`${(window.WorldAtlas?.meta.total||CITY_CATALOG.length).toLocaleString('it-IT')} località nel catalogo · ${window.WorldAtlas?.countries.size||13} paesi e territori · simulazione · ${currentCity.residents.toLocaleString('it-IT')} in ${currentCity.name} · ${currentCity.points.toLocaleString('it-IT')} punti città · ${count.toLocaleString('it-IT')} case 3D caricate`:currentCity.name+' · '+count.toLocaleString('it-IT')+' case · '+(cityStates.get(currentCity.id)?.shops??shopPurchases.length).toLocaleString('it-IT')+' attività';
  refreshCityMarkers();window.WorldRoads?.refresh();
 }
 function selectCity(id,fly=false){

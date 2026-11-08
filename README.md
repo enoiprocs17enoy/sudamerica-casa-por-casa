@@ -1,4 +1,23 @@
-# Sudamérica Casa por Casa — v9.2.3
+# Sudamérica Casa por Casa — v9.3.0
+
+La vista pubblica offre mappa, navigazione 3D, ricerca di case e attività, schede
+delle proprietà e obiettivi. Non include i comandi per alterare la simulazione.
+
+Il pulsante con il lucchetto apre l'accesso proprietario tramite un link personale
+ricevuto per email. L'identità autorizzata è memorizzata solo nel database privato.
+Ogni sessione deve essere valida, verificata e non revocata. Il pannello di test è
+scaricato da Supabase solo dopo l'autorizzazione sul server e l'apertura esplicita.
+
+Il proprietario entra sempre nella vista pubblica. Tornando dalla simulazione,
+popolazione, evoluzioni e personalizzazioni di prova vengono ripristinate. Il
+login si sincronizza tra le schede dello stesso browser; ogni browser mantiene
+una propria sessione. La chiave presente nel client è una chiave pubblicabile,
+non una chiave amministrativa. Non inserire segreti nei file del sito.
+
+Le traduzioni complete e il selettore delle lingue sono ancora in lavorazione e
+non sono inclusi in questa revisione. Il Goal complessivo non è ancora concluso.
+
+## Prestazioni e navigazione
 
 Caricamento iniziale della mappa alleggerito: circa 1,48 MB di risorse geografiche
 del solo 3D vengono scaricati all'ingresso in città e poi riutilizzati. Il catalogo
@@ -10,18 +29,17 @@ della telecamera limitati a uno per fotogramma durante il trascinamento e passag
 corretto da due dita a una. Su telefono il 3D apre la visuale ampia e offre un
 pulsante per alternare spostamento e rotazione/inclinazione.
 
-La traduzione completa e l'accesso riservato del proprietario non sono ancora
-inclusi in questa revisione: i comandi di simulazione restano quelli esistenti.
-
 ## Schermata di caricamento
 
 Schermata di caricamento per l’avvio, l’ingresso nel 3D, i cambi di città, i cataloghi geografici e gli aggiornamenti della scena. Mostra il luogo e il tipo di preparazione con un indicatore animato, senza percentuali simulate.
 
 Le operazioni pesanti attendono che la schermata sia stata disegnata. Il pannello rimane visibile fino al completamento del lavoro e al rendering successivo; più operazioni consecutive condividono la stessa attesa. I comandi vengono temporaneamente protetti e ripristinati anche in caso di errore. Supportate preferenze di movimento ridotto e schermi piccoli.
 
-I file caricati dalla pagina sono nella cartella releases/9.2.2. Le copie alla radice sono i sorgenti di lavoro. Per avviare il progetto serve un server HTTP e Internet per Leaflet e Three.js.
+I file del motore caricati dalla pagina sono nella cartella releases/9.3.0. Le copie alla radice sono i sorgenti di lavoro. Per avviare il progetto serve un server HTTP e Internet per Leaflet, Three.js e l'accesso proprietario a Supabase.
 
 ---
+
+## Storico delle versioni precedenti
 
 # Sudamérica Casa por Casa — v9.2.1
 
