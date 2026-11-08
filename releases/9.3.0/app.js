@@ -787,7 +787,7 @@ function refreshCityMarkers(){
   visibleIds.add(city.id);
   let marker=cityMarkers.get(city.id);
   if(!marker){
-   const tooltip=document.createElement('span');tooltip.textContent=city.name+' · '+city.residents.toLocaleString('it-IT')+' abitanti simulati';
+   const tooltip=document.createElement('span');tooltip.textContent=city.name+' · '+city.residents.toLocaleString('it-IT')+' abitanti virtuali';
    marker=L.marker([city.lat,city.lng],{icon:cityPinIcon,zIndexOffset:1000,
     title:city.name+' · '+city.country}).bindTooltip(
      tooltip,{direction:'top'});
@@ -813,7 +813,7 @@ function updateCitySelection(){
  const label=$('cityLabel');if(label)label.textContent=currentCity.name+' · '+currentCity.country;
  const name=$('currentCityName');if(name)name.textContent=currentCity.name;
  const overview=$('cityOverview');
- if(overview)overview.textContent=`${(window.WorldAtlas?.meta.total||CITY_CATALOG.length).toLocaleString('it-IT')} località nel catalogo · ${window.WorldAtlas?.countries.size||13} paesi e territori · simulazione · ${currentCity.residents.toLocaleString('it-IT')} in ${currentCity.name} · ${currentCity.points.toLocaleString('it-IT')} punti città · ${count.toLocaleString('it-IT')} case 3D caricate`;
+ if(overview)overview.textContent=window.OwnerAccess?.testMode()?`${(window.WorldAtlas?.meta.total||CITY_CATALOG.length).toLocaleString('it-IT')} località nel catalogo · ${window.WorldAtlas?.countries.size||13} paesi e territori · simulazione · ${currentCity.residents.toLocaleString('it-IT')} in ${currentCity.name} · ${currentCity.points.toLocaleString('it-IT')} punti città · ${count.toLocaleString('it-IT')} case 3D caricate`:currentCity.name+' · '+count.toLocaleString('it-IT')+' case · '+shopPurchases.length.toLocaleString('it-IT')+' attività';
  refreshCityMarkers();window.WorldRoads?.refresh();
 }
 function selectCity(id,fly=false){
@@ -6212,18 +6212,18 @@ function openPublicWorks(selected=null){
  };
  search.oninput=render;render();
 }
-function openCityDirectory(){
+function openCityDirectory(defaultType='all'){
  const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;$('v4Title').textContent='Trova nella città';body.replaceChildren();
  const search=document.createElement('input');search.type='search';search.placeholder='Nome, nickname o numero…';search.setAttribute('aria-label','Cerca edifici');
- const type=document.createElement('select');for(const [value,label] of [['all','Tutti gli edifici'],['public','Strutture pubbliche'],['shop','Attività'],['home','Case']]){const opt=document.createElement('option');opt.value=value;opt.textContent=label;type.append(opt);}
+ const type=document.createElement('select');for(const [value,label] of [['all','Tutti gli edifici'],['public','Strutture pubbliche'],['shop','Attività'],['home','Case']]){const opt=document.createElement('option');opt.value=value;opt.textContent=label;type.append(opt);}type.value=defaultType;
  const list=document.createElement('div'),info=document.createElement('p'),more=document.createElement('button');more.textContent='Mostra altri risultati';body.append(search,type,info,list,more);
  const records=[...publicZones().map(zone=>({type:'public',name:zone.name,ref:zone})),...shopPurchases.map(shop=>({type:'shop',name:shop.business+' #'+(shop.id+1)+' · @'+(ownerForShop(shop)?.user||''),ref:shop})),...homes.map(home=>({type:'home',name:'Casa #'+home.id+' · @'+home.user,ref:home}))];
  let limit=60;
  const render=()=>{list.replaceChildren();const q=search.value.trim().toLocaleLowerCase('it');const matching=records.filter(record=>(type.value==='all'||record.type===type.value)&&(!q||record.name.toLocaleLowerCase('it').includes(q)));
   info.textContent=matching.length+' risultati';for(const record of matching.slice(0,limit)){
    const row=document.createElement('div');row.className='civicObjective achieved';const label=document.createElement('strong');label.textContent=record.name;
-   const button=document.createElement('button');button.textContent='📍 Raggiungi e apri';button.onclick=()=>{
-    if(!active)enter();
+   const button=document.createElement('button');button.textContent='📍 Raggiungi e apri';button.onclick=async()=>{
+    if(!active&&!await enter())return;
     const ref=record.ref,b=record.type==='public'?facilityBounds(ref.block):ref;
     const height=record.type==='home'?HOUSE_TIERS[houseTier(ref.points)].levels*3.15:5;
     flyToWorld({x:b.x,y:Math.max(3,height*.4),z:b.z},{distance:record.type==='public'?120:Math.max(65,height*1.8),elevation:1});
@@ -6253,7 +6253,7 @@ function openV4(tab){
  if(tab==='ranking')body.innerHTML=homes.slice(0,10).map((h,i)=>`<div class="v4Rank"><span>${i+1}. @${h.user}</span><b>${h.points} ⭐</b></div>`).join('');
 
  const wire=(id,fn)=>{if($(id))$(id).onclick=fn};
- wire('publicBrowseShops',()=>openCityDirectory());
+ wire('publicBrowseShops',()=>openCityDirectory('shop'));
  wire('publicFindResident',()=>{const query=$('publicResidentSearch').value.trim();if(!query)return;$('search').value=query;panel.hidden=true;$('find').click();});
  // The demo has no login: its first resident is @Carlos75.
  // Use a safe elevated overview rather than placing the camera inside
