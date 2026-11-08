@@ -1708,10 +1708,12 @@ function makeScene(){if(!window.THREE){$('status').textContent='Motore 3D non ca
 canvas.style.touchAction='none';
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 const pointerStart=new Map();
+let navigationFrame=0,multiTouch=false;
+const scheduleNavigation=()=>{if(!navigationFrame)navigationFrame=requestAnimationFrame(()=>{navigationFrame=0;updateCamera();});};
 canvas.addEventListener('pointerdown',e=>{
  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
  pointerStart.set(e.pointerId,{x:e.clientX,y:e.clientY});
- dragging=true;moved=false;
+ dragging=true;if(pointers.size===1){moved=false;multiTouch=false;}else{multiTouch=true;moved=true;}
  gesture=pointers.size>1?'pinch':(e.button===2||e.shiftKey||!panMode?'orbit':'pan');
  canvas.setPointerCapture(e.pointerId);
 });
@@ -1725,31 +1727,32 @@ canvas.addEventListener('pointermove',e=>{
   const prev=ids.map(id=>id===e.pointerId?old:pointers.get(id));
   const length=a=>Math.hypot(a[1].x-a[0].x,a[1].y-a[0].y);
   const before=length(prev),after=length(pts);
-  if(before>3&&after>3)zoomBy(before/after);
+  if(before>12&&after>12)zoomBy(after/before);
   const beforeAng=Math.atan2(prev[1].y-prev[0].y,prev[1].x-prev[0].x);
   const afterAng=Math.atan2(pts[1].y-pts[0].y,pts[1].x-pts[0].x);
-  azimuth-=afterAng-beforeAng;
+  azimuth-=Math.atan2(Math.sin(afterAng-beforeAng),Math.cos(afterAng-beforeAng));
   panPixels((pts[0].x+pts[1].x-prev[0].x-prev[1].x)/2,(pts[0].y+pts[1].y-prev[0].y-prev[1].y)/2);
-  moved=true;updateCamera();return;
+  moved=true;scheduleNavigation();return;
  }
  const origin=pointerStart.get(e.pointerId);
  if(origin&&Math.hypot(e.clientX-origin.x,e.clientY-origin.y)>4)moved=true;
  if(gesture==='pan')panPixels(dx,dy);
- else{azimuth-=dx*.006;elevation=clamp(elevation+dy*.005,.22,1.55);}
- updateCamera();
+ else{azimuth-=dx*.006;elevation=clamp(elevation+dy*.004,.22,1.55);}
+ scheduleNavigation();
 });
 canvas.addEventListener('pointerup',e=>{
  const start=pointerStart.get(e.pointerId);
  pointers.delete(e.pointerId);pointerStart.delete(e.pointerId);
  if(!pointers.size){dragging=false;gesture=null;
-  if(start&&Math.hypot(e.clientX-start.x,e.clientY-start.y)<5&&e.button===0)pick(e);
- }else gesture='pinch';
+  if(!multiTouch&&start&&Math.hypot(e.clientX-start.x,e.clientY-start.y)<5&&e.button===0)pick(e);
+ }else{gesture=pointers.size>1?'pinch':(panMode?'pan':'orbit');for(const [id,p]of pointers)pointerStart.set(id,{...p});}
 });
 canvas.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);pointerStart.delete(e.pointerId);dragging=false;gesture=null;});
 canvas.addEventListener('wheel',e=>{
  e.preventDefault();
  const before=screenToGround(e.clientX,e.clientY);
- zoomBy(Math.exp(-e.deltaY*.0012));
+ const wheelDelta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?canvas.clientHeight:1);
+ zoomBy(Math.exp(-clamp(wheelDelta,-200,200)*.0012));
  updateCamera();
  const after=screenToGround(e.clientX,e.clientY);
  if(before&&after){target.x+=before.x-after.x;target.z+=before.z-after.z;updateCamera();}
@@ -5663,7 +5666,7 @@ function showShopCard(shop){showOwnerCard(ownerForShop(shop),'negozio',shop)}
 function showBalloonCard(balloon){showOwnerCard(homes.find(h=>h.id===balloon.ownerId)||homes[0],'mongolfiera',balloon)}
 function showPersonCard(a){showOwnerCard(a.home,'persona')}
 function showCard(h){showOwnerCard(h,'casa')}
-function enterNow(){if(!active&&window.WorldRoads){WorldRoads.sync();const p=WorldRoads.cityPlan(currentCity,worldCityCells(),WorldAtlas);azimuth=0;elevation=1.12;distance=Math.min(3500,Math.max(360,(Math.max(p.bounds.maxX-p.bounds.minX,p.bounds.maxZ-p.bounds.minZ))*.85));}if(!threeReady&&!makeScene())return false;active=true;document.body.classList.add("city-view");$('threeLayer').classList.add('active');$('threeLayer').style.opacity=1;map.dragging.disable();map.scrollWheelZoom.disable();rebuildNow();updateCamera();resize();void ensureCitySquare(currentCity);void ensureRegionalCatalog(currentCity);return true;}
+function enterNow(){if(!active&&window.WorldRoads){WorldRoads.sync();const p=WorldRoads.cityPlan(currentCity,worldCityCells(),WorldAtlas);azimuth=0;elevation=1.12;distance=Math.min(3500,Math.max(360,(Math.max(p.bounds.maxX-p.bounds.minX,p.bounds.maxZ-p.bounds.minZ))*.85));}if(!threeReady&&!makeScene())return false;active=true;document.body.classList.add("city-view");if(window.matchMedia('(max-width:720px)').matches){document.body.classList.add('wide-city');const toggle=$('cityPanelToggle');if(toggle){toggle.textContent='☰ Comandi';toggle.setAttribute('aria-expanded','false');}}$('threeLayer').classList.add('active');$('threeLayer').style.opacity=1;map.dragging.disable();map.scrollWheelZoom.disable();rebuildNow();updateCamera();resize();void ensureCitySquare(currentCity);void ensureRegionalCatalog(currentCity);return true;}
 function back(){clearAvatarLabels();active=false;document.body.classList.remove("city-view");$('threeLayer').style.opacity=0;$('threeLayer').classList.remove('active');$('card').style.display='none';map.dragging.enable();map.scrollWheelZoom.enable();$('status').textContent='Mappa geografica · le città sono posizionate con coordinate reali'}
 function onZoom(){
  if(active||suppressMapEntry||cityEntryPromise)return;
@@ -6372,6 +6375,9 @@ document.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','A
 
 function ensureRegionalCatalog(city){const atlas=window.WorldAtlas;if(!atlas||atlas.regionReady(city))return Promise.resolve();if(regionalLoad?.id===city.id)return regionalLoad.promise;const promise=CityLoading.run(async()=>{await atlas.loadRegion(city);if(!active||currentCity.id!==city.id)return;WorldRoads.sync(true);rebuildNow();updateCamera();},{phase:'region',priority:25,title:'Il mondo continua, intorno a te.',place:city.name,detail:'Prepariamo le città vicine, le strade e il paesaggio.'}).catch(e=>{console.warn('Catalogo dei dintorni non disponibile',e);});const record={id:city.id,promise};regionalLoad=record;void promise.finally(()=>{if(regionalLoad===record)regionalLoad=null;});return promise;}
 function cityLoadingError(error){console.error('Caricamento città',error);$('status').textContent='Non è stato possibile completare il caricamento. Puoi riprovare.';return false;}
-function enter(){if(cityEntryPromise)return cityEntryPromise;const id=currentCity.id,name=currentCity.name;cityEntryPromise=CityLoading.run(()=>{if(currentCity.id!==id)return false;return enterNow();},{phase:'city',priority:30,title:'La tua città prende forma.',place:name,detail:'Prepariamo edifici, strade e paesaggio.'}).then(async result=>{if(regionalLoad?.id===id)await regionalLoad.promise;return result;}).catch(cityLoadingError).finally(()=>{cityEntryPromise=null;});return cityEntryPromise;}
+function enter(){if(cityEntryPromise)return cityEntryPromise;const id=currentCity.id,name=currentCity.name;cityEntryPromise=CityLoading.run(async()=>{if(currentCity.id!==id)return false;await window.SceneAssets?.load();const atlas=window.WorldAtlas;if(atlas&&!atlas.regionReady(currentCity)){try{await atlas.loadRegion(currentCity);WorldRoads.sync(true);}catch(error){console.warn('Catalogo regionale non disponibile',error);}}if(currentCity.id!==id)return false;return enterNow();},{phase:'city',priority:30,title:'La tua città prende forma.',place:name,detail:'Prepariamo edifici, strade e paesaggio.'}).then(async result=>{if(regionalLoad?.id===id)await regionalLoad.promise;return result;}).catch(cityLoadingError).finally(()=>{cityEntryPromise=null;});return cityEntryPromise;}
 function rebuild(){if(!threeReady||!active)return Promise.resolve(false);if(pendingRebuildPromise)return pendingRebuildPromise;const id=currentCity.id;pendingRebuildPromise=CityLoading.run(()=>{if(!active||currentCity.id!==id)return false;rebuildNow();updateCamera();return true;},{phase:'update',priority:20,title:'La città si rinnova.',place:currentCity.name,detail:'Aggiorniamo edifici, dettagli e abitanti.'}).catch(cityLoadingError).finally(()=>{pendingRebuildPromise=null;});return pendingRebuildPromise;}
 function setCount(n){if(!active)return setCountNow(n);return CityLoading.run(()=>setCountNow(n),{phase:'population',priority:25,title:'Una città sempre più viva.',place:currentCity.name,detail:'Prepariamo le case e i servizi per i suoi abitanti.'}).catch(cityLoadingError);}
+
+// Touch users can switch between moving and orbiting without reopening the sidebar.
+const touchModeButton=document.createElement('button');touchModeButton.id='touchCameraMode';touchModeButton.type='button';touchModeButton.textContent='↻';touchModeButton.title='Ruota e inclina la visuale';touchModeButton.setAttribute('aria-label',touchModeButton.title);touchModeButton.setAttribute('aria-pressed','false');touchModeButton.onclick=()=>{panMode=!panMode;touchModeButton.textContent=panMode?'↻':'✥';touchModeButton.title=panMode?'Ruota e inclina la visuale':'Sposta la visuale';touchModeButton.setAttribute('aria-label',touchModeButton.title);touchModeButton.setAttribute('aria-pressed',String(!panMode));$('panMode').classList.toggle('selected',panMode);$('orbitMode').classList.toggle('selected',!panMode);};$('earthControls').append(touchModeButton);
