@@ -6,16 +6,16 @@ function build({group,plan,height,getCamera,setCamera,onEnter,states,camera,cont
  if(container){labelsRoot=document.createElement('div');labelsRoot.className='regional-city-labels';labelsRoot.style.cssText='position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:4';container.append(labelsRoot);}
  const positions=[],dummy=new THREE.Object3D();
  for(const n of plan.neighbors||[]){
-  const city=n.city,pop=states?.get(city.id)?.count??city.pop??80,count=Math.min(90,Math.max(22,Math.round(Math.sqrt(pop)*4))),nx=Math.ceil(Math.sqrt(count*1.45)),nz=Math.ceil(count/nx);
+  const city=n.city,pop=states?.get(city.id)?.count??city.pop??80,range=Math.hypot(n.x,n.z),count=Math.min(range>18000?16:range>7000?28:70,Math.max(16,Math.round(Math.sqrt(pop)*4))),nx=Math.ceil(Math.sqrt(count*1.45)),nz=Math.ceil(count/nx);
   const begin=positions.length;
   for(let i=0;i<count;i++){const x=(i%nx-(nx-1)/2)*26,z=(Math.floor(i/nx)-(nz-1)/2)*26;if(Math.abs(x)<14||Math.abs(z)<14)continue;const h=i%19===0?45:i%7===0?22:6+i%3*3;positions.push({city,x:n.x+x,z:n.z+z,h,y:height(n.x+x,n.z+z)});}
   let label=null;if(labelsRoot){label=document.createElement('button');label.type='button';label.textContent=city.name;label.title=city.name+' · '+city.country;label.setAttribute('aria-label','Raggiungi '+city.name);label.style.cssText='position:absolute;display:none;pointer-events:auto;background:#102f40f2;color:#fff9e8;border:1px solid #c6e6e0aa;border-radius:7px;padding:6px 10px;font:600 13px/18px system-ui,Arial;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 2px 6px #0005;transform:translate(-50%,-100%);height:32px';label.onclick=()=>focus(city.id);labelsRoot.append(label);}
   entries.push({...n,y:height(n.x,n.z),radius:n.radius||220,label,buildings:positions.length-begin});
  }
- const body=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshStandardMaterial({color:0xe0cc9a,roughness:.95}),positions.length),roofGeo=new THREE.ConeGeometry(.72,1,4);roofGeo.rotateY(Math.PI/4);
- const roofs=new THREE.InstancedMesh(roofGeo,new THREE.MeshStandardMaterial({color:0xac5944,roughness:.95}),positions.length);
+ const body=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshLambertMaterial({color:0xe0cc9a}),positions.length),roofGeo=new THREE.ConeGeometry(.72,1,4);roofGeo.rotateY(Math.PI/4);
+ const roofs=new THREE.InstancedMesh(roofGeo,new THREE.MeshLambertMaterial({color:0xac5944}),positions.length);
  positions.forEach((p,i)=>{dummy.position.set(p.x,p.y+p.h/2,p.z);dummy.scale.set(15,p.h,15);dummy.updateMatrix();body.setMatrixAt(i,dummy.matrix);dummy.position.y=p.y+p.h+1.6;dummy.scale.set(18,3.2,18);dummy.updateMatrix();roofs.setMatrixAt(i,dummy.matrix);});
- const owners=positions.map(p=>p.city);for(const m of [body,roofs]){m.computeBoundingSphere();m.receiveShadow=true;m.userData.neighborCities=owners;group.add(m);}
+ const owners=positions.map(p=>p.city);for(const m of [body,roofs]){m.computeBoundingSphere();m.receiveShadow=false;m.userData.neighborCities=owners;group.add(m);}
  group.userData.neighborPreviews=entries.map(e=>({id:e.city.id,name:e.city.name,x:e.x,z:e.z,buildings:e.buildings}));
 }
 function list(){return entries.map(e=>({...e,distance:Math.hypot(e.x,e.z)})).sort((a,b)=>a.distance-b.distance);}
