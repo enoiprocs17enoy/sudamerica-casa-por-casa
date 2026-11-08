@@ -1,4 +1,19 @@
-# Sudamérica Casa por Casa — v9.2.2
+# Sudamérica Casa por Casa — v9.2.3
+
+Caricamento iniziale della mappa alleggerito: circa 1,48 MB di risorse geografiche
+del solo 3D vengono scaricati all'ingresso in città e poi riutilizzati. Il catalogo
+regionale viene preparato prima della scena, evitando una costruzione intermedia.
+La ricerca delle città usa un indice per paese e testi normalizzati memorizzati.
+
+Zoom a due dita corretto, rotazione senza salti attraverso ±180°, aggiornamenti
+della telecamera limitati a uno per fotogramma durante il trascinamento e passaggio
+corretto da due dita a una. Su telefono il 3D apre la visuale ampia e offre un
+pulsante per alternare spostamento e rotazione/inclinazione.
+
+La traduzione completa e l'accesso riservato del proprietario non sono ancora
+inclusi in questa revisione: i comandi di simulazione restano quelli esistenti.
+
+## Schermata di caricamento
 
 Schermata di caricamento per l’avvio, l’ingresso nel 3D, i cambi di città, i cataloghi geografici e gli aggiornamenti della scena. Mostra il luogo e il tipo di preparazione con un indicatore animato, senza percentuali simulate.
 
