@@ -1539,13 +1539,13 @@ function buildRegionalLandscape(houses){
    if(Math.abs(u)>ridgeWidth/2||Math.abs(v)>ridgeDepth/2)return 0;
    const inland=v+ridgeDepth/2;
    const start=90*Math.sin(u*.004+seed)+42*Math.sin(u*.009-seed);
-   const approach=Math.max(0,Math.min(1,(inland-start)/1100));
+   const approach=Math.max(0,Math.min(1,(inland-start)/2200));
    const toe=Math.max(0,Math.min(1,inland/280));
    const rise=approach*approach*(3-2*approach)*toe*toe*(3-2*toe);
-   const ridges=.42+.30*Math.pow(Math.sin(u*.0031+inland*.0017+seed),2)
-     +.24*Math.pow(Math.cos(u*.0067-inland*.0023),2);
-   const crags=.80+.20*Math.sin(u*.021+inland*.012)*Math.cos(u*.014-inland*.017);
-   const altitude=220+Math.min(inland,5400)*.22;
+   const ridges=.58+.18*Math.pow(Math.sin(u*.00032+inland*.00042+seed),2)
+     +.16*Math.pow(Math.cos(u*.00062-inland*.00035),2);
+   const crags=.98+.02*Math.sin(u*.0011+inland*.0007)*Math.cos(u*.0008-inland*.0009);
+   const altitude=220+Math.min(inland,18000)*.16;
    return rise*ridges*crags*mountain.strength*altitude;
   }
   terrainHeight=(x,z)=>elevation(axisZ*x-axisX*z,axisX*x+axisZ*z-edge-160-ridgeDepth*.5);
