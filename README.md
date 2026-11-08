@@ -1,8 +1,8 @@
-# Sudamérica Casa por Casa — v9.2.0
+# Sudamérica Casa por Casa — v9.2.1
 
 Vegetazione continua verso l’orizzonte: alberi 3D vicini e gruppi leggeri in lontananza, con sovrapposizione progressiva e disposizione ancorata alle coordinate geografiche. Il dominio di 52 km termina dentro la nebbia atmosferica: non è un mondo infinito.
 
-I biomi hanno transizioni graduali di terreno e densità vegetale. Le strade regionali condividono il grafo della mappa: niente anelli inventati sulle isole. Le destinazioni vicine hanno anteprime 3D alle coordinate relative reali; avvicinandosi si carica la città completa, mantenendo orientamento e posizione geografica della visuale. Il pulsante Città vicine consente di raggiungerle.
+I biomi hanno transizioni graduali di terreno e densità vegetale. Le strade regionali condividono il grafo della mappa: niente anelli inventati sulle isole. Tutte le località nel raggio regionale di 46 km hanno anteprime 3D alle coordinate relative reali, anche se non appartengono al ramo stradale della città caricata; avvicinandosi si carica la città completa, mantenendo orientamento e posizione geografica della visuale. Il pulsante Città vicine consente di raggiungerle. I nomi sono etichette nitide a schermo, con controllo delle sovrapposizioni e delle montagne interposte. Gli edifici delle anteprime sono raccolti in due gruppi condivisi per mantenere la fluidità. Il catalogo regionale carica anche i paesi confinanti quando necessari.
 
 Le anteprime sono rappresentazioni leggere della località, non repliche degli edifici reali. Coste e substrati restano approssimazioni regionali: vedere GEOGRAPHY_SOURCES.md. Piazze, evoluzioni, negozi e servizi delle versioni precedenti sono conservati.
 
