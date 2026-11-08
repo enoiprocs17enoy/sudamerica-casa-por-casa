@@ -1,3 +1,13 @@
+# Sudamérica Casa por Casa — v9.2.2
+
+Schermata di caricamento per l’avvio, l’ingresso nel 3D, i cambi di città, i cataloghi geografici e gli aggiornamenti della scena. Mostra il luogo e il tipo di preparazione con un indicatore animato, senza percentuali simulate.
+
+Le operazioni pesanti attendono che la schermata sia stata disegnata. Il pannello rimane visibile fino al completamento del lavoro e al rendering successivo; più operazioni consecutive condividono la stessa attesa. I comandi vengono temporaneamente protetti e ripristinati anche in caso di errore. Supportate preferenze di movimento ridotto e schermi piccoli.
+
+I file caricati dalla pagina sono nella cartella releases/9.2.2. Le copie alla radice sono i sorgenti di lavoro. Per avviare il progetto serve un server HTTP e Internet per Leaflet e Three.js.
+
+---
+
 # Sudamérica Casa por Casa — v9.2.1
 
 Vegetazione continua verso l’orizzonte: alberi 3D vicini e gruppi leggeri in lontananza, con sovrapposizione progressiva e disposizione ancorata alle coordinate geografiche. Il dominio di 52 km termina dentro la nebbia atmosferica: non è un mondo infinito.

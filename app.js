@@ -846,6 +846,7 @@ function cityAtMapCenter(){
   return !best||d<best.distance?{city:c,distance:d}:best;
  },null);
 }
+let cityEntryPromise=null,pendingRebuildPromise=null,regionalLoad=null;
 let count=500,homes=[],threeReady=false,scene,camera,renderer,group,raycaster,houseMeshes=[],shown=0,active=false,target={x:-17,y:0,z:16},azimuth=.72,elevation=.29,distance=115,dragging=false,lastX=0,lastY=0,moved=false,panMode=true,pointers=new Map(),gesture=null;
 const rnd=n=>{let x=Math.sin(n*127.13+19.1)*43758.5453;return x-Math.floor(x)};
 // Urban layout v1.4: blocks, NOT one road per house.
@@ -1818,7 +1819,7 @@ function updateCamera(){
  camera.updateProjectionMatrix();camera.updateMatrixWorld(true);
 }
 function flyToWorld(point,opts={}){
- if(!active)enter();
+ if(!active)return enter().then(ok=>ok?flyToWorld(point,opts):null);
  const dest={x:point.x,y:point.y??0,z:point.z};
  const from={x:target.x,y:target.y,z:target.z,d:distance,a:azimuth,e:elevation};
  const to={...dest,d:opts.distance??60,a:opts.azimuth??azimuth,e:opts.elevation??1.02};
@@ -5395,7 +5396,7 @@ function renderFallbackHouses(selected){
   mesh.userData.homes=items.map(e=>e.h);group.add(mesh);houseMeshes.push(mesh);
  }
 }
-function rebuild(){
+function rebuildNow(){
  if(!threeReady)return;
  roadDetailMeshes=[];lastRoadDetailUpdate=0;
  shopDetailMeshes=[];lastShopDetailUpdate=0;
@@ -5451,7 +5452,7 @@ function rebuild(){
  if(errors.length){
   let warning=document.getElementById('cityErrorNotice');
   if(!warning){warning=document.createElement('div');warning.id='cityErrorNotice';warning.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99999;background:#722;color:white;padding:12px;border-radius:8px;max-width:70vw;font:13px Arial';document.body.appendChild(warning)}
-  warning.textContent='v9.2.1 · '+errors.join(' | ');
+  warning.textContent='v9.2.2 · '+errors.join(' | ');
  }else{document.getElementById('cityErrorNotice')?.remove()}
 }
 function renderMilestones(){
@@ -5662,10 +5663,10 @@ function showShopCard(shop){showOwnerCard(ownerForShop(shop),'negozio',shop)}
 function showBalloonCard(balloon){showOwnerCard(homes.find(h=>h.id===balloon.ownerId)||homes[0],'mongolfiera',balloon)}
 function showPersonCard(a){showOwnerCard(a.home,'persona')}
 function showCard(h){showOwnerCard(h,'casa')}
-function enter(){if(!active&&window.WorldRoads){WorldRoads.sync();const p=WorldRoads.cityPlan(currentCity,worldCityCells(),WorldAtlas);azimuth=0;elevation=1.12;distance=Math.min(3500,Math.max(360,(Math.max(p.bounds.maxX-p.bounds.minX,p.bounds.maxZ-p.bounds.minZ))*.85));}if(!threeReady&&!makeScene())return;active=true;document.body.classList.add("city-view");$('threeLayer').classList.add('active');$('threeLayer').style.opacity=1;map.dragging.disable();map.scrollWheelZoom.disable();rebuild();updateCamera();resize();void ensureCitySquare(currentCity);void ensureRegionalCatalog(currentCity)}
+function enterNow(){if(!active&&window.WorldRoads){WorldRoads.sync();const p=WorldRoads.cityPlan(currentCity,worldCityCells(),WorldAtlas);azimuth=0;elevation=1.12;distance=Math.min(3500,Math.max(360,(Math.max(p.bounds.maxX-p.bounds.minX,p.bounds.maxZ-p.bounds.minZ))*.85));}if(!threeReady&&!makeScene())return false;active=true;document.body.classList.add("city-view");$('threeLayer').classList.add('active');$('threeLayer').style.opacity=1;map.dragging.disable();map.scrollWheelZoom.disable();rebuildNow();updateCamera();resize();void ensureCitySquare(currentCity);void ensureRegionalCatalog(currentCity);return true;}
 function back(){clearAvatarLabels();active=false;document.body.classList.remove("city-view");$('threeLayer').style.opacity=0;$('threeLayer').classList.remove('active');$('card').style.display='none';map.dragging.enable();map.scrollWheelZoom.enable();$('status').textContent='Mappa geografica · le città sono posizionate con coordinate reali'}
 function onZoom(){
- if(active||suppressMapEntry)return;
+ if(active||suppressMapEntry||cityEntryPromise)return;
  const nearest=cityAtMapCenter();
  const near=nearest&&nearest.distance<50000;
  const z=map.getZoom();
@@ -5674,7 +5675,7 @@ function onZoom(){
   if(!active){distance=115;enter()}else updateCamera();
  }else if(active)back();
 }
-function setCount(n){
+function setCountNow(n){
  count=n;syncPopulationControls();cityStates.get(currentCity.id).count=n;
  homes=createHomes(n);
  $('counter').textContent=n.toLocaleString('it-IT');
@@ -5682,7 +5683,7 @@ function setCount(n){
  updateCitySelection();
  if(selectedDemoHouseId>n)selectedDemoHouseId=1;
  updateDemoHouseLabel();
- if(active)rebuild();else renderMilestones();
+ if(active)rebuildNow();else renderMilestones();
 }
 let selectedDemoHouseId=1;
 const scoreSelect=$('demoScore');
@@ -6250,8 +6251,8 @@ function openV4(tab){
  // The demo has no login: its first resident is @Carlos75.
  // Use a safe elevated overview rather than placing the camera inside
  // the house, below the map, or too close to the avatar geometry.
- const focus=(avatar)=>{
-  if(!active)enter();
+ const focus=async(avatar)=>{
+  if(!active&&!await enter())return;
   const h=homes[0];if(!h)return;
   const a=avatar?life.people.find(person=>person.home?.id===h.id):null;
   if(avatar&&!a){$('status').textContent='Personaggio non generato';return;}
@@ -6363,10 +6364,14 @@ cityViewStyle.textContent=`
 document.head.append(cityViewStyle);
 
 // Adjacent towns keep their geographic positions when the local scene origin changes.
-async function enterNeighborCity(neighbor,state){if(!active)return;const old=currentCity,geo=WorldRoads.point(old,state.target.x,state.target.z),next=neighbor.city;const layer=$('threeLayer');$('status').textContent='Entrando a '+next.name+'…';layer.style.transition='opacity 180ms';layer.style.opacity='.45';await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));selectCity(next.id,false);WorldRoads.sync(true);enter();const p=WorldRoads.local(next,{lat:geo[0],lng:geo[1]});target.x=p.x;target.z=p.z;target.y=Math.max(2,state.target.y-neighbor.y);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();layer.style.opacity='1';$('status').textContent=next.name+' · città raggiunta · '+count.toLocaleString('it-IT')+' case';}
-function showNeighborCities(){if(!active)enter();const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;$('v4Title').textContent='Città vicine';body.replaceChildren();const items=window.WorldNeighbors?.list()||[];if(!items.length){const p=document.createElement('p');p.textContent='Nessuna città collegata visibile in questa zona. Puoi cercare altre località nella mappa.';body.append(p);}for(const e of items){const button=document.createElement('button');button.textContent='🏙 '+e.city.name+' · '+(e.distance/1000).toLocaleString('it-IT',{maximumFractionDigits:1})+' km';button.onclick=()=>{panel.hidden=true;WorldNeighbors.focus(e.city.id);};body.append(button);}}
+function enterNeighborCity(neighbor,state){if(!active)return;const old=currentCity,geo=WorldRoads.point(old,state.target.x,state.target.z),next=neighbor.city;return CityLoading.run(()=>{selectCity(next.id,false);WorldRoads.sync(true);if(!enterNow())return false;const p=WorldRoads.local(next,{lat:geo[0],lng:geo[1]});target.x=p.x;target.z=p.z;target.y=Math.max(2,state.target.y-neighbor.y);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();$('status').textContent=next.name+' · città raggiunta · '+count.toLocaleString('it-IT')+' case';return true;},{phase:'travel',priority:30,title:'Prossima fermata: '+next.name+'.',place:next.name,detail:'Prepariamo la città e i suoi dintorni.'}).catch(cityLoadingError);}
+function showNeighborCities(){if(!active)return enter().then(ok=>ok?showNeighborCities():null);const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;$('v4Title').textContent='Città vicine';body.replaceChildren();const items=window.WorldNeighbors?.list()||[];if(!items.length){const p=document.createElement('p');p.textContent='Nessuna città collegata visibile in questa zona. Puoi cercare altre località nella mappa.';body.append(p);}for(const e of items){const button=document.createElement('button');button.textContent='🏙 '+e.city.name+' · '+(e.distance/1000).toLocaleString('it-IT',{maximumFractionDigits:1})+' km';button.onclick=()=>{panel.hidden=true;WorldNeighbors.focus(e.city.id);};body.append(button);}}
 const neighborButton=document.createElement('button');neighborButton.id='nearbyCities';neighborButton.textContent='🏙 Città vicine';neighborButton.title='Avvicinati alle città collegate';neighborButton.onclick=showNeighborCities;neighborButton.style.cssText='width:auto;min-width:132px;padding:10px 12px;font-size:13px;white-space:nowrap';$('earthControls').style.alignItems='flex-end';$('earthControls').append(neighborButton);
 document.addEventListener('pointerdown',e=>{if(e.target.closest?.('#threeLayer'))window.WorldNeighbors?.cancelFlight();},true);
 document.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','a','s','d'].includes(e.key))window.WorldNeighbors?.cancelFlight();},true);
 
-async function ensureRegionalCatalog(city){const atlas=window.WorldAtlas;if(!atlas||atlas.regionReady(city))return;try{await atlas.loadRegion(city);if(!active||currentCity.id!==city.id)return;WorldRoads.sync(true);rebuild();updateCamera();}catch(e){console.warn('Catalogo dei dintorni non disponibile',e);}}
+function ensureRegionalCatalog(city){const atlas=window.WorldAtlas;if(!atlas||atlas.regionReady(city))return Promise.resolve();if(regionalLoad?.id===city.id)return regionalLoad.promise;const promise=CityLoading.run(async()=>{await atlas.loadRegion(city);if(!active||currentCity.id!==city.id)return;WorldRoads.sync(true);rebuildNow();updateCamera();},{phase:'region',priority:25,title:'Il mondo continua, intorno a te.',place:city.name,detail:'Prepariamo le città vicine, le strade e il paesaggio.'}).catch(e=>{console.warn('Catalogo dei dintorni non disponibile',e);});const record={id:city.id,promise};regionalLoad=record;void promise.finally(()=>{if(regionalLoad===record)regionalLoad=null;});return promise;}
+function cityLoadingError(error){console.error('Caricamento città',error);$('status').textContent='Non è stato possibile completare il caricamento. Puoi riprovare.';return false;}
+function enter(){if(cityEntryPromise)return cityEntryPromise;const id=currentCity.id,name=currentCity.name;cityEntryPromise=CityLoading.run(()=>{if(currentCity.id!==id)return false;return enterNow();},{phase:'city',priority:30,title:'La tua città prende forma.',place:name,detail:'Prepariamo edifici, strade e paesaggio.'}).then(async result=>{if(regionalLoad?.id===id)await regionalLoad.promise;return result;}).catch(cityLoadingError).finally(()=>{cityEntryPromise=null;});return cityEntryPromise;}
+function rebuild(){if(!threeReady||!active)return Promise.resolve(false);if(pendingRebuildPromise)return pendingRebuildPromise;const id=currentCity.id;pendingRebuildPromise=CityLoading.run(()=>{if(!active||currentCity.id!==id)return false;rebuildNow();updateCamera();return true;},{phase:'update',priority:20,title:'La città si rinnova.',place:currentCity.name,detail:'Aggiorniamo edifici, dettagli e abitanti.'}).catch(cityLoadingError).finally(()=>{pendingRebuildPromise=null;});return pendingRebuildPromise;}
+function setCount(n){if(!active)return setCountNow(n);return CityLoading.run(()=>setCountNow(n),{phase:'population',priority:25,title:'Una città sempre più viva.',place:currentCity.name,detail:'Prepariamo le case e i servizi per i suoi abitanti.'}).catch(cityLoadingError);}
