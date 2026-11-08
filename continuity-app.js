@@ -3404,7 +3404,7 @@ function drawReservedBillboards(selected){
  const sold=new Set(shopPurchases.map(sh=>sh.block+':'+sh.slot));
  // Compare actual occupied world-space parcels, not only IDs: signs must
  // never survive on a lot already used by a commercial building.
- const occupiedShopBounds=shopPurchases.map(sh=>plotBounds(sh.block,sh.slot));
+ const occupiedShopBounds=shopPurchases.filter(sh=>Number.isInteger(sh.block)&&Number.isInteger(sh.slot)).map(sh=>plotBounds(sh.block,sh.slot));
  const occupiedHouseBounds=selected.map(h=>plotBounds(h.blockIndex,h.slot));
  const occupiedPublicBounds=publicZones().map(z=>facilityBounds(z.block));
  const occupiedKeys=new Set([...selected.map(h=>h.blockIndex+':'+h.slot),...shopPurchases.map(sh=>sh.block+':'+sh.slot)]);
