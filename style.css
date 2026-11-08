@@ -128,3 +128,6 @@ button:hover{filter:brightness(1.065)}
 
 /* Keep the map visible above the scrollable controls on narrow screens. */
 @media(max-width:720px){body{overflow:hidden}.layout{height:calc(100dvh - 56px);grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(300px,58dvh) minmax(0,1fr);overflow:hidden}.layout>.mapwrap{grid-row:1;min-height:0;height:auto}.layout>aside{grid-row:2;min-height:0;overflow:auto;overscroll-behavior:contain}}
+
+#touchCameraMode{display:none}
+@media(max-width:720px){.city-view #touchCameraMode{display:block}.city-view #nearbyCities{min-width:42px!important;width:42px!important;font-size:0!important;padding:0!important}.city-view #nearbyCities::before{content:'🏙';font-size:20px}.city-view #cityPanelToggle{max-width:90px;font-size:10px}.city-view .earthControls{gap:5px;top:105px}.city-view .v4Nav{bottom:max(12px,env(safe-area-inset-bottom));padding:6px}.city-view .v4Nav button{min-height:44px}.city-view .hud{bottom:95px;max-width:calc(100% - 30px);font-size:10px}.city-view .squareAttribution{bottom:82px;font-size:8px}}
