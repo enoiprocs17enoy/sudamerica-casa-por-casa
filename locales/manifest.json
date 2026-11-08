@@ -1,0 +1,15 @@
+{
+  "source": "it",
+  "languages": [
+    {
+      "code": "it",
+      "name": "Italiano",
+      "complete": true
+    },
+    {
+      "code": "en",
+      "name": "English",
+      "complete": false
+    }
+  ]
+}

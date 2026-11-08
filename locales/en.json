@@ -1,0 +1,579 @@
+{
+  "locale": "en",
+  "name": "English",
+  "reviewStatus": "in-progress",
+  "messages": {
+    "Esplora il mondo": "Explore the world",
+    "Scegli una città": "Choose a city",
+    "Cerca utente Instagram": "Find an Instagram user",
+    "Cerca": "Search",
+    "Nome utente": "Username",
+    "@nomeutente": "@username",
+    "case nella città": "homes in the city",
+    "La città cresce": "The city is growing",
+    "Ingrandisci la mappa per scoprire le città e avvicinarti ai loro quartieri.": "Zoom in on the map to discover cities and explore their neighbourhoods.",
+    "Un mondo virtuale di città da esplorare, una casa alla volta.": "A virtual world of cities to explore, one home at a time.",
+    "Un luogo, tante storie": "One place, many stories",
+    "Benvenuto, esploratore.": "Welcome, explorer.",
+    "Carichiamo il mondo e le sue città.": "Loading the world and its cities.",
+    "Una casa alla volta, il mondo prende vita.": "One home at a time, the world comes to life.",
+    "La tua città prende forma.": "Your city is taking shape.",
+    "Prepariamo edifici, strade e paesaggio.": "Preparing buildings, roads and scenery.",
+    "La città si rinnova.": "Your city is being updated.",
+    "Aggiorniamo edifici, dettagli e abitanti.": "Updating buildings, details and residents.",
+    "Una città sempre più viva.": "A city full of life.",
+    "Prepariamo le case e i servizi per i suoi abitanti.": "Preparing homes and services for the residents.",
+    "Il mondo continua, intorno a te.": "The world continues around you.",
+    "Prepariamo le città vicine, le strade e il paesaggio.": "Preparing nearby cities, roads and scenery.",
+    "Esploriamo nuovi luoghi.": "Exploring new places.",
+    "Carichiamo le località della regione.": "Loading places in the region.",
+    "Prepariamo le località e la mappa della regione.": "Preparing the region’s places and map.",
+    "Caricamento in corso": "Loading",
+    "Non è stato possibile completare il caricamento. Puoi riprovare.": "Loading could not be completed. Please try again.",
+    "Motore 3D non caricato. Verifica Internet e ricarica.": "The 3D engine could not load. Check your connection and reload.",
+    "Continente": "Continent",
+    "Paese o territorio": "Country or territory",
+    "Cerca una località": "Find a place",
+    "Nome città o regione": "City or region name",
+    "Tutti i continenti": "All continents",
+    "Antartide": "Antarctica",
+    "Europa": "Europe",
+    "America del Nord e centrale": "North and Central America",
+    "America del Sud": "South America",
+    "🌐 Vedi tutto il mondo": "🌐 View the whole world",
+    "Seleziona una città…": "Select a city…",
+    "Caricamento delle località…": "Loading places…",
+    "Nessuna località trovata in questo paese": "No places found in this country",
+    "Catalogo non caricato. Controlla la connessione e riseleziona il paese.": "The directory could not load. Check your connection and select the country again.",
+    "Vai alla città selezionata": "Go to the selected city",
+    "Entra nel 3D": "Enter 3D",
+    "Torna alla mappa": "Back to the map",
+    "Controlli 3D": "3D controls",
+    "↻ Ruota": "↻ Rotate",
+    "✥ Sposta": "✥ Move",
+    "⌂ Centro": "⌂ Centre",
+    "⛶ Vista ampia": "⛶ Wide view",
+    "☰ Comandi": "☰ Controls",
+    "Orienta a nord": "Face north",
+    "Alterna vista dall’alto e inclinata": "Switch between overhead and tilted views",
+    "Avvicina": "Zoom in",
+    "Allontana": "Zoom out",
+    "Ruota e inclina la visuale": "Rotate and tilt the view",
+    "Sposta la visuale": "Move the view",
+    "🏙 Città vicine": "🏙 Nearby cities",
+    "Città vicine": "Nearby cities",
+    "Avvicinati alle città collegate": "Travel towards connected cities",
+    "Nessuna città collegata visibile in questa zona. Puoi cercare altre località nella mappa.": "No connected cities are visible here. You can find other places on the map.",
+    "Mappa geografica · le città sono posizionate con coordinate reali": "World map · cities are placed at their real coordinates",
+    "Un mondo. Milioni di storie. Una casa per ognuno.": "One world. Millions of stories. A home for everyone.",
+    "🌎 Città selezionata:": "🌎 Selected city:",
+    "Tienda": "Businesses",
+    "Attività": "Businesses",
+    "La mia casa": "My home",
+    "Personaggio": "Character",
+    "Il mio personaggio": "My character",
+    "Mondo": "World",
+    "Ranking": "Leaderboard",
+    "Trova": "Find",
+    "Obras": "Public works",
+    "Opere": "Public works",
+    "Menu mondo": "World menu",
+    "Chiudi": "Close",
+    "Casa": "Home",
+    "Negozio": "Business",
+    "Mongolfiera": "Hot-air balloon",
+    "Scopri le attività della città e le loro evoluzioni.": "Discover the city’s businesses and how they evolve.",
+    "🏪 Esplora le attività": "🏪 Explore businesses",
+    "Cerca il tuo nome utente per trovare la casa, il personaggio e le proprietà collegate.": "Search for your username to find your home, character and related properties.",
+    "Trova nella città": "Find in the city",
+    "🌎 Entra nel 3D": "🌎 Enter 3D",
+    "🧭 Panoramica": "🧭 Overview",
+    "Animazioni ambientali": "Ambient animations",
+    "Strutture e obiettivi": "Facilities and milestones",
+    "Ricostruzione 3D stilizzata: la planimetria e gli elementi documentati sono affiancati da arredi di integrazione.": "A stylised 3D reconstruction: the documented layout and features are complemented by additional furnishings.",
+    "Le fonti disponibili non descrivono ancora statue e fontane di questa piazza.": "The available sources do not yet describe this square’s statues and fountains.",
+    "Presenza mappata · forma 3D da completare": "Mapped feature · 3D form still to be completed",
+    "Riferimento documentato · modello 3D stilizzato": "Documented reference · stylised 3D model",
+    "Tipologia mappata · modello 3D da verificare nei dettagli": "Mapped type · 3D details still to be verified",
+    "Fonte": "Source",
+    "Torna agli obiettivi": "Back to milestones",
+    "Parco di quartiere": "Neighbourhood park",
+    "Acquedotto e serbatoio": "Water supply and reservoir",
+    "Ambulatorio e pronto soccorso": "Clinic and emergency care",
+    "Stazione di polizia": "Police station",
+    "Caserma dei pompieri": "Fire station",
+    "Primi servizi": "Essential services",
+    "Asilo e area giochi": "Nursery and playground",
+    "Scuola primaria": "Primary school",
+    "Centro raccolta e riciclo": "Recycling and collection centre",
+    "Campo da calcio": "Football pitch",
+    "Biblioteca pubblica": "Public library",
+    "Ospedale generale": "General hospital",
+    "Municipio": "Town hall",
+    "Autostazione": "Bus station",
+    "Centrale elettrica di quartiere": "Local power station",
+    "Giardini e area giochi": "Gardens and playground",
+    "Centro commerciale": "Shopping centre",
+    "Campo da baseball": "Baseball field",
+    "Centro sportivo": "Sports centre",
+    "Museo civico": "Municipal museum",
+    "Teatro e auditorium": "Theatre and auditorium",
+    "Piscina comunale": "Public swimming pool",
+    "Stadio cittadino": "City stadium",
+    "Università e campus": "University campus",
+    "Stazione ferroviaria": "Railway station",
+    "Palazzo di giustizia": "Courthouse",
+    "Depuratore e servizi ambientali": "Water treatment and environmental services",
+    "Piazza monumentale": "Landmark square",
+    "Eliporto di soccorso": "Rescue heliport",
+    "Orto botanico e serre": "Botanical gardens and greenhouses",
+    "Servizi di quartiere": "Neighbourhood services",
+    "Città in crescita": "Growing city",
+    "Grande città": "Major city",
+    "Strutture pubbliche": "Public facilities",
+    "Tutti gli edifici": "All buildings",
+    "Case": "Homes",
+    "Cerca edifici": "Search buildings",
+    "Nome, nickname o numero…": "Name, username or number…",
+    "Mostra altri risultati": "Show more results",
+    "📍 Raggiungi e apri": "📍 Go there and open",
+    "Nessuna struttura trovata.": "No facilities found.",
+    "Raggiunto": "Reached",
+    "Caffetteria": "Café",
+    "Supermercato": "Supermarket",
+    "Ristorante": "Restaurant",
+    "Libreria": "Bookshop",
+    "Farmacia": "Pharmacy",
+    "Negozio di moda": "Clothing shop",
+    "Officina": "Workshop",
+    "Panetteria": "Bakery",
+    "Palestra": "Gym",
+    "Mercato": "Market",
+    "PIAZZA CIVICA": "CIVIC SQUARE",
+    "PIAZZA PRINCIPALE": "MAIN SQUARE",
+    "SERVIZI PUBBLICI": "PUBLIC SERVICES",
+    "Monolocale": "Studio home",
+    "Casa piccola": "Small house",
+    "Villetta": "Detached house",
+    "Palazzina": "Small apartment building",
+    "Condominio": "Apartment building",
+    "Torre residenziale": "Residential tower",
+    "Grattacielo": "Skyscraper",
+    "Grattacielo monumentale": "Landmark skyscraper",
+    "Crema": "Cream",
+    "Bianco": "White",
+    "Rosa": "Pink",
+    "Azzurro": "Light blue",
+    "Verde salvia": "Sage green",
+    "Ocra": "Ochre",
+    "Grigio": "Grey",
+    "Gratis": "Free",
+    "Base": "Standard",
+    "Accesso proprietario": "Owner sign-in",
+    "Accedi per aprire gli strumenti di simulazione.": "Sign in to open the simulation tools.",
+    "Ricevi link di accesso": "Send sign-in link",
+    "Apri l’email ricevuta e premi il link di accesso. Il link è personale e utilizzabile una sola volta.": "Open the email and follow the sign-in link. It is personal and can only be used once.",
+    "Apri simulazione": "Open simulation",
+    "Torna alla vista pubblica": "Return to public view",
+    "Apri gli strumenti proprietario": "Open owner tools",
+    "Esci dal tuo account": "Sign out",
+    "Vista pubblica ripristinata.": "Public view restored.",
+    "Accedi nuovamente per continuare.": "Sign in again to continue.",
+    "Strumenti riservati non disponibili.": "Private tools are unavailable.",
+    "Il sito sta ancora terminando il caricamento.": "The site is still finishing loading.",
+    "Sei uscito. Il sito è tornato alla vista pubblica.": "You have signed out. The site has returned to public view.",
+    "Accesso chiuso su questo dispositivo. Connessione al servizio non disponibile.": "Signed out on this device. The sign-in service could not be reached.",
+    "Troppe richieste. Attendi un minuto e riprova.": "Too many requests. Wait a minute and try again.",
+    "Accesso non disponibile. Controlla i dati e riprova.": "Sign-in is unavailable. Check your details and try again.",
+    "Verifichiamo il tuo accesso.": "Verifying your sign-in.",
+    "Tra poco tornerai alla tua città.": "You’ll be back in your city shortly.",
+    "Il link non è valido oppure è già stato utilizzato. Richiedi un nuovo accesso.": "This link is invalid or has already been used. Request a new sign-in link.",
+    "Questo account non è autorizzato ad aprire la simulazione.": "This account is not authorised to open the simulation.",
+    "Torna al sito": "Back to the site",
+    "🧪 Simulazione e test": "🧪 Simulation and testing",
+    "Le modifiche di prova restano in questa sessione. Torna alla vista pubblica per ripristinare la città.": "Test changes stay in this session. Return to public view to restore the city.",
+    "👥 Abitanti simulati:": "👥 Simulated residents:",
+    "Numero di case simulate": "Number of simulated homes",
+    "Numero esatto di case": "Exact number of homes",
+    "Applica": "Apply",
+    "Sposta il cursore per scegliere. Rilascia per generare la città; oppure inserisci il numero esatto e premi Applica.": "Move the slider to choose a number. Release it to generate the city, or enter an exact number and press Apply.",
+    "🏗️ Evoluzione casa (demo)": "🏗️ Home evolution (test)",
+    "Clicca qualsiasi casa nel 3D per scegliere quale far evolvere: il lotto rimane fisso.": "Select any home in 3D to evolve it. Its plot stays in the same place.",
+    "Attività di prova": "Test businesses",
+    "+1 negozio": "+1 business",
+    "+100 negozi": "+100 businesses",
+    "Azzera negozi": "Reset businesses",
+    "Lingua": "Language",
+    "Prepariamo la tua lingua.": "Preparing your language.",
+    "Aggiorniamo testi e cartelli della città.": "Updating the city’s text and signs.",
+    "Lingua non disponibile. Controlla la connessione e riprova.": "This language could not load. Check your connection and try again.",
+    "Classifica": "Leaderboard",
+    "abitanti": "residents",
+    "Negozi": "Businesses",
+    "Email": "Email",
+    "Premium": "Premium",
+    "Hotel": "Hotel",
+    "Cinema": "Cinema",
+    "Africa": "Africa",
+    "Asia": "Asia",
+    "Oceania": "Oceania",
+    "Terracotta": "Terracotta",
+    "Zoom in": "Zoom in",
+    "Zoom out": "Zoom out",
+    "A JavaScript library for interactive maps": "A JavaScript library for interactive maps",
+    "Località:": "Places:",
+    "· Terre: Natural Earth": "· Land: Natural Earth",
+    "· Terreno:": "· Terrain:",
+    "Seleziona una città del mondo: ogni città ha case evolute, negozi e mongolfiere. Avvicinati per scoprire giardini, attività e piazze. Puoi ruotare, spostarti liberamente e selezionare le case.": "Choose a city to explore its homes, businesses and hot-air balloons. Move closer to discover gardens, shops and squares. Rotate the view, travel freely and select a home.",
+    "Trascina per spostarti. Usa Ruota per inclinare la visuale. Su telefono allarga due dita per avvicinarti e chiudile per allontanarti. Tocca una casa, un’attività o una persona per aprire la sua scheda.": "Drag to move. Use Rotate to tilt the view. On a phone, spread two fingers to zoom in and pinch them together to zoom out. Select a home, business or person to open their details.",
+    "Statue, fontane e dettagli della piazza": "Statues, fountains and square details",
+    "Cerca una struttura…": "Search for a facility…",
+    "Cerca strutture pubbliche": "Search public facilities",
+    "IL TUO NEGOZIO": "YOUR BUSINESS",
+    "PUÒ ESSERE QUI": "COULD BE HERE",
+    "PROSSIMA OPERA": "NEXT PUBLIC WORK",
+    "LA CITTÀ CRESCE": "THE CITY IS GROWING",
+    "Scopri il traguardo": "Discover the next milestone",
+    "Scopri le attività": "Explore businesses",
+    "PIAZZA DI QUARTIERE": "NEIGHBOURHOOD SQUARE",
+    "Cespuglio": "Shrub",
+    "Sfera fiorita": "Flowering globe shrub",
+    "Arbusto a foglie": "Leafy shrub",
+    "Siepe compatta": "Compact hedge",
+    "Cespuglio a tre chiome": "Three-crown shrub",
+    "Vialetto": "Garden path",
+    "Pietra chiara": "Light stone",
+    "Pietra scura": "Dark stone",
+    "Cotto": "Terracotta paving",
+    "Lastre separate": "Stepping stones",
+    "Aiuola": "Flowerbed",
+    "Fiori misti": "Mixed flowers",
+    "Rose rosse": "Red roses",
+    "Margherite": "Daisies",
+    "Lavanda": "Lavender",
+    "Lampioncino": "Garden light",
+    "Classico": "Classic",
+    "Globo": "Globe",
+    "Lanterna quadrata": "Square lantern",
+    "Paletto moderno": "Modern bollard",
+    "Barbecue Premium": "Premium barbecue",
+    "Muratura con cappa": "Brick barbecue with chimney",
+    "Griglia con coperchio": "Covered grill",
+    "Forno a legna": "Wood-fired oven",
+    "Cucina BBQ moderna": "Modern outdoor kitchen",
+    "Cassetta postale": "Letterbox",
+    "Rossa": "Red",
+    "Nera": "Black",
+    "Casetta": "House-shaped",
+    "Acciaio": "Steel",
+    "Recinzione": "Fence",
+    "Legno": "Wood",
+    "Ferro": "Iron",
+    "Siepe": "Hedge",
+    "Muretto": "Low wall",
+    "Piscina Premium": "Premium pool",
+    "Piscina classica": "Classic pool",
+    "Piscina ovale": "Oval pool",
+    "Piscina sportiva": "Lap pool",
+    "Piscina rotonda": "Round pool",
+    "🌿 Giardino: non sbloccato": "🌿 Garden: not unlocked",
+    "PARCO DI QUARTIERE": "NEIGHBOURHOOD PARK",
+    "ACQUEDOTTO E SERBATOIO": "WATER SUPPLY AND RESERVOIR",
+    "AMBULATORIO E PRONTO SOCCORSO": "CLINIC AND EMERGENCY CARE",
+    "STAZIONE DI POLIZIA": "POLICE STATION",
+    "CASERMA DEI POMPIERI": "FIRE STATION",
+    "ASILO E AREA GIOCHI": "NURSERY AND PLAYGROUND",
+    "SCUOLA PRIMARIA": "PRIMARY SCHOOL",
+    "CENTRO RACCOLTA E RICICLO": "RECYCLING AND COLLECTION CENTRE",
+    "CAMPO DA CALCIO": "FOOTBALL PITCH",
+    "BIBLIOTECA PUBBLICA": "PUBLIC LIBRARY",
+    "OSPEDALE GENERALE": "GENERAL HOSPITAL",
+    "MUNICIPIO": "TOWN HALL",
+    "AUTOSTAZIONE": "BUS STATION",
+    "CENTRALE ELETTRICA DI QUARTIERE": "LOCAL POWER STATION",
+    "GIARDINI E AREA GIOCHI": "GARDENS AND PLAYGROUND",
+    "CENTRO COMMERCIALE": "SHOPPING CENTRE",
+    "CAMPO DA BASEBALL": "BASEBALL FIELD",
+    "CENTRO SPORTIVO": "SPORTS CENTRE",
+    "MUSEO CIVICO": "MUNICIPAL MUSEUM",
+    "TEATRO E AUDITORIUM": "THEATRE AND AUDITORIUM",
+    "PISCINA COMUNALE": "PUBLIC SWIMMING POOL",
+    "STADIO CITTADINO": "CITY STADIUM",
+    "UNIVERSITÀ E CAMPUS": "UNIVERSITY CAMPUS",
+    "STAZIONE FERROVIARIA": "RAILWAY STATION",
+    "PALAZZO DI GIUSTIZIA": "COURTHOUSE",
+    "DEPURATORE E SERVIZI AMBIENTALI": "WATER TREATMENT AND ENVIRONMENTAL SERVICES",
+    "PIAZZA MONUMENTALE": "LANDMARK SQUARE",
+    "ELIPORTO DI SOCCORSO": "RESCUE HELIPORT",
+    "ORTO BOTANICO E SERRE": "BOTANICAL GARDENS AND GREENHOUSES",
+    "CAFFETTERIA": "CAFÉ",
+    "SUPERMERCATO": "SUPERMARKET",
+    "RISTORANTE": "RESTAURANT",
+    "LIBRERIA": "BOOKSHOP",
+    "FARMACIA": "PHARMACY",
+    "NEGOZIO DI MODA": "CLOTHING SHOP",
+    "OFFICINA": "WORKSHOP",
+    "PANETTERIA": "BAKERY",
+    "CINEMA": "CINEMA",
+    "PALESTRA": "GYM",
+    "HOTEL": "HOTEL",
+    "MERCATO": "MARKET"
+  },
+  "templates": [
+    {
+      "source": "{count} risultati",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "one": "{count} result",
+          "other": "{count} results"
+        }
+      }
+    },
+    {
+      "source": "{city} · {count} case · {shops} attività",
+      "target": "{city} · {count} homes · {shops} businesses"
+    },
+    {
+      "source": "Casa · {city}",
+      "target": "Home · {city}"
+    },
+    {
+      "source": "🌿 Giardino: {plant} · {count} piante",
+      "target": "🌿 Garden: {plant} · {count} plants",
+      "translateSlots": [
+        "plant"
+      ]
+    },
+    {
+      "source": "🎨 Colore: {color}",
+      "target": "🎨 Colour: {color}",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "🏗️ {tier} · {floors} piani",
+      "target": {
+        "plural": "floors",
+        "forms": {
+          "one": "🏗️ {tier} · {floors} floor",
+          "other": "🏗️ {tier} · {floors} floors"
+        }
+      },
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "🎨 Design: {design}",
+      "target": "🎨 Design: {design}",
+      "translateSlots": [
+        "design"
+      ]
+    },
+    {
+      "source": "⭐ {points} punti",
+      "target": {
+        "plural": "points",
+        "forms": {
+          "one": "⭐ {points} point",
+          "other": "⭐ {points} points"
+        }
+      }
+    },
+    {
+      "source": "{count} case mancanti",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "one": "{count} more home needed",
+          "other": "{count} more homes needed"
+        }
+      }
+    },
+    {
+      "source": "{version} · Edizione mondiale",
+      "target": "{version} · World edition"
+    },
+    {
+      "source": "Prossima fermata: {city}.",
+      "target": "Next stop: {city}."
+    },
+    {
+      "source": "{city} · {count} case · {shops} negozi · {facilities} strutture pubbliche",
+      "target": "{city} · {count} homes · {shops} businesses · {facilities} public facilities"
+    },
+    {
+      "source": "{city} · città raggiunta · {count} case",
+      "target": "{city} · destination reached · {count} homes"
+    },
+    {
+      "source": "{city} · {count} case · scegli Entra nel 3D",
+      "target": "{city} · {count} homes · select Enter 3D"
+    },
+    {
+      "source": "{count} risultati mostrati · scrivi per restringere la ricerca",
+      "target": "Showing {count} results · type to narrow your search"
+    },
+    {
+      "source": "{count} risultati mostrati",
+      "target": "Showing {count} results"
+    },
+    {
+      "source": "Utente non presente in {city}",
+      "target": "User not found in {city}"
+    },
+    {
+      "source": "Esplora {city} con la telecamera libera.",
+      "target": "Explore {city} with the free camera."
+    },
+    {
+      "source": "🏠 Casa #{id} · @{user}",
+      "target": "🏠 Home #{id} · @{user}"
+    },
+    {
+      "source": "🏠 Casa #{id}",
+      "target": "🏠 Home #{id}"
+    },
+    {
+      "source": "Casa #{id}",
+      "target": "Home #{id}"
+    },
+    {
+      "source": "{points} punti",
+      "target": {
+        "plural": "points",
+        "forms": {
+          "one": "{points} point",
+          "other": "{points} points"
+        }
+      }
+    },
+    {
+      "source": "{count} case",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "one": "{count} home",
+          "other": "{count} homes"
+        }
+      }
+    },
+    {
+      "source": "{count} negozi · lotti misti",
+      "target": "{count} businesses · mixed plots"
+    },
+    {
+      "source": "{count} mongolfiere",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "one": "{count} hot-air balloon",
+          "other": "{count} hot-air balloons"
+        }
+      }
+    },
+    {
+      "source": "Livello {level}/{total}",
+      "target": "Level {level}/{total}"
+    },
+    {
+      "source": "Proprietà raggiungibili ({count})",
+      "target": "Linked properties ({count})"
+    },
+    {
+      "source": "Raggiungi {city}",
+      "target": "Travel to {city}"
+    },
+    {
+      "source": "{city} · {count} abitanti virtuali",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} virtual resident",
+            "other": "{count} virtual residents"
+          }
+        }
+      ]
+    },
+    {
+      "source": "{business} · {city} · Livello {level}/{total} · {points} punti · {design}",
+      "target": [
+        "{business} · {city} · Level {level}/{total} · ",
+        {
+          "plural": "points",
+          "forms": {
+            "one": "{points} point",
+            "other": "{points} points"
+          }
+        },
+        " · {design}"
+      ],
+      "translateSlots": [
+        "business",
+        "design"
+      ]
+    },
+    {
+      "source": "{business} #{id} · @{user}",
+      "target": "{business} #{id} · @{user}",
+      "translateSlots": [
+        "business"
+      ]
+    },
+    {
+      "source": "🏪 {business} #{id}",
+      "target": "🏪 {business} #{id}",
+      "translateSlots": [
+        "business"
+      ]
+    },
+    {
+      "source": "{tier} ({floors} piani)",
+      "target": {
+        "plural": "floors",
+        "forms": {
+          "one": "{tier} ({floors} floor)",
+          "other": "{tier} ({floors} floors)"
+        }
+      },
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{tier} ({floors} piano)",
+      "target": "{tier} ({floors} floor)",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{count} CASE",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "one": "{count} HOME",
+          "other": "{count} HOMES"
+        }
+      }
+    },
+    {
+      "source": "{city} · {count} case · {reached}/{total} obiettivi raggiunti",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} home",
+            "other": "{count} homes"
+          }
+        },
+        " · {reached}/{total} milestones reached"
+      ]
+    }
+  ]
+}
