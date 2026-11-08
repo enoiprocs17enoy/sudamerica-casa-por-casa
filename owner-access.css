@@ -1,0 +1,8 @@
+#ownerAccessDialog{box-sizing:border-box;width:min(440px,calc(100vw - 28px));max-height:calc(100dvh - 32px);overflow:auto;padding:26px;border:1px solid #73acaa;border-radius:20px;background:#102f40;color:#f3f1df;box-shadow:0 20px 90px #0008}
+#ownerAccessDialog::backdrop{background:#03131dcc;backdrop-filter:blur(5px)}
+#ownerAccessDialog h2{margin:0 32px 16px 0;font-size:23px}#ownerAccessDialog p{line-height:1.6}
+#ownerAccessDialog form:not(.owner-dialog-close),#ownerVerifiedActions{display:grid;gap:12px;margin-top:18px}#ownerAccessDialog [hidden]{display:none!important}
+#ownerAccessDialog input{box-sizing:border-box;width:100%;padding:13px;border:1px solid #79a3ad;border-radius:8px;font-size:16px;background:#092330;color:#fff}
+#ownerAccessDialog button{min-height:44px;padding:12px;border-radius:9px;border:1px solid #75b3ad;background:#247c75;color:white;font-weight:700;cursor:pointer}#ownerAccessDialog button:disabled{opacity:.5;cursor:wait}
+.owner-dialog-close{position:absolute;right:12px;top:10px}.owner-dialog-close button{min-height:36px!important;width:36px;padding:4px!important;background:transparent!important;border:none!important}
+#ownerSimulationControls{padding:14px;margin:18px 0;border:1px solid #e9b75d;border-radius:12px;background:#263e45}#ownerSimulationControls h3{color:#ffe0a3;margin-top:0}
