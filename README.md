@@ -1,10 +1,12 @@
-# Sudamérica Casa por Casa — v9.1.4
+# Sudamérica Casa por Casa — v9.2.0
 
-Correzione geografica: sagoma terra/acqua condivisa da mare, terreno, foreste e strade; costa dettagliata vicino alla città; onde leggere senza reticolo visibile; continuazioni stradali fino all’orizzonte e anelli sulle piccole isole. Le strade montane cercano valichi e tornanti, seguendo la superficie triangolata del terreno.
+Vegetazione continua verso l’orizzonte: alberi 3D vicini e gruppi leggeri in lontananza, con sovrapposizione progressiva e disposizione ancorata alle coordinate geografiche. Il dominio di 52 km termina dentro la nebbia atmosferica: non è un mondo infinito.
 
-Terreno distinto per posizione: le ecoregioni aride ricevono un substrato sabbioso/roccioso e vegetazione rada; le altre restano verdi, con una categoria separata per la tundra. La classificazione è regionale, non un rilievo del suolo di ogni singolo lotto. Vedere GEOGRAPHY_SOURCES.md per fonti, attribuzioni e limiti.
+I biomi hanno transizioni graduali di terreno e densità vegetale. Le strade regionali condividono il grafo della mappa: niente anelli inventati sulle isole. Le destinazioni vicine hanno anteprime 3D alle coordinate relative reali; avvicinandosi si carica la città completa, mantenendo orientamento e posizione geografica della visuale. Il pulsante Città vicine consente di raggiungerle.
 
-Aprire tramite un server HTTP; Leaflet e Three.js richiedono Internet come nelle versioni precedenti.
+Le anteprime sono rappresentazioni leggere della località, non repliche degli edifici reali. Coste e substrati restano approssimazioni regionali: vedere GEOGRAPHY_SOURCES.md. Piazze, evoluzioni, negozi e servizi delle versioni precedenti sono conservati.
+
+Aprire tramite server HTTP; Leaflet e Three.js richiedono Internet.
 
 ---
 

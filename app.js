@@ -758,7 +758,7 @@ function housePaint(h){
 function isPremiumHouse(h){return designOverrides.get(scoreOverrideKey(h.cityId,h.id))??false;}
 
 function scoreOverrideKey(city,id){return city+':'+id;}
-let manualCityNavigation=false;
+let manualCityNavigation=false,suppressMapEntry=false;
 const cityStates=new Map(CITY_CATALOG.map(c=>[c.id,{count:c.pop,shops:Math.max(1,Math.round(c.pop/28)),balloons:Math.min(8,Math.max(1,Math.floor(c.pop/380)))}]));
 const cities=L.layerGroup().addTo(map);
 const cityPinIcon=L.divIcon({className:'south-city-pin',html:'<span></span>',iconSize:[22,22],iconAnchor:[11,11]});
@@ -836,7 +836,7 @@ function selectCity(id,fly=false){
  target={x:-17,y:0,z:16};distance=115;azimuth=.72;elevation=.29;
  updateCitySelection();renderMilestones();
  if(fly){manualCityNavigation=true;map.flyTo([next.lat,next.lng],12,{duration:1.1});map.once('moveend',()=>{manualCityNavigation=false;});}
- else map.setView([next.lat,next.lng],12);
+ else {suppressMapEntry=true;try{map.setView([next.lat,next.lng],12);}finally{suppressMapEntry=false;}}
  $('status').textContent=`${next.name} · ${count} case demo · scegli Entra nel 3D`;
 }
 function cityAtMapCenter(){
@@ -1168,7 +1168,7 @@ function plotBounds(block,slot){
 }
 function plotPosition(block,slot){
   const {col,row}=spiralCell(block);
-  return {block,col,row,...plotBounds(block,slot)};
+  return {block,slot,col,row,...plotBounds(block,slot)};
 }
 function isInsideParcel(x,z,w,d,b,eps=.01){
   return x-w/2>=b.left-eps&&x+w/2<=b.right+eps&&
@@ -1504,7 +1504,7 @@ function buildRegionalLandscape(houses){
   minZ=Math.min(minZ,z-halfZ);maxZ=Math.max(maxZ,z+halfZ);
   shore=Math.max(shore,x*east+z*south+Math.abs(east)*halfX+Math.abs(south)*halfZ);
  }
- const region=window.WorldGeography?WorldGeography.makeRegion(city,{minX,maxX,minZ,maxZ}):null;
+ const region=window.WorldGeography?WorldGeography.makeRegion(city,{minX,maxX,minZ,maxZ,neighbors:roadPlan?.neighbors||[]}):null;
  if(region){group.userData.geography=region;for(const ground of scene.children.filter(m=>m.userData.regionalGround))WorldGeography.clipMaterial(ground.material,region);}
  const coastFrame=coast&&typeof window!=='undefined'&&window.WorldTerrain?window.WorldTerrain.coastFrame(coast,{minX,maxX,minZ,maxZ}):null;
  shore=coastFrame?coastFrame.shore:shore+85+(coast?.[1]||0)*1000;
@@ -1589,12 +1589,16 @@ function buildRegionalLandscape(houses){
 
  if(roadPlan&&window.WorldTerrain)window.WorldTerrain.prepare(roadPlan,terrainHeight,region||coastFrame);
  if(roadPlan)group.userData.roadPlan=roadPlan;
+ group.userData.terrainHeight=terrainHeight;
  if(roadPlan)window.WorldRoads.draw3D(roadPlan,group,terrainHeight,(x,z)=>region?region.landDistance(x,z)>15:!coast||x*east+z*south<shore-20);
- const candidates=[],spacing=48,horizon=5920;
+ const candidates=[],spacing=48,horizon=6500;
  for(let col=Math.floor(-horizon/spacing);col<=Math.ceil(horizon/spacing);col++){
   for(let row=Math.floor(-horizon/spacing);row<=Math.ceil(horizon/spacing);row++){
    const i=col*73856093^row*19349663;
    const x=(col+rnd(i+city.lng))*spacing,z=(row+rnd(i+city.lat+37))*spacing;
+   const radial=Math.hypot(x,z),nearKeep=1-Math.max(0,Math.min(1,(radial-4700)/1900));
+   if(radial>6500||rnd(i+1927)>nearKeep)continue;
+   if((roadPlan?.neighbors||[]).some(n=>Math.hypot(x-n.x,z-n.z)<n.radius+40))continue;
    let developedHere=false;
    for(let c=Math.round((x-28)/BLOCK_X);c<=Math.round((x+28)/BLOCK_X);c++)
     for(let r=Math.round((z-28)/BLOCK_Z);r<=Math.round((z+28)/BLOCK_Z);r++)
@@ -1604,13 +1608,14 @@ function buildRegionalLandscape(houses){
    const transition=Math.max(0,Math.min(1,gap/1500));
    const density=.16+.73*transition*transition*(3-2*transition);
    const grove=.91+.09*Math.sin(x*.004)*Math.cos(z*.003);
-   const aridity=region?.aridity(x,z)||0;
-   if(rnd(i*79)>density*grove*(1-aridity*.987))continue;
+   const aridity=region?.aridity(x,z)||0,coldness=region?.coldness(x,z)||0;
+   if(rnd(i*79)>density*grove*(1-aridity*.987)*(1-coldness*.97))continue;
    const ground=terrainHeight(x,z);
-   if(ground>680)continue;
+   if(rnd(i+731)>1-Math.max(0,Math.min(1,(ground-650)/600)))continue;
    candidates.push({x,z,i,aridity,y:Math.max(0,ground-.15),detailed:gap<220});
   }
  }
+ group.userData.nearForestTrees=candidates.length;
  const canopyMaterial=new THREE.MeshStandardMaterial({roughness:1});
  const barkMaterial=new THREE.MeshStandardMaterial({color:0x645039,roughness:1});
  const nearCount=candidates.filter(tree=>tree.detailed).length;
@@ -1621,7 +1626,7 @@ function buildRegionalLandscape(houses){
  const dummy=new THREE.Object3D(),color=new THREE.Color(),indices=[0,0];
  candidates.forEach(({x,z,i,y,detailed,aridity},index)=>{
   const baseSize=rnd(i*21)<.72?3+rnd(i*21+9)*5:8+rnd(i*21+9)*5;
-  const size=baseSize*(aridity>.5?.22:1);
+  const size=baseSize*(1-aridity*.78);
   const trunkHeight=size*.71;
   dummy.position.set(x,y+trunkHeight*.5,z);
   dummy.rotation.set(0,0,0);
@@ -1641,6 +1646,8 @@ function buildRegionalLandscape(houses){
   group.add(mesh);
  }
 
+ if(region&&window.WorldForest)WorldForest.build({group,region,plan:roadPlan,height:terrainHeight,city,bounds:{minX,maxX,minZ,maxZ}});
+ if(roadPlan&&window.WorldNeighbors)WorldNeighbors.build({group,plan:roadPlan,height:terrainHeight,states:cityStates,getCamera:()=>({target:{...target},distance,azimuth,elevation}),setCamera:state=>{Object.assign(target,state.target);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();},onEnter:enterNeighborCity});
 }
 function regionalMountain(city){
  if(typeof window!=='undefined'&&window.WorldAtlas)return window.WorldAtlas.mountain(city);
@@ -1871,6 +1878,7 @@ function animate(now=0){
   if(elapsed+.001<minInterval)return;
   lastRenderedFrame+=Math.floor((elapsed+.001)/minInterval)*minInterval;
   const t=now*.001;
+  if(window.WorldNeighbors)WorldNeighbors.update(now);
   if(regionalWaterUniform)regionalWaterUniform.value=t;
   updateProgressiveDetails();
   updateRoadDetailLOD(now);
@@ -3396,7 +3404,7 @@ function drawReservedBillboards(selected){
  const sold=new Set(shopPurchases.map(sh=>sh.block+':'+sh.slot));
  // Compare actual occupied world-space parcels, not only IDs: signs must
  // never survive on a lot already used by a commercial building.
- const occupiedShopBounds=shopPurchases.map(sh=>plotBounds(sh.block,sh.slot));
+ const occupiedShopBounds=shopPurchases.filter(sh=>Number.isInteger(sh.block)&&Number.isInteger(sh.slot)).map(sh=>plotBounds(sh.block,sh.slot));
  const occupiedHouseBounds=selected.map(h=>plotBounds(h.blockIndex,h.slot));
  const occupiedPublicBounds=publicZones().map(z=>facilityBounds(z.block));
  const occupiedKeys=new Set([...selected.map(h=>h.blockIndex+':'+h.slot),...shopPurchases.map(sh=>sh.block+':'+sh.slot)]);
@@ -5432,7 +5440,7 @@ function rebuild(){
   cover(parcel.x,parcel.z,parcel.width+12,parcel.depth+12);
  }
  if(Number.isFinite(shadowBounds.minX))group.userData.cityShadowBounds=shadowBounds;
- group.userData.pickables=group.children.filter(mesh=>mesh.userData.shops||mesh.userData.homes||mesh.userData.home||mesh.userData.publicZone);
+ group.userData.pickables=group.children.filter(mesh=>mesh.userData.shops||mesh.userData.homes||mesh.userData.home||mesh.userData.publicZone||mesh.userData.neighborCity);
  const builtGroup=group,builtHouseMeshes=houseMeshes;
  group=previousGroup;
  try{disposeGroup();scene.remove(previousGroup)}catch(err){console.error('Pulizia scena',err)}
@@ -5443,7 +5451,7 @@ function rebuild(){
  if(errors.length){
   let warning=document.getElementById('cityErrorNotice');
   if(!warning){warning=document.createElement('div');warning.id='cityErrorNotice';warning.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99999;background:#722;color:white;padding:12px;border-radius:8px;max-width:70vw;font:13px Arial';document.body.appendChild(warning)}
-  warning.textContent='v9.1.4 · '+errors.join(' | ');
+  warning.textContent='v9.2.0 · '+errors.join(' | ');
  }else{document.getElementById('cityErrorNotice')?.remove()}
 }
 function renderMilestones(){
@@ -5469,6 +5477,7 @@ function updateDensity(){/* Houses remain visible regardless of camera zoom. */}
 function resolveStructureHit(hit){
  if(!hit)return null;
  const data=hit.object.userData;
+ if(data.neighborCity)return {type:'neighbor',ref:data.neighborCity,distance:hit.distance};
  if(data.publicZone)return {type:'public',ref:data.publicZone,distance:hit.distance};
  if(data.shops){const ref=data.shops[hit.instanceId];if(ref)return {type:'shop',ref,distance:hit.distance};}
  const home=data.homes?.[hit.instanceId]||data.home;
@@ -5499,6 +5508,7 @@ function pick(e){
   if(hit&&hit.distance<balloonDistance){balloon=b;balloonDistance=hit.distance;}
  }
  if(balloon&&(!structure||balloonDistance<structure.distance)){showBalloonCard(balloon);return;}
+ if(structure?.type==='neighbor'){WorldNeighbors.focus(structure.ref.id);return;}
  if(structure?.type==='public'){openPublicWorks(structure.ref);return;}
  if(structure?.type==='shop'){showShopCard(structure.ref);return;}
  if(structure?.type==='home')showCard(structure.ref);
@@ -6349,3 +6359,10 @@ cityViewStyle.textContent=`
  .city-view.wide-city .mapwrap{height:auto}
 `;
 document.head.append(cityViewStyle);
+
+// Adjacent towns keep their geographic positions when the local scene origin changes.
+async function enterNeighborCity(neighbor,state){if(!active)return;const old=currentCity,geo=WorldRoads.point(old,state.target.x,state.target.z),next=neighbor.city;const layer=$('threeLayer');$('status').textContent='Entrando a '+next.name+'…';layer.style.transition='opacity 180ms';layer.style.opacity='.45';await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));WorldRoads.holdGraph();selectCity(next.id,false);enter();const p=WorldRoads.local(next,{lat:geo[0],lng:geo[1]});target.x=p.x;target.z=p.z;target.y=Math.max(2,state.target.y-neighbor.y);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();layer.style.opacity='1';$('status').textContent=next.name+' · città raggiunta · '+count.toLocaleString('it-IT')+' case';}
+function showNeighborCities(){if(!active)enter();const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;$('v4Title').textContent='Città vicine';body.replaceChildren();const items=window.WorldNeighbors?.list()||[];if(!items.length){const p=document.createElement('p');p.textContent='Nessuna città collegata visibile in questa zona. Puoi cercare altre località nella mappa.';body.append(p);}for(const e of items){const button=document.createElement('button');button.textContent='🏙 '+e.city.name+' · '+(e.distance/1000).toLocaleString('it-IT',{maximumFractionDigits:1})+' km';button.onclick=()=>{panel.hidden=true;WorldNeighbors.focus(e.city.id);};body.append(button);}}
+const neighborButton=document.createElement('button');neighborButton.id='nearbyCities';neighborButton.textContent='🏙 Città vicine';neighborButton.title='Avvicinati alle città collegate';neighborButton.onclick=showNeighborCities;neighborButton.style.cssText='width:auto;min-width:132px;padding:10px 12px;font-size:13px;white-space:nowrap';$('earthControls').style.alignItems='flex-end';$('earthControls').append(neighborButton);
+document.addEventListener('pointerdown',e=>{if(e.target.closest?.('#threeLayer'))window.WorldNeighbors?.cancelFlight();},true);
+document.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','a','s','d'].includes(e.key))window.WorldNeighbors?.cancelFlight();},true);
