@@ -1483,7 +1483,7 @@ let regionalWaterUniform=null;
 function worldCityCells(selected=homes){
  const cells=new Map();for(const h of selected){const p=spiralCell(h.blockIndex);cells.set(p.col+':'+p.row,p);}for(const shop of shopPurchases){const p=spiralCell(shop.block);cells.set(p.col+':'+p.row,p);}for(const zone of publicZones()){const p=spiralCell(zone.block);cells.set(p.col+':'+p.row,p);}return [...cells.values()];
 }
-function buildRegionalLandscape(houses){
+function buildRegionalLandscape(houses){console.log("Region: start");
  const city=currentCity;
  const roadPlan=typeof window!=='undefined'&&window.WorldRoads&&window.WorldAtlas?window.WorldRoads.cityPlan(city,worldCityCells(houses),window.WorldAtlas):null;
  regionalWaterUniform=null;
@@ -1504,7 +1504,7 @@ function buildRegionalLandscape(houses){
   minZ=Math.min(minZ,z-halfZ);maxZ=Math.max(maxZ,z+halfZ);
   shore=Math.max(shore,x*east+z*south+Math.abs(east)*halfX+Math.abs(south)*halfZ);
  }
- const region=window.WorldGeography?WorldGeography.makeRegion(city,{minX,maxX,minZ,maxZ,neighbors:roadPlan?.neighbors||[]}):null;
+ console.log("Region: masks");const region=window.WorldGeography?WorldGeography.makeRegion(city,{minX,maxX,minZ,maxZ,neighbors:roadPlan?.neighbors||[]}):null;
  if(region){group.userData.geography=region;for(const ground of scene.children.filter(m=>m.userData.regionalGround))WorldGeography.clipMaterial(ground.material,region);}
  const coastFrame=coast&&typeof window!=='undefined'&&window.WorldTerrain?window.WorldTerrain.coastFrame(coast,{minX,maxX,minZ,maxZ}):null;
  shore=coastFrame?coastFrame.shore:shore+85+(coast?.[1]||0)*1000;
@@ -1587,7 +1587,7 @@ function buildRegionalLandscape(houses){
 
 
 
- if(roadPlan&&window.WorldTerrain)window.WorldTerrain.prepare(roadPlan,terrainHeight,region||coastFrame);
+ console.log("Region: roads",roadPlan?.roads.length);if(roadPlan&&window.WorldTerrain)window.WorldTerrain.prepare(roadPlan,terrainHeight,region||coastFrame);
  if(roadPlan)group.userData.roadPlan=roadPlan;
  group.userData.terrainHeight=terrainHeight;
  if(roadPlan)window.WorldRoads.draw3D(roadPlan,group,terrainHeight,(x,z)=>region?region.landDistance(x,z)>15:!coast||x*east+z*south<shore-20);
@@ -1646,8 +1646,8 @@ function buildRegionalLandscape(houses){
   group.add(mesh);
  }
 
- if(region&&window.WorldForest)WorldForest.build({group,region,plan:roadPlan,height:terrainHeight,city,bounds:{minX,maxX,minZ,maxZ}});
- if(roadPlan&&window.WorldNeighbors)WorldNeighbors.build({group,camera,container:$('threeLayer'),plan:roadPlan,height:terrainHeight,states:cityStates,getCamera:()=>({target:{...target},distance,azimuth,elevation}),setCamera:state=>{Object.assign(target,state.target);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();},onEnter:enterNeighborCity});
+ console.log("Region: far forest");if(region&&window.WorldForest)WorldForest.build({group,region,plan:roadPlan,height:terrainHeight,city,bounds:{minX,maxX,minZ,maxZ}});
+ console.log("Region: neighbors");if(roadPlan&&window.WorldNeighbors)WorldNeighbors.build({group,camera,container:$('threeLayer'),plan:roadPlan,height:terrainHeight,states:cityStates,getCamera:()=>({target:{...target},distance,azimuth,elevation}),setCamera:state=>{Object.assign(target,state.target);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();},onEnter:enterNeighborCity});
 }
 function regionalMountain(city){
  if(typeof window!=='undefined'&&window.WorldAtlas)return window.WorldAtlas.mountain(city);
