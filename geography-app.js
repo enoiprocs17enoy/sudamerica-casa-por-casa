@@ -1806,6 +1806,7 @@ function updateCamera(){
  camera.up.set(0,1,0);
  camera.lookAt(target.x,target.y,target.z);
  camera.near=Math.max(.1,Math.min(8,distance/300));
+ camera.near=Math.max(.6,Math.min(45,distance*.012));
  camera.far=Math.max(48000,distance*5);
  camera.updateProjectionMatrix();camera.updateMatrixWorld(true);
 }
