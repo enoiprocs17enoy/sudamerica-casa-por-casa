@@ -1,0 +1,886 @@
+{
+  "locale": "fr",
+  "name": "Français",
+  "reviewStatus": "in-progress",
+  "messages": {
+    "Esplora il mondo": "Explorez le monde",
+    "Scegli una città": "Choisissez une ville",
+    "Cerca utente Instagram": "Rechercher un utilisateur Instagram",
+    "Cerca": "Rechercher",
+    "Nome utente": "Nom d’utilisateur",
+    "@nomeutente": "@utilisateur",
+    "case nella città": "maisons dans la ville",
+    "La città cresce": "La ville s’agrandit",
+    "Ingrandisci la mappa per scoprire le città e avvicinarti ai loro quartieri.": "Zoomez sur la carte pour découvrir les villes et explorer leurs quartiers.",
+    "Un mondo virtuale di città da esplorare, una casa alla volta.": "Un monde virtuel de villes à explorer, maison par maison.",
+    "Un luogo, tante storie": "Un lieu, tant d’histoires",
+    "Benvenuto, esploratore.": "Bienvenue, explorateur.",
+    "Carichiamo il mondo e le sue città.": "Chargement du monde et de ses villes.",
+    "Una casa alla volta, il mondo prende vita.": "Maison par maison, le monde prend vie.",
+    "La tua città prende forma.": "Votre ville prend forme.",
+    "Prepariamo edifici, strade e paesaggio.": "Préparation des bâtiments, des routes et du paysage.",
+    "La città si rinnova.": "La ville se renouvelle.",
+    "Aggiorniamo edifici, dettagli e abitanti.": "Mise à jour des bâtiments, des détails et des habitants.",
+    "Una città sempre più viva.": "Une ville toujours plus vivante.",
+    "Prepariamo le case e i servizi per i suoi abitanti.": "Préparation des maisons et des services pour les habitants.",
+    "Il mondo continua, intorno a te.": "Le monde s’étend autour de vous.",
+    "Prepariamo le città vicine, le strade e il paesaggio.": "Préparation des villes voisines, des routes et du paysage.",
+    "Esploriamo nuovi luoghi.": "Explorons de nouveaux lieux.",
+    "Carichiamo le località della regione.": "Chargement des localités de la région.",
+    "Prepariamo le località e la mappa della regione.": "Préparation des localités et de la carte de la région.",
+    "Caricamento in corso": "Chargement en cours",
+    "Non è stato possibile completare il caricamento. Puoi riprovare.": "Le chargement n’a pas pu se terminer. Vous pouvez réessayer.",
+    "Motore 3D non caricato. Verifica Internet e ricarica.": "Le moteur 3D n’a pas pu être chargé. Vérifiez votre connexion et rechargez la page.",
+    "Continente": "Continent",
+    "Paese o territorio": "Pays ou territoire",
+    "Cerca una località": "Rechercher une localité",
+    "Nome città o regione": "Nom de ville ou de région",
+    "Tutti i continenti": "Tous les continents",
+    "Antartide": "Antarctique",
+    "Europa": "Europe",
+    "America del Nord e centrale": "Amérique du Nord et centrale",
+    "America del Sud": "Amérique du Sud",
+    "🌐 Vedi tutto il mondo": "🌐 Voir le monde entier",
+    "Seleziona una città…": "Choisissez une ville…",
+    "Caricamento delle località…": "Chargement des localités…",
+    "Nessuna località trovata in questo paese": "Aucune localité trouvée dans ce pays",
+    "Catalogo non caricato. Controlla la connessione e riseleziona il paese.": "Le catalogue n’a pas pu être chargé. Vérifiez votre connexion et sélectionnez à nouveau le pays.",
+    "Vai alla città selezionata": "Aller à la ville sélectionnée",
+    "Entra nel 3D": "Passer en 3D",
+    "Torna alla mappa": "Revenir à la carte",
+    "Controlli 3D": "Commandes 3D",
+    "↻ Ruota": "↻ Pivoter",
+    "✥ Sposta": "✥ Déplacer",
+    "⌂ Centro": "⌂ Centrer",
+    "⛶ Vista ampia": "⛶ Vue étendue",
+    "☰ Comandi": "☰ Commandes",
+    "Orienta a nord": "Orienter vers le nord",
+    "Alterna vista dall’alto e inclinata": "Alterner entre vue aérienne et inclinée",
+    "Avvicina": "Zoomer",
+    "Allontana": "Dézoomer",
+    "Ruota e inclina la visuale": "Faire pivoter et incliner la vue",
+    "Sposta la visuale": "Déplacer la vue",
+    "🏙 Città vicine": "🏙 Villes voisines",
+    "Città vicine": "Villes voisines",
+    "Avvicinati alle città collegate": "Rapprochez-vous des villes reliées",
+    "Nessuna città collegata visibile in questa zona. Puoi cercare altre località nella mappa.": "Aucune ville reliée n’est visible dans cette zone. Vous pouvez rechercher d’autres localités sur la carte.",
+    "Mappa geografica · le città sono posizionate con coordinate reali": "Carte géographique · les villes sont placées selon leurs coordonnées réelles",
+    "Un mondo. Milioni di storie. Una casa per ognuno.": "Un monde. Des millions d’histoires. Une maison pour chacun.",
+    "🌎 Città selezionata:": "🌎 Ville sélectionnée :",
+    "Tienda": "Boutique",
+    "Attività": "Commerces",
+    "La mia casa": "Ma maison",
+    "Personaggio": "Personnage",
+    "Il mio personaggio": "Mon personnage",
+    "Mondo": "Monde",
+    "Ranking": "Classement",
+    "Trova": "Trouver",
+    "Obras": "Travaux publics",
+    "Opere": "Travaux publics",
+    "Menu mondo": "Menu du monde",
+    "Chiudi": "Fermer",
+    "Casa": "Maison",
+    "Negozio": "Commerce",
+    "Mongolfiera": "Montgolfière",
+    "Scopri le attività della città e le loro evoluzioni.": "Découvrez les commerces de la ville et leurs évolutions.",
+    "🏪 Esplora le attività": "🏪 Explorer les commerces",
+    "Cerca il tuo nome utente per trovare la casa, il personaggio e le proprietà collegate.": "Recherchez votre nom d’utilisateur pour retrouver votre maison, votre personnage et vos propriétés associées.",
+    "Trova nella città": "Trouver dans la ville",
+    "🌎 Entra nel 3D": "🌎 Passer en 3D",
+    "🧭 Panoramica": "🧭 Vue d’ensemble",
+    "Animazioni ambientali": "Animations du décor",
+    "Strutture e obiettivi": "Équipements et objectifs",
+    "Ricostruzione 3D stilizzata: la planimetria e gli elementi documentati sono affiancati da arredi di integrazione.": "Reconstitution 3D stylisée : le plan et les éléments documentés sont complétés par du mobilier supplémentaire.",
+    "Le fonti disponibili non descrivono ancora statue e fontane di questa piazza.": "Les sources disponibles ne décrivent pas encore les statues et les fontaines de cette place.",
+    "Presenza mappata · forma 3D da completare": "Élément cartographié · modèle 3D à compléter",
+    "Riferimento documentato · modello 3D stilizzato": "Référence documentée · modèle 3D stylisé",
+    "Tipologia mappata · modello 3D da verificare nei dettagli": "Type cartographié · détails du modèle 3D à vérifier",
+    "Fonte": "Source",
+    "Torna agli obiettivi": "Revenir aux objectifs",
+    "Parco di quartiere": "Parc de quartier",
+    "Acquedotto e serbatoio": "Aqueduc et réservoir",
+    "Ambulatorio e pronto soccorso": "Centre de soins et urgences",
+    "Stazione di polizia": "Commissariat de police",
+    "Caserma dei pompieri": "Caserne de pompiers",
+    "Primi servizi": "Services essentiels",
+    "Asilo e area giochi": "Crèche et aire de jeux",
+    "Scuola primaria": "École primaire",
+    "Centro raccolta e riciclo": "Centre de collecte et de recyclage",
+    "Campo da calcio": "Terrain de football",
+    "Biblioteca pubblica": "Bibliothèque publique",
+    "Ospedale generale": "Hôpital général",
+    "Municipio": "Hôtel de ville",
+    "Autostazione": "Gare routière",
+    "Centrale elettrica di quartiere": "Centrale électrique de quartier",
+    "Giardini e area giochi": "Jardins et aire de jeux",
+    "Centro commerciale": "Centre commercial",
+    "Campo da baseball": "Terrain de baseball",
+    "Centro sportivo": "Centre sportif",
+    "Museo civico": "Musée municipal",
+    "Teatro e auditorium": "Théâtre et auditorium",
+    "Piscina comunale": "Piscine municipale",
+    "Stadio cittadino": "Stade municipal",
+    "Università e campus": "Université et campus",
+    "Stazione ferroviaria": "Gare ferroviaire",
+    "Palazzo di giustizia": "Palais de justice",
+    "Depuratore e servizi ambientali": "Station d’épuration et services environnementaux",
+    "Piazza monumentale": "Place monumentale",
+    "Eliporto di soccorso": "Héliport de secours",
+    "Orto botanico e serre": "Jardin botanique et serres",
+    "Servizi di quartiere": "Services de quartier",
+    "Città in crescita": "Ville en croissance",
+    "Grande città": "Grande ville",
+    "Strutture pubbliche": "Équipements publics",
+    "Tutti gli edifici": "Tous les bâtiments",
+    "Case": "Maisons",
+    "Cerca edifici": "Rechercher des bâtiments",
+    "Nome, nickname o numero…": "Nom, pseudonyme ou numéro…",
+    "Mostra altri risultati": "Afficher plus de résultats",
+    "📍 Raggiungi e apri": "📍 Rejoindre et ouvrir",
+    "Nessuna struttura trovata.": "Aucun bâtiment trouvé.",
+    "Raggiunto": "Atteint",
+    "Caffetteria": "Café",
+    "Supermercato": "Supermarché",
+    "Ristorante": "Restaurant",
+    "Libreria": "Librairie",
+    "Farmacia": "Pharmacie",
+    "Negozio di moda": "Magasin de vêtements",
+    "Officina": "Garage",
+    "Panetteria": "Boulangerie",
+    "Palestra": "Salle de sport",
+    "Mercato": "Marché",
+    "PIAZZA CIVICA": "PLACE CIVIQUE",
+    "PIAZZA PRINCIPALE": "PLACE PRINCIPALE",
+    "SERVIZI PUBBLICI": "SERVICES PUBLICS",
+    "Monolocale": "Studio",
+    "Casa piccola": "Petite maison",
+    "Villetta": "Pavillon",
+    "Palazzina": "Petit immeuble",
+    "Condominio": "Immeuble résidentiel",
+    "Torre residenziale": "Tour résidentielle",
+    "Grattacielo": "Gratte-ciel",
+    "Grattacielo monumentale": "Gratte-ciel monumental",
+    "Crema": "Crème",
+    "Bianco": "Blanc",
+    "Rosa": "Rose",
+    "Azzurro": "Bleu ciel",
+    "Verde salvia": "Vert sauge",
+    "Ocra": "Ocre",
+    "Grigio": "Gris",
+    "Gratis": "Gratuit",
+    "Base": "Standard",
+    "Accesso proprietario": "Accès propriétaire",
+    "Accedi per aprire gli strumenti di simulazione.": "Connectez-vous pour accéder aux outils de simulation.",
+    "Ricevi link di accesso": "Recevoir un lien de connexion",
+    "Apri l’email ricevuta e premi il link di accesso. Il link è personale e utilizzabile una sola volta.": "Ouvrez l’e-mail reçu et cliquez sur le lien de connexion. Ce lien est personnel et ne peut être utilisé qu’une seule fois.",
+    "Apri simulazione": "Ouvrir la simulation",
+    "Torna alla vista pubblica": "Revenir à la vue publique",
+    "Apri gli strumenti proprietario": "Ouvrir les outils du propriétaire",
+    "Esci dal tuo account": "Se déconnecter",
+    "Vista pubblica ripristinata.": "Vue publique rétablie.",
+    "Accedi nuovamente per continuare.": "Reconnectez-vous pour continuer.",
+    "Strumenti riservati non disponibili.": "Les outils privés ne sont pas disponibles.",
+    "Il sito sta ancora terminando il caricamento.": "Le site termine son chargement.",
+    "Sei uscito. Il sito è tornato alla vista pubblica.": "Vous êtes déconnecté. Le site est revenu à la vue publique.",
+    "Accesso chiuso su questo dispositivo. Connessione al servizio non disponibile.": "Session fermée sur cet appareil. La connexion au service est indisponible.",
+    "Troppe richieste. Attendi un minuto e riprova.": "Trop de demandes. Attendez une minute, puis réessayez.",
+    "Accesso non disponibile. Controlla i dati e riprova.": "Connexion indisponible. Vérifiez vos informations et réessayez.",
+    "Verifichiamo il tuo accesso.": "Vérification de votre accès.",
+    "Tra poco tornerai alla tua città.": "Vous retrouverez bientôt votre ville.",
+    "Il link non è valido oppure è già stato utilizzato. Richiedi un nuovo accesso.": "Le lien est invalide ou a déjà été utilisé. Demandez un nouveau lien de connexion.",
+    "Questo account non è autorizzato ad aprire la simulazione.": "Ce compte n’est pas autorisé à ouvrir la simulation.",
+    "Torna al sito": "Revenir au site",
+    "🧪 Simulazione e test": "🧪 Simulation et tests",
+    "Le modifiche di prova restano in questa sessione. Torna alla vista pubblica per ripristinare la città.": "Les modifications de test restent dans cette session. Revenez à la vue publique pour rétablir la ville.",
+    "👥 Abitanti simulati:": "👥 Habitants simulés :",
+    "Numero di case simulate": "Nombre de maisons simulées",
+    "Numero esatto di case": "Nombre exact de maisons",
+    "Applica": "Appliquer",
+    "Sposta il cursore per scegliere. Rilascia per generare la città; oppure inserisci il numero esatto e premi Applica.": "Déplacez le curseur pour choisir. Relâchez-le pour générer la ville, ou saisissez le nombre exact et appuyez sur Appliquer.",
+    "🏗️ Evoluzione casa (demo)": "🏗️ Évolution de la maison (démo)",
+    "Clicca qualsiasi casa nel 3D per scegliere quale far evolvere: il lotto rimane fisso.": "Sélectionnez une maison en 3D pour la faire évoluer : sa parcelle reste au même endroit.",
+    "Attività di prova": "Commerces de test",
+    "+1 negozio": "+1 commerce",
+    "+100 negozi": "+100 commerces",
+    "Azzera negozi": "Supprimer les commerces de test",
+    "Lingua": "Langue",
+    "Prepariamo la tua lingua.": "Préparation de votre langue.",
+    "Aggiorniamo testi e cartelli della città.": "Mise à jour des textes et des panneaux de la ville.",
+    "Lingua non disponibile. Controlla la connessione e riprova.": "Cette langue n’a pas pu être chargée. Vérifiez votre connexion et réessayez.",
+    "Classifica": "Classement",
+    "abitanti": "habitants",
+    "Negozi": "Commerces",
+    "Email": "E-mail",
+    "Premium": "Premium",
+    "Hotel": "Hôtel",
+    "Cinema": "Cinéma",
+    "Africa": "Afrique",
+    "Asia": "Asie",
+    "Oceania": "Océanie",
+    "Terracotta": "Terre cuite",
+    "Zoom in": "Zoomer",
+    "Zoom out": "Dézoomer",
+    "A JavaScript library for interactive maps": "Une bibliothèque pour les cartes interactives",
+    "Località:": "Localités :",
+    "· Terre: Natural Earth": "· Terres : Natural Earth",
+    "· Terreno:": "· Terrain :",
+    "Seleziona una città del mondo: ogni città ha case evolute, negozi e mongolfiere. Avvicinati per scoprire giardini, attività e piazze. Puoi ruotare, spostarti liberamente e selezionare le case.": "Choisissez une ville pour explorer ses maisons, ses commerces et ses montgolfières. Rapprochez-vous pour découvrir les jardins, les boutiques et les places. Faites pivoter la vue, déplacez-vous librement et sélectionnez une maison.",
+    "Trascina per spostarti. Usa Ruota per inclinare la visuale. Su telefono allarga due dita per avvicinarti e chiudile per allontanarti. Tocca una casa, un’attività o una persona per aprire la sua scheda.": "Faites glisser pour vous déplacer. Utilisez Pivoter pour incliner la vue. Sur téléphone, écartez deux doigts pour zoomer et rapprochez-les pour dézoomer. Sélectionnez une maison, un commerce ou une personne pour ouvrir sa fiche.",
+    "Statue, fontane e dettagli della piazza": "Statues, fontaines et détails de la place",
+    "Cerca una struttura…": "Rechercher un équipement…",
+    "Cerca strutture pubbliche": "Rechercher des équipements publics",
+    "IL TUO NEGOZIO": "VOTRE COMMERCE",
+    "PUÒ ESSERE QUI": "PEUT ÊTRE ICI",
+    "PROSSIMA OPERA": "PROCHAIN ÉQUIPEMENT",
+    "LA CITTÀ CRESCE": "LA VILLE S’AGRANDIT",
+    "Scopri il traguardo": "Découvrez le prochain objectif",
+    "Scopri le attività": "Découvrez les commerces",
+    "PIAZZA DI QUARTIERE": "PLACE DE QUARTIER",
+    "Cespuglio": "Buisson",
+    "Sfera fiorita": "Buisson fleuri en boule",
+    "Arbusto a foglie": "Arbuste feuillu",
+    "Siepe compatta": "Haie compacte",
+    "Cespuglio a tre chiome": "Buisson à trois couronnes",
+    "Vialetto": "Allée",
+    "Pietra chiara": "Pierre claire",
+    "Pietra scura": "Pierre sombre",
+    "Cotto": "Terre cuite",
+    "Lastre separate": "Dalles séparées",
+    "Aiuola": "Parterre",
+    "Fiori misti": "Fleurs variées",
+    "Rose rosse": "Roses rouges",
+    "Margherite": "Marguerites",
+    "Lavanda": "Lavande",
+    "Lampioncino": "Lampadaire de jardin",
+    "Classico": "Classique",
+    "Globo": "Globe",
+    "Lanterna quadrata": "Lanterne carrée",
+    "Paletto moderno": "Borne moderne",
+    "Barbecue Premium": "Barbecue Premium",
+    "Muratura con cappa": "En maçonnerie avec hotte",
+    "Griglia con coperchio": "Gril avec couvercle",
+    "Forno a legna": "Four à bois",
+    "Cucina BBQ moderna": "Cuisine barbecue moderne",
+    "Cassetta postale": "Boîte aux lettres",
+    "Rossa": "Rouge",
+    "Nera": "Noire",
+    "Casetta": "Maisonnette",
+    "Acciaio": "Acier",
+    "Recinzione": "Clôture",
+    "Legno": "Bois",
+    "Ferro": "Fer",
+    "Siepe": "Haie",
+    "Muretto": "Muret",
+    "Piscina Premium": "Piscine Premium",
+    "Piscina classica": "Piscine classique",
+    "Piscina ovale": "Piscine ovale",
+    "Piscina sportiva": "Piscine sportive",
+    "Piscina rotonda": "Piscine ronde",
+    "🌿 Giardino: non sbloccato": "🌿 Jardin : non débloqué",
+    "Scegli una città del mondo. Il puntatore della città rimane della stessa dimensione.": "Choisissez une ville pour commencer à explorer le monde.",
+    "📍 Conegliano e dintorni · Veneto": "📍 Conegliano et ses environs · Veneto",
+    "Cerca città nel mondo": "Rechercher des villes dans le monde",
+    "N ↑": "N ↑",
+    "Evoluzione attività": "Évolution du commerce",
+    "Design Premium (demo)": "Design Premium (démo)",
+    "Applica evoluzione": "Appliquer l’évolution",
+    "🏗️ Evoluzione di questa casa (demo)": "🏗️ Évolution de cette maison (démo)",
+    "Scegli i punti e il design: cambia solo questa casa, senza spostare il lotto.": "Choisissez les points et le design : seule cette maison change, sur la même parcelle.",
+    "Punti esatti per questa casa": "Points exacts pour cette maison",
+    "Applica punti": "Appliquer les points",
+    "🎨 Design per questa evoluzione": "🎨 Design de cette évolution",
+    "Gratis · Casa standard": "Gratuit · Maison standard",
+    "Abbonamento · Casa con balconi, camino e dettagli": "Abonnement · Maison avec balcons, cheminée et détails",
+    "🎨 Colore della casa": "🎨 Couleur de la maison",
+    "🌿 Personalizza le decorazioni · 4 modelli per sblocco": "🌿 Personnalisez les décorations · 4 modèles par déblocage",
+    "Casa senza piante a 0 punti.": "Aucune plante à 0 point.",
+    "4 piante con Premium": "4 plantes avec Premium",
+    "2 piante con Gratis": "2 plantes avec la version gratuite",
+    "posizioni automatiche.": "positionnement automatique.",
+    "Simulazione dell’abbonamento: non viene effettuato alcun pagamento.": "Simulation de l’abonnement : aucun paiement n’est effectué.",
+    "Acquisti dimostrativi: nessun pagamento reale.": "Achats de démonstration : aucun paiement réel.",
+    "🏪 Aggiungi negozio": "🏪 Ajouter un commerce",
+    "🎈 Aggiungi mongolfiera": "🎈 Ajouter une montgolfière",
+    "📍 Vai alla mia casa": "📍 Aller à ma maison",
+    "La personalizzazione della facciata sarà ampliata nelle prossime versioni.": "La personnalisation de la façade sera enrichie dans les prochaines versions.",
+    "Colore della pelle": "Couleur de peau",
+    "Vestiti": "Vêtements",
+    "📍 Trova il mio personaggio": "📍 Trouver mon personnage",
+    "Personaggio non generato": "Personnage non généré",
+    "Pizzeria": "Pizzeria",
+    "PIZZERIA": "PIZZERIA",
+    "Opera mappata": "Œuvre cartographiée",
+    "Fontana mappata": "Fontaine cartographiée",
+    "Prepariamo la città e i suoi dintorni.": "Préparation de la ville et de ses environs.",
+    "Design Premium (demo abbonamento)": "Design Premium (démo d’abonnement)",
+    "Design Gratis": "Design gratuit",
+    "San Martín anziano in abiti civili con mantello al vento, sopra base rocciosa con tre rilievi. Il monumento equestre appartiene al Parque San Martín, non a questa piazza.": "San Martín âgé, en tenue civile, son manteau flottant au vent, sur un socle rocheux à trois reliefs. Le monument équestre se trouve au Parque San Martín, et non sur cette place.",
+    "Giardino-calendario cartografato: aiuola floreale con anno corrente. Disegno delle fioriture interpretato, non un rilievo fotografico.": "Jardin-calendrier cartographié : parterre floral indiquant l’année en cours. Le dessin des fleurs est une interprétation, et non un relevé photographique.",
+    "San Martín equestre, bronzo su basamento in granito con rilievi.": "Statue équestre de San Martín, en bronze sur un socle de granit orné de reliefs.",
+    "Arenales a cavallo con quindici figure allegoriche alla base.": "Arenales à cheval, avec quinze figures allégoriques autour du socle.",
+    "Libertà di Lola Mora, marmo di Carrara, panneggio e catene spezzate; nessuno scudo o cavallo.": "La Liberté de Lola Mora, en marbre de Carrare, avec des drapés et des chaînes brisées ; sans bouclier ni cheval.",
+    "Posizione: cartografia · orientamento e dettagli fini ancora da verificare": "Position : cartographie · orientation et détails fins encore à vérifier",
+    "PARCO DI QUARTIERE": "PARC DE QUARTIER",
+    "ACQUEDOTTO E SERBATOIO": "AQUEDUC ET RÉSERVOIR",
+    "AMBULATORIO E PRONTO SOCCORSO": "CENTRE DE SOINS ET URGENCES",
+    "STAZIONE DI POLIZIA": "COMMISSARIAT DE POLICE",
+    "CASERMA DEI POMPIERI": "CASERNE DE POMPIERS",
+    "ASILO E AREA GIOCHI": "CRÈCHE ET AIRE DE JEUX",
+    "SCUOLA PRIMARIA": "ÉCOLE PRIMAIRE",
+    "CENTRO RACCOLTA E RICICLO": "CENTRE DE COLLECTE ET DE RECYCLAGE",
+    "CAMPO DA CALCIO": "TERRAIN DE FOOTBALL",
+    "BIBLIOTECA PUBBLICA": "BIBLIOTHÈQUE PUBLIQUE",
+    "OSPEDALE GENERALE": "HÔPITAL GÉNÉRAL",
+    "MUNICIPIO": "HÔTEL DE VILLE",
+    "AUTOSTAZIONE": "GARE ROUTIÈRE",
+    "CENTRALE ELETTRICA DI QUARTIERE": "CENTRALE ÉLECTRIQUE DE QUARTIER",
+    "GIARDINI E AREA GIOCHI": "JARDINS ET AIRE DE JEUX",
+    "CENTRO COMMERCIALE": "CENTRE COMMERCIAL",
+    "CAMPO DA BASEBALL": "TERRAIN DE BASEBALL",
+    "CENTRO SPORTIVO": "CENTRE SPORTIF",
+    "MUSEO CIVICO": "MUSÉE MUNICIPAL",
+    "TEATRO E AUDITORIUM": "THÉÂTRE ET AUDITORIUM",
+    "PISCINA COMUNALE": "PISCINE MUNICIPALE",
+    "STADIO CITTADINO": "STADE MUNICIPAL",
+    "UNIVERSITÀ E CAMPUS": "UNIVERSITÉ ET CAMPUS",
+    "STAZIONE FERROVIARIA": "GARE FERROVIAIRE",
+    "PALAZZO DI GIUSTIZIA": "PALAIS DE JUSTICE",
+    "DEPURATORE E SERVIZI AMBIENTALI": "STATION D’ÉPURATION ET SERVICES ENVIRONNEMENTAUX",
+    "PIAZZA MONUMENTALE": "PLACE MONUMENTALE",
+    "ELIPORTO DI SOCCORSO": "HÉLIPORT DE SECOURS",
+    "ORTO BOTANICO E SERRE": "JARDIN BOTANIQUE ET SERRES",
+    "CAFFETTERIA": "CAFÉ",
+    "SUPERMERCATO": "SUPERMARCHÉ",
+    "RISTORANTE": "RESTAURANT",
+    "LIBRERIA": "LIBRAIRIE",
+    "FARMACIA": "PHARMACIE",
+    "NEGOZIO DI MODA": "MAGASIN DE VÊTEMENTS",
+    "OFFICINA": "GARAGE",
+    "PANETTERIA": "BOULANGERIE",
+    "CINEMA": "CINÉMA",
+    "PALESTRA": "SALLE DE SPORT",
+    "HOTEL": "HÔTEL",
+    "MERCATO": "MARCHÉ"
+  },
+  "templates": [
+    {
+      "source": "{count} risultati",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "one": "{count} résultat",
+          "other": "{count} résultats"
+        }
+      }
+    },
+    {
+      "source": "{city} · {count} case · {shops} attività",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} maison",
+            "other": "{count} maisons"
+          }
+        },
+        " · ",
+        {
+          "plural": "shops",
+          "forms": {
+            "one": "{shops} commerce",
+            "other": "{shops} commerces"
+          }
+        }
+      ]
+    },
+    {
+      "source": "Casa · {city}",
+      "target": "Maison · {city}"
+    },
+    {
+      "source": "🌿 Giardino: {plant} · {count} piante",
+      "target": [
+        "🌿 Jardin : {plant} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} plante",
+            "other": "{count} plantes"
+          }
+        }
+      ],
+      "translateSlots": [
+        "plant"
+      ]
+    },
+    {
+      "source": "🎨 Colore: {color}",
+      "target": "🎨 Couleur : {color}",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "🏗️ {tier} · {floors} piani",
+      "target": {
+        "plural": "floors",
+        "forms": {
+          "one": "🏗️ {tier} · {floors} étage",
+          "other": "🏗️ {tier} · {floors} étages"
+        }
+      },
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "🎨 Design: {design}",
+      "target": "🎨 Design : {design}",
+      "translateSlots": [
+        "design"
+      ]
+    },
+    {
+      "source": "⭐ {points} punti",
+      "target": {
+        "plural": "points",
+        "forms": {
+          "one": "⭐ {points} point",
+          "other": "⭐ {points} points"
+        }
+      }
+    },
+    {
+      "source": "{count} case mancanti",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "one": "Il manque {count} maison",
+          "other": "Il manque {count} maisons"
+        }
+      }
+    },
+    {
+      "source": "{version} · Edizione mondiale",
+      "target": "{version} · Édition mondiale"
+    },
+    {
+      "source": "Prossima fermata: {city}.",
+      "target": "Prochain arrêt : {city}."
+    },
+    {
+      "source": "{city} · {count} case · {shops} negozi · {facilities} strutture pubbliche",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} maison",
+            "other": "{count} maisons"
+          }
+        },
+        " · ",
+        {
+          "plural": "shops",
+          "forms": {
+            "one": "{shops} commerce",
+            "other": "{shops} commerces"
+          }
+        },
+        " · ",
+        {
+          "plural": "facilities",
+          "forms": {
+            "one": "{facilities} équipement public",
+            "other": "{facilities} équipements publics"
+          }
+        }
+      ]
+    },
+    {
+      "source": "{city} · città raggiunta · {count} case",
+      "target": [
+        "{city} · destination atteinte · ",
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} maison",
+            "other": "{count} maisons"
+          }
+        }
+      ]
+    },
+    {
+      "source": "{city} · {count} case · scegli Entra nel 3D",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} maison",
+            "other": "{count} maisons"
+          }
+        },
+        " · sélectionnez Passer en 3D"
+      ]
+    },
+    {
+      "source": "{count} risultati mostrati · scrivi per restringere la ricerca",
+      "target": [
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} résultat affiché",
+            "other": "{count} résultats affichés"
+          }
+        },
+        " · écrivez pour affiner la recherche"
+      ]
+    },
+    {
+      "source": "{count} risultati mostrati",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "one": "{count} résultat affiché",
+          "other": "{count} résultats affichés"
+        }
+      }
+    },
+    {
+      "source": "Utente non presente in {city}",
+      "target": "Utilisateur introuvable à {city}"
+    },
+    {
+      "source": "Esplora {city} con la telecamera libera.",
+      "target": "Explorez {city} avec la caméra libre."
+    },
+    {
+      "source": "🏠 Casa #{id} · @{user}",
+      "target": "🏠 Maison nº {id} · @{user}"
+    },
+    {
+      "source": "🏠 Casa #{id}",
+      "target": "🏠 Maison nº {id}"
+    },
+    {
+      "source": "Casa #{id}",
+      "target": "Maison nº {id}"
+    },
+    {
+      "source": "{points} punti",
+      "target": {
+        "plural": "points",
+        "forms": {
+          "one": "{points} point",
+          "other": "{points} points"
+        }
+      }
+    },
+    {
+      "source": "{count} case",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "one": "{count} maison",
+          "other": "{count} maisons"
+        }
+      }
+    },
+    {
+      "source": "{count} negozi · lotti misti",
+      "target": [
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} commerce",
+            "other": "{count} commerces"
+          }
+        },
+        " · parcelles mixtes"
+      ]
+    },
+    {
+      "source": "{count} mongolfiere",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "one": "{count} montgolfière",
+          "other": "{count} montgolfières"
+        }
+      }
+    },
+    {
+      "source": "Livello {level}/{total}",
+      "target": "Niveau {level}/{total}"
+    },
+    {
+      "source": "Proprietà raggiungibili ({count})",
+      "target": "Propriétés associées ({count})"
+    },
+    {
+      "source": "Raggiungi {city}",
+      "target": "Rejoindre {city}"
+    },
+    {
+      "source": "{city} · {count} abitanti virtuali",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} habitant virtuel",
+            "other": "{count} habitants virtuels"
+          }
+        }
+      ]
+    },
+    {
+      "source": "{business} · {city} · Livello {level}/{total} · {points} punti · {design}",
+      "target": [
+        "{business} · {city} · Niveau {level}/{total} · ",
+        {
+          "plural": "points",
+          "forms": {
+            "one": "{points} point",
+            "other": "{points} points"
+          }
+        },
+        " · {design}"
+      ],
+      "translateSlots": [
+        "business",
+        "design"
+      ]
+    },
+    {
+      "source": "{business} #{id} · @{user}",
+      "target": "{business} nº {id} · @{user}",
+      "translateSlots": [
+        "business"
+      ]
+    },
+    {
+      "source": "🏪 {business} #{id}",
+      "target": "🏪 {business} nº {id}",
+      "translateSlots": [
+        "business"
+      ]
+    },
+    {
+      "source": "{tier} ({floors} piani)",
+      "target": {
+        "plural": "floors",
+        "forms": {
+          "one": "{tier} ({floors} étage)",
+          "other": "{tier} ({floors} étages)"
+        }
+      },
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{tier} ({floors} piano)",
+      "target": "{tier} ({floors} étage)",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{count} CASE",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "one": "{count} MAISON",
+          "other": "{count} MAISONS"
+        }
+      }
+    },
+    {
+      "source": "{city} · {count} case · {reached}/{total} obiettivi raggiunti",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} maison",
+            "other": "{count} maisons"
+          }
+        },
+        " · {reached}/{total} objectifs atteints"
+      ]
+    },
+    {
+      "source": "🏙 {city} · {distance} km",
+      "target": "🏙 {city} · {distance} km"
+    },
+    {
+      "source": "📍 Trova {facility}",
+      "target": "📍 Trouver {facility}",
+      "translateSlots": [
+        "facility"
+      ]
+    },
+    {
+      "source": "Personaggio · {city}",
+      "target": "Personnage · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Mongolfiera · {city}",
+      "target": "Montgolfière · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Negozio · {city}",
+      "target": "Commerce · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Livello {level} · {points} punti",
+      "target": [
+        "Niveau {level} · ",
+        {
+          "plural": "points",
+          "forms": {
+            "one": "{points} point",
+            "other": "{points} points"
+          }
+        }
+      ],
+      "translateSlots": []
+    },
+    {
+      "source": "{points} punti · {tier} ({floors} piani)",
+      "target": [
+        {
+          "plural": "points",
+          "forms": {
+            "one": "{points} point",
+            "other": "{points} points"
+          }
+        },
+        " · ",
+        {
+          "plural": "floors",
+          "forms": {
+            "one": "{tier} ({floors} étage)",
+            "other": "{tier} ({floors} étages)"
+          }
+        }
+      ],
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{color} · pareti e tetto",
+      "target": "{color} · murs et toit",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "🎈 Mongolfiera #{id}",
+      "target": "🎈 Montgolfière nº {id}",
+      "translateSlots": []
+    },
+    {
+      "source": "Casa demo di @{user}",
+      "target": "Maison de démonstration de @{user}",
+      "translateSlots": []
+    },
+    {
+      "source": "@{user} · personaggio selezionato (freccia gialla)",
+      "target": "@{user} · personnage sélectionné (flèche jaune)",
+      "translateSlots": []
+    },
+    {
+      "source": "Nella demo la prima casa appartiene a @{user}. Non è ancora presente un sistema di accesso personale.",
+      "target": "La première maison de démonstration appartient à @{user}. La connexion personnelle des habitants n’est pas encore disponible.",
+      "translateSlots": []
+    },
+    {
+      "source": "Un personaggio gratuito per ogni casa. In questa demo puoi individuare il personaggio di @{user}.",
+      "target": "Un personnage gratuit pour chaque maison. Dans cette démonstration, vous pouvez retrouver le personnage de @{user}.",
+      "translateSlots": []
+    },
+    {
+      "source": "Cespuglio: {variant}",
+      "target": "Buisson : {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Vialetto: {variant}",
+      "target": "Allée : {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Aiuola: {variant}",
+      "target": "Parterre : {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Lampioncino: {variant}",
+      "target": "Lampadaire de jardin : {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Barbecue Premium: {variant}",
+      "target": "Barbecue Premium : {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Cassetta postale: {variant}",
+      "target": "Boîte aux lettres : {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Recinzione: {variant}",
+      "target": "Clôture : {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Piscina Premium: {variant}",
+      "target": "Piscine Premium : {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Casa #{id} · colore {color}",
+      "target": "Maison nº {id} · couleur {color}",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "Demo @{user} · Casa #{id} · {points} punti · {tier}",
+      "target": "Démo @{user} · Maison nº {id} · {points} points · {tier}",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{count} località nel catalogo · {countries} paesi e territori · simulazione · {residents} in {city} · {points} punti città · {homes} case 3D caricate",
+      "target": "{count} localités dans le catalogue · {countries} pays et territoires · simulation · {residents} à {city} · {points} points de ville · {homes} maisons 3D chargées",
+      "translateSlots": []
+    }
+  ]
+}

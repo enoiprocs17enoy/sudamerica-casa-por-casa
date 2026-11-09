@@ -3,7 +3,7 @@
    Catalogues are reviewed static assets; no translation requests at runtime. */
 function createTranslator(locale,catalog={}){
  const messages=catalog.messages||{},patterns=(catalog.templates||[]).map(({source,target,translateSlots=[]})=>{
-  const slots=[];let cursor=0,pattern='^';for(const match of source.matchAll(/\{([A-Za-z][A-Za-z0-9_]*)\}/g)){const numeric=['count','points','level','total','floors','id','shops','facilities','reached'].includes(match[1]);pattern+=escape(source.slice(cursor,match.index))+(numeric?'([\\p{N}.,\\u00a0\\u202f ]+)':'(.+?)');slots.push(match[1]);cursor=match.index+match[0].length;}pattern+=escape(source.slice(cursor))+'$';return {regexp:new RegExp(pattern,'u'),slots,target,translateSlots};
+  const slots=[];let cursor=0,pattern='^';for(const match of source.matchAll(/\{([A-Za-z][A-Za-z0-9_]*)\}/g)){const numeric=['count','points','level','total','floors','id','shops','facilities','reached'].includes(match[1]);pattern+=escape(source.slice(cursor,match.index))+(numeric?'([\\p{N}.,\\u00a0\\u202f\\u066b\\u066c\\u200e\\u200f\\u061c\\u2019\\u0027 ]+)':'(.+?)');slots.push(match[1]);cursor=match.index+match[0].length;}pattern+=escape(source.slice(cursor))+'$';return {regexp:new RegExp(pattern,'u'),slots,target,translateSlots};
  });
  function escape(text){return text.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
  const number=new Intl.NumberFormat(locale),plainNumber=new Intl.NumberFormat(locale,{useGrouping:false}),plural=new Intl.PluralRules(locale),parts=number.formatToParts(12345.6),group=parts.find(part=>part.type==='group')?.value,decimal=parts.find(part=>part.type==='decimal')?.value||'.',digits=new Map(Array.from({length:10},(_,i)=>[plainNumber.format(i),String(i)]));
@@ -37,7 +37,7 @@ function bindTranslation(root,getTranslator,{onMissing=()=>{},skipSelector='scri
 }
 
 (function(){'use strict';
- const revision='9.4.0-i18n5',review=document.documentElement.dataset.i18nReview==='true',cache=new Map(),listeners=new Set(),auditors=new Set(),missing=new Set();
+ const revision='9.4.0-i18n6',review=document.documentElement.dataset.i18nReview==='true',cache=new Map(),listeners=new Set(),auditors=new Set(),missing=new Set();
  const italian={
   "locale":"it",
   "name":"Italiano",
