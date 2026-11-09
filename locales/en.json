@@ -321,7 +321,35 @@
     "Scegli una città del mondo. Il puntatore della città rimane della stessa dimensione.": "Choose a city to begin exploring the world.",
     "📍 Conegliano e dintorni · Veneto": "📍 Conegliano and nearby towns · Veneto",
     "Cerca città nel mondo": "Find cities around the world",
-    "N ↑": "N ↑"
+    "N ↑": "N ↑",
+    "Evoluzione attività": "Business evolution",
+    "Design Premium (demo)": "Premium design (demo)",
+    "Applica evoluzione": "Apply evolution",
+    "🏗️ Evoluzione di questa casa (demo)": "🏗️ Evolve this home (demo)",
+    "Scegli i punti e il design: cambia solo questa casa, senza spostare il lotto.": "Choose the points and design: only this home changes, within the same plot.",
+    "Punti esatti per questa casa": "Exact points for this home",
+    "Applica punti": "Apply points",
+    "🎨 Design per questa evoluzione": "🎨 Design for this evolution",
+    "Gratis · Casa standard": "Free · Standard home",
+    "Abbonamento · Casa con balconi, camino e dettagli": "Subscription · Home with balconies, chimney and details",
+    "🎨 Colore della casa": "🎨 Home colour",
+    "🌿 Personalizza le decorazioni · 4 modelli per sblocco": "🌿 Customise decorations · 4 designs per unlock",
+    "Casa senza piante a 0 punti.": "No plants at 0 points.",
+    "4 piante con Premium": "4 plants with Premium",
+    "2 piante con Gratis": "2 plants with Free",
+    "posizioni automatiche.": "automatically positioned.",
+    "Simulazione dell’abbonamento: non viene effettuato alcun pagamento.": "Subscription simulation: no payment is made.",
+    "Acquisti dimostrativi: nessun pagamento reale.": "Demo purchases: no real payments.",
+    "🏪 Aggiungi negozio": "🏪 Add a business",
+    "🎈 Aggiungi mongolfiera": "🎈 Add a hot-air balloon",
+    "📍 Vai alla mia casa": "📍 Go to my home",
+    "La personalizzazione della facciata sarà ampliata nelle prossime versioni.": "More façade customisation is planned for future versions.",
+    "Colore della pelle": "Skin colour",
+    "Vestiti": "Clothes",
+    "📍 Trova il mio personaggio": "📍 Find my character",
+    "Personaggio non generato": "Character not generated",
+    "Pizzeria": "Pizzeria",
+    "PIZZERIA": "PIZZERIA"
   },
   "templates": [
     {
@@ -336,7 +364,24 @@
     },
     {
       "source": "{city} · {count} case · {shops} attività",
-      "target": "{city} · {count} homes · {shops} businesses"
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} home",
+            "other": "{count} homes"
+          }
+        },
+        " · ",
+        {
+          "plural": "shops",
+          "forms": {
+            "one": "{shops} business",
+            "other": "{shops} businesses"
+          }
+        }
+      ]
     },
     {
       "source": "Casa · {city}",
@@ -344,7 +389,16 @@
     },
     {
       "source": "🌿 Giardino: {plant} · {count} piante",
-      "target": "🌿 Garden: {plant} · {count} plants",
+      "target": [
+        "🌿 Garden: {plant} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} plant",
+            "other": "{count} plants"
+          }
+        }
+      ],
       "translateSlots": [
         "plant"
       ]
@@ -406,23 +460,82 @@
     },
     {
       "source": "{city} · {count} case · {shops} negozi · {facilities} strutture pubbliche",
-      "target": "{city} · {count} homes · {shops} businesses · {facilities} public facilities"
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} home",
+            "other": "{count} homes"
+          }
+        },
+        " · ",
+        {
+          "plural": "shops",
+          "forms": {
+            "one": "{shops} business",
+            "other": "{shops} businesses"
+          }
+        },
+        " · ",
+        {
+          "plural": "facilities",
+          "forms": {
+            "one": "{facilities} public facility",
+            "other": "{facilities} public facilities"
+          }
+        }
+      ]
     },
     {
       "source": "{city} · città raggiunta · {count} case",
-      "target": "{city} · destination reached · {count} homes"
+      "target": [
+        "{city} · destination reached · ",
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} home",
+            "other": "{count} homes"
+          }
+        }
+      ]
     },
     {
       "source": "{city} · {count} case · scegli Entra nel 3D",
-      "target": "{city} · {count} homes · select Enter 3D"
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} home",
+            "other": "{count} homes"
+          }
+        },
+        " · select Enter 3D"
+      ]
     },
     {
       "source": "{count} risultati mostrati · scrivi per restringere la ricerca",
-      "target": "Showing {count} results · type to narrow your search"
+      "target": [
+        {
+          "plural": "count",
+          "forms": {
+            "one": "Showing {count} result",
+            "other": "Showing {count} results"
+          }
+        },
+        " · type to narrow your search"
+      ]
     },
     {
       "source": "{count} risultati mostrati",
-      "target": "Showing {count} results"
+      "target": {
+        "plural": "count",
+        "forms": {
+          "one": "Showing {count} result",
+          "other": "Showing {count} results"
+        }
+      }
     },
     {
       "source": "Utente non presente in {city}",
@@ -466,7 +579,16 @@
     },
     {
       "source": "{count} negozi · lotti misti",
-      "target": "{count} businesses · mixed plots"
+      "target": [
+        {
+          "plural": "count",
+          "forms": {
+            "one": "{count} business",
+            "other": "{count} businesses"
+          }
+        },
+        " · mixed plots"
+      ]
     },
     {
       "source": "{count} mongolfiere",
@@ -582,6 +704,153 @@
     {
       "source": "🏙 {city} · {distance} km",
       "target": "🏙 {city} · {distance} km"
+    },
+    {
+      "source": "📍 Trova {facility}",
+      "target": "📍 Find {facility}",
+      "translateSlots": [
+        "facility"
+      ]
+    },
+    {
+      "source": "Personaggio · {city}",
+      "target": "Character · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Mongolfiera · {city}",
+      "target": "Hot-air balloon · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Negozio · {city}",
+      "target": "Business · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Livello {level} · {points} punti",
+      "target": [
+        "Level {level} · ",
+        {
+          "plural": "points",
+          "forms": {
+            "one": "{points} point",
+            "other": "{points} points"
+          }
+        }
+      ],
+      "translateSlots": []
+    },
+    {
+      "source": "{points} punti · {tier} ({floors} piani)",
+      "target": [
+        {
+          "plural": "points",
+          "forms": {
+            "one": "{points} point",
+            "other": "{points} points"
+          }
+        },
+        " · ",
+        {
+          "plural": "floors",
+          "forms": {
+            "one": "{tier} ({floors} floor)",
+            "other": "{tier} ({floors} floors)"
+          }
+        }
+      ],
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{color} · pareti e tetto",
+      "target": "{color} · walls and roof",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "🎈 Mongolfiera #{id}",
+      "target": "🎈 Hot-air balloon #{id}",
+      "translateSlots": []
+    },
+    {
+      "source": "Casa demo di @{user}",
+      "target": "Demo home of @{user}",
+      "translateSlots": []
+    },
+    {
+      "source": "@{user} · personaggio selezionato (freccia gialla)",
+      "target": "@{user} · character selected (yellow arrow)",
+      "translateSlots": []
+    },
+    {
+      "source": "Nella demo la prima casa appartiene a @{user}. Non è ancora presente un sistema di accesso personale.",
+      "target": "The first demo home belongs to @{user}. Resident sign-in is not available yet.",
+      "translateSlots": []
+    },
+    {
+      "source": "Un personaggio gratuito per ogni casa. In questa demo puoi individuare il personaggio di @{user}.",
+      "target": "A free character for every home. In this demo, you can find the character of @{user}.",
+      "translateSlots": []
+    },
+    {
+      "source": "Cespuglio: {variant}",
+      "target": "Shrub: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Vialetto: {variant}",
+      "target": "Path: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Aiuola: {variant}",
+      "target": "Flower bed: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Lampioncino: {variant}",
+      "target": "Garden light: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Barbecue Premium: {variant}",
+      "target": "Premium barbecue: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Cassetta postale: {variant}",
+      "target": "Mailbox: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Recinzione: {variant}",
+      "target": "Fence: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Piscina Premium: {variant}",
+      "target": "Premium swimming pool: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
     }
   ]
 }

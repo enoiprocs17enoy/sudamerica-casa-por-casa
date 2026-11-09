@@ -6245,6 +6245,9 @@ function openCityDirectory(defaultType='all'){
  search.oninput=type.onchange=()=>{limit=60;render();};more.onclick=()=>{limit+=60;render();};render();
 }
 
+function leaderboardEntries(residents,limit=10){
+ return [...residents].sort((a,b)=>b.points-a.points||a.id-b.id).slice(0,limit);
+}
 function openV4(tab){
  localizedPanelRoute={type:'menu',tab};
  if(tab==='works'){openPublicWorks();return;}
@@ -6261,7 +6264,15 @@ function openV4(tab){
   if(tab==='home'||tab==='avatar')body.innerHTML='<p>Cerca il tuo nome utente per trovare la casa, il personaggio e le proprietà collegate.</p><label for="publicResidentSearch">Nome utente</label><input id="publicResidentSearch" type="search" autocomplete="off" placeholder="@nomeutente"><button id="publicFindResident">Trova nella città</button>';
  }
  if(tab==='world')body.innerHTML=`<p>Esplora ${currentCity.name} con la telecamera libera.</p><button id="v4Enter">🌎 Entra nel 3D</button><button id="v4Overview">🧭 Panoramica</button><label><input type="checkbox" id="v4Motion" ${v4.motion?'checked':''}> Animazioni ambientali</label>`;
- if(tab==='ranking')body.innerHTML=homes.slice(0,10).map((h,i)=>`<div class="v4Rank"><span>${i+1}. @${h.user}</span><b>${h.points} ⭐</b></div>`).join('');
+ if(tab==='ranking'){
+  body.replaceChildren();
+  leaderboardEntries(homes).forEach((h,i)=>{
+   const row=document.createElement('div');row.className='v4Rank';
+   const name=document.createElement('span');name.dataset.i18nSkip='true';name.dir='auto';name.textContent=(i+1)+'. @'+h.user;
+   const points=document.createElement('b');points.textContent=h.points.toLocaleString(window.GameI18n?.locale||'it-IT')+' ⭐';
+   row.append(name,points);body.append(row);
+  });
+ }
 
  const wire=(id,fn)=>{if($(id))$(id).onclick=fn};
  wire('publicBrowseShops',()=>openCityDirectory('shop'));

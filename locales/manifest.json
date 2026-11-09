@@ -10,6 +10,11 @@
       "code": "en",
       "name": "English",
       "complete": false
+    },
+    {
+      "code": "es",
+      "name": "Español",
+      "complete": false
     }
   ]
 }
