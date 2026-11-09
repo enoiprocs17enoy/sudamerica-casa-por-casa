@@ -20,6 +20,11 @@
       "code": "fr",
       "name": "Français",
       "complete": false
+    },
+    {
+      "code": "pt-BR",
+      "name": "Português (Brasil)",
+      "complete": false
     }
   ]
 }

@@ -8,7 +8,7 @@ function createTranslator(locale,catalog={}){
  function escape(text){return text.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
  const number=new Intl.NumberFormat(locale),plainNumber=new Intl.NumberFormat(locale,{useGrouping:false}),plural=new Intl.PluralRules(locale),parts=number.formatToParts(12345.6),group=parts.find(part=>part.type==='group')?.value,decimal=parts.find(part=>part.type==='decimal')?.value||'.',digits=new Map(Array.from({length:10},(_,i)=>[plainNumber.format(i),String(i)]));
  function numeric(value){let text=String(value).trim();for(const [digit,ascii]of digits)text=text.replaceAll(digit,ascii);if(group)text=text.replaceAll(group,'');text=text.replaceAll(decimal,'.').replace(/[\s\u061c\u200e\u200f]/g,'');return Number(text);}
- function render(target,values,numbers){if(Array.isArray(target))return target.map(part=>render(part,values,numbers)).join('');if(target&&typeof target==='object'){const form=plural.select(numbers[target.plural]);return render(target.forms[form]??target.forms.other,values,numbers);}return String(target).replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g,(token,key)=>values[key]??token);}
+ function render(target,values,numbers){if(Array.isArray(target))return target.map(part=>render(part,values,numbers)).join('');if(target&&typeof target==='object'){const count=numbers[target.plural],form=plural.select(count);return render(target.forms['='+count]??target.forms[form]??target.forms.other,values,numbers);}return String(target).replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g,(token,key)=>values[key]??token);}
  function translate(value,depth=0){const text=String(value??''),trimmed=text.trim();if(!trimmed)return text;
   let result=Object.hasOwn(messages,trimmed)?messages[trimmed]:null;
   if(result===null)for(const {regexp,slots,target,translateSlots}of patterns){const match=regexp.exec(trimmed);if(!match)continue;const values={},numbers={};slots.forEach((key,i)=>{const raw=match[i+1];numbers[key]=numeric(raw);values[key]=translateSlots.includes(key)&&Object.hasOwn(messages,raw)?messages[raw]:raw;if(['count','points','level','total','floors'].includes(key)&&/^\p{N}+$/u.test(raw.trim())&&Number.isFinite(numbers[key]))values[key]=(['level','total','floors'].includes(key)?plainNumber:number).format(numbers[key]);});result=render(target,values,numbers);break;}
@@ -18,7 +18,7 @@ function createTranslator(locale,catalog={}){
  }
  const script=new Intl.Locale(locale).maximize().script;
  function recognizes(value,depth=0){const text=String(value).trim();if(Object.hasOwn(messages,text)||patterns.some(pattern=>pattern.regexp.test(text)))return true;if(depth===0&&text.includes(' · '))return text.split(' · ').every(part=>recognizes(part,1));if(depth<3){const prefix=/^([^\p{L}\p{N}]+?\s+)([\s\S]+)$/u.exec(text);if(prefix)return recognizes(prefix[2],depth+1);}return false;}
- return {locale,translate,recognizes,number:value=>number.format(value),plural:(count,forms)=>forms[plural.select(count)]??forms.other,dir:['Arab','Hebr','Syrc','Thaa','Nkoo','Adlm','Rohg','Mand','Samr'].includes(script)?'rtl':'ltr'};
+ return {locale,translate,recognizes,number:value=>number.format(value),plural:(count,forms)=>forms['='+count]??forms[plural.select(count)]??forms.other,dir:['Arab','Hebr','Syrc','Thaa','Nkoo','Adlm','Rohg','Mand','Samr'].includes(script)?'rtl':'ltr'};
 }
 
 /* Translate UI text without replacing markup, handlers, values or proper names. */
@@ -36,8 +36,25 @@ function bindTranslation(root,getTranslator,{onMissing=()=>{},skipSelector='scri
  return {refresh:()=>queue(root),dispose:()=>{disposed=true;observer.disconnect();pending.clear();}};
 }
 
+/* Match regional browser preferences only to catalogues actually available. */
+function matchLocale(preference,available){
+ if(typeof preference!=='string'||!preference.trim())return null;
+ try{
+  const requested=new Intl.Locale(preference),canonical=requested.baseName;
+  const exact=available.find(code=>new Intl.Locale(code).baseName===canonical);if(exact)return exact;
+  const candidates=available.map((code,index)=>({code,index,locale:new Intl.Locale(code)})).filter(item=>item.locale.language===requested.language);
+  if(!candidates.length)return null;
+  const script=requested.maximize().script;
+  candidates.sort((a,b)=>{
+   const score=item=>(item.locale.maximize().script===script?4:0)+(requested.region&&item.locale.region===requested.region?2:0)+(!item.locale.region?1:0);
+   return score(b)-score(a)||a.index-b.index;
+  });
+  return candidates[0].code;
+ }catch{return null;}
+}
+
 (function(){'use strict';
- const revision='9.4.0-i18n8',review=document.documentElement.dataset.i18nReview==='true',cache=new Map(),listeners=new Set(),auditors=new Set(),missing=new Set();
+ const revision='9.4.0-i18n9',review=document.documentElement.dataset.i18nReview==='true',cache=new Map(),listeners=new Set(),auditors=new Set(),missing=new Set();
  const italian={
   "locale":"it",
   "name":"Italiano",
@@ -72,7 +89,7 @@ function bindTranslation(root,getTranslator,{onMissing=()=>{},skipSelector='scri
  function picker(){const controls=document.getElementById('earthControls');if(!controls)return;const container=document.createElement('div');container.id='languageSwitcher';const icon=document.createElement('span');icon.textContent='🌐';icon.setAttribute('aria-hidden','true');select=document.createElement('select');select.id='languagePicker';select.dataset.i18nSkip='true';select.setAttribute('aria-label','Lingua');for(const language of manifest.languages){if(!language.complete&&!review)continue;const option=document.createElement('option');option.value=language.code;option.textContent=language.name+(!language.complete?' · preview':'');option.lang=language.code;select.append(option);}select.onchange=()=>void setLocale(select.value);container.append(icon,select);controls.append(container);}
  const proper=node=>node.parentElement?.closest('#worldCountry,#citySelect,#cityLabel,#currentCityName,#username,.regional-city-labels,[data-i18n-skip]');
  binding=bindTranslation(document.body,()=>translator,{onMissing:(source,node)=>{const text=source.trim(),brand=text.replace(/^[^\p{L}\p{N}]+/u,'');if(review&&!proper(node)&&!translator.recognizes(text)&&!['Sudamérica Casa por Casa','Sudamérica · Casa por Casa','OpenStreetMap contributors','OpenMapTiles','GeoNames','Leaflet','Natural Earth','RESOLVE'].includes(brand)&&missing.size<3000&&/[A-Za-zÀ-ž]/.test(source))missing.add(text);}});
- (async()=>{try{const response=await fetch('locales/manifest.json?v='+revision);if(!response.ok)throw Error('Manifest not available');manifest=await response.json();picker();let requested=new URL(location.href).searchParams.get('lang');if(!requested)try{requested=localStorage.getItem('casa-language-v1');}catch{}const available=manifest.languages.filter(language=>language.complete||review).map(language=>language.code);if(!requested){for(const preference of navigator.languages||[navigator.language]){requested=available.find(code=>code.toLowerCase()===preference.toLowerCase())||available.find(code=>code===preference.split('-')[0]);if(requested)break;}}if(!available.includes(requested))requested='it';await setLocale(requested,{remember:false});
+ (async()=>{try{const response=await fetch('locales/manifest.json?v='+revision);if(!response.ok)throw Error('Manifest not available');manifest=await response.json();picker();let requested=new URL(location.href).searchParams.get('lang');if(!requested)try{requested=localStorage.getItem('casa-language-v1');}catch{}const available=manifest.languages.filter(language=>language.complete||review).map(language=>language.code);requested=matchLocale(requested,available);if(!requested){for(const preference of navigator.languages||[navigator.language]){requested=matchLocale(preference,available);if(requested)break;}}if(!requested)requested='it';await setLocale(requested,{remember:false});
   }catch{console.warn('Language manifest unavailable');}
  })();
 })();

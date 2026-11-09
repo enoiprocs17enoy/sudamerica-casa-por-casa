@@ -1,0 +1,912 @@
+{
+  "locale": "pt-BR",
+  "name": "Português (Brasil)",
+  "reviewStatus": "in-progress",
+  "messages": {
+    "Esplora il mondo": "Explore o mundo",
+    "Scegli una città": "Escolha uma cidade",
+    "Cerca utente Instagram": "Busque um usuário do Instagram",
+    "Cerca": "Buscar",
+    "Nome utente": "Nome de usuário",
+    "@nomeutente": "@usuario",
+    "case nella città": "casas na cidade",
+    "La città cresce": "A cidade está crescendo",
+    "Ingrandisci la mappa per scoprire le città e avvicinarti ai loro quartieri.": "Aproxime o mapa para descobrir cidades e explorar seus bairros.",
+    "Un mondo virtuale di città da esplorare, una casa alla volta.": "Um mundo virtual de cidades para explorar, casa por casa.",
+    "Un luogo, tante storie": "Um lugar, muitas histórias",
+    "Benvenuto, esploratore.": "Bem-vindo, explorador.",
+    "Carichiamo il mondo e le sue città.": "Carregando o mundo e suas cidades.",
+    "Una casa alla volta, il mondo prende vita.": "Casa por casa, o mundo ganha vida.",
+    "La tua città prende forma.": "Sua cidade está tomando forma.",
+    "Prepariamo edifici, strade e paesaggio.": "Preparando os edifícios, as ruas e a paisagem.",
+    "La città si rinnova.": "A cidade está se renovando.",
+    "Aggiorniamo edifici, dettagli e abitanti.": "Atualizando os edifícios, os detalhes e os habitantes.",
+    "Una città sempre più viva.": "Uma cidade cada vez mais viva.",
+    "Prepariamo le case e i servizi per i suoi abitanti.": "Preparando as casas e os serviços para seus habitantes.",
+    "Il mondo continua, intorno a te.": "O mundo continua ao seu redor.",
+    "Prepariamo le città vicine, le strade e il paesaggio.": "Preparando as cidades próximas, as estradas e a paisagem.",
+    "Esploriamo nuovi luoghi.": "Explorando novos lugares.",
+    "Carichiamo le località della regione.": "Carregando as localidades da região.",
+    "Prepariamo le località e la mappa della regione.": "Preparando as localidades e o mapa da região.",
+    "Caricamento in corso": "Carregando",
+    "Non è stato possibile completare il caricamento. Puoi riprovare.": "Não foi possível concluir o carregamento. Você pode tentar novamente.",
+    "Motore 3D non caricato. Verifica Internet e ricarica.": "Não foi possível carregar o motor 3D. Verifique sua conexão e recarregue a página.",
+    "Continente": "Continente",
+    "Paese o territorio": "País ou território",
+    "Cerca una località": "Busque uma localidade",
+    "Nome città o regione": "Nome da cidade ou região",
+    "Tutti i continenti": "Todos os continentes",
+    "Antartide": "Antártida",
+    "Europa": "Europa",
+    "America del Nord e centrale": "América do Norte e Central",
+    "America del Sud": "América do Sul",
+    "🌐 Vedi tutto il mondo": "🌐 Ver o mundo inteiro",
+    "Seleziona una città…": "Escolha uma cidade…",
+    "Caricamento delle località…": "Carregando as localidades…",
+    "Nessuna località trovata in questo paese": "Nenhuma localidade encontrada neste país",
+    "Catalogo non caricato. Controlla la connessione e riseleziona il paese.": "Não foi possível carregar o catálogo. Verifique sua conexão e selecione o país novamente.",
+    "Vai alla città selezionata": "Ir para a cidade selecionada",
+    "Entra nel 3D": "Entrar em 3D",
+    "Torna alla mappa": "Voltar ao mapa",
+    "Controlli 3D": "Controles 3D",
+    "↻ Ruota": "↻ Girar",
+    "✥ Sposta": "✥ Mover",
+    "⌂ Centro": "⌂ Centralizar",
+    "⛶ Vista ampia": "⛶ Visão ampla",
+    "☰ Comandi": "☰ Controles",
+    "Orienta a nord": "Orientar para o norte",
+    "Alterna vista dall’alto e inclinata": "Alternar entre vista aérea e inclinada",
+    "Avvicina": "Aproximar",
+    "Allontana": "Afastar",
+    "Ruota e inclina la visuale": "Girar e inclinar a visão",
+    "Sposta la visuale": "Mover a visão",
+    "🏙 Città vicine": "🏙 Cidades próximas",
+    "Città vicine": "Cidades próximas",
+    "Avvicinati alle città collegate": "Aproxime-se das cidades conectadas",
+    "Nessuna città collegata visibile in questa zona. Puoi cercare altre località nella mappa.": "Nenhuma cidade conectada está visível nesta área. Você pode buscar outras localidades no mapa.",
+    "Mappa geografica · le città sono posizionate con coordinate reali": "Mapa geográfico · as cidades estão posicionadas em suas coordenadas reais",
+    "Un mondo. Milioni di storie. Una casa per ognuno.": "Um mundo. Milhões de histórias. Uma casa para cada pessoa.",
+    "🌎 Città selezionata:": "🌎 Cidade selecionada:",
+    "Tienda": "Loja",
+    "Attività": "Negócios",
+    "La mia casa": "Minha casa",
+    "Personaggio": "Personagem",
+    "Il mio personaggio": "Meu personagem",
+    "Mondo": "Mundo",
+    "Ranking": "Ranking",
+    "Trova": "Encontrar",
+    "Obras": "Obras",
+    "Opere": "Obras públicas",
+    "Menu mondo": "Menu do mundo",
+    "Chiudi": "Fechar",
+    "Casa": "Casa",
+    "Negozio": "Negócio",
+    "Mongolfiera": "Balão de ar quente",
+    "Scopri le attività della città e le loro evoluzioni.": "Descubra os negócios da cidade e suas evoluções.",
+    "🏪 Esplora le attività": "🏪 Explorar negócios",
+    "Cerca il tuo nome utente per trovare la casa, il personaggio e le proprietà collegate.": "Busque seu nome de usuário para encontrar sua casa, seu personagem e suas propriedades vinculadas.",
+    "Trova nella città": "Encontrar na cidade",
+    "🌎 Entra nel 3D": "🌎 Entrar em 3D",
+    "🧭 Panoramica": "🧭 Visão geral",
+    "Animazioni ambientali": "Animações do ambiente",
+    "Strutture e obiettivi": "Estruturas e objetivos",
+    "Ricostruzione 3D stilizzata: la planimetria e gli elementi documentati sono affiancati da arredi di integrazione.": "Reconstrução 3D estilizada: a planta e os elementos documentados são complementados com mobiliário adicional.",
+    "Le fonti disponibili non descrivono ancora statue e fontane di questa piazza.": "As fontes disponíveis ainda não descrevem as estátuas e os chafarizes desta praça.",
+    "Presenza mappata · forma 3D da completare": "Elemento mapeado · modelo 3D a completar",
+    "Riferimento documentato · modello 3D stilizzato": "Referência documentada · modelo 3D estilizado",
+    "Tipologia mappata · modello 3D da verificare nei dettagli": "Tipo mapeado · detalhes do modelo 3D a verificar",
+    "Fonte": "Fonte",
+    "Torna agli obiettivi": "Voltar aos objetivos",
+    "Parco di quartiere": "Parque do bairro",
+    "Acquedotto e serbatoio": "Aqueduto e reservatório",
+    "Ambulatorio e pronto soccorso": "Ambulatório e pronto-socorro",
+    "Stazione di polizia": "Delegacia de polícia",
+    "Caserma dei pompieri": "Quartel dos bombeiros",
+    "Primi servizi": "Serviços essenciais",
+    "Asilo e area giochi": "Creche e playground",
+    "Scuola primaria": "Escola de ensino fundamental",
+    "Centro raccolta e riciclo": "Centro de coleta e reciclagem",
+    "Campo da calcio": "Campo de futebol",
+    "Biblioteca pubblica": "Biblioteca pública",
+    "Ospedale generale": "Hospital geral",
+    "Municipio": "Prefeitura",
+    "Autostazione": "Terminal rodoviário",
+    "Centrale elettrica di quartiere": "Usina elétrica do bairro",
+    "Giardini e area giochi": "Jardins e playground",
+    "Centro commerciale": "Shopping center",
+    "Campo da baseball": "Campo de beisebol",
+    "Centro sportivo": "Centro esportivo",
+    "Museo civico": "Museu municipal",
+    "Teatro e auditorium": "Teatro e auditório",
+    "Piscina comunale": "Piscina municipal",
+    "Stadio cittadino": "Estádio da cidade",
+    "Università e campus": "Universidade e campus",
+    "Stazione ferroviaria": "Estação ferroviária",
+    "Palazzo di giustizia": "Palácio da justiça",
+    "Depuratore e servizi ambientali": "Estação de tratamento e serviços ambientais",
+    "Piazza monumentale": "Praça monumental",
+    "Eliporto di soccorso": "Heliponto de resgate",
+    "Orto botanico e serre": "Jardim botânico e estufas",
+    "Servizi di quartiere": "Serviços do bairro",
+    "Città in crescita": "Cidade em crescimento",
+    "Grande città": "Grande cidade",
+    "Strutture pubbliche": "Estruturas públicas",
+    "Tutti gli edifici": "Todos os edifícios",
+    "Case": "Casas",
+    "Cerca edifici": "Buscar edifícios",
+    "Nome, nickname o numero…": "Nome, apelido ou número…",
+    "Mostra altri risultati": "Mostrar mais resultados",
+    "📍 Raggiungi e apri": "📍 Ir e abrir",
+    "Nessuna struttura trovata.": "Nenhuma estrutura encontrada.",
+    "Raggiunto": "Alcançado",
+    "Caffetteria": "Cafeteria",
+    "Supermercato": "Supermercado",
+    "Ristorante": "Restaurante",
+    "Libreria": "Livraria",
+    "Farmacia": "Farmácia",
+    "Negozio di moda": "Loja de roupas",
+    "Officina": "Oficina mecânica",
+    "Panetteria": "Padaria",
+    "Palestra": "Academia",
+    "Mercato": "Mercado",
+    "PIAZZA CIVICA": "PRAÇA CÍVICA",
+    "PIAZZA PRINCIPALE": "PRAÇA PRINCIPAL",
+    "SERVIZI PUBBLICI": "SERVIÇOS PÚBLICOS",
+    "Monolocale": "Quitinete",
+    "Casa piccola": "Casa pequena",
+    "Villetta": "Sobrado",
+    "Palazzina": "Prédio pequeno",
+    "Condominio": "Edifício residencial",
+    "Torre residenziale": "Torre residencial",
+    "Grattacielo": "Arranha-céu",
+    "Grattacielo monumentale": "Arranha-céu monumental",
+    "Crema": "Creme",
+    "Bianco": "Branco",
+    "Rosa": "Rosa",
+    "Azzurro": "Azul-celeste",
+    "Verde salvia": "Verde-sálvia",
+    "Ocra": "Ocre",
+    "Grigio": "Cinza",
+    "Gratis": "Grátis",
+    "Base": "Padrão",
+    "Accesso proprietario": "Acesso do proprietário",
+    "Accedi per aprire gli strumenti di simulazione.": "Entre para abrir as ferramentas de simulação.",
+    "Ricevi link di accesso": "Receber link de acesso",
+    "Apri l’email ricevuta e premi il link di accesso. Il link è personale e utilizzabile una sola volta.": "Abra o e-mail recebido e clique no link de acesso. O link é pessoal e só pode ser usado uma vez.",
+    "Apri simulazione": "Abrir simulação",
+    "Torna alla vista pubblica": "Voltar à visão pública",
+    "Apri gli strumenti proprietario": "Abrir ferramentas do proprietário",
+    "Esci dal tuo account": "Sair da conta",
+    "Vista pubblica ripristinata.": "Visão pública restaurada.",
+    "Accedi nuovamente per continuare.": "Entre novamente para continuar.",
+    "Strumenti riservati non disponibili.": "As ferramentas privadas não estão disponíveis.",
+    "Il sito sta ancora terminando il caricamento.": "O site ainda está terminando de carregar.",
+    "Sei uscito. Il sito è tornato alla vista pubblica.": "Você saiu da conta. O site voltou à visão pública.",
+    "Accesso chiuso su questo dispositivo. Connessione al servizio non disponibile.": "Sessão encerrada neste dispositivo. A conexão com o serviço está indisponível.",
+    "Troppe richieste. Attendi un minuto e riprova.": "Muitas solicitações. Aguarde um minuto e tente novamente.",
+    "Accesso non disponibile. Controlla i dati e riprova.": "Acesso indisponível. Confira os dados e tente novamente.",
+    "Verifichiamo il tuo accesso.": "Verificando seu acesso.",
+    "Tra poco tornerai alla tua città.": "Em breve você voltará à sua cidade.",
+    "Il link non è valido oppure è già stato utilizzato. Richiedi un nuovo accesso.": "O link é inválido ou já foi utilizado. Solicite um novo acesso.",
+    "Questo account non è autorizzato ad aprire la simulazione.": "Esta conta não está autorizada a abrir a simulação.",
+    "Torna al sito": "Voltar ao site",
+    "🧪 Simulazione e test": "🧪 Simulação e testes",
+    "Le modifiche di prova restano in questa sessione. Torna alla vista pubblica per ripristinare la città.": "As alterações de teste ficam apenas nesta sessão. Volte à visão pública para restaurar a cidade.",
+    "👥 Abitanti simulati:": "👥 Habitantes simulados:",
+    "Numero di case simulate": "Número de casas simuladas",
+    "Numero esatto di case": "Número exato de casas",
+    "Applica": "Aplicar",
+    "Sposta il cursore per scegliere. Rilascia per generare la città; oppure inserisci il numero esatto e premi Applica.": "Mova o controle para escolher. Solte-o para gerar a cidade, ou digite o número exato e pressione Aplicar.",
+    "🏗️ Evoluzione casa (demo)": "🏗️ Evolução da casa (demo)",
+    "Clicca qualsiasi casa nel 3D per scegliere quale far evolvere: il lotto rimane fisso.": "Selecione qualquer casa em 3D para fazê-la evoluir: o terreno permanece no mesmo lugar.",
+    "Attività di prova": "Negócios de teste",
+    "+1 negozio": "+1 negócio",
+    "+100 negozi": "+100 negócios",
+    "Azzera negozi": "Remover negócios de teste",
+    "Lingua": "Idioma",
+    "Prepariamo la tua lingua.": "Preparando seu idioma.",
+    "Aggiorniamo testi e cartelli della città.": "Atualizando os textos e as placas da cidade.",
+    "Lingua non disponibile. Controlla la connessione e riprova.": "Não foi possível carregar este idioma. Verifique sua conexão e tente novamente.",
+    "Classifica": "Classificação",
+    "abitanti": "habitantes",
+    "Negozi": "Negócios",
+    "Email": "E-mail",
+    "Premium": "Premium",
+    "Hotel": "Hotel",
+    "Cinema": "Cinema",
+    "Africa": "África",
+    "Asia": "Ásia",
+    "Oceania": "Oceania",
+    "Terracotta": "Terracota",
+    "Zoom in": "Aproximar",
+    "Zoom out": "Afastar",
+    "A JavaScript library for interactive maps": "Uma biblioteca para mapas interativos",
+    "Località:": "Localidades:",
+    "· Terre: Natural Earth": "· Terras: Natural Earth",
+    "· Terreno:": "· Terreno:",
+    "Seleziona una città del mondo: ogni città ha case evolute, negozi e mongolfiere. Avvicinati per scoprire giardini, attività e piazze. Puoi ruotare, spostarti liberamente e selezionare le case.": "Escolha uma cidade para explorar suas casas, seus negócios e seus balões. Aproxime-se para descobrir jardins, lojas e praças. Gire a visão, mova-se livremente e selecione uma casa.",
+    "Trascina per spostarti. Usa Ruota per inclinare la visuale. Su telefono allarga due dita per avvicinarti e chiudile per allontanarti. Tocca una casa, un’attività o una persona per aprire la sua scheda.": "Arraste para se mover. Use Girar para inclinar a visão. No celular, afaste dois dedos para aproximar e junte-os para afastar. Toque em uma casa, um negócio ou uma pessoa para abrir sua ficha.",
+    "Statue, fontane e dettagli della piazza": "Estátuas, chafarizes e detalhes da praça",
+    "Cerca una struttura…": "Busque uma estrutura…",
+    "Cerca strutture pubbliche": "Buscar estruturas públicas",
+    "IL TUO NEGOZIO": "SEU NEGÓCIO",
+    "PUÒ ESSERE QUI": "PODE ESTAR AQUI",
+    "PROSSIMA OPERA": "PRÓXIMA OBRA",
+    "LA CITTÀ CRESCE": "A CIDADE ESTÁ CRESCENDO",
+    "Scopri il traguardo": "Descubra o próximo objetivo",
+    "Scopri le attività": "Descubra os negócios",
+    "PIAZZA DI QUARTIERE": "PRAÇA DO BAIRRO",
+    "Cespuglio": "Arbusto",
+    "Sfera fiorita": "Arbusto florido em esfera",
+    "Arbusto a foglie": "Arbusto folhoso",
+    "Siepe compatta": "Cerca-viva compacta",
+    "Cespuglio a tre chiome": "Arbusto de três copas",
+    "Vialetto": "Caminho",
+    "Pietra chiara": "Pedra clara",
+    "Pietra scura": "Pedra escura",
+    "Cotto": "Terracota",
+    "Lastre separate": "Placas separadas",
+    "Aiuola": "Canteiro",
+    "Fiori misti": "Flores variadas",
+    "Rose rosse": "Rosas vermelhas",
+    "Margherite": "Margaridas",
+    "Lavanda": "Lavanda",
+    "Lampioncino": "Luminária de jardim",
+    "Classico": "Clássico",
+    "Globo": "Globo",
+    "Lanterna quadrata": "Lanterna quadrada",
+    "Paletto moderno": "Balizador moderno",
+    "Barbecue Premium": "Churrasqueira Premium",
+    "Muratura con cappa": "De alvenaria com coifa",
+    "Griglia con coperchio": "Grelha com tampa",
+    "Forno a legna": "Forno a lenha",
+    "Cucina BBQ moderna": "Cozinha de churrasco moderna",
+    "Cassetta postale": "Caixa de correio",
+    "Rossa": "Vermelha",
+    "Nera": "Preta",
+    "Casetta": "Casinha",
+    "Acciaio": "Aço",
+    "Recinzione": "Cerca",
+    "Legno": "Madeira",
+    "Ferro": "Ferro",
+    "Siepe": "Cerca-viva",
+    "Muretto": "Mureta",
+    "Piscina Premium": "Piscina Premium",
+    "Piscina classica": "Piscina clássica",
+    "Piscina ovale": "Piscina oval",
+    "Piscina sportiva": "Piscina esportiva",
+    "Piscina rotonda": "Piscina redonda",
+    "🌿 Giardino: non sbloccato": "🌿 Jardim: bloqueado",
+    "Scegli una città del mondo. Il puntatore della città rimane della stessa dimensione.": "Escolha uma cidade para começar a explorar o mundo.",
+    "📍 Conegliano e dintorni · Veneto": "📍 Conegliano e arredores · Veneto",
+    "Cerca città nel mondo": "Buscar cidades no mundo",
+    "N ↑": "N ↑",
+    "Evoluzione attività": "Evolução do negócio",
+    "Design Premium (demo)": "Design Premium (demo)",
+    "Applica evoluzione": "Aplicar evolução",
+    "🏗️ Evoluzione di questa casa (demo)": "🏗️ Evolução desta casa (demo)",
+    "Scegli i punti e il design: cambia solo questa casa, senza spostare il lotto.": "Escolha os pontos e o design: só esta casa muda, sem mover o terreno.",
+    "Punti esatti per questa casa": "Pontos exatos para esta casa",
+    "Applica punti": "Aplicar pontos",
+    "🎨 Design per questa evoluzione": "🎨 Design para esta evolução",
+    "Gratis · Casa standard": "Grátis · Casa padrão",
+    "Abbonamento · Casa con balconi, camino e dettagli": "Assinatura · Casa com varandas, chaminé e detalhes",
+    "🎨 Colore della casa": "🎨 Cor da casa",
+    "🌿 Personalizza le decorazioni · 4 modelli per sblocco": "🌿 Personalize a decoração · 4 modelos por desbloqueio",
+    "Casa senza piante a 0 punti.": "Casa sem plantas com 0 pontos.",
+    "4 piante con Premium": "4 plantas com Premium",
+    "2 piante con Gratis": "2 plantas na versão gratuita",
+    "posizioni automatiche.": "posicionamento automático.",
+    "Simulazione dell’abbonamento: non viene effettuato alcun pagamento.": "Simulação da assinatura: nenhum pagamento é realizado.",
+    "Acquisti dimostrativi: nessun pagamento reale.": "Compras de demonstração: nenhum pagamento real.",
+    "🏪 Aggiungi negozio": "🏪 Adicionar negócio",
+    "🎈 Aggiungi mongolfiera": "🎈 Adicionar balão",
+    "📍 Vai alla mia casa": "📍 Ir para minha casa",
+    "La personalizzazione della facciata sarà ampliata nelle prossime versioni.": "A personalização da fachada será ampliada nas próximas versões.",
+    "Colore della pelle": "Cor da pele",
+    "Vestiti": "Roupas",
+    "📍 Trova il mio personaggio": "📍 Encontrar meu personagem",
+    "Personaggio non generato": "Personagem não gerado",
+    "Pizzeria": "Pizzaria",
+    "PIZZERIA": "PIZZARIA",
+    "Opera mappata": "Obra mapeada",
+    "Fontana mappata": "Chafariz mapeado",
+    "Prepariamo la città e i suoi dintorni.": "Preparando a cidade e seus arredores.",
+    "Design Premium (demo abbonamento)": "Design Premium (demo da assinatura)",
+    "Design Gratis": "Design gratuito",
+    "San Martín anziano in abiti civili con mantello al vento, sopra base rocciosa con tre rilievi. Il monumento equestre appartiene al Parque San Martín, non a questa piazza.": "San Martín idoso em trajes civis, com o manto ao vento, sobre uma base rochosa com três relevos. O monumento equestre fica no Parque San Martín, e não nesta praça.",
+    "Giardino-calendario cartografato: aiuola floreale con anno corrente. Disegno delle fioriture interpretato, non un rilievo fotografico.": "Jardim-calendário mapeado: canteiro de flores com o ano atual. O desenho das flores é uma interpretação, não um levantamento fotográfico.",
+    "San Martín equestre, bronzo su basamento in granito con rilievi.": "Estátua equestre de San Martín, em bronze sobre uma base de granito com relevos.",
+    "Arenales a cavallo con quindici figure allegoriche alla base.": "Arenales a cavalo, com quinze figuras alegóricas na base.",
+    "Libertà di Lola Mora, marmo di Carrara, panneggio e catene spezzate; nessuno scudo o cavallo.": "A Liberdade de Lola Mora, em mármore de Carrara, com drapeados e correntes rompidas; sem escudo nem cavalo.",
+    "Posizione: cartografia · orientamento e dettagli fini ancora da verificare": "Posição: cartografia · orientação e detalhes finos ainda a verificar",
+    "PARCO DI QUARTIERE": "PARQUE DO BAIRRO",
+    "ACQUEDOTTO E SERBATOIO": "AQUEDUTO E RESERVATÓRIO",
+    "AMBULATORIO E PRONTO SOCCORSO": "AMBULATÓRIO E PRONTO-SOCORRO",
+    "STAZIONE DI POLIZIA": "DELEGACIA DE POLÍCIA",
+    "CASERMA DEI POMPIERI": "QUARTEL DOS BOMBEIROS",
+    "ASILO E AREA GIOCHI": "CRECHE E PLAYGROUND",
+    "SCUOLA PRIMARIA": "ESCOLA DE ENSINO FUNDAMENTAL",
+    "CENTRO RACCOLTA E RICICLO": "CENTRO DE COLETA E RECICLAGEM",
+    "CAMPO DA CALCIO": "CAMPO DE FUTEBOL",
+    "BIBLIOTECA PUBBLICA": "BIBLIOTECA PÚBLICA",
+    "OSPEDALE GENERALE": "HOSPITAL GERAL",
+    "MUNICIPIO": "PREFEITURA",
+    "AUTOSTAZIONE": "TERMINAL RODOVIÁRIO",
+    "CENTRALE ELETTRICA DI QUARTIERE": "USINA ELÉTRICA DO BAIRRO",
+    "GIARDINI E AREA GIOCHI": "JARDINS E PLAYGROUND",
+    "CENTRO COMMERCIALE": "SHOPPING CENTER",
+    "CAMPO DA BASEBALL": "CAMPO DE BEISEBOL",
+    "CENTRO SPORTIVO": "CENTRO ESPORTIVO",
+    "MUSEO CIVICO": "MUSEU MUNICIPAL",
+    "TEATRO E AUDITORIUM": "TEATRO E AUDITÓRIO",
+    "PISCINA COMUNALE": "PISCINA MUNICIPAL",
+    "STADIO CITTADINO": "ESTÁDIO DA CIDADE",
+    "UNIVERSITÀ E CAMPUS": "UNIVERSIDADE E CAMPUS",
+    "STAZIONE FERROVIARIA": "ESTAÇÃO FERROVIÁRIA",
+    "PALAZZO DI GIUSTIZIA": "PALÁCIO DA JUSTIÇA",
+    "DEPURATORE E SERVIZI AMBIENTALI": "ESTAÇÃO DE TRATAMENTO E SERVIÇOS AMBIENTAIS",
+    "PIAZZA MONUMENTALE": "PRAÇA MONUMENTAL",
+    "ELIPORTO DI SOCCORSO": "HELIPONTO DE RESGATE",
+    "ORTO BOTANICO E SERRE": "JARDIM BOTÂNICO E ESTUFAS",
+    "CAFFETTERIA": "CAFETERIA",
+    "SUPERMERCATO": "SUPERMERCADO",
+    "RISTORANTE": "RESTAURANTE",
+    "LIBRERIA": "LIVRARIA",
+    "FARMACIA": "FARMÁCIA",
+    "NEGOZIO DI MODA": "LOJA DE ROUPAS",
+    "OFFICINA": "OFICINA MECÂNICA",
+    "PANETTERIA": "PADARIA",
+    "CINEMA": "CINEMA",
+    "PALESTRA": "ACADEMIA",
+    "HOTEL": "HOTEL",
+    "MERCATO": "MERCADO"
+  },
+  "templates": [
+    {
+      "source": "{count} risultati",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "=0": "{count} resultados",
+          "one": "{count} resultado",
+          "other": "{count} resultados"
+        }
+      }
+    },
+    {
+      "source": "{city} · {count} case · {shops} attività",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "=0": "{count} casas",
+            "one": "{count} casa",
+            "other": "{count} casas"
+          }
+        },
+        " · ",
+        {
+          "plural": "shops",
+          "forms": {
+            "=0": "{shops} negócios",
+            "one": "{shops} negócio",
+            "other": "{shops} negócios"
+          }
+        }
+      ]
+    },
+    {
+      "source": "Casa · {city}",
+      "target": "Casa · {city}"
+    },
+    {
+      "source": "🌿 Giardino: {plant} · {count} piante",
+      "target": [
+        "🌿 Jardim: {plant} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "=0": "{count} plantas",
+            "one": "{count} planta",
+            "other": "{count} plantas"
+          }
+        }
+      ],
+      "translateSlots": [
+        "plant"
+      ]
+    },
+    {
+      "source": "🎨 Colore: {color}",
+      "target": "🎨 Cor: {color}",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "🏗️ {tier} · {floors} piani",
+      "target": {
+        "plural": "floors",
+        "forms": {
+          "=0": "🏗️ {tier} · {floors} andares",
+          "one": "🏗️ {tier} · {floors} andar",
+          "other": "🏗️ {tier} · {floors} andares"
+        }
+      },
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "🎨 Design: {design}",
+      "target": "🎨 Design: {design}",
+      "translateSlots": [
+        "design"
+      ]
+    },
+    {
+      "source": "⭐ {points} punti",
+      "target": {
+        "plural": "points",
+        "forms": {
+          "=0": "⭐ {points} pontos",
+          "one": "⭐ {points} ponto",
+          "other": "⭐ {points} pontos"
+        }
+      }
+    },
+    {
+      "source": "{count} case mancanti",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "=0": "Faltam {count} casas",
+          "one": "Falta {count} casa",
+          "other": "Faltam {count} casas"
+        }
+      }
+    },
+    {
+      "source": "{version} · Edizione mondiale",
+      "target": "{version} · Edição mundial"
+    },
+    {
+      "source": "Prossima fermata: {city}.",
+      "target": "Próxima parada: {city}."
+    },
+    {
+      "source": "{city} · {count} case · {shops} negozi · {facilities} strutture pubbliche",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "=0": "{count} casas",
+            "one": "{count} casa",
+            "other": "{count} casas"
+          }
+        },
+        " · ",
+        {
+          "plural": "shops",
+          "forms": {
+            "=0": "{shops} negócios",
+            "one": "{shops} negócio",
+            "other": "{shops} negócios"
+          }
+        },
+        " · ",
+        {
+          "plural": "facilities",
+          "forms": {
+            "=0": "{facilities} estruturas públicas",
+            "one": "{facilities} estrutura pública",
+            "other": "{facilities} estruturas públicas"
+          }
+        }
+      ]
+    },
+    {
+      "source": "{city} · città raggiunta · {count} case",
+      "target": [
+        "{city} · destino alcançado · ",
+        {
+          "plural": "count",
+          "forms": {
+            "=0": "{count} casas",
+            "one": "{count} casa",
+            "other": "{count} casas"
+          }
+        }
+      ]
+    },
+    {
+      "source": "{city} · {count} case · scegli Entra nel 3D",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "=0": "{count} casas",
+            "one": "{count} casa",
+            "other": "{count} casas"
+          }
+        },
+        " · selecione Entrar em 3D"
+      ]
+    },
+    {
+      "source": "{count} risultati mostrati · scrivi per restringere la ricerca",
+      "target": [
+        {
+          "plural": "count",
+          "forms": {
+            "=0": "{count} resultados exibidos",
+            "one": "{count} resultado exibido",
+            "other": "{count} resultados exibidos"
+          }
+        },
+        " · digite para refinar a busca"
+      ]
+    },
+    {
+      "source": "{count} risultati mostrati",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "=0": "{count} resultados exibidos",
+          "one": "{count} resultado exibido",
+          "other": "{count} resultados exibidos"
+        }
+      }
+    },
+    {
+      "source": "Utente non presente in {city}",
+      "target": "Usuário não encontrado em {city}"
+    },
+    {
+      "source": "Esplora {city} con la telecamera libera.",
+      "target": "Explore {city} com a câmera livre."
+    },
+    {
+      "source": "🏠 Casa #{id} · @{user}",
+      "target": "🏠 Casa nº {id} · @{user}"
+    },
+    {
+      "source": "🏠 Casa #{id}",
+      "target": "🏠 Casa nº {id}"
+    },
+    {
+      "source": "Casa #{id}",
+      "target": "Casa nº {id}"
+    },
+    {
+      "source": "{points} punti",
+      "target": {
+        "plural": "points",
+        "forms": {
+          "=0": "{points} pontos",
+          "one": "{points} ponto",
+          "other": "{points} pontos"
+        }
+      }
+    },
+    {
+      "source": "{count} case",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "=0": "{count} casas",
+          "one": "{count} casa",
+          "other": "{count} casas"
+        }
+      }
+    },
+    {
+      "source": "{count} negozi · lotti misti",
+      "target": [
+        {
+          "plural": "count",
+          "forms": {
+            "=0": "{count} negócios",
+            "one": "{count} negócio",
+            "other": "{count} negócios"
+          }
+        },
+        " · terrenos mistos"
+      ]
+    },
+    {
+      "source": "{count} mongolfiere",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "=0": "{count} balões de ar quente",
+          "one": "{count} balão de ar quente",
+          "other": "{count} balões de ar quente"
+        }
+      }
+    },
+    {
+      "source": "Livello {level}/{total}",
+      "target": "Nível {level}/{total}"
+    },
+    {
+      "source": "Proprietà raggiungibili ({count})",
+      "target": "Propriedades vinculadas ({count})"
+    },
+    {
+      "source": "Raggiungi {city}",
+      "target": "Viajar para {city}"
+    },
+    {
+      "source": "{city} · {count} abitanti virtuali",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "=0": "{count} habitantes virtuais",
+            "one": "{count} habitante virtual",
+            "other": "{count} habitantes virtuais"
+          }
+        }
+      ]
+    },
+    {
+      "source": "{business} · {city} · Livello {level}/{total} · {points} punti · {design}",
+      "target": [
+        "{business} · {city} · Nível {level}/{total} · ",
+        {
+          "plural": "points",
+          "forms": {
+            "=0": "{points} pontos",
+            "one": "{points} ponto",
+            "other": "{points} pontos"
+          }
+        },
+        " · {design}"
+      ],
+      "translateSlots": [
+        "business",
+        "design"
+      ]
+    },
+    {
+      "source": "{business} #{id} · @{user}",
+      "target": "{business} nº {id} · @{user}",
+      "translateSlots": [
+        "business"
+      ]
+    },
+    {
+      "source": "🏪 {business} #{id}",
+      "target": "🏪 {business} nº {id}",
+      "translateSlots": [
+        "business"
+      ]
+    },
+    {
+      "source": "{tier} ({floors} piani)",
+      "target": {
+        "plural": "floors",
+        "forms": {
+          "=0": "{tier} ({floors} andares)",
+          "one": "{tier} ({floors} andar)",
+          "other": "{tier} ({floors} andares)"
+        }
+      },
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{tier} ({floors} piano)",
+      "target": "{tier} ({floors} andar)",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{count} CASE",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "=0": "{count} CASAS",
+          "one": "{count} CASA",
+          "other": "{count} CASAS"
+        }
+      }
+    },
+    {
+      "source": "{city} · {count} case · {reached}/{total} obiettivi raggiunti",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "=0": "{count} casas",
+            "one": "{count} casa",
+            "other": "{count} casas"
+          }
+        },
+        " · {reached}/{total} objetivos alcançados"
+      ]
+    },
+    {
+      "source": "🏙 {city} · {distance} km",
+      "target": "🏙 {city} · {distance} km"
+    },
+    {
+      "source": "📍 Trova {facility}",
+      "target": "📍 Encontrar {facility}",
+      "translateSlots": [
+        "facility"
+      ]
+    },
+    {
+      "source": "Personaggio · {city}",
+      "target": "Personagem · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Mongolfiera · {city}",
+      "target": "Balão de ar quente · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Negozio · {city}",
+      "target": "Negócio · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Livello {level} · {points} punti",
+      "target": [
+        "Nível {level} · ",
+        {
+          "plural": "points",
+          "forms": {
+            "=0": "{points} pontos",
+            "one": "{points} ponto",
+            "other": "{points} pontos"
+          }
+        }
+      ],
+      "translateSlots": []
+    },
+    {
+      "source": "{points} punti · {tier} ({floors} piani)",
+      "target": [
+        {
+          "plural": "points",
+          "forms": {
+            "=0": "{points} pontos",
+            "one": "{points} ponto",
+            "other": "{points} pontos"
+          }
+        },
+        " · ",
+        {
+          "plural": "floors",
+          "forms": {
+            "=0": "{tier} ({floors} andares)",
+            "one": "{tier} ({floors} andar)",
+            "other": "{tier} ({floors} andares)"
+          }
+        }
+      ],
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{color} · pareti e tetto",
+      "target": "{color} · paredes e telhado",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "🎈 Mongolfiera #{id}",
+      "target": "🎈 Balão nº {id}",
+      "translateSlots": []
+    },
+    {
+      "source": "Casa demo di @{user}",
+      "target": "Casa de demonstração de @{user}",
+      "translateSlots": []
+    },
+    {
+      "source": "@{user} · personaggio selezionato (freccia gialla)",
+      "target": "@{user} · personagem selecionado (seta amarela)",
+      "translateSlots": []
+    },
+    {
+      "source": "Nella demo la prima casa appartiene a @{user}. Non è ancora presente un sistema di accesso personale.",
+      "target": "A primeira casa de demonstração pertence a @{user}. O acesso pessoal dos moradores ainda não está disponível.",
+      "translateSlots": []
+    },
+    {
+      "source": "Un personaggio gratuito per ogni casa. In questa demo puoi individuare il personaggio di @{user}.",
+      "target": "Um personagem gratuito para cada casa. Nesta demonstração, você pode encontrar o personagem de @{user}.",
+      "translateSlots": []
+    },
+    {
+      "source": "Cespuglio: {variant}",
+      "target": "Arbusto: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Vialetto: {variant}",
+      "target": "Caminho: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Aiuola: {variant}",
+      "target": "Canteiro: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Lampioncino: {variant}",
+      "target": "Luminária de jardim: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Barbecue Premium: {variant}",
+      "target": "Churrasqueira Premium: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Cassetta postale: {variant}",
+      "target": "Caixa de correio: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Recinzione: {variant}",
+      "target": "Cerca: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Piscina Premium: {variant}",
+      "target": "Piscina Premium: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Casa #{id} · colore {color}",
+      "target": "Casa nº {id} · cor {color}",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "Demo @{user} · Casa #{id} · {points} punti · {tier}",
+      "target": "Demo @{user} · Casa nº {id} · {points} pontos · {tier}",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{count} località nel catalogo · {countries} paesi e territori · simulazione · {residents} in {city} · {points} punti città · {homes} case 3D caricate",
+      "target": "{count} localidades no catálogo · {countries} países e territórios · simulação · {residents} em {city} · {points} pontos da cidade · {homes} casas 3D carregadas",
+      "translateSlots": []
+    }
+  ]
+}
