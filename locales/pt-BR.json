@@ -899,7 +899,18 @@
     },
     {
       "source": "Demo @{user} · Casa #{id} · {points} punti · {tier}",
-      "target": "Demo @{user} · Casa nº {id} · {points} pontos · {tier}",
+      "target": [
+        "Demo @{user} · Casa nº {id} · ",
+        {
+          "plural": "points",
+          "forms": {
+            "=0": "{points} pontos",
+            "one": "{points} ponto",
+            "other": "{points} pontos"
+          }
+        },
+        " · {tier}"
+      ],
       "translateSlots": [
         "tier"
       ]
