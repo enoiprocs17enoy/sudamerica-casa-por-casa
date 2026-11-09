@@ -25,8 +25,8 @@ function createTranslator(locale,catalog={}){
 function bindTranslation(root,getTranslator,{onMissing=()=>{},skipSelector='script,style,noscript,code,pre,textarea,[data-i18n-skip],#worldCountry,#citySelect,#cityLabel,#currentCityName,#loadingPlace,.regional-city-labels,#username'}={}){
  const textSources=new WeakMap(),attributeSources=new WeakMap(),pending=new Set();let scheduled=false,disposed=false;
  const skip=node=>!node||!!node.closest?.(skipSelector);
- function text(node){if(skip(node.parentElement)||!node.data.trim())return;const previous=textSources.get(node),source=previous&&node.data===previous.rendered?previous.source:node.data;const rendered=getTranslator().translate(source);textSources.set(node,{source,rendered});if(node.data!==rendered)node.data=rendered;if(source===rendered&&/[\p{L}]/u.test(source))onMissing(source,node);}
- function attributes(element){if(skip(element))return;let sources=attributeSources.get(element);if(!sources){sources=new Map();attributeSources.set(element,sources);}for(const name of ['title','aria-label','placeholder']){if(!element.hasAttribute(name))continue;const value=element.getAttribute(name),previous=sources.get(name),source=previous&&value===previous.rendered?previous.source:value,rendered=getTranslator().translate(source);sources.set(name,{source,rendered});if(value!==rendered)element.setAttribute(name,rendered);if(source===rendered&&/[\p{L}]/u.test(source))onMissing(source,{parentElement:element});}}
+ function text(node){if(skip(node.parentElement)||!node.data.trim())return;const previous=textSources.get(node),source=previous&&node.data===previous.rendered?previous.source:node.data;const rendered=getTranslator().translate(source);textSources.set(node,{source,rendered});if(node.data!==rendered)node.data=rendered;if(/[\p{L}]/u.test(source))onMissing(source,node);}
+ function attributes(element){if(skip(element))return;let sources=attributeSources.get(element);if(!sources){sources=new Map();attributeSources.set(element,sources);}for(const name of ['title','aria-label','placeholder']){if(!element.hasAttribute(name))continue;const value=element.getAttribute(name),previous=sources.get(name),source=previous&&value===previous.rendered?previous.source:value,rendered=getTranslator().translate(source);sources.set(name,{source,rendered});if(value!==rendered)element.setAttribute(name,rendered);if(/[\p{L}]/u.test(source))onMissing(source,{parentElement:element});}}
  function walk(node){if(node.nodeType===3){text(node);return;}if(node.nodeType!==1||skip(node))return;attributes(node);for(const element of node.querySelectorAll('[title],[aria-label],[placeholder]'))attributes(element);const walker=document.createTreeWalker(node,NodeFilter.SHOW_TEXT);let next;while(next=walker.nextNode())text(next);}
  const options={subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['title','aria-label','placeholder']};
  function flush(){scheduled=false;if(disposed)return;observer.disconnect();try{const roots=[...pending];pending.clear();for(const node of roots){if(node!==root&&!node.isConnected)continue;if(roots.some(parent=>parent!==node&&parent.contains?.(node)))continue;walk(node);}}finally{observer.observe(root,options);}}
@@ -37,7 +37,7 @@ function bindTranslation(root,getTranslator,{onMissing=()=>{},skipSelector='scri
 }
 
 (function(){'use strict';
- const revision='9.4.0-i18n6',review=document.documentElement.dataset.i18nReview==='true',cache=new Map(),listeners=new Set(),auditors=new Set(),missing=new Set();
+ const revision='9.4.0-i18n7',review=document.documentElement.dataset.i18nReview==='true',cache=new Map(),listeners=new Set(),auditors=new Set(),missing=new Set();
  const italian={
   "locale":"it",
   "name":"Italiano",
