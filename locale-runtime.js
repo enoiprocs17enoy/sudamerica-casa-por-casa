@@ -37,7 +37,7 @@ function bindTranslation(root,getTranslator,{onMissing=()=>{},skipSelector='scri
 }
 
 (function(){'use strict';
- const revision='9.4.0-i18n4',review=document.documentElement.dataset.i18nReview==='true',cache=new Map(),listeners=new Set(),auditors=new Set(),missing=new Set();
+ const revision='9.4.0-i18n5',review=document.documentElement.dataset.i18nReview==='true',cache=new Map(),listeners=new Set(),auditors=new Set(),missing=new Set();
  const italian={
   "locale":"it",
   "name":"Italiano",

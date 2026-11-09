@@ -6182,7 +6182,7 @@ function openSquareDetailPanel(){
  if(!features.length){const empty=document.createElement('p');empty.textContent='Le fonti disponibili non descrivono ancora statue e fontane di questa piazza.';body.append(empty);}
  for(const feature of features){
   const row=document.createElement('div');row.className='civicObjective '+(feature.status==='needs-model'?'pending':'documented');
-  const name=document.createElement('strong');name.textContent=feature.name;
+  const name=document.createElement('strong');name.textContent=feature.name;if(!['Opera mappata','Fontana mappata'].includes(feature.name))name.dataset.i18nSkip='true';
   const state=document.createElement('span');state.textContent=feature.status==='needs-model'?'Presenza mappata · forma 3D da completare':feature.status==='reference-model'?'Riferimento documentato · modello 3D stilizzato':'Tipologia mappata · modello 3D da verificare nei dettagli';row.append(name,state);
   if(feature.description){const description=document.createElement('p');description.textContent=feature.description;row.append(description);}
   if(feature.evidence){const evidence=document.createElement('small');evidence.textContent='Posizione: '+(feature.evidence.position==='mapped-point'?'cartografia':feature.evidence.position)+' · orientamento e dettagli fini ancora da verificare';row.append(evidence);}

@@ -349,7 +349,18 @@
     "📍 Trova il mio personaggio": "📍 Find my character",
     "Personaggio non generato": "Character not generated",
     "Pizzeria": "Pizzeria",
-    "PIZZERIA": "PIZZERIA"
+    "PIZZERIA": "PIZZERIA",
+    "Opera mappata": "Mapped artwork",
+    "Fontana mappata": "Mapped fountain",
+    "Prepariamo la città e i suoi dintorni.": "Preparing the city and its surroundings.",
+    "Design Premium (demo abbonamento)": "Premium design (subscription demo)",
+    "Design Gratis": "Free design",
+    "San Martín anziano in abiti civili con mantello al vento, sopra base rocciosa con tre rilievi. Il monumento equestre appartiene al Parque San Martín, non a questa piazza.": "An elderly San Martín in civilian clothes, his cloak blowing in the wind, on a rocky base with three reliefs. The equestrian monument stands in Parque San Martín, a different location.",
+    "Giardino-calendario cartografato: aiuola floreale con anno corrente. Disegno delle fioriture interpretato, non un rilievo fotografico.": "Mapped calendar garden: a flower bed displaying the current year. The floral design is an interpretation rather than a photographic survey.",
+    "San Martín equestre, bronzo su basamento in granito con rilievi.": "Equestrian statue of San Martín, in bronze on a granite pedestal with reliefs.",
+    "Arenales a cavallo con quindici figure allegoriche alla base.": "Arenales on horseback, with fifteen allegorical figures around the base.",
+    "Libertà di Lola Mora, marmo di Carrara, panneggio e catene spezzate; nessuno scudo o cavallo.": "Lola Mora’s Liberty, in Carrara marble, with drapery and broken chains. The sculpture has no shield or horse.",
+    "Posizione: cartografia · orientamento e dettagli fini ancora da verificare": "Position: mapped · orientation and fine details still need verification"
   },
   "templates": [
     {
@@ -851,6 +862,25 @@
       "translateSlots": [
         "variant"
       ]
+    },
+    {
+      "source": "Casa #{id} · colore {color}",
+      "target": "Home #{id} · colour {color}",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "Demo @{user} · Casa #{id} · {points} punti · {tier}",
+      "target": "Demo @{user} · Home #{id} · {points} points · {tier}",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{count} località nel catalogo · {countries} paesi e territori · simulazione · {residents} in {city} · {points} punti città · {homes} case 3D caricate",
+      "target": "{count} places in the catalogue · {countries} countries and territories · simulation · {residents} in {city} · {points} city points · {homes} 3D homes loaded",
+      "translateSlots": []
     }
   ]
 }

@@ -349,7 +349,18 @@
     "📍 Trova il mio personaggio": "📍 Encontrar mi personaje",
     "Personaggio non generato": "Personaje no generado",
     "Pizzeria": "Pizzería",
-    "PIZZERIA": "PIZZERÍA"
+    "PIZZERIA": "PIZZERÍA",
+    "Opera mappata": "Obra cartografiada",
+    "Fontana mappata": "Fuente cartografiada",
+    "Prepariamo la città e i suoi dintorni.": "Preparando la ciudad y sus alrededores.",
+    "Design Premium (demo abbonamento)": "Diseño Premium (demo de suscripción)",
+    "Design Gratis": "Diseño gratuito",
+    "San Martín anziano in abiti civili con mantello al vento, sopra base rocciosa con tre rilievi. Il monumento equestre appartiene al Parque San Martín, non a questa piazza.": "San Martín anciano con vestimenta civil y el manto al viento, sobre una base rocosa con tres relieves. El monumento ecuestre se encuentra en el Parque San Martín, no en esta plaza.",
+    "Giardino-calendario cartografato: aiuola floreale con anno corrente. Disegno delle fioriture interpretato, non un rilievo fotografico.": "Jardín calendario cartografiado: parterre floral con el año actual. El diseño de las flores es una interpretación, no un relevamiento fotográfico.",
+    "San Martín equestre, bronzo su basamento in granito con rilievi.": "Estatua ecuestre de San Martín, de bronce sobre una base de granito con relieves.",
+    "Arenales a cavallo con quindici figure allegoriche alla base.": "Arenales a caballo con quince figuras alegóricas en la base.",
+    "Libertà di Lola Mora, marmo di Carrara, panneggio e catene spezzate; nessuno scudo o cavallo.": "La Libertad de Lola Mora, en mármol de Carrara, con paños y cadenas rotas; sin escudo ni caballo.",
+    "Posizione: cartografia · orientamento e dettagli fini ancora da verificare": "Posición: cartografía · orientación y detalles finos pendientes de verificar"
   },
   "templates": [
     {
@@ -851,6 +862,25 @@
       "translateSlots": [
         "variant"
       ]
+    },
+    {
+      "source": "Casa #{id} · colore {color}",
+      "target": "Casa #{id} · color {color}",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "Demo @{user} · Casa #{id} · {points} punti · {tier}",
+      "target": "Demo @{user} · Casa #{id} · {points} puntos · {tier}",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{count} località nel catalogo · {countries} paesi e territori · simulazione · {residents} in {city} · {points} punti città · {homes} case 3D caricate",
+      "target": "{count} localidades en el catálogo · {countries} países y territorios · simulación · {residents} en {city} · {points} puntos de ciudad · {homes} casas 3D cargadas",
+      "translateSlots": []
     }
   ]
 }
