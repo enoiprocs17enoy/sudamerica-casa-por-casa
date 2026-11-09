@@ -13,18 +13,20 @@ function createTranslator(locale,catalog={}){
   let result=Object.hasOwn(messages,trimmed)?messages[trimmed]:null;
   if(result===null)for(const {regexp,slots,target,translateSlots}of patterns){const match=regexp.exec(trimmed);if(!match)continue;const values={},numbers={};slots.forEach((key,i)=>{const raw=match[i+1];numbers[key]=numeric(raw);values[key]=translateSlots.includes(key)&&Object.hasOwn(messages,raw)?messages[raw]:raw;if(['count','points','level','total','floors'].includes(key)&&/^\p{N}+$/u.test(raw.trim())&&Number.isFinite(numbers[key]))values[key]=(['level','total','floors'].includes(key)?plainNumber:number).format(numbers[key]);});result=render(target,values,numbers);break;}
   if(result===null&&depth===0&&trimmed.includes(' · '))result=trimmed.split(' · ').map(part=>translate(part,1)).join(' · ');
+  if(result===null&&depth<3){const prefix=/^([^\p{L}\p{N}]+?\s+)([\s\S]+)$/u.exec(trimmed);if(prefix)result=prefix[1]+translate(prefix[2],depth+1);}
   return result===null?text:text.slice(0,text.indexOf(trimmed))+result+text.slice(text.indexOf(trimmed)+trimmed.length);
  }
  const script=new Intl.Locale(locale).maximize().script;
- return {locale,translate,recognizes:value=>Object.hasOwn(messages,String(value).trim())||patterns.some(pattern=>pattern.regexp.test(String(value).trim())),number:value=>number.format(value),plural:(count,forms)=>forms[plural.select(count)]??forms.other,dir:['Arab','Hebr','Syrc','Thaa','Nkoo','Adlm','Rohg','Mand','Samr'].includes(script)?'rtl':'ltr'};
+ function recognizes(value,depth=0){const text=String(value).trim();if(Object.hasOwn(messages,text)||patterns.some(pattern=>pattern.regexp.test(text)))return true;if(depth===0&&text.includes(' · '))return text.split(' · ').every(part=>recognizes(part,1));if(depth<3){const prefix=/^([^\p{L}\p{N}]+?\s+)([\s\S]+)$/u.exec(text);if(prefix)return recognizes(prefix[2],depth+1);}return false;}
+ return {locale,translate,recognizes,number:value=>number.format(value),plural:(count,forms)=>forms[plural.select(count)]??forms.other,dir:['Arab','Hebr','Syrc','Thaa','Nkoo','Adlm','Rohg','Mand','Samr'].includes(script)?'rtl':'ltr'};
 }
 
 /* Translate UI text without replacing markup, handlers, values or proper names. */
-function bindTranslation(root,getTranslator,{onMissing=()=>{},skipSelector='script,style,code,pre,textarea,[data-i18n-skip],#worldCountry,#citySelect,#cityLabel,#currentCityName,#loadingPlace,.regional-city-labels,#username'}={}){
+function bindTranslation(root,getTranslator,{onMissing=()=>{},skipSelector='script,style,noscript,code,pre,textarea,[data-i18n-skip],#worldCountry,#citySelect,#cityLabel,#currentCityName,#loadingPlace,.regional-city-labels,#username'}={}){
  const textSources=new WeakMap(),attributeSources=new WeakMap(),pending=new Set();let scheduled=false,disposed=false;
  const skip=node=>!node||!!node.closest?.(skipSelector);
  function text(node){if(skip(node.parentElement)||!node.data.trim())return;const previous=textSources.get(node),source=previous&&node.data===previous.rendered?previous.source:node.data;const rendered=getTranslator().translate(source);textSources.set(node,{source,rendered});if(node.data!==rendered)node.data=rendered;if(source===rendered&&/[\p{L}]/u.test(source))onMissing(source,node);}
- function attributes(element){if(skip(element))return;let sources=attributeSources.get(element);if(!sources){sources=new Map();attributeSources.set(element,sources);}for(const name of ['title','aria-label','placeholder']){if(!element.hasAttribute(name))continue;const value=element.getAttribute(name),previous=sources.get(name),source=previous&&value===previous.rendered?previous.source:value,rendered=getTranslator().translate(source);sources.set(name,{source,rendered});if(value!==rendered)element.setAttribute(name,rendered);}}
+ function attributes(element){if(skip(element))return;let sources=attributeSources.get(element);if(!sources){sources=new Map();attributeSources.set(element,sources);}for(const name of ['title','aria-label','placeholder']){if(!element.hasAttribute(name))continue;const value=element.getAttribute(name),previous=sources.get(name),source=previous&&value===previous.rendered?previous.source:value,rendered=getTranslator().translate(source);sources.set(name,{source,rendered});if(value!==rendered)element.setAttribute(name,rendered);if(source===rendered&&/[\p{L}]/u.test(source))onMissing(source,{parentElement:element});}}
  function walk(node){if(node.nodeType===3){text(node);return;}if(node.nodeType!==1||skip(node))return;attributes(node);for(const element of node.querySelectorAll('[title],[aria-label],[placeholder]'))attributes(element);const walker=document.createTreeWalker(node,NodeFilter.SHOW_TEXT);let next;while(next=walker.nextNode())text(next);}
  const options={subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['title','aria-label','placeholder']};
  function flush(){scheduled=false;if(disposed)return;observer.disconnect();try{const roots=[...pending];pending.clear();for(const node of roots){if(node!==root&&!node.isConnected)continue;if(roots.some(parent=>parent!==node&&parent.contains?.(node)))continue;walk(node);}}finally{observer.observe(root,options);}}
@@ -35,7 +37,7 @@ function bindTranslation(root,getTranslator,{onMissing=()=>{},skipSelector='scri
 }
 
 (function(){'use strict';
- const revision='9.4.0-i18n2',review=document.documentElement.dataset.i18nReview==='true',cache=new Map(),listeners=new Set(),auditors=new Set(),missing=new Set();
+ const revision='9.4.0-i18n3',review=document.documentElement.dataset.i18nReview==='true',cache=new Map(),listeners=new Set(),auditors=new Set(),missing=new Set();
  const italian={
   "locale":"it",
   "name":"Italiano",

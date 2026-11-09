@@ -317,7 +317,11 @@
     "CINEMA": "CINEMA",
     "PALESTRA": "GYM",
     "HOTEL": "HOTEL",
-    "MERCATO": "MARKET"
+    "MERCATO": "MARKET",
+    "Scegli una città del mondo. Il puntatore della città rimane della stessa dimensione.": "Choose a city to begin exploring the world.",
+    "📍 Conegliano e dintorni · Veneto": "📍 Conegliano and nearby towns · Veneto",
+    "Cerca città nel mondo": "Find cities around the world",
+    "N ↑": "N ↑"
   },
   "templates": [
     {
@@ -574,6 +578,10 @@
         },
         " · {reached}/{total} milestones reached"
       ]
+    },
+    {
+      "source": "🏙 {city} · {distance} km",
+      "target": "🏙 {city} · {distance} km"
     }
   ]
 }
