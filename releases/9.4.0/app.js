@@ -6176,7 +6176,7 @@ function animateLife(t){if(!active||!v4.motion)return;
 function publicStepStatus(step){return {unlocked:count>=step.at,remaining:Math.max(0,step.at-count)};}
 function openSquareDetailPanel(){
  localizedPanelRoute={type:'square'};
- const panel=$('v4Panel'),body=$('v4Body'),profile=citySquareProfile(currentCity);panel.hidden=false;$('v4Title').textContent=profile.name;$('v4Title').dataset.i18nSkip='true';body.replaceChildren();
+ const panel=$('v4Panel'),body=$('v4Body'),profile=citySquareProfile(currentCity);panel.hidden=false;$('v4Title').textContent=profile.name;if(profile.name.startsWith('Piazza civica di '))delete $('v4Title').dataset.i18nSkip;else $('v4Title').dataset.i18nSkip='true';body.replaceChildren();
  const intro=document.createElement('p');intro.textContent='Ricostruzione 3D stilizzata: la planimetria e gli elementi documentati sono affiancati da arredi di integrazione.';body.append(intro);
  const features=profile.landmarks||[];
  if(!features.length){const empty=document.createElement('p');empty.textContent='Le fonti disponibili non descrivono ancora statue e fontane di questa piazza.';body.append(empty);}
@@ -6194,7 +6194,7 @@ function openSquareDetailPanel(){
 }
 function openPublicWorks(selected=null){
  localizedPanelRoute={type:'works',selected};
- const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;$('v4Title').textContent=selected?.name||'Strutture e obiettivi';delete $('v4Title').dataset.i18nSkip;if(selected?.kind==='park'&&selected.block===0)$('v4Title').dataset.i18nSkip='true';body.replaceChildren();
+ const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;$('v4Title').textContent=selected?.name||'Strutture e obiettivi';delete $('v4Title').dataset.i18nSkip;if(selected?.kind==='park'&&selected.block===0&&!selected.name.startsWith('Piazza civica di '))$('v4Title').dataset.i18nSkip='true';body.replaceChildren();
  const summary=document.createElement('p');summary.textContent=currentCity.name+' · '+count.toLocaleString(window.GameI18n?.locale||'it-IT')+' case · '+PUBLIC_STEPS.filter(s=>publicStepStatus(s).unlocked).length+'/'+PUBLIC_STEPS.length+' obiettivi raggiunti';body.append(summary);
  if(!selected||selected.kind==='park'){
   const details=document.createElement('button');details.textContent='Statue, fontane e dettagli della piazza';details.onclick=openSquareDetailPanel;body.append(details);

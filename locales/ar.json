@@ -1018,6 +1018,11 @@
       "source": "{count} località nel catalogo · {countries} paesi e territori · simulazione · {residents} in {city} · {points} punti città · {homes} case 3D caricate",
       "target": "الأماكن في الدليل: {count} · الدول والأقاليم: {countries} · محاكاة · السكان في {city}: {residents} · نقاط المدينة: {points} · المنازل ثلاثية الأبعاد المحمّلة: {homes}",
       "translateSlots": []
+    },
+    {
+      "source": "Piazza civica di {city}",
+      "target": "الساحة المدنية في {city}",
+      "translateSlots": []
     }
   ]
 }

@@ -919,6 +919,11 @@
       "source": "{count} località nel catalogo · {countries} paesi e territori · simulazione · {residents} in {city} · {points} punti città · {homes} case 3D caricate",
       "target": "{count} localidades no catálogo · {countries} países e territórios · simulação · {residents} em {city} · {points} pontos da cidade · {homes} casas 3D carregadas",
       "translateSlots": []
+    },
+    {
+      "source": "Piazza civica di {city}",
+      "target": "Praça cívica de {city}",
+      "translateSlots": []
     }
   ]
 }
