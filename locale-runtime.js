@@ -54,7 +54,7 @@ function matchLocale(preference,available){
 }
 
 (function(){'use strict';
- const revision='9.4.0-i18n23',review=document.documentElement.dataset.i18nReview==='true',cache=new Map(),listeners=new Set(),auditors=new Set(),missing=new Set();
+ const revision='9.4.0-i18n24',review=document.documentElement.dataset.i18nReview==='true',cache=new Map(),listeners=new Set(),auditors=new Set(),missing=new Set();
  const preferenceKey=review?'casa-language-review-v1':'casa-language-v1';
  const italian={
   "locale":"it",
