@@ -40,6 +40,11 @@
       "code": "pt-BR",
       "name": "Português (Brasil)",
       "complete": false
+    },
+    {
+      "code": "zh-Hans",
+      "name": "简体中文",
+      "complete": false
     }
   ]
 }
