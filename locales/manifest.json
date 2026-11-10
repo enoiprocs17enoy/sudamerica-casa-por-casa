@@ -32,6 +32,11 @@
       "complete": false
     },
     {
+      "code": "ja",
+      "name": "日本語",
+      "complete": false
+    },
+    {
       "code": "pt-BR",
       "name": "Português (Brasil)",
       "complete": false
