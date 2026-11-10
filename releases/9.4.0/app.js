@@ -1093,12 +1093,19 @@ function decorationAllowed(x,z,w,d){
  if(!isInsideParcel(x,z,w,d,bb))return false;
  const block=cellBlockIndex(col,row);
  if(block!==null){
+  // The lattice and reserved parcels never change between cities or evolutions.
+  // Keep these private to collision checks; callers cannot mutate cached bounds.
+  const cache=decorationAllowed.parcels||(decorationAllowed.parcels=new Map());
+  let reserved=cache.get(block);
+  if(!reserved){
+   reserved=Array.from({length:LOT_COLS*LOT_ROWS},(_,slot)=>plotBounds(block,slot));
+   if(block%PUBLIC_BLOCK_INTERVAL===0)reserved.push(facilityBounds(block));
+   if(cache.size>=1024)cache.delete(cache.keys().next().value);
+   cache.set(block,reserved);
+  }
   // No landscaping/parking/playgrounds may overlap ANY permanently reserved lot.
   // This also protects lots which have not yet been purchased or occupied.
-  for(let slot=0;slot<LOT_COLS*LOT_ROWS;slot++){
-   if(overlapsRect(x,z,w,d,plotBounds(block,slot),.12))return false;
-  }
-  if(block%PUBLIC_BLOCK_INTERVAL===0&&overlapsRect(x,z,w,d,facilityBounds(block),.12))return false;
+  for(const parcel of reserved)if(overlapsRect(x,z,w,d,parcel,.12))return false;
  }
  return true;
 }
@@ -5407,7 +5414,7 @@ function rebuildNow(){
  clearAvatarLabels();residentBatches=null;
  group=new THREE.Group();houseMeshes=[];window.v47Marker=null;window.v49Focus=null;
  const selected=homes,errors=[];
- function safe(label,fn){try{fn()}catch(err){console.error(label,err);errors.push(label+': '+err.message)}}
+ function safe(label,fn){const started=window.ReviewPerformance?performance.now():null;try{fn()}catch(err){console.error(label,err);errors.push(label+': '+err.message)}finally{if(started!==null)window.ReviewPerformance.recordStage(label,performance.now()-started);}}
  safe('Strade',()=>drawRoadNetwork(selected));
  const before=group.children.length;
  safe('Edifici',()=>renderAllHouses(selected));
