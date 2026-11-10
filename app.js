@@ -4380,18 +4380,21 @@ function renderAllHouses(selected){
   const domeGeo=new THREE.SphereGeometry(.5,8,5);
   const poolCircleGeo=new THREE.CylinderGeometry(.5,.5,1,20);
   const dummy=new THREE.Object3D(),batches=new Map();
+  let facingHouse=null,facingAngle=0,facingCos=1,facingSin=0;
   function place(kind,geo,color,h,x,y,z,w,height,d,rotation=0){
     const key=kind+'_'+color;
     if(!batches.has(key))batches.set(key,{geo,color,entries:[]});
     // Every building faces the road bordering its row: north row toward -Z,
     // south row toward +Z. Rotate *all* architectural details together.
-    if(h){const a=facadeAngle(h),dx=x-h.x;let dz=z-h.z;
-      const ca=Math.cos(a),sa=Math.sin(a);
+    if(h){
+      if(facingHouse!==h){facingHouse=h;facingAngle=facadeAngle(h);facingCos=Math.cos(facingAngle);facingSin=Math.sin(facingAngle);}
+      const a=facingAngle,dx=x-h.x;let dz=z-h.z;
+      const ca=facingCos,sa=facingSin;
       dz+=(h._visualOffsetZ||0);
       x=h.x+dx*ca+dz*sa;z=h.z-dx*sa+dz*ca;
       rotation+=a;
     }
-    batches.get(key).entries.push({h,x,y,z,w,height,d,rotation});
+    batches.get(key).entries.push({h,x,y,z,w,height,d,rotation,color});
   }
   for(const h of selected){
     const tier=houseTier(h.points);
@@ -4869,7 +4872,9 @@ function renderAllHouses(selected){
       if(!renderBatches.has(key))renderBatches.set(key,{
         profile,geo:batch.geo,texture,normalStrength,roughness,metalness,casts,receives,entries:[]
       });
-      renderBatches.get(key).entries.push({...entry,color:batch.color});
+      // Placements are already complete. Reuse them rather than cloning every
+      // window, roof tile and trim piece into a second temporary object graph.
+      renderBatches.get(key).entries.push(entry);
     }
   }
   const tint=new THREE.Color();
