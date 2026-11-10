@@ -5942,16 +5942,26 @@ function v45Avatar(h,i){
  return a;
 }
 function v45Bird(i,x,z,phase){
+ const assets=v45Bird.assets||(v45Bird.assets={geometry:{
+  body:new THREE.SphereGeometry(.56,10,8),head:new THREE.SphereGeometry(.29,9,7),
+  beak:new THREE.ConeGeometry(.13,.53,6),eye:new THREE.SphereGeometry(.045,5,4),
+  tail:new THREE.ConeGeometry(.32,.65,3),wing:new THREE.BoxGeometry(1.8,.10,.57)
+ },materials:new Map()});
+ function part(shape,color,parent,x=0,y=0,z=0){
+  if(!assets.materials.has(color))assets.materials.set(color,new THREE.MeshLambertMaterial({color}));
+  const mesh=new THREE.Mesh(assets.geometry[shape],assets.materials.get(color));
+  mesh.position.set(x,y,z);parent.add(mesh);return mesh;
+ }
  const g=new THREE.Group(),feather=i%5===0?0xe3e9ef:0xfff8e9;
- const body=v4Mesh(new THREE.SphereGeometry(.56,10,8),feather,g,0,0,0);body.scale.set(.72,.52,1.45);
- v4Mesh(new THREE.SphereGeometry(.29,9,7),feather,g,0,.14,-.7);
- const beak=v4Mesh(new THREE.ConeGeometry(.13,.53,6),0xe9b350,g,0,.08,-1.09);beak.rotation.x=Math.PI/2;
- for(const xx of [-.16,.16])v4Mesh(new THREE.SphereGeometry(.045,5,4),0x273c4b,g,xx,.22,-.9);
- const tail=v4Mesh(new THREE.ConeGeometry(.32,.65,3),feather,g,0,.04,1.02);tail.rotation.x=Math.PI/2;
+ const body=part('body',feather,g);body.scale.set(.72,.52,1.45);
+ part('head',feather,g,0,.14,-.7);
+ const beak=part('beak',0xe9b350,g,0,.08,-1.09);beak.rotation.x=Math.PI/2;
+ for(const xx of [-.16,.16])part('eye',0x273c4b,g,xx,.22,-.9);
+ const tail=part('tail',feather,g,0,.04,1.02);tail.rotation.x=Math.PI/2;
  const wings=[];
  for(const side of [-1,1]){
   const pivot=new THREE.Group();pivot.position.set(side*.32,.06,0);g.add(pivot);
-  const wing=v4Mesh(new THREE.BoxGeometry(1.8,.10,.57),feather,pivot,side*.88,0,.03);
+  const wing=part('wing',feather,pivot,side*.88,0,.03);
   wing.rotation.y=side*.16;wings.push({pivot,side});
  }
  const rx=22+rnd(i*9+4)*22,rz=18+rnd(i*5+8)*20;
@@ -6002,9 +6012,12 @@ function flightClearance(group){
   const geometry=mesh.geometry;
   if(!geometry.boundingBox)geometry.computeBoundingBox();
   if(mesh.isInstancedMesh){
-   if(!mesh.boundingBox)mesh.computeBoundingBox();
-   bounds.copy(mesh.boundingBox).applyMatrix4(mesh.matrixWorld);
-   if(bounds.max.y<=12)return;
+   // Reuse a pre-existing coarse bound, but do not construct it here:
+   // that would transform every instance once before the exact pass below.
+   if(mesh.boundingBox){
+    bounds.copy(mesh.boundingBox).applyMatrix4(mesh.matrixWorld);
+    if(bounds.max.y<=12)return;
+   }
    for(let i=0;i<mesh.count;i++){
     mesh.getMatrixAt(i,instance);
     world.multiplyMatrices(mesh.matrixWorld,instance);
@@ -6028,6 +6041,8 @@ function flightClearance(group){
 }
 function createV4Life(selected){
  life.people.length=0;life.birds.length=0;life.balloons.length=0;residentBatches=null;
+ // Scene cleanup owns these resources; do not retain a previous city's pool.
+ v45Bird.assets=null;
  if(!selected.length)return;
  const clearance=flightClearance(group);
  // A sampled owner is visible in every district; the first user's avatar
