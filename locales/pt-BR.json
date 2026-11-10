@@ -1,7 +1,7 @@
 {
   "locale": "pt-BR",
   "name": "Português (Brasil)",
-  "reviewStatus": "in-progress",
+  "reviewStatus": "verified",
   "messages": {
     "Esplora il mondo": "Explore o mundo",
     "Scegli una città": "Escolha uma cidade",
@@ -926,5 +926,12 @@
       "target": "Praça cívica de {city}",
       "translateSlots": []
     }
-  ]
+  ],
+  "verification": {
+    "messages": 360,
+    "templates": 61,
+    "browserEvidence": "Lingue_mobile_brasiliano_SaoPaulo_v9.4.0.jpg",
+    "privateOptions": "all eight tiers; source normalization and translation regression checked",
+    "scope": "Current game UI; further languages remain in development"
+  }
 }

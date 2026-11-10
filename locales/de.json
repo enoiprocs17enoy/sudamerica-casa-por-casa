@@ -1,7 +1,7 @@
 {
   "locale": "de",
   "name": "Deutsch",
-  "reviewStatus": "in-progress",
+  "reviewStatus": "verified",
   "messages": {
     "Esplora il mondo": "Entdecke die Welt",
     "Scegli una città": "Wähle eine Stadt",
@@ -899,5 +899,12 @@
       "target": "Stadtplatz von {city}",
       "translateSlots": []
     }
-  ]
+  ],
+  "verification": {
+    "messages": 360,
+    "templates": 61,
+    "browserEvidence": "Cartello_tedesco_Berlino_v9.4.0.jpg",
+    "privateOptions": "all eight tiers; source normalization and translation regression checked",
+    "scope": "Current game UI; further languages remain in development"
+  }
 }

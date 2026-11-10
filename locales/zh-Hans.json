@@ -1,7 +1,7 @@
 {
   "locale": "zh-Hans",
   "name": "简体中文",
-  "reviewStatus": "in-progress",
+  "reviewStatus": "verified",
   "messages": {
     "Esplora il mondo": "探索世界",
     "Scegli una città": "选择城市",
@@ -687,5 +687,12 @@
       "target": "{city}市民广场",
       "translateSlots": []
     }
-  ]
+  ],
+  "verification": {
+    "messages": 360,
+    "templates": 61,
+    "browserEvidence": "Cartello_cinese_Shanghai_v9.4.0.jpg",
+    "privateOptions": "all eight tiers; source normalization and translation regression checked",
+    "scope": "Current game UI; further languages remain in development"
+  }
 }

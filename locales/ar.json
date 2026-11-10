@@ -1,7 +1,7 @@
 {
   "locale": "ar",
   "name": "العربية",
-  "reviewStatus": "in-progress",
+  "reviewStatus": "verified",
   "messages": {
     "Esplora il mondo": "استكشف العالم",
     "Scegli una città": "اختر مدينة",
@@ -1025,5 +1025,12 @@
       "target": "الساحة المدنية في {city}",
       "translateSlots": []
     }
-  ]
+  ],
+  "verification": {
+    "messages": 360,
+    "templates": 61,
+    "browserEvidence": "Lingue_mobile_arabo_Cairo_v9.4.0.jpg",
+    "privateOptions": "all eight tiers; source normalization and translation regression checked",
+    "scope": "Current game UI; further languages remain in development"
+  }
 }

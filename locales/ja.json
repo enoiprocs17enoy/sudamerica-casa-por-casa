@@ -1,7 +1,7 @@
 {
   "locale": "ja",
   "name": "日本語",
-  "reviewStatus": "in-progress",
+  "reviewStatus": "verified",
   "messages": {
     "Esplora il mondo": "世界を探索",
     "Scegli una città": "都市を選択",
@@ -687,5 +687,12 @@
       "target": "{city}の市民広場",
       "translateSlots": []
     }
-  ]
+  ],
+  "verification": {
+    "messages": 360,
+    "templates": 61,
+    "browserEvidence": "Cartello_giapponese_Tokyo_v9.4.0.jpg",
+    "privateOptions": "all eight tiers; source normalization and translation regression checked",
+    "scope": "Current game UI; further languages remain in development"
+  }
 }

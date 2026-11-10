@@ -1,7 +1,7 @@
 {
   "locale": "en",
   "name": "English",
-  "reviewStatus": "in-progress",
+  "reviewStatus": "verified",
   "messages": {
     "Esplora il mondo": "Explore the world",
     "Scegli una città": "Choose a city",
@@ -899,5 +899,12 @@
       "target": "Civic square of {city}",
       "translateSlots": []
     }
-  ]
+  ],
+  "verification": {
+    "messages": 360,
+    "templates": 61,
+    "browserEvidence": "Cartelli_inglese_v9.4.0.jpg",
+    "privateOptions": "all eight tiers; source normalization and translation regression checked",
+    "scope": "Current game UI; further languages remain in development"
+  }
 }

@@ -1,7 +1,7 @@
 {
   "locale": "fr",
   "name": "Français",
-  "reviewStatus": "in-progress",
+  "reviewStatus": "verified",
   "messages": {
     "Esplora il mondo": "Explorez le monde",
     "Scegli una città": "Choisissez une ville",
@@ -899,5 +899,12 @@
       "target": "Place civique de {city}",
       "translateSlots": []
     }
-  ]
+  ],
+  "verification": {
+    "messages": 360,
+    "templates": 61,
+    "browserEvidence": "Lingue_mobile_francese_Parigi_v9.4.0.jpg",
+    "privateOptions": "all eight tiers; source normalization and translation regression checked",
+    "scope": "Current game UI; further languages remain in development"
+  }
 }

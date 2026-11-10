@@ -1,7 +1,7 @@
 {
   "locale": "es",
   "name": "Español",
-  "reviewStatus": "in-progress",
+  "reviewStatus": "verified",
   "messages": {
     "Esplora il mondo": "Explora el mundo",
     "Scegli una città": "Elige una ciudad",
@@ -899,5 +899,12 @@
       "target": "Plaza cívica de {city}",
       "translateSlots": []
     }
-  ]
+  ],
+  "verification": {
+    "messages": 360,
+    "templates": 61,
+    "browserEvidence": "Lingue_mobile_spagnolo_v9.4.0.jpg",
+    "privateOptions": "all eight tiers; source normalization and translation regression checked",
+    "scope": "Current game UI; further languages remain in development"
+  }
 }
