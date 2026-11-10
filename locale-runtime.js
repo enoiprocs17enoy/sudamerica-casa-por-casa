@@ -8,7 +8,7 @@ function createTranslator(locale,catalog={}){
  function escape(text){return text.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
  const number=new Intl.NumberFormat(locale),plainNumber=new Intl.NumberFormat(locale,{useGrouping:false}),plural=new Intl.PluralRules(locale),parts=number.formatToParts(12345.6),group=parts.find(part=>part.type==='group')?.value,decimal=parts.find(part=>part.type==='decimal')?.value||'.',digits=new Map(Array.from({length:10},(_,i)=>[plainNumber.format(i),String(i)]));
  function numeric(value){let text=String(value).trim();for(const [digit,ascii]of digits)text=text.replaceAll(digit,ascii);if(group)text=text.replaceAll(group,'');text=text.replaceAll(decimal,'.').replace(/[\s\u061c\u200e\u200f]/g,'');return Number(text);}
- function render(target,values,numbers){if(Array.isArray(target))return target.map(part=>render(part,values,numbers)).join('');if(target&&typeof target==='object'){const count=numbers[target.plural],form=plural.select(count);return render(target.forms['='+count]??target.forms[form]??target.forms.other,values,numbers);}return String(target).replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g,(token,key)=>values[key]??token);}
+ function render(target,values,numbers){if(Array.isArray(target))return target.map(part=>render(part,values,numbers)).join('');if(target&&typeof target==='object'){const count=numbers[target.plural],form=plural.select(count);return render(target.forms['='+count]??target.forms[form]??target.forms.other,values,numbers);}return String(target).replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g,(token,key)=>{if(!Object.hasOwn(values,key))return token;const value=String(values[key]);return rtl&&!/^[\u2066-\u2068][\s\S]*\u2069$/u.test(value)?'\u2068'+value+'\u2069':value;});}
  function translate(value,depth=0){const text=String(value??''),trimmed=text.trim();if(!trimmed)return text;
   let result=Object.hasOwn(messages,trimmed)?messages[trimmed]:null;
   if(result===null)for(const {regexp,slots,target,translateSlots}of patterns){const match=regexp.exec(trimmed);if(!match)continue;const values={},numbers={};slots.forEach((key,i)=>{const raw=match[i+1];numbers[key]=numeric(raw);values[key]=translateSlots.includes(key)&&Object.hasOwn(messages,raw)?messages[raw]:raw;if(['count','points','level','total','floors'].includes(key)&&/^\p{N}+$/u.test(raw.trim())&&Number.isFinite(numbers[key]))values[key]=(['level','total','floors'].includes(key)?plainNumber:number).format(numbers[key]);});result=render(target,values,numbers);break;}
@@ -16,9 +16,9 @@ function createTranslator(locale,catalog={}){
   if(result===null&&depth<3){const prefix=/^([^\p{L}\p{N}]+?\s+)([\s\S]+)$/u.exec(trimmed);if(prefix)result=prefix[1]+translate(prefix[2],depth+1);}
   return result===null?text:text.slice(0,text.indexOf(trimmed))+result+text.slice(text.indexOf(trimmed)+trimmed.length);
  }
- const script=new Intl.Locale(locale).maximize().script;
+ const script=new Intl.Locale(locale).maximize().script,rtl=['Arab','Hebr','Syrc','Thaa','Nkoo','Adlm','Rohg','Mand','Samr'].includes(script);
  function recognizes(value,depth=0){const text=String(value).trim();if(Object.hasOwn(messages,text)||patterns.some(pattern=>pattern.regexp.test(text)))return true;if(depth===0&&text.includes(' · '))return text.split(' · ').every(part=>recognizes(part,1));if(depth<3){const prefix=/^([^\p{L}\p{N}]+?\s+)([\s\S]+)$/u.exec(text);if(prefix)return recognizes(prefix[2],depth+1);}return false;}
- return {locale,translate,recognizes,number:value=>number.format(value),plural:(count,forms)=>forms['='+count]??forms[plural.select(count)]??forms.other,dir:['Arab','Hebr','Syrc','Thaa','Nkoo','Adlm','Rohg','Mand','Samr'].includes(script)?'rtl':'ltr'};
+ return {locale,translate,recognizes,number:value=>number.format(value),plural:(count,forms)=>forms['='+count]??forms[plural.select(count)]??forms.other,dir:rtl?'rtl':'ltr'};
 }
 
 /* Translate UI text without replacing markup, handlers, values or proper names. */
@@ -54,7 +54,7 @@ function matchLocale(preference,available){
 }
 
 (function(){'use strict';
- const revision='9.4.0-i18n11',review=document.documentElement.dataset.i18nReview==='true',cache=new Map(),listeners=new Set(),auditors=new Set(),missing=new Set();
+ const revision='9.4.0-i18n12',review=document.documentElement.dataset.i18nReview==='true',cache=new Map(),listeners=new Set(),auditors=new Set(),missing=new Set();
  const italian={
   "locale":"it",
   "name":"Italiano",

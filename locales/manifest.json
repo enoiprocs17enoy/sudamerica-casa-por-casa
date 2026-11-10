@@ -7,6 +7,11 @@
       "complete": true
     },
     {
+      "code": "ar",
+      "name": "العربية",
+      "complete": false
+    },
+    {
       "code": "de",
       "name": "Deutsch",
       "complete": false
