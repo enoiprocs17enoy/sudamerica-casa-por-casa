@@ -5461,12 +5461,12 @@ function rebuildNow(){
  try{disposeGroup();scene.remove(previousGroup)}catch(err){console.error('Pulizia scena',err)}
  group=builtGroup;group.name='city-geometry';houseMeshes=builtHouseMeshes;
  $('status').textContent=errors.length
-  ?'Città parzialmente recuperata: '+errors.join(' | ')
+  ?"Alcuni elementi della città non sono stati caricati. Puoi riprovare."
   :`${currentCity.name} · ${selected.length.toLocaleString(window.GameI18n?.locale||'it-IT')} case · ${shopPurchases.length.toLocaleString(window.GameI18n?.locale||'it-IT')} negozi · ${publicZones().length} strutture pubbliche`;
  if(errors.length){
   let warning=document.getElementById('cityErrorNotice');
   if(!warning){warning=document.createElement('div');warning.id='cityErrorNotice';warning.style.cssText='position:fixed;left:12px;bottom:12px;z-index:99999;background:#722;color:white;padding:12px;border-radius:8px;max-width:70vw;font:13px Arial';document.body.appendChild(warning)}
-  warning.textContent='v9.2.2 · '+errors.join(' | ');
+  warning.textContent="Alcuni elementi della città non sono stati caricati. Puoi riprovare.";
  }else{document.getElementById('cityErrorNotice')?.remove()}
 }
 function renderMilestones(){
@@ -5777,6 +5777,7 @@ syncPopulationControls();
 $('go').onclick=()=>map.flyTo([currentCity.lat,currentCity.lng],12,{duration:1.1});
 $('enter').onclick=()=>{map.setView([currentCity.lat,currentCity.lng],12);enter()};
 $('back').onclick=()=>{back();map.setView([currentCity.lat,currentCity.lng],9)};
+$('close').setAttribute('aria-label','Chiudi');
 $('close').onclick=()=>{$('card').style.display='none'};
 $('find').onclick=()=>{
  let q=$('search').value.trim().replace(/^@/,'').toLowerCase();

@@ -361,7 +361,8 @@
     "CINEMA": "KINO",
     "PALESTRA": "FITNESSSTUDIO",
     "HOTEL": "HOTEL",
-    "MERCATO": "MARKT"
+    "MERCATO": "MARKT",
+    "Alcuni elementi della città non sono stati caricati. Puoi riprovare.": "Einige Teile der Stadt konnten nicht geladen werden. Du kannst es erneut versuchen."
   },
   "templates": [
     {

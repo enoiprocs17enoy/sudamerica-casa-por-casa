@@ -361,7 +361,8 @@
     "CINEMA": "سينما",
     "PALESTRA": "نادي لياقة",
     "HOTEL": "فندق",
-    "MERCATO": "سوق"
+    "MERCATO": "سوق",
+    "Alcuni elementi della città non sono stati caricati. Puoi riprovare.": "تعذّر تحميل بعض عناصر المدينة. يمكنك المحاولة مجددًا."
   },
   "templates": [
     {

@@ -361,7 +361,8 @@
     "CINEMA": "映画館",
     "PALESTRA": "ジム",
     "HOTEL": "ホテル",
-    "MERCATO": "市場"
+    "MERCATO": "市場",
+    "Alcuni elementi della città non sono stati caricati. Puoi riprovare.": "街の一部の要素を読み込めませんでした。もう一度お試しください。"
   },
   "templates": [
     {
