@@ -1888,6 +1888,19 @@ function updateShopDetailLOD(now){
   mesh.visible=shopDetailFrustum.intersectsSphere(shopDetailSphere);
  }
 }
+function reviewSceneWorkload(){
+ const categories={},residents=new Set(residentBatches?.meshes||[]);
+ group.traverse(mesh=>{
+  if(!mesh.isMesh)return;
+  for(let parent=mesh;parent;parent=parent.parent)if(!parent.visible)return;
+  const data=mesh.userData;
+  const category=data.birdInstances?'birds':residents.has(mesh)?'residents':data.homes||data.home?'houses':data.shops?'shops':data.regionalForest||data.farForest||data.farForestCanopies?'forest':data.regionalWater?'water':'other';
+  const value=categories[category]||(categories[category]={meshes:0,instances:0,triangles:0});
+  const instances=mesh.isInstancedMesh?mesh.count:1;
+  value.meshes++;value.instances+=instances;value.triangles+=(mesh.geometry.index?.count||mesh.geometry.attributes.position.count)/3*instances;
+ });
+ return {scope:'Scene totals before frustum culling',categories};
+}
 let lastRenderedFrame=0,measuredRenderGroup=null;
 function animate(now=0){
   if(!renderer)return;
@@ -1911,7 +1924,7 @@ function animate(now=0){
   const drawStarted=measureFirst?performance.now():0;
   if(window.SudamericaRender8)SudamericaRender8.render(scene,camera,renderer,minInterval);
   else renderer.render(scene,camera);
-  if(measureFirst){measuredRenderGroup=group;window.ReviewPerformance.recordStage('Primo disegno della città',performance.now()-drawStarted);window.ReviewPerformance.recordFirstDraw?.({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,programs:renderer.info.programs?.length||0});}
+  if(measureFirst){measuredRenderGroup=group;window.ReviewPerformance.recordStage('Primo disegno della città',performance.now()-drawStarted);window.ReviewPerformance.recordFirstDraw?.({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,programs:renderer.info.programs?.length||0,scene:reviewSceneWorkload()});}
 }
 const walls = [0xd98972,0xb4d8b3,0xdca1ad,0x89b9df,0xc6a7de,0xe6b768,0x9bc9bd,0xd9a184,0xbac8d5];
 const roofs = [0xa44d3f,0x518a70,0x627bb2,0x9d5a73,0x886b9c,0xc07943,0x4d8b8c,0x795d48,0xc66a50];
