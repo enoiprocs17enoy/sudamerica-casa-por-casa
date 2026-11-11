@@ -4372,7 +4372,8 @@ function homePattern(kind){
  homeTextures[kind]=tex;return tex;
 }
 
-function renderAllHouses(selected){
+function renderAllHouses(selected){const steps=renderHouseStages(selected);while(!steps.next().done){}}
+function* renderHouseStages(selected){
   // Multiple architectural families, all instanced: render every house at every zoom.
   const boxGeo=new THREE.BoxGeometry(1,1,1);
   const roofGeo=makeRidgeRoof();
@@ -4396,7 +4397,9 @@ function renderAllHouses(selected){
     }
     batches.get(key).entries.push({h,x,y,z,w,height,d,rotation,color});
   }
+  let houseBudget=0;
   for(const h of selected){
+    if(houseBudget++===32){houseBudget=1;yield;}
     const tier=houseTier(h.points);
     const premium=isPremiumHouse(h);
     const {width:footW,depth:footD,offsetZ}=houseFootprint(h,tier);
@@ -4894,12 +4897,13 @@ function renderAllHouses(selected){
     mesh.castShadow=batch.casts;
     mesh.receiveShadow=batch.receives;
     mesh.userData.homes=batch.entries.map(e=>e.h);
-    batch.entries.forEach((e,i)=>{
-      dummy.position.set(e.x,e.y,e.z);
+    for(let i=0;i<batch.entries.length;i++){
+      if(i>0&&i%2048===0)yield;
+      const e=batch.entries[i];dummy.position.set(e.x,e.y,e.z);
       let rotation=placementRotations.get(e.rotation);
       if(!rotation){rotation=new THREE.Quaternion().setFromEuler(placementEuler.set(0,e.rotation,0));placementRotations.set(e.rotation,rotation);}
       dummy.scale.set(e.w,e.height,e.d);dummy.matrix.compose(dummy.position,rotation,dummy.scale);mesh.setMatrixAt(i,dummy.matrix); mesh.setColorAt(i,tint.setHex(e.color));
-    });
+    }
     mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();group.add(mesh);
     if(batch.entries[0].h)houseMeshes.push(mesh);
   }
@@ -5427,7 +5431,9 @@ function* rebuildStages(){
  safe('Strade',()=>drawRoadNetwork(selected));
  yield;
  const before=group.children.length;
- safe('Edifici',()=>renderAllHouses(selected));
+ const buildingsStarted=window.ReviewPerformance?performance.now():null;
+ try{yield* renderHouseStages(selected);}catch(err){console.error('Edifici',err);errors.push('Edifici: '+err.message);}
+ finally{if(buildingsStarted!==null)window.ReviewPerformance.recordStage('Edifici',performance.now()-buildingsStarted);}
  yield;
  if(!houseMeshes.length){
   // Remove partial meshes from the failed pass, then use basic, safe houses.
@@ -5485,8 +5491,13 @@ function rebuildNow(){const stages=rebuildStages();while(!stages.next().done){}}
 async function rebuildResponsive(){
  if(!threeReady)return;
  cityBuildDepth++;
- try{const stages=rebuildStages();while(!stages.next().done){await new Promise(resolve=>setTimeout(resolve,0));}}
- finally{cityBuildDepth--;}
+ // Posted tasks release the main thread without the nested-timer delay.
+ const channel=typeof MessageChannel==='function'?new MessageChannel():null;
+ let resume;
+ if(channel)channel.port1.onmessage=()=>resume();
+ const pause=channel?()=>new Promise(resolve=>{resume=resolve;channel.port2.postMessage(0);}):()=>new Promise(resolve=>setTimeout(resolve,0));
+ try{const stages=rebuildStages();while(!stages.next().done){await pause();}}
+ finally{channel?.port1.close();channel?.port2.close();cityBuildDepth--;}
 }
 
 function renderMilestones(){
