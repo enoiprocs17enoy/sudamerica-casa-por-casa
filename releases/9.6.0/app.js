@@ -5447,6 +5447,50 @@ function renderFallbackHouses(selected){
   mesh.userData.homes=items.map(e=>e.h);group.add(mesh);houseMeshes.push(mesh);
  }
 }
+function batchStaticBoxes(){const steps=staticBoxStages();while(!steps.next().done){}}
+function* staticBoxStages(){
+ const batches=new Map(),geometryKeys=new WeakMap(),materialKeys=new WeakMap();
+ const excluded=new Set([...roadDetailMeshes,...shopDetailMeshes]);
+ const materialTypes=new Set(['MeshBasicMaterial','MeshLambertMaterial','MeshPhongMaterial','MeshStandardMaterial']);
+ const textures=['map','normalMap','roughnessMap','metalnessMap','emissiveMap','alphaMap','bumpMap','aoMap','lightMap','displacementMap','specularMap','envMap'];
+ let scanned=0;
+ for(const source of group.children.slice()){
+  if(scanned++%128===127)yield;
+  if(!source.isMesh||source.isInstancedMesh||!source.visible||excluded.has(source)||source.geometry.type!=='BoxGeometry')continue;
+  if(source.isSkinnedMesh||source.customDepthMaterial||source.customDistanceMaterial||source.matrixWorldAutoUpdate===false)continue;
+  if(source.onBeforeRender!==THREE.Object3D.prototype.onBeforeRender||source.onAfterRender!==THREE.Object3D.prototype.onAfterRender)continue;
+  const data=source.userData,material=source.material,geometry=source.geometry;
+  if(data.homes||data.home||data.shops||data.neighborCity||data.neighborCities)continue;
+  if(Array.isArray(material)||!materialTypes.has(material.type)||material.transparent||material.opacity!==1||!material.depthWrite||!material.depthTest||!material.colorWrite||material.blending!==THREE.NormalBlending||material.alphaTest||material.vertexColors||textures.some(key=>material[key]))continue;
+  if(material.onBeforeCompile!==THREE.Material.prototype.onBeforeCompile||Object.keys(material.userData).length)continue;
+  if(Object.keys(geometry.morphAttributes).length||geometry.isInstancedBufferGeometry||geometry.drawRange.start!==0||geometry.drawRange.count!==Infinity)continue;
+  let geometryKey=geometryKeys.get(geometry);
+  if(!geometryKey){geometryKey=JSON.stringify({attributes:Object.entries(geometry.attributes).sort(([a],[b])=>a.localeCompare(b)).map(([name,a])=>[name,a.itemSize,a.normalized,a.array.constructor.name,Array.from(a.array)]),index:geometry.index?Array.from(geometry.index.array):null});geometryKeys.set(geometry,geometryKey);}
+  let materialKey=materialKeys.get(material);
+  if(!materialKey){const description=material.toJSON();delete description.uuid;delete description.metadata;delete description.name;delete description.color;materialKey=JSON.stringify(description);materialKeys.set(material,materialKey);}
+  const key=geometryKey+'|'+materialKey+'|'+source.castShadow+'|'+source.receiveShadow+'|'+source.renderOrder+'|'+source.layers.mask;
+  if(!batches.has(key))batches.set(key,[]);batches.get(key).push(source);
+ }
+ const color=new THREE.Color();let merged=0;
+ for(const sources of batches.values()){
+  if(sources.length<3)continue;
+  const first=sources[0],material=first.material.clone();material.color.setHex(0xffffff);
+  const mesh=new THREE.InstancedMesh(first.geometry,material,sources.length);
+  mesh.castShadow=first.castShadow;mesh.receiveShadow=first.receiveShadow;mesh.renderOrder=first.renderOrder;mesh.layers.mask=first.layers.mask;
+  mesh.userData.staticBoxInstances=true;
+  for(let i=0;i<sources.length;i++){
+   const source=sources[i];if(source.matrixAutoUpdate)source.updateMatrix();
+   mesh.setMatrixAt(i,source.matrix);mesh.setColorAt(i,color.copy(source.material.color));
+  }
+  mesh.instanceMatrix.needsUpdate=true;mesh.instanceColor.needsUpdate=true;mesh.computeBoundingSphere();group.add(mesh);
+  // Keep original geometry/metadata as exact selection proxies; Three.js
+  // raycasting in the pinned engine is independent of render visibility.
+  for(const source of sources){source.visible=false;source.userData.staticBoxProxy=true;}
+  merged+=sources.length;yield;
+ }
+ group.userData.staticBoxSources=merged;
+}
+
 let cityBuildDepth=0;
 function* rebuildStages(){
  if(!threeReady)return;
@@ -5485,6 +5529,10 @@ function* rebuildStages(){
  const peopleStarted=window.ReviewPerformance?performance.now():null;
  try{yield* createLifeStages(selected);}catch(err){console.error('Persone',err);errors.push('Persone: '+err.message);}
  finally{if(peopleStarted!==null)window.ReviewPerformance.recordStage('Persone',performance.now()-peopleStarted);}
+ yield;
+ const staticStarted=window.ReviewPerformance?performance.now():null;
+ try{yield* staticBoxStages();}catch(err){console.error('Modelli statici',err);errors.push('Modelli statici: '+err.message);}
+ finally{if(staticStarted!==null)window.ReviewPerformance.recordStage('Modelli statici',performance.now()-staticStarted);}
  yield;
  scene.add(group);
  // Near-detail failures must not undo the entire city.
@@ -5569,7 +5617,7 @@ function pick(e){
  const pointer=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
  raycaster.setFromCamera(pointer,camera);
  const candidates=group.userData.pickables||houseMeshes;
- const hits=raycaster.intersectObjects(candidates.filter(mesh=>mesh.visible),false);
+ const hits=raycaster.intersectObjects(candidates.filter(mesh=>mesh.visible||mesh.userData.staticBoxProxy),false);
  const structure=hits.map(resolveStructureHit).find(Boolean);
  const click=new THREE.Vector2(e.clientX-r.left,e.clientY-r.top);
  let closest=null,best=23;
