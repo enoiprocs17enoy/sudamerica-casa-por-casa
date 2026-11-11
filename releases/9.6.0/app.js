@@ -1888,7 +1888,7 @@ function updateShopDetailLOD(now){
   mesh.visible=shopDetailFrustum.intersectsSphere(shopDetailSphere);
  }
 }
-let lastRenderedFrame=0;
+let lastRenderedFrame=0,measuredRenderGroup=null;
 function animate(now=0){
   if(!renderer)return;
   requestAnimationFrame(animate);
@@ -1907,8 +1907,11 @@ function animate(now=0){
   animateLife(t);
   updateAvatarLabels(t);
   if(releaseSky)releaseSky.position.copy(camera.position);
+  const measureFirst=window.ReviewPerformance&&measuredRenderGroup!==group;
+  const drawStarted=measureFirst?performance.now():0;
   if(window.SudamericaRender8)SudamericaRender8.render(scene,camera,renderer,minInterval);
   else renderer.render(scene,camera);
+  if(measureFirst){measuredRenderGroup=group;window.ReviewPerformance.recordStage('Primo disegno della città',performance.now()-drawStarted);window.ReviewPerformance.recordFirstDraw?.({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,programs:renderer.info.programs?.length||0});}
 }
 const walls = [0xd98972,0xb4d8b3,0xdca1ad,0x89b9df,0xc6a7de,0xe6b768,0x9bc9bd,0xd9a184,0xbac8d5];
 const roofs = [0xa44d3f,0x518a70,0x627bb2,0x9d5a73,0x886b9c,0xc07943,0x4d8b8c,0x795d48,0xc66a50];
