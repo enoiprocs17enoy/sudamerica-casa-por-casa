@@ -6033,6 +6033,38 @@ function v45Bird(i,x,z,phase){
  g.position.set(x,24+i%6*3,z);group.add(g);
  return {g,x,z,i,wings,phase,rx,rz};
 }
+let birdBatches=null;
+function buildBirdBatches(birds){
+ const batches=new Map();
+ for(const bird of birds)bird.g.traverse(part=>{
+  if(!part.isMesh)return;
+  const key=part.geometry.id+':'+part.material.id;
+  if(!batches.has(key))batches.set(key,{geometry:part.geometry,material:part.material,castShadow:part.castShadow,receiveShadow:part.receiveShadow,parts:[]});
+  batches.get(key).parts.push(part);
+ });
+ const meshes=[];
+ for(const batch of batches.values()){
+  const mesh=new THREE.InstancedMesh(batch.geometry,batch.material,batch.parts.length);
+  mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);mesh.frustumCulled=false;
+  mesh.castShadow=batch.castShadow;mesh.receiveShadow=batch.receiveShadow;
+  mesh.userData.birdInstances=true;group.add(mesh);
+  for(const part of batch.parts)part.visible=false;
+  meshes.push({mesh,parts:batch.parts});
+ }
+ birdBatches={birds,meshes,inverse:new THREE.Matrix4(),matrix:new THREE.Matrix4()};
+ updateBirdBatches();
+}
+function updateBirdBatches(){
+ if(!birdBatches)return;
+ const {birds,meshes,inverse,matrix}=birdBatches;
+ group.updateWorldMatrix(true,false);inverse.copy(group.matrixWorld).invert();
+ for(const bird of birds)bird.g.updateWorldMatrix(true,true);
+ for(const {mesh,parts}of meshes){
+  for(let i=0;i<parts.length;i++){matrix.multiplyMatrices(inverse,parts[i].matrixWorld);mesh.setMatrixAt(i,matrix);}
+  mesh.instanceMatrix.needsUpdate=true;
+ }
+}
+
 function v45Balloon(i,home){
  const g=new THREE.Group();
  const palette=[0xf33751,0xffae28,0xffd15b,0x2d8bd4,0xe84fa3];
@@ -6110,7 +6142,7 @@ function* flightClearanceStages(group){
 }
 function createV4Life(selected){const steps=createLifeStages(selected);while(!steps.next().done){}}
 function* createLifeStages(selected){
- life.people.length=0;life.birds.length=0;life.balloons.length=0;residentBatches=null;
+ life.people.length=0;life.birds.length=0;life.balloons.length=0;residentBatches=null;birdBatches=null;
  // Scene cleanup owns these resources; do not retain a previous city's pool.
  v45Bird.assets=null;
  if(!selected.length)return;
@@ -6145,6 +6177,7 @@ function* createLifeStages(selected){
    life.birds.push(bird);
   }
  }
+ buildBirdBatches(life.birds);
  // Use evenly distributed owners, never selected[i] (which stacks them
  // over the first houses of a spiral-growing city).
  const balloonCount=Math.min(20,v4.balloons);
@@ -6260,6 +6293,7 @@ function animateLife(t){if(!active||!v4.motion)return;
   b.g.rotation.set(0,Math.atan2(-vx,-vz),Math.sin(ang)*.08);
   for(const wing of b.wings)wing.pivot.rotation.z=wing.side*(.05+Math.sin(t*4.7+b.i)*.32);
  }
+ updateBirdBatches();
  for(const b of life.balloons){
   b.g.position.y=b.baseY+Math.sin(t*.45+b.i)*BALLOON_BOB;
   b.g.position.x=b.x+Math.sin(t*.13+b.i)*BALLOON_SWAY_X;
