@@ -5812,15 +5812,22 @@ $('enter').onclick=()=>{map.setView([currentCity.lat,currentCity.lng],12);enter(
 $('back').onclick=()=>{back();map.setView([currentCity.lat,currentCity.lng],9)};
 $('close').setAttribute('aria-label','Chiudi');
 $('close').onclick=()=>{$('card').style.display='none'};
-$('find').onclick=()=>{
- let q=$('search').value.trim().replace(/^@/,'').toLowerCase();
+async function findResident(query,kind='casa'){
+ const q=query.trim().replace(/^@/,'').toLowerCase();
  const comment=simulatedComments.find(entry=>entry.user===q);
  if(comment&&currentCity.id!==comment.cityId)selectCity(comment.cityId);
- let h=homes.find(x=>x.user.toLowerCase()===q);
- if(!h){$('status').textContent='Utente non presente in '+currentCity.name;return}
- map.setView([currentCity.lat,currentCity.lng],13);
- enter();flyToWorld(h,{distance:62,elevation:1.05});showCard(h);
-};
+ const h=homes.find(x=>x.user.toLowerCase()===q);
+ if(!h){$('status').textContent='Utente non presente in '+currentCity.name;return false;}
+ if(!active){map.setView([currentCity.lat,currentCity.lng],13);if(!await enter())return false;}
+ else if(cityEntryPromise&&!await cityEntryPromise)return false;
+ if(kind==='persona'){
+  const person=life.people.find(a=>a.home.id===h.id);
+  if(person){flyToWorld(person.g.position,{distance:32,elevation:1.05});showPersonCard(person);return true;}
+ }
+ flyToWorld(h,{distance:62,elevation:1.05});showCard(h);return true;
+}
+$('find').onclick=()=>findResident($('search').value);
+
 for(const option of $('demoScore').options){
  const tier=HOUSE_TIERS.find(entry=>entry.min===Number(option.value));
  if(tier)option.textContent=tier.min.toLocaleString(window.GameI18n?.locale||'it-IT')+' punti · '+tier.name+' ('+tier.levels+(tier.levels===1?' piano)':' piani)');
@@ -6344,7 +6351,7 @@ function openV4(tab){
 
  const wire=(id,fn)=>{if($(id))$(id).onclick=fn};
  wire('publicBrowseShops',()=>openCityDirectory('shop'));
- wire('publicFindResident',()=>{const query=$('publicResidentSearch').value.trim();if(!query)return;$('search').value=query;panel.hidden=true;$('find').click();});
+ wire('publicFindResident',()=>{const query=$('publicResidentSearch').value.trim();if(!query)return;$('search').value=query;panel.hidden=true;void findResident(query,tab==='avatar'?'persona':'casa');});
  // The demo has no login: its first resident is @Carlos75.
  // Use a safe elevated overview rather than placing the camera inside
  // the house, below the map, or too close to the avatar geometry.
