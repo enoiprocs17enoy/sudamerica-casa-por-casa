@@ -4888,7 +4888,7 @@ function* renderHouseStages(selected){
     const profile=[batch.geo.id,texture,normalStrength,roughness,metalness,casts,receives].join(':');
     for(const entry of batch.entries){
       // Dense cities cull whole neighborhoods instead of submitting every house.
-      const key=spatialBatches?profile+':'+Math.floor(entry.h.x/184)+':'+Math.floor(entry.h.z/184):profile;
+      const key=spatialBatches?profile+':'+Math.floor(entry.h.x/368)+':'+Math.floor(entry.h.z/368):profile;
       if(!renderBatches.has(key))renderBatches.set(key,{
         profile,geo:batch.geo,texture,normalStrength,roughness,metalness,casts,receives,entries:[]
       });
