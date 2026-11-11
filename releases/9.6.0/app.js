@@ -1894,7 +1894,7 @@ function reviewSceneWorkload(){
   if(!mesh.isMesh)return;
   for(let parent=mesh;parent;parent=parent.parent)if(!parent.visible)return;
   const data=mesh.userData;
-  const category=data.birdInstances?'birds':residents.has(mesh)?'residents':data.homes||data.home?'houses':data.shops?'shops':data.regionalForest||data.farForest||data.farForestCanopies?'forest':data.regionalWater?'water':'other';
+  const category=data.birdInstances?'birds':data.urbanTreeTrunk||data.urbanTreeCanopy||data.urbanTreeCanopyBatch?'urbanTrees':residents.has(mesh)?'residents':data.homes||data.home?'houses':data.shops?'shops':data.regionalForest||data.farForest||data.farForestCanopies?'forest':data.regionalWater?'water':'other';
   const value=categories[category]||(categories[category]={meshes:0,instances:0,triangles:0});
   const instances=mesh.isInstancedMesh?mesh.count:1;
   value.meshes++;value.instances+=instances;value.triangles+=(mesh.geometry.index?.count||mesh.geometry.attributes.position.count)/3*instances;
@@ -1974,7 +1974,7 @@ function addTree(x,z,seed,scale=1,flowering=false) {
  const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.12,.27,height,7),bark);
  trunk.scale.setScalar(scale);
  trunk.position.set(x,height*scale/2,z);
- trunk.castShadow=true;
+ trunk.castShadow=true;trunk.userData.urbanTreeTrunk=true;
  group.add(trunk);
 
  const palette=[0x55992e,0x78a932,0x3c893e,0x9b51c4,0x508f35,0x82af38];
@@ -1997,7 +1997,7 @@ function addTree(x,z,seed,scale=1,flowering=false) {
  }
  canopy.scale.setScalar(scale);
  canopy.position.set(x,(height-.1)*scale,z);
- canopy.castShadow=true;
+ canopy.castShadow=true;canopy.userData.urbanTreeCanopy=true;
  canopy.receiveShadow=true;
  canopy.computeBoundingSphere();
  group.add(canopy);
@@ -5447,6 +5447,32 @@ function renderFallbackHouses(selected){
   mesh.userData.homes=items.map(e=>e.h);group.add(mesh);houseMeshes.push(mesh);
  }
 }
+function* staticTreeStages(){
+ const batches=new Map(),part=new THREE.Matrix4(),matrix=new THREE.Matrix4(),color=new THREE.Color();
+ for(const source of group.children.slice()){
+  if(!source.userData.urbanTreeCanopy||!source.visible||!source.isInstancedMesh||source.geometry.parameters?.radius!==1||source.geometry.parameters?.detail!==1)continue;
+  const key=Math.floor(source.position.x/368)+':'+Math.floor(source.position.z/368);
+  if(!batches.has(key))batches.set(key,[]);batches.get(key).push(source);
+ }
+ let merged=0;
+ for(const sources of batches.values()){
+  if(sources.length<2)continue;
+  const first=sources[0],count=sources.reduce((n,s)=>n+s.count,0),mesh=new THREE.InstancedMesh(first.geometry,first.material.clone(),count);
+  mesh.castShadow=first.castShadow;mesh.receiveShadow=first.receiveShadow;mesh.userData.urbanTreeCanopyBatch=true;
+  let at=0;
+  for(const source of sources){
+   if(source.matrixAutoUpdate)source.updateMatrix();
+   for(let i=0;i<source.count;i++){
+    source.getMatrixAt(i,part);matrix.multiplyMatrices(source.matrix,part);mesh.setMatrixAt(at,matrix);
+    source.getColorAt(i,color);mesh.setColorAt(at++,color);
+   }
+  }
+  mesh.instanceMatrix.needsUpdate=true;mesh.instanceColor.needsUpdate=true;mesh.computeBoundingSphere();group.add(mesh);
+  for(const source of sources){source.visible=false;source.userData.staticTreeProxy=true;}
+  merged+=sources.length;yield;
+ }
+ group.userData.batchedUrbanTrees=merged;
+}
 function batchStaticBoxes(){const steps=staticBoxStages();while(!steps.next().done){}}
 function* staticBoxStages(){
  const batches=new Map(),geometryKeys=new WeakMap(),materialKeys=new WeakMap();
@@ -5467,7 +5493,7 @@ function* staticBoxStages(){
   let geometryKey=geometryKeys.get(geometry);
   if(!geometryKey){geometryKey=JSON.stringify({attributes:Object.entries(geometry.attributes).sort(([a],[b])=>a.localeCompare(b)).map(([name,a])=>[name,a.itemSize,a.normalized,a.array.constructor.name,Array.from(a.array)]),index:geometry.index?Array.from(geometry.index.array):null});geometryKeys.set(geometry,geometryKey);}
   let materialKey=materialKeys.get(material);
-  if(!materialKey){const description=material.toJSON();delete description.uuid;delete description.metadata;delete description.name;delete description.color;materialKey=JSON.stringify(description);materialKeys.set(material,materialKey);}
+  if(!materialKey){const description=material.toJSON();delete description.uuid;delete description.metadata;delete description.name;delete description.color;description.linearColors=[material.emissive?.toArray()||null,material.specular?.toArray()||null];materialKey=JSON.stringify(description);materialKeys.set(material,materialKey);}
   const key=geometryKey+'|'+materialKey+'|'+source.castShadow+'|'+source.receiveShadow+'|'+source.renderOrder+'|'+source.layers.mask;
   if(!batches.has(key))batches.set(key,[]);batches.get(key).push(source);
  }
@@ -5531,7 +5557,7 @@ function* rebuildStages(){
  finally{if(peopleStarted!==null)window.ReviewPerformance.recordStage('Persone',performance.now()-peopleStarted);}
  yield;
  const staticStarted=window.ReviewPerformance?performance.now():null;
- try{yield* staticBoxStages();}catch(err){console.error('Modelli statici',err);errors.push('Modelli statici: '+err.message);}
+ try{yield* staticBoxStages();yield* staticTreeStages();}catch(err){console.error('Modelli statici',err);errors.push('Modelli statici: '+err.message);}
  finally{if(staticStarted!==null)window.ReviewPerformance.recordStage('Modelli statici',performance.now()-staticStarted);}
  yield;
  scene.add(group);
@@ -5617,7 +5643,7 @@ function pick(e){
  const pointer=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
  raycaster.setFromCamera(pointer,camera);
  const candidates=group.userData.pickables||houseMeshes;
- const hits=raycaster.intersectObjects(candidates.filter(mesh=>mesh.visible||mesh.userData.staticBoxProxy),false);
+ const hits=raycaster.intersectObjects(candidates.filter(mesh=>mesh.visible||mesh.userData.staticBoxProxy||mesh.userData.staticTreeProxy),false);
  const structure=hits.map(resolveStructureHit).find(Boolean);
  const click=new THREE.Vector2(e.clientX-r.left,e.clientY-r.top);
  let closest=null,best=23;
