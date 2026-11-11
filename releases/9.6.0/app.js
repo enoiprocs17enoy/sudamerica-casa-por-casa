@@ -1894,7 +1894,7 @@ function reviewSceneWorkload(){
   if(!mesh.isMesh)return;
   for(let parent=mesh;parent;parent=parent.parent)if(!parent.visible)return;
   const data=mesh.userData;
-  const category=data.birdInstances?'birds':data.urbanTreeTrunk||data.urbanTreeCanopy||data.urbanTreeCanopyBatch?'urbanTrees':residents.has(mesh)?'residents':data.homes||data.home?'houses':data.shops?'shops':data.regionalForest||data.farForest||data.farForestCanopies?'forest':data.regionalWater?'water':'other';
+  const category=data.birdInstances?'birds':data.urbanTreeTrunk||data.urbanTreeCanopy||data.urbanTreeCanopyBatch||data.urbanTreeTrunkBatch?'urbanTrees':residents.has(mesh)?'residents':data.homes||data.home?'houses':data.shops?'shops':data.regionalForest||data.farForest||data.farForestCanopies?'forest':data.regionalWater?'water':'other';
   const value=categories[category]||(categories[category]={meshes:0,instances:0,triangles:0});
   const instances=mesh.isInstancedMesh?mesh.count:1;
   value.meshes++;value.instances+=instances;value.triangles+=(mesh.geometry.index?.count||mesh.geometry.attributes.position.count)/3*instances;
@@ -5473,6 +5473,31 @@ function* staticTreeStages(){
  }
  group.userData.batchedUrbanTrees=merged;
 }
+function* staticTrunkStages(){
+ const batches=new Map(),stretch=new THREE.Matrix4(),matrix=new THREE.Matrix4();
+ for(const source of group.children.slice()){
+  if(!source.userData.urbanTreeTrunk||!source.visible||source.isInstancedMesh)continue;
+  const p=source.geometry.parameters;
+  if(source.geometry.type!=='CylinderGeometry'||p?.radiusTop!==.12||p.radiusBottom!==.27||p.radialSegments!==7||p.heightSegments!==1||p.openEnded)continue;
+  const key=Math.floor(source.position.x/368)+':'+Math.floor(source.position.z/368);
+  if(!batches.has(key))batches.set(key,[]);batches.get(key).push(source);
+ }
+ let geometry=null,merged=0;
+ for(const sources of batches.values()){
+  if(sources.length<2)continue;
+  geometry=geometry||new THREE.CylinderGeometry(.12,.27,1,7);
+  const first=sources[0],mesh=new THREE.InstancedMesh(geometry,first.material.clone(),sources.length);
+  mesh.castShadow=first.castShadow;mesh.receiveShadow=first.receiveShadow;mesh.userData.urbanTreeTrunkBatch=true;
+  for(let i=0;i<sources.length;i++){
+   const source=sources[i];if(source.matrixAutoUpdate)source.updateMatrix();
+   stretch.makeScale(1,source.geometry.parameters.height,1);matrix.multiplyMatrices(source.matrix,stretch);mesh.setMatrixAt(i,matrix);
+  }
+  mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();group.add(mesh);
+  for(const source of sources){source.visible=false;source.userData.staticTreeProxy=true;}
+  merged+=sources.length;yield;
+ }
+ group.userData.batchedUrbanTrunks=merged;
+}
 function batchStaticBoxes(){const steps=staticBoxStages();while(!steps.next().done){}}
 function* staticBoxStages(){
  const batches=new Map(),geometryKeys=new WeakMap(),materialKeys=new WeakMap();
@@ -5557,7 +5582,7 @@ function* rebuildStages(){
  finally{if(peopleStarted!==null)window.ReviewPerformance.recordStage('Persone',performance.now()-peopleStarted);}
  yield;
  const staticStarted=window.ReviewPerformance?performance.now():null;
- try{yield* staticBoxStages();yield* staticTreeStages();}catch(err){console.error('Modelli statici',err);errors.push('Modelli statici: '+err.message);}
+ try{yield* staticBoxStages();yield* staticTreeStages();yield* staticTrunkStages();}catch(err){console.error('Modelli statici',err);errors.push('Modelli statici: '+err.message);}
  finally{if(staticStarted!==null)window.ReviewPerformance.recordStage('Modelli statici',performance.now()-staticStarted);}
  yield;
  scene.add(group);
