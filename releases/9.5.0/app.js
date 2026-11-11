@@ -5450,7 +5450,9 @@ function* rebuildStages(){
  yield;
  safe('Strutture pubbliche',()=>renderMilestones());
  yield;
- safe('Persone',()=>createV4Life(selected));
+ const peopleStarted=window.ReviewPerformance?performance.now():null;
+ try{yield* createLifeStages(selected);}catch(err){console.error('Persone',err);errors.push('Persone: '+err.message);}
+ finally{if(peopleStarted!==null)window.ReviewPerformance.recordStage('Persone',performance.now()-peopleStarted);}
  yield;
  scene.add(group);
  // Near-detail failures must not undo the entire city.
@@ -6031,7 +6033,8 @@ function v45Balloon(i,home){
 }
 const BIRD_BOB=.9, BALLOON_BOB=2, BALLOON_SWAY_X=5, BALLOON_SWAY_Z=4;
 // Flight paths use a fixed safe altitude for the entire orbit.
-function flightClearance(group){
+function flightClearance(group){const steps=flightClearanceStages(group);let result;do{result=steps.next();}while(!result.done);return result.value;}
+function* flightClearanceStages(group){
  const cellSize=24, heights=new Map();
  const bounds=new THREE.Box3(), world=new THREE.Matrix4(), instance=new THREE.Matrix4();
  group.updateMatrixWorld(true);
@@ -6044,8 +6047,10 @@ function flightClearance(group){
    }
   }
  }
- group.traverse(mesh=>{
-  if(!mesh.isMesh)return;
+ const meshes=[];group.traverse(mesh=>{if(mesh.isMesh)meshes.push(mesh);});
+ let meshBudget=0;
+ for(const mesh of meshes){
+  if(meshBudget++===64){meshBudget=1;yield;}
   const geometry=mesh.geometry;
   if(!geometry.boundingBox)geometry.computeBoundingBox();
   if(mesh.isInstancedMesh){
@@ -6053,9 +6058,10 @@ function flightClearance(group){
    // that would transform every instance once before the exact pass below.
    if(mesh.boundingBox){
     bounds.copy(mesh.boundingBox).applyMatrix4(mesh.matrixWorld);
-    if(bounds.max.y<=12)return;
+    if(bounds.max.y<=12)continue;
    }
    for(let i=0;i<mesh.count;i++){
+    if(i>0&&i%1024===0)yield;
     mesh.getMatrixAt(i,instance);
     world.multiplyMatrices(mesh.matrixWorld,instance);
     bounds.copy(geometry.boundingBox).applyMatrix4(world);
@@ -6065,7 +6071,7 @@ function flightClearance(group){
    bounds.copy(geometry.boundingBox).applyMatrix4(mesh.matrixWorld);
    record();
   }
- });
+ }
  return (x,z,rx,rz)=>{
   let height=0;
   for(let i=Math.floor((x-rx)/cellSize);i<=Math.floor((x+rx)/cellSize);i++){
@@ -6076,16 +6082,18 @@ function flightClearance(group){
   return height;
  };
 }
-function createV4Life(selected){
+function createV4Life(selected){const steps=createLifeStages(selected);while(!steps.next().done){}}
+function* createLifeStages(selected){
  life.people.length=0;life.birds.length=0;life.balloons.length=0;residentBatches=null;
  // Scene cleanup owns these resources; do not retain a previous city's pool.
  v45Bird.assets=null;
  if(!selected.length)return;
- const clearance=flightClearance(group);
+ const clearance=yield* flightClearanceStages(group);
  // A sampled owner is visible in every district; the first user's avatar
  // always exists even when there is only one house.
  const peopleCount=selected.length;
  for(let i=0;i<peopleCount;i++){
+  if(i>0&&i%64===0)yield;
   const h=selected[spreadIndex(i,peopleCount,selected.length)];
   life.people.push(v45Avatar(h,i));
  }
@@ -6097,6 +6105,7 @@ function createV4Life(selected){
  // Cap total meshes for performance without crowding a tiny settlement.
  const flockCount=Math.min(120,Math.max(1,Math.ceil(selected.length/12)));
  for(let flock=0;flock<flockCount;flock++){
+  if(flock>0&&flock%8===0)yield;
   const h=selected[spreadIndex(flock,flockCount,selected.length)];
   const birdsInFlock=3+(flock%3);
   const centerX=h.x+(rnd(flock*29+7)-.5)*35;
