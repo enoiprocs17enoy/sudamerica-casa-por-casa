@@ -1487,7 +1487,8 @@ let regionalWaterUniform=null;
 function worldCityCells(selected=homes){
  const cells=new Map();for(const h of selected){const p=spiralCell(h.blockIndex);cells.set(p.col+':'+p.row,p);}for(const shop of shopPurchases){const p=spiralCell(shop.block);cells.set(p.col+':'+p.row,p);}for(const zone of publicZones()){const p=spiralCell(zone.block);cells.set(p.col+':'+p.row,p);}return [...cells.values()];
 }
-function buildRegionalLandscape(houses){
+function buildRegionalLandscape(houses){const steps=buildRegionalStages(houses);while(!steps.next().done){}}
+function* buildRegionalStages(houses){
  let regionalMark=window.ReviewPerformance?performance.now():null;
  const markRegion=label=>{if(regionalMark===null)return;const now=performance.now();window.ReviewPerformance.recordStage(label,now-regionalMark);regionalMark=now;};
  const city=currentCity;
@@ -1512,6 +1513,7 @@ function buildRegionalLandscape(houses){
  }
  const region=window.WorldGeography?WorldGeography.makeRegion(city,{minX,maxX,minZ,maxZ,neighbors:roadPlan?.neighbors||[]}):null;
  markRegion('Geografia e costa');
+ yield;
  if(region){group.userData.geography=region;for(const ground of scene.children.filter(m=>m.userData.regionalGround))WorldGeography.clipMaterial(ground.material,region);}
  const coastFrame=coast&&typeof window!=='undefined'&&window.WorldTerrain?window.WorldTerrain.coastFrame(coast,{minX,maxX,minZ,maxZ}):null;
  shore=coastFrame?coastFrame.shore:shore+85+(coast?.[1]||0)*1000;
@@ -1595,11 +1597,13 @@ function buildRegionalLandscape(houses){
 
 
  markRegion('Rilievi e materiali');
+ yield;
  if(roadPlan&&window.WorldTerrain)window.WorldTerrain.prepare(roadPlan,terrainHeight,region||coastFrame);
  if(roadPlan)group.userData.roadPlan=roadPlan;
  group.userData.terrainHeight=terrainHeight;
  if(roadPlan)window.WorldRoads.draw3D(roadPlan,group,terrainHeight,(x,z)=>region?region.landDistance(x,z)>15:!coast||x*east+z*south<shore-20);
  markRegion('Strade esterne');
+ yield;
  const candidates=[],spacing=48,horizon=6500;
  for(let col=Math.floor(-horizon/spacing);col<=Math.ceil(horizon/spacing);col++){
   for(let row=Math.floor(-horizon/spacing);row<=Math.ceil(horizon/spacing);row++){
@@ -1656,8 +1660,10 @@ function buildRegionalLandscape(houses){
  }
 
  markRegion('Alberi vicini');
- if(region&&window.WorldForest)WorldForest.build({group,region,plan:roadPlan,height:terrainHeight,city,bounds:{minX,maxX,minZ,maxZ}});
+ yield;
+ if(region&&window.WorldForest){const options={group,region,plan:roadPlan,height:terrainHeight,city,bounds:{minX,maxX,minZ,maxZ}};if(WorldForest.buildSteps)yield* WorldForest.buildSteps(options);else WorldForest.build(options);}
  markRegion('Bosco lontano');
+ yield;
  if(roadPlan&&window.WorldNeighbors)WorldNeighbors.build({group,camera,container:$('threeLayer'),plan:roadPlan,height:terrainHeight,states:cityStates,getCamera:()=>({target:{...target},distance,azimuth,elevation}),setCamera:state=>{Object.assign(target,state.target);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();},onEnter:enterNeighborCity});
  markRegion('Anteprime città vicine');
 }
@@ -5448,7 +5454,9 @@ function* rebuildStages(){
   while(group.children.length>before){group.remove(group.children[group.children.length-1]);}
   safe('Edifici di emergenza',()=>renderFallbackHouses(selected));
  }
- safe('Paesaggio regionale',()=>buildRegionalLandscape(selected));
+ const regionalStarted=window.ReviewPerformance?performance.now():null;
+ try{yield* buildRegionalStages(selected);}catch(err){console.error('Paesaggio regionale',err);errors.push('Paesaggio regionale: '+err.message);}
+ finally{if(regionalStarted!==null)window.ReviewPerformance.recordStage('Paesaggio regionale',performance.now()-regionalStarted);}
  yield;
  safe('Paesaggio',()=>addUrbanLandscaping(selected));
  yield;
