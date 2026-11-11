@@ -1878,7 +1878,7 @@ let lastRenderedFrame=0;
 function animate(now=0){
   if(!renderer)return;
   requestAnimationFrame(animate);
-  if(!active||document.hidden)return;
+  if(!active||document.hidden||cityBuildDepth>0)return;
   // Cap expensive large-city rendering at 30 FPS; smaller towns stay at 60.
   const minInterval=1000/60;
   const elapsed=now-lastRenderedFrame;
@@ -5413,7 +5413,8 @@ function renderFallbackHouses(selected){
   mesh.userData.homes=items.map(e=>e.h);group.add(mesh);houseMeshes.push(mesh);
  }
 }
-function rebuildNow(){
+let cityBuildDepth=0;
+function* rebuildStages(){
  if(!threeReady)return;
  roadDetailMeshes=[];lastRoadDetailUpdate=0;
  shopDetailMeshes=[];lastShopDetailUpdate=0;
@@ -5424,19 +5425,27 @@ function rebuildNow(){
  const selected=homes,errors=[];
  function safe(label,fn){const started=window.ReviewPerformance?performance.now():null;try{fn()}catch(err){console.error(label,err);errors.push(label+': '+err.message)}finally{if(started!==null)window.ReviewPerformance.recordStage(label,performance.now()-started);}}
  safe('Strade',()=>drawRoadNetwork(selected));
+ yield;
  const before=group.children.length;
  safe('Edifici',()=>renderAllHouses(selected));
+ yield;
  if(!houseMeshes.length){
   // Remove partial meshes from the failed pass, then use basic, safe houses.
   while(group.children.length>before){group.remove(group.children[group.children.length-1]);}
   safe('Edifici di emergenza',()=>renderFallbackHouses(selected));
  }
  safe('Paesaggio regionale',()=>buildRegionalLandscape(selected));
+ yield;
  safe('Paesaggio',()=>addUrbanLandscaping(selected));
+ yield;
  safe('Piazze artistiche',()=>addSignaturePlazas(selected));
+ yield;
  safe('Vita urbana',()=>drawCityLife(selected));
+ yield;
  safe('Strutture pubbliche',()=>renderMilestones());
+ yield;
  safe('Persone',()=>createV4Life(selected));
+ yield;
  scene.add(group);
  // Near-detail failures must not undo the entire city.
  safe('Dettagli vicini',()=>updateProgressiveDetails(true));
@@ -5472,6 +5481,14 @@ function rebuildNow(){
   warning.textContent="Alcuni elementi della città non sono stati caricati. Puoi riprovare.";
  }else{document.getElementById('cityErrorNotice')?.remove()}
 }
+function rebuildNow(){const stages=rebuildStages();while(!stages.next().done){}}
+async function rebuildResponsive(){
+ if(!threeReady)return;
+ cityBuildDepth++;
+ try{const stages=rebuildStages();while(!stages.next().done){await new Promise(resolve=>setTimeout(resolve,0));}}
+ finally{cityBuildDepth--;}
+}
+
 function renderMilestones(){
   const host=$('milestones');if(!host)return;
   host.replaceChildren();
@@ -5680,7 +5697,7 @@ function showShopCard(shop){showOwnerCard(ownerForShop(shop),'negozio',shop)}
 function showBalloonCard(balloon){showOwnerCard(homes.find(h=>h.id===balloon.ownerId)||homes[0],'mongolfiera',balloon)}
 function showPersonCard(a){showOwnerCard(a.home,'persona')}
 function showCard(h){showOwnerCard(h,'casa')}
-function enterNow(){if(!active&&window.WorldRoads){WorldRoads.sync();const p=WorldRoads.cityPlan(currentCity,worldCityCells(),WorldAtlas);azimuth=0;elevation=1.12;distance=Math.min(3500,Math.max(360,(Math.max(p.bounds.maxX-p.bounds.minX,p.bounds.maxZ-p.bounds.minZ))*.85));}if(!threeReady&&!makeScene())return false;active=true;document.body.classList.add("city-view");if(window.matchMedia('(max-width:720px), (max-height:480px)').matches){document.body.classList.add('wide-city');const toggle=$('cityPanelToggle');if(toggle){toggle.textContent='☰ Comandi';toggle.setAttribute('aria-expanded','false');}}$('threeLayer').classList.add('active');$('threeLayer').style.opacity=1;map.dragging.disable();map.scrollWheelZoom.disable();rebuildNow();updateCamera();resize();void ensureCitySquare(currentCity);void ensureRegionalCatalog(currentCity);return true;}
+function enterNow(build=rebuildNow){if(!active&&window.WorldRoads){WorldRoads.sync();const p=WorldRoads.cityPlan(currentCity,worldCityCells(),WorldAtlas);azimuth=0;elevation=1.12;distance=Math.min(3500,Math.max(360,(Math.max(p.bounds.maxX-p.bounds.minX,p.bounds.maxZ-p.bounds.minZ))*.85));}if(!threeReady&&!makeScene())return false;active=true;document.body.classList.add("city-view");if(window.matchMedia('(max-width:720px), (max-height:480px)').matches){document.body.classList.add('wide-city');const toggle=$('cityPanelToggle');if(toggle){toggle.textContent='☰ Comandi';toggle.setAttribute('aria-expanded','false');}}$('threeLayer').classList.add('active');$('threeLayer').style.opacity=1;map.dragging.disable();map.scrollWheelZoom.disable();const built=build();const finish=()=>{updateCamera();resize();void ensureCitySquare(currentCity);void ensureRegionalCatalog(currentCity);return true;};return built?.then?built.then(finish):finish();}
 function back(){clearAvatarLabels();active=false;document.body.classList.remove("city-view");$('threeLayer').style.opacity=0;$('threeLayer').classList.remove('active');$('card').style.display='none';map.dragging.enable();map.scrollWheelZoom.enable();$('status').textContent='Mappa geografica · le città sono posizionate con coordinate reali'}
 function onZoom(){
  if(active||suppressMapEntry||cityEntryPromise)return;
@@ -5692,7 +5709,7 @@ function onZoom(){
   if(!active){distance=115;enter()}else updateCamera();
  }else if(active)back();
 }
-function setCountNow(n){
+function setCountNow(n,build=rebuildNow){
  count=n;syncPopulationControls();cityStates.get(currentCity.id).count=n;
  homes=createHomes(n);
  $('counter').textContent=n.toLocaleString(window.GameI18n?.locale||'it-IT');
@@ -5700,7 +5717,7 @@ function setCountNow(n){
  updateCitySelection();
  if(selectedDemoHouseId>n)selectedDemoHouseId=1;
  updateDemoHouseLabel();
- if(active)rebuildNow();else renderMilestones();
+ if(active)build();else renderMilestones();
 }
 let selectedDemoHouseId=1;
 const scoreSelect=$('demoScore');
@@ -6424,18 +6441,18 @@ cityViewStyle.textContent=`
 document.head.append(cityViewStyle);
 
 // Adjacent towns keep their geographic positions when the local scene origin changes.
-function enterNeighborCity(neighbor,state){if(!active)return;const old=currentCity,geo=WorldRoads.point(old,state.target.x,state.target.z),next=neighbor.city;return CityLoading.run(()=>{selectCity(next.id,false);WorldRoads.sync(true);if(!enterNow())return false;const p=WorldRoads.local(next,{lat:geo[0],lng:geo[1]});target.x=p.x;target.z=p.z;target.y=Math.max(2,state.target.y-neighbor.y);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();$('status').textContent=next.name+' · città raggiunta · '+count.toLocaleString(window.GameI18n?.locale||'it-IT')+' case';return true;},{phase:'travel',priority:30,title:'Prossima fermata: '+next.name+'.',place:next.name,detail:'Prepariamo la città e i suoi dintorni.'}).catch(cityLoadingError);}
+function enterNeighborCity(neighbor,state){if(!active)return;const old=currentCity,geo=WorldRoads.point(old,state.target.x,state.target.z),next=neighbor.city;return CityLoading.run(async()=>{selectCity(next.id,false);WorldRoads.sync(true);if(!await enterNow(rebuildResponsive))return false;const p=WorldRoads.local(next,{lat:geo[0],lng:geo[1]});target.x=p.x;target.z=p.z;target.y=Math.max(2,state.target.y-neighbor.y);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();$('status').textContent=next.name+' · città raggiunta · '+count.toLocaleString(window.GameI18n?.locale||'it-IT')+' case';return true;},{phase:'travel',priority:30,title:'Prossima fermata: '+next.name+'.',place:next.name,detail:'Prepariamo la città e i suoi dintorni.'}).catch(cityLoadingError);}
 function showNeighborCities(){
  localizedPanelRoute={type:'neighbors'};if(!active)return enter().then(ok=>ok?showNeighborCities():null);const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;$('v4Title').textContent='Città vicine';delete $('v4Title').dataset.i18nSkip;body.replaceChildren();const items=window.WorldNeighbors?.list()||[];if(!items.length){const p=document.createElement('p');p.textContent='Nessuna città collegata visibile in questa zona. Puoi cercare altre località nella mappa.';body.append(p);}for(const e of items){const button=document.createElement('button');button.textContent='🏙 '+e.city.name+' · '+(e.distance/1000).toLocaleString(window.GameI18n?.locale||'it-IT',{maximumFractionDigits:1})+' km';button.onclick=()=>{panel.hidden=true;WorldNeighbors.focus(e.city.id);};body.append(button);}}
 const neighborButton=document.createElement('button');neighborButton.id='nearbyCities';neighborButton.textContent='🏙 Città vicine';neighborButton.title='Avvicinati alle città collegate';neighborButton.onclick=showNeighborCities;neighborButton.style.cssText='width:auto;min-width:132px;padding:10px 12px;font-size:13px;white-space:nowrap';$('earthControls').style.alignItems='flex-end';$('earthControls').append(neighborButton);
 document.addEventListener('pointerdown',e=>{if(e.target.closest?.('#threeLayer'))window.WorldNeighbors?.cancelFlight();},true);
 document.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','a','s','d'].includes(e.key))window.WorldNeighbors?.cancelFlight();},true);
 
-function ensureRegionalCatalog(city){const atlas=window.WorldAtlas;if(!atlas||atlas.regionReady(city))return Promise.resolve();if(regionalLoad?.id===city.id)return regionalLoad.promise;const promise=CityLoading.run(async()=>{await atlas.loadRegion(city);if(!active||currentCity.id!==city.id)return;WorldRoads.sync(true);rebuildNow();updateCamera();},{phase:'region',priority:25,title:'Il mondo continua, intorno a te.',place:city.name,detail:'Prepariamo le città vicine, le strade e il paesaggio.'}).catch(e=>{console.warn('Catalogo dei dintorni non disponibile',e);});const record={id:city.id,promise};regionalLoad=record;void promise.finally(()=>{if(regionalLoad===record)regionalLoad=null;});return promise;}
+function ensureRegionalCatalog(city){const atlas=window.WorldAtlas;if(!atlas||atlas.regionReady(city))return Promise.resolve();if(regionalLoad?.id===city.id)return regionalLoad.promise;const promise=CityLoading.run(async()=>{await atlas.loadRegion(city);if(!active||currentCity.id!==city.id)return;WorldRoads.sync(true);await rebuildResponsive();updateCamera();},{phase:'region',priority:25,title:'Il mondo continua, intorno a te.',place:city.name,detail:'Prepariamo le città vicine, le strade e il paesaggio.'}).catch(e=>{console.warn('Catalogo dei dintorni non disponibile',e);});const record={id:city.id,promise};regionalLoad=record;void promise.finally(()=>{if(regionalLoad===record)regionalLoad=null;});return promise;}
 function cityLoadingError(error){console.error('Caricamento città',error);$('status').textContent='Non è stato possibile completare il caricamento. Puoi riprovare.';return false;}
-function enter(){if(cityEntryPromise)return cityEntryPromise;const id=currentCity.id,name=currentCity.name;cityEntryPromise=CityLoading.run(async()=>{if(currentCity.id!==id)return false;await window.SceneAssets?.load();const atlas=window.WorldAtlas;if(atlas&&!atlas.regionReady(currentCity)){try{await atlas.loadRegion(currentCity);WorldRoads.sync(true);}catch(error){console.warn('Catalogo regionale non disponibile',error);}}if(currentCity.id!==id)return false;return enterNow();},{phase:'city',priority:30,title:'La tua città prende forma.',place:name,detail:'Prepariamo edifici, strade e paesaggio.'}).then(async result=>{if(regionalLoad?.id===id)await regionalLoad.promise;return result;}).catch(cityLoadingError).finally(()=>{cityEntryPromise=null;});return cityEntryPromise;}
-function rebuild(){if(!threeReady||!active)return Promise.resolve(false);if(pendingRebuildPromise)return pendingRebuildPromise;const id=currentCity.id;pendingRebuildPromise=CityLoading.run(()=>{if(!active||currentCity.id!==id)return false;rebuildNow();updateCamera();return true;},{phase:'update',priority:20,title:'La città si rinnova.',place:currentCity.name,detail:'Aggiorniamo edifici, dettagli e abitanti.'}).catch(cityLoadingError).finally(()=>{pendingRebuildPromise=null;});return pendingRebuildPromise;}
-function setCount(n){if(!active)return setCountNow(n);return CityLoading.run(()=>setCountNow(n),{phase:'population',priority:25,title:'Una città sempre più viva.',place:currentCity.name,detail:'Prepariamo le case e i servizi per i suoi abitanti.'}).catch(cityLoadingError);}
+function enter(){if(cityEntryPromise)return cityEntryPromise;const id=currentCity.id,name=currentCity.name;cityEntryPromise=CityLoading.run(async()=>{if(currentCity.id!==id)return false;await window.SceneAssets?.load();const atlas=window.WorldAtlas;if(atlas&&!atlas.regionReady(currentCity)){try{await atlas.loadRegion(currentCity);WorldRoads.sync(true);}catch(error){console.warn('Catalogo regionale non disponibile',error);}}if(currentCity.id!==id)return false;return enterNow(rebuildResponsive);},{phase:'city',priority:30,title:'La tua città prende forma.',place:name,detail:'Prepariamo edifici, strade e paesaggio.'}).then(async result=>{if(regionalLoad?.id===id)await regionalLoad.promise;return result;}).catch(cityLoadingError).finally(()=>{cityEntryPromise=null;});return cityEntryPromise;}
+function rebuild(){if(!threeReady||!active)return Promise.resolve(false);if(pendingRebuildPromise)return pendingRebuildPromise;const id=currentCity.id;pendingRebuildPromise=CityLoading.run(async()=>{if(!active||currentCity.id!==id)return false;await rebuildResponsive();updateCamera();return true;},{phase:'update',priority:20,title:'La città si rinnova.',place:currentCity.name,detail:'Aggiorniamo edifici, dettagli e abitanti.'}).catch(cityLoadingError).finally(()=>{pendingRebuildPromise=null;});return pendingRebuildPromise;}
+function setCount(n){if(!active)return setCountNow(n);return CityLoading.run(async()=>{const result=setCountNow(n,()=>{});if(active)await rebuildResponsive();return result;},{phase:'population',priority:25,title:'Una città sempre più viva.',place:currentCity.name,detail:'Prepariamo le case e i servizi per i suoi abitanti.'}).catch(cityLoadingError);}
 
 // Touch users can switch between moving and orbiting without reopening the sidebar.
 const touchModeButton=document.createElement('button');touchModeButton.id='touchCameraMode';touchModeButton.type='button';touchModeButton.textContent='↻';touchModeButton.title='Ruota e inclina la visuale';touchModeButton.setAttribute('aria-label',touchModeButton.title);touchModeButton.setAttribute('aria-pressed','false');touchModeButton.onclick=()=>{panMode=!panMode;touchModeButton.textContent=panMode?'↻':'✥';touchModeButton.title=panMode?'Ruota e inclina la visuale':'Sposta la visuale';touchModeButton.setAttribute('aria-label',touchModeButton.title);touchModeButton.setAttribute('aria-pressed',String(!panMode));$('panMode').classList.toggle('selected',panMode);$('orbitMode').classList.toggle('selected',!panMode);};$('earthControls').append(touchModeButton);
