@@ -2718,7 +2718,7 @@ function drawShops(){
     }
     batches.get(key).entries.push({shop,color,x,y,z,w,h,d,rotation});
   }
-  function furnishBusiness(shop,shape,stage,premium,w,d,height,trim,glass){
+  function furnishBusiness(shop,shape,stage,premium,w,d,height,trim,glass,serviceRear){
     const x=shop.x,front=shop.z+d/2,cream=0xf3e4c9,wood=0xb98350,metal=0x374b53;
     const part=(kind,color,dx,y,dz,a,b,c)=>put(kind,color,shop,x+dx,y,front+dz,a,b,c);
     const box=(color,dx,y,dz,a,b,c)=>part('shopForecourtDetail',color,dx,y,dz,a,b,c);
@@ -2747,8 +2747,8 @@ function drawShops(){
     }
     // Early buildings also have a working rear facade. Later stages already
     // have category-specific rear annexes, loading bays and glazed halls.
-    if(stage<2){
-      const rear=-d;
+    if(stage<2||shape===8){
+      const rear=shape===8?serviceRear-front:-d;
       if(shape===1||shape===6){
         part('garageGate',0x63787c,0,1.38,rear-.10,w*.29,2.65,.16);
         for(let rib=0;rib<6;rib++)box(0xabc0c1,0,.40+rib*.40,rear-.20,w*.28,.045,.04);
@@ -2892,6 +2892,7 @@ function drawShops(){
     put('shopPaving',paving,shop,x,.055,z,17.7,.06,17.5);
     put('body',wallColor,shop,x,height/2,z,w,height,d);
     const front=z+d/2, trim=style.trim, glass=style.glass;
+    let serviceRear=z-d/2;
 
     if(stage>=1){
       const canopyDepth=shape===0||shape===2||shape===7?4.15:shape===6?2.75:2.15;
@@ -3012,9 +3013,14 @@ function drawShops(){
           const tx=x+side*annexWidth*.25;
           put('shopDiningPedestal',trim,shop,tx,.60,back-1.47,.22,.84,.22);
           put('shopDiningTable',0xf4dab1,shop,tx,1.04,back-1.47,1.18,.13,.94);
+          for(const end of [-1,1]){
+            put('shopForecourtDetail',0xb98350,shop,tx,.55,back-1.47+end*.85,.53,.13,.56);
+            put('shopForecourtDetail',0xb98350,shop,tx,.87,back-1.47+end*1.10,.53,.62,.10);
+            for(const sideLeg of [-1,1])put('shopForecourtDetail',trim,shop,tx+sideLeg*.19,.29,back-1.47+end*.85,.06,.48,.42);
+          }
           if(stage>=6){
-            put('shopPergolaPost',trim,shop,tx,1.65,back-2.45,.14,2.99,.14);
-            put('shopPergolaBeam',trim,shop,tx,3.13,back-1.31,.16,.18,2.50);
+            put('shopPergolaPost',trim,shop,tx+side*.70,1.65,back-2.45,.14,2.99,.14);
+            put('shopPergolaBeam',trim,shop,tx+side*.70,3.13,back-1.31,.16,.18,2.50);
           }
         }
       }
@@ -3029,6 +3035,7 @@ function drawShops(){
       put('body',wallColor,shop,x,extensionHeight/2,extensionZ,extensionWidth,extensionHeight,extensionDepth);
       put('roof',trim,shop,x,extensionHeight+.13,extensionZ,extensionWidth+.28,.26,extensionDepth+.28);
       const back=extensionZ-extensionDepth/2;
+      serviceRear=back;
       if(restaurant){
         for(const bay of [-1,0,1]){
           put('displayGlass',glass,shop,x+bay*extensionWidth*.27,extensionHeight*.51,back-.08,extensionWidth*.19,extensionHeight*.56,.17);
@@ -3039,6 +3046,11 @@ function drawShops(){
             const tx=x+side*extensionWidth*.25;
             put('shopDiningTable',0xf0ca91,shop,tx,1.08,back-1.59,1.18,.14,.95);
             put('shopDiningPedestal',trim,shop,tx,.60,back-1.59,.23,.83,.23);
+            for(const end of [-1,1]){
+              put('shopForecourtDetail',0x88534b,shop,tx,.55,back-1.59+end*.88,.57,.13,.58);
+              put('shopForecourtDetail',0x88534b,shop,tx,.87,back-1.59+end*1.14,.57,.62,.10);
+              for(const sideLeg of [-1,1])put('shopForecourtDetail',trim,shop,tx+sideLeg*.21,.29,back-1.59+end*.88,.06,.48,.44);
+            }
           }
         }
       }else if(cinema){
@@ -3179,6 +3191,7 @@ function drawShops(){
       put('cafeHandleSign',0xffefcd,shop,x+.84,height+1.36,front+1.10,1.17,1.22,1.16);
     }
     if(shape===2&&shop.id%24===14){
+      put('tradeMark',trim,shop,x,height+.25,front+.30,.16,.10,.65);
       put('tradeMark',trim,shop,x,height+.93,front+.55,.16,1.70,.10);
       put('pizzaDiscSign',0xc47b30,shop,x,height+2.13,front+.60,2.85,2.85,.39);
       put('pizzaSauceSign',0xffc260,shop,x,height+2.13,front+.83,2.46,2.46,.09);
@@ -3245,7 +3258,10 @@ function drawShops(){
         for(const side of [-1,1])mark(side*.31,.46,.23,.42,ivory,'tradeSculpt',0,.46);
       }else if(shape===7){ // Rounded loaf with scored crust
         mark(0,0,1.69,.95,0xe1a34c,'tradeSculpt',0,.96);
-        for(const score of [-.40,0,.40])mark(score,.39,.10,.08,0xffd287,'tradeSculpt',0,.44);
+        for(const score of [-.40,0,.40])for(const dz of [-.28,-.14,0,.14,.28]){
+          const surface=.475*Math.sqrt(Math.max(0,1-(score/.845)**2-(dz/.48)**2));
+          mark(score,surface+.012,.10,.045,0xb8793a,'tradeSculpt',dz,.16);
+        }
       }else if(shape===8){ // Clapperboard with a projecting hinged top
         mark(0,-.19,1.42,.82,0xf2d9a9,'tradeMark',0,.52);
         for(const face of [-1,1]){
@@ -3530,7 +3546,7 @@ function drawShops(){
       }
     }
 
-    furnishBusiness(shop,shape,stage,progress.premium,w,d,height,trim,glass);
+    furnishBusiness(shop,shape,stage,progress.premium,w,d,height,trim,glass,serviceRear);
   }
   const material=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.77,metalness:.02});
   const instanceColor=new THREE.Color();
