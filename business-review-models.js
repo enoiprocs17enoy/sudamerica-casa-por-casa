@@ -93,6 +93,31 @@ function drawShops(){
       for(const side of [-1,1])for(const end of [-1,1])soft(0x273039,dx+side*.66,.36,dz+end*.76,.22,.61,.61);
       for(const side of [-1,1])box(0xffedbc,dx+side*.39,.66,dz+1.23,.22,.15,.035);
     }
+    // Early buildings also have a working rear facade. Later stages already
+    // have category-specific rear annexes, loading bays and glazed halls.
+    if(stage<2){
+      const rear=-d;
+      if(shape===1||shape===6){
+        part('garageGate',0x63787c,0,1.38,rear-.10,w*.29,2.65,.16);
+        for(let rib=0;rib<6;rib++)box(0xabc0c1,0,.40+rib*.40,rear-.20,w*.28,.045,.04);
+        for(const side of [-1,1])part('displayGlass',glass,side*w*.32,3.16,rear-.08,w*.20,.61,.12);
+      }else{
+        const exits=shape===8?[-.62,.62]:[0];
+        for(const dx of exits){
+          part('entryDoor',trim,dx,1.14,rear-.09,1.22,2.14,.14);
+          part('entryDoorGlass',shape===8?0x485463:glass,dx,1.35,rear-.19,.99,1.54,.06);
+          box(metal,dx+(shape===8?0:.40),1.08,rear-.25,shape===8?.76:.045,shape===8?.065:.27,.06);
+        }
+        if(shape!==8&&!(premium&&(shape===9||shape===10)))for(const side of [-1,1]){
+          part('displayGlass',glass,side*w*.29,2.08,rear-.08,w*.20,1.18,.13);
+          box(cream,side*w*.29,1.45,rear-.16,w*.22,.12,.24);
+        }
+        if([0,2,7].includes(shape)){
+          box(0x9faeab,0,2.75,rear-.23,.95,.37,.42);
+          for(const slat of [-.30,0,.30])box(metal,slat,2.76,rear-.46,.035,.23,.03);
+        }
+      }
+    }
     // These forecourts stay inside the fixed20.5m x45m parcel. Each trade
     // uses recognisable equipment rather than the same display rectangles.
     const dining=shape===2,pizzeria=dining&&shop.id%24===14;
