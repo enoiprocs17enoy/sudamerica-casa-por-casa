@@ -2808,7 +2808,7 @@ function drawShops(){
           for(let book=0;book<5;book++)box([0x638a91,0xc17358,0xc1a761][book%3],dx+(book-2)*.19,.80+shelf*.57,dz+2.13,.14,.42,.17);
         }}
       }
-      if(stage>=4)for(const side of [-1,1])table(side*w*.25,-d*.26,false,height+.65);
+      if(stage>=4)for(const side of [-1,1])table(side*w*.25,-d*.26,false,height+.47);
     }else if(shape===4){
       // Accessible approach, illuminated medicine collection lockers.
       box(0xd4ddd7,0,.16,3.3,2.35,.25,4.2);
@@ -3175,6 +3175,7 @@ function drawShops(){
 
     if(shape===3&&stage>=2){
       const stone=0xe9d9bb;
+      for(const side of [-1,1])put('displayGlass',glass,shop,x+side*(w/2+.08),2.4,z,.16,1.6,d*.50);
       for(let level=5.5;level+1<height;level+=3.2){
         for(const side of [-1,1]){
           for(const bay of [-1,0,1]){
@@ -3553,7 +3554,12 @@ function drawShops(){
       for(let i=0;i<3;i++)
         put('bookshopSideShelf',0x8d6a4c,shop,x+w/2+.15,1.05+i*.78,z,.15,.10,d*.50);
       if(stage>=4){
-        for(const side of [-1,1])roofPut('roof',0xe9d9bb,shop,x+side*w*.46,rooftop+.28,z,.35,.60,d*.94);
+        for(const side of [-1,1]){
+          roofPut('body',0xe9d9bb,shop,x+side*w*.47,height+.88,z,.22,.85,d*.96);
+          roofPut('roof',trim,shop,x+side*w*.47,height+1.34,z,.29,.12,d*.98);
+          roofPut('body',0xe9d9bb,shop,x,height+.88,z+side*d*.47,w*.96,.85,.22);
+          roofPut('roof',trim,shop,x,height+1.34,z+side*d*.47,w*.98,.12,.29);
+        }
       }
       if(stage>=5){
         const domeWidth=w*(stage>=7?.70:stage>=6?.64:.56),domeRise=2+stage*.36,domeZ=z-d*.14;
@@ -3604,7 +3610,7 @@ function drawShops(){
         roofPut('marketRoofCap',0xe3d5ad,shop,x+side*w*.23,rooftop+.38,z,w*.40,.08,d*.64);
       }
     }
-    if(seed%3===0&&!(progress.premium&&shape===9))put('side',style.glass,shop,x+w/2+.1,height*.55,z, .2,1.6,d*.45);
+    if(seed%3===0&&!(progress.premium&&shape===9)&&!(shape===3&&stage>=2))put('side',style.glass,shop,x+w/2+.1,height*.55,z, .2,1.6,d*.45);
     if(progress.premium&&shape===2){
       const terraceX=x+w/2+1.19,terraceZ=z-d*.17;
       put('shopDiningDeck',0xbd9a74,shop,terraceX,.15,terraceZ,2.48,.23,4.55);
