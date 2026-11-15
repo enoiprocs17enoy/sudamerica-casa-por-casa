@@ -3525,7 +3525,7 @@ function drawShops(){
         roofPut('marketRoofCap',0xe3d5ad,shop,x+side*w*.23,rooftop+.38,z,w*.40,.08,d*.64);
       }
     }
-    if(seed%3===0)put('side',style.glass,shop,x+w/2+.1,height*.55,z, .2,1.6,d*.45);
+    if(seed%3===0&&!(progress.premium&&shape===9))put('side',style.glass,shop,x+w/2+.1,height*.55,z, .2,1.6,d*.45);
     if(progress.premium&&shape===2){
       const terraceX=x+w/2+1.19,terraceZ=z-d*.17;
       put('shopDiningDeck',0xbd9a74,shop,terraceX,.15,terraceZ,2.48,.23,4.55);
