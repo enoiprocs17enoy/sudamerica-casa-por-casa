@@ -1,7 +1,7 @@
 {
   "locale": "id",
   "name": "Bahasa Indonesia",
-  "reviewStatus": "in-progress",
+  "reviewStatus": "verified",
   "messages": {
     "Esplora il mondo": "Jelajahi dunia",
     "Scegli una città": "Pilih kota",
@@ -687,5 +687,13 @@
       "target": "Alun-alun kota {city}",
       "translateSlots": []
     }
-  ]
+  ],
+  "verification": {
+    "messages": 360,
+    "templates": 61,
+    "browserEvidence": "Indonesiano_obiettivi_contrasto_v9.8.0.jpg",
+    "additionalEvidence": "Indonesiano_scheda_attivita_v9.8.0.jpg",
+    "audit": "indonesian-browser-audit.json",
+    "scope": "Current UI catalogue; public panels, city labels, business card, owner sign-in text and 390px responsive layout verified. Further world languages and the overall Goal remain incomplete."
+  }
 }
