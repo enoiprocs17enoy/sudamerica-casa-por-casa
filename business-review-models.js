@@ -510,6 +510,17 @@ function drawShops(){
           for(const bay of [-1,0,1]){
             put('hotelUpperWindow',glass,shop,x+bay*w*.29,levelY,z+side*(d/2+.07),w*.20,1.79,.15);
             put('hotelUpperWindow',glass,shop,x+side*(w/2+.07),levelY,z+bay*d*.28,.15,1.79,d*.20);
+            if(progress.premium){
+              put('shopPremiumSill',0xf2dfbf,shop,x+bay*w*.29,levelY-.98,z+side*(d/2+.16),w*.24,.14,.30);
+              put('shopPremiumSill',0xf2dfbf,shop,x+side*(w/2+.16),levelY-.98,z+bay*d*.28,.30,.14,d*.24);
+              put('shopPremiumMullion',0xf2dfbf,shop,x+bay*w*.29,levelY,z+side*(d/2+.17),.07,1.79,.10);
+              put('shopPremiumMullion',0xf2dfbf,shop,x+side*(w/2+.17),levelY,z+bay*d*.28,.10,1.79,.07);
+            }
+          }
+          if(progress.premium&&floor>=3&&floor%3===0){
+            put('hotelBalcony',0xf2dfbf,shop,x,levelY-1.03,z+side*(d/2+.46),w*.88,.12,.94);
+            put('hotelBalconyRail',trim,shop,x,levelY-.10,z+side*(d/2+.91),w*.89,.09,.09);
+            for(const bay of [-.42,-.21,0,.21,.42])put('hotelBalconyPost',trim,shop,x+bay*w,levelY-.55,z+side*(d/2+.91),.07,.90,.07);
           }
           put('evolutionStoreyBand',trim,shop,x,levelY+1.23,z+side*(d/2+.09),w+.10,.16,.22);
           put('evolutionSideStoreyBand',trim,shop,x+side*(w/2+.09),levelY+1.23,z,.22,.16,d+.10);
@@ -876,18 +887,17 @@ function drawShops(){
       for(let slat=-3;slat<=3;slat++)
         put('shopPergolaSlat',slat%2?0xe3b88b:trim,shop,terraceX+slat*.34,3.22,terraceZ,.14,.14,4.30);
     }
-    if(progress.premium&&(shape===9||shape===10)){
-      const hotel=shape===10;
+    if(progress.premium&&shape===9){
       const rear=z-d/2;
-      for(const level of hotel?[.32,.61,.82]:[.33]){
+      for(const level of [.33]){
         const windowY=height*level;
         for(const bay of [-1,1]){
           const windowX=x+bay*w*.23,windowZ=z+bay*d*.23;
-          put('displayGlass',glass,shop,windowX,windowY,rear-.066,w*.29,hotel?1.28:1.62,.15);
+          put('displayGlass',glass,shop,windowX,windowY,rear-.066,w*.29,1.62,.15);
           put('shopPremiumSill',trim,shop,windowX,windowY-.85,rear-.13,w*.33,.15,.30);
           for(const side of [-1,1]){
             const sideX=x+side*(w/2+.066);
-            put('displayGlass',glass,shop,sideX,windowY,windowZ,.15,hotel?1.28:1.62,d*.29);
+            put('displayGlass',glass,shop,sideX,windowY,windowZ,.15,1.62,d*.29);
             put('shopPremiumSill',trim,shop,sideX+side*.06,windowY-.85,windowZ,.30,.15,d*.33);
           }
         }
