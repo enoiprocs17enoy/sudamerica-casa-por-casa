@@ -2692,6 +2692,8 @@ function drawShops(){
   bar.rotateZ(Math.PI/2);
   const cup=new THREE.CylinderGeometry(.5,.34,1,20);
   const handle=new THREE.TorusGeometry(.32,.10,8,18);
+  const furnitureRound=new THREE.CylinderGeometry(.5,.5,1,12);
+  const furnitureSoft=new THREE.SphereGeometry(.5,8,6);
   const structuralKinds=new Set(['evolutionSignatureHall','evolutionSignatureHallWindow','evolutionSignatureHallSide','evolutionEntranceCanopy','evolutionEntranceColumn','evolutionUpperWindow','evolutionSideWindow','evolutionRoofTerrace','evolutionTerraceRail','evolutionTerraceSideRail','evolutionTerracePavilion','evolutionTerracePavilionPost','evolutionGrandEntrance','evolutionGrandPier','cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeMark','tradeRound','tradeDress','tradeSculpt','tradeBar','shopPaving','shopUpperBody','shopUpperGlass','shopUpperCap','body','roof','hotelRoof','cinemaRoof',
       'garageRoof','superRoof','displayGlass','entryDoor','entryDoorGlass',
       'signFascia','signInset','garageGate','cinemaParapet','hotelUpperWindow']);
@@ -2701,9 +2703,10 @@ function drawShops(){
     const detailed=!structuralKinds.has(kind);
     const cx=shop?Math.floor(shop.x/90):0,cz=shop?Math.floor(shop.z/90):0;
     const geometry=kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:
+      kind==='shopRoundFurniture'?furnitureRound:(kind==='shopSoftFurniture'||kind==='shopUmbrellaCanopy')?furnitureSoft:
       kind==='tradeDress'?dress:kind==='tradeSculpt'?sculpt:kind==='tradeBar'?bar:
       kind.startsWith('pizza')||kind==='tradeRound'?disc:box;
-    const casts=/^(body|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof|evolutionSignatureHall|evolutionEntranceCanopy|evolutionEntranceColumn|evolutionRoofTerrace|evolutionTerracePavilion|evolutionGrandEntrance|evolutionGrandPier)$/.test(kind);
+    const casts=/^(body|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof|evolutionSignatureHall|evolutionEntranceCanopy|evolutionEntranceColumn|evolutionRoofTerrace|evolutionTerracePavilion|evolutionGrandEntrance|evolutionGrandPier|shopForecourtDetail|shopRoundFurniture|shopUmbrellaCanopy)$/.test(kind);
     const receives=casts||kind==='shopPaving';
     const key=[geometry.id,casts,receives,detailed?cx:'all',detailed?cz:'all'].join(':');
     if(!batches.has(key))batches.set(key,{geo:geometry,casts,receives,entries:[],detailed,
@@ -2714,6 +2717,155 @@ function drawShops(){
       x=shop.x+dx*ca+dz*sa;z=shop.z-dx*sa+dz*ca;
     }
     batches.get(key).entries.push({shop,color,x,y,z,w,h,d,rotation});
+  }
+  function furnishBusiness(shop,shape,stage,premium,w,d,height,trim,glass,serviceRear){
+    const x=shop.x,front=shop.z+d/2,cream=0xf3e4c9,wood=0xb98350,metal=0x374b53;
+    const part=(kind,color,dx,y,dz,a,b,c)=>put(kind,color,shop,x+dx,y,front+dz,a,b,c);
+    const box=(color,dx,y,dz,a,b,c)=>part('shopForecourtDetail',color,dx,y,dz,a,b,c);
+    const round=(color,dx,y,dz,a,b,c)=>part('shopRoundFurniture',color,dx,y,dz,a,b,c);
+    const soft=(color,dx,y,dz,a,b,c)=>part('shopSoftFurniture',color,dx,y,dz,a,b,c);
+    function chair(dx,dz,side,color=wood,y=0){
+      box(color,dx,y+.55,dz,.53,.13,.58);
+      box(color,dx,y+.88,dz+side*.26,.53,.62,.10);
+      for(const a of [-1,1])for(const b of [-1,1])box(metal,dx+a*.20,y+.28,dz+b*.21,.055,.50,.055);
+    }
+    function table(dx,dz,dining,y=0){
+      if(dining){box(cream,dx,y+1.04,dz,1.34,.12,1.12);box(trim,dx,y+.77,dz,1.37,.43,1.15);}
+      else round(wood,dx,y+1.04,dz,1.12,.12,1.12);
+      round(metal,dx,y+.57,dz,.13,.86,.13);round(metal,dx,y+.17,dz,.58,.08,.58);
+      chair(dx,dz-.87,-1,dining?0x88534b:wood,y);chair(dx,dz+.87,1,dining?0x88534b:wood,y);
+      if(dining){
+        for(const side of [-1,1]){round(0xfffbef,dx,y+1.13,dz+side*.30,.37,.035,.37);box(metal,dx+.25,y+1.14,dz+side*.30,.04,.025,.28);}
+        round(0x8a6950,dx,y+1.20,dz,.14,.25,.14);soft(0x6c974a,dx,y+1.39,dz,.27,.22,.27);
+      }else{round(cream,dx,y+1.17,dz,.16,.21,.16);round(0x563b2d,dx,y+1.28,dz,.13,.018,.13);}
+    }
+    function car(dx,dz,color){
+      box(metal,dx,.30,dz,1.25,.35,2.35);box(color,dx,.66,dz,1.30,.48,2.42);
+      box(glass,dx,.99,dz-.10,1.06,.44,1.22);box(color,dx,1.23,dz-.10,1.12,.10,1.30);
+      for(const side of [-1,1])for(const end of [-1,1])soft(0x273039,dx+side*.66,.36,dz+end*.76,.22,.61,.61);
+      for(const side of [-1,1])box(0xffedbc,dx+side*.39,.66,dz+1.23,.22,.15,.035);
+    }
+    // Early buildings also have a working rear facade. Later stages already
+    // have category-specific rear annexes, loading bays and glazed halls.
+    if(stage<2||shape===8){
+      const rear=shape===8?serviceRear-front:-d;
+      if(shape===1||shape===6){
+        part('garageGate',0x63787c,0,1.38,rear-.10,w*.29,2.65,.16);
+        for(let rib=0;rib<6;rib++)box(0xabc0c1,0,.40+rib*.40,rear-.20,w*.28,.045,.04);
+        for(const side of [-1,1])part('displayGlass',glass,side*w*.32,3.16,rear-.08,w*.20,.61,.12);
+      }else{
+        const exits=shape===8?[-.62,.62]:[0];
+        for(const dx of exits){
+          part('entryDoor',trim,dx,1.14,rear-.09,1.22,2.14,.14);
+          part('entryDoorGlass',shape===8?0x485463:glass,dx,1.35,rear-.19,.99,1.54,.06);
+          box(metal,dx+(shape===8?0:.40),1.08,rear-.25,shape===8?.76:.045,shape===8?.065:.27,.06);
+        }
+        if(shape!==8&&!(premium&&(shape===9||shape===10)))for(const side of [-1,1]){
+          part('displayGlass',glass,side*w*.29,2.08,rear-.08,w*.20,1.18,.13);
+          box(cream,side*w*.29,1.45,rear-.16,w*.22,.12,.24);
+        }
+        if([0,2,7].includes(shape)){
+          box(0x9faeab,0,2.75,rear-.23,.95,.37,.42);
+          for(const slat of [-.30,0,.30])box(metal,slat,2.76,rear-.46,.035,.23,.03);
+        }
+      }
+    }
+    // These forecourts stay inside the fixed20.5m x45m parcel. Each trade
+    // uses recognisable equipment rather than the same display rectangles.
+    const dining=shape===2,pizzeria=dining&&shop.id%24===14;
+    if(shape===0||dining){
+      if(stage>=1){
+        const rows=Math.min(dining?4:3,1+Math.floor(stage/2)),pitch=2.7;
+        part('shopPaving',dining?0xd1b19c:0xc3a580,0,.12,7.5,Math.min(17.8,w+1),.12,12);
+        for(let row=0;row<rows;row++)for(const side of [-1,1]){
+          const dx=side*Math.min(3.35,w*.26),dz=3.9+row*pitch;table(dx,dz,dining);
+          if(pizzeria){round(0xc38b48,dx,1.135,dz,.54,.035,.54);round(0xd15c36,dx,1.16,dz,.43,.02,.43);}
+          if(premium&&row%2===1){round(metal,dx+.78,1.78,dz,.055,3.02,.055);box(metal,dx+.39,3.08,dz,.83,.06,.06);part('shopUmbrellaCanopy',trim,dx,3.23,dz,2.15,.28,2.15);}
+        }
+      }
+      if(stage>=4)for(const side of [-1,1])table(side*w*.25,-d*.26,dining,height+.65);
+    }else if(shape===1){
+      // Produce islands and a dedicated cart corral, not restaurant tables.
+      for(let rack=0;rack<Math.min(4,1+Math.floor(stage/2));rack++){
+        const dx=(rack%2?1:-1)*w*.28,dz=4.6+Math.floor(rack/2)*2.5;
+        box(wood,dx,.58,dz,1.48,1.05,1.10);
+        for(let row=0;row<2;row++)for(let col=0;col<4;col++)soft(row?0xe6ae43:0x779e43,dx+(col-1.5)*.29,1.17,dz+(row-.5)*.42,.30,.29,.31);
+      }
+      if(stage>=1)for(let cart=0;cart<Math.min(4,stage+1);cart++){
+        const dx=-w*.31+cart*.52,dz=8.4;box(metal,dx,.38,dz,.68,.08,.92);
+        for(const side of [-1,1]){box(trim,dx+side*.32,.84,dz,.055,.68,.83);box(trim,dx,.98,dz+side*.40,.68,.07,.055);}
+        for(const side of [-1,1])for(const end of [-1,1])soft(metal,dx+side*.27,.25,dz+end*.33,.16,.23,.23);
+      }
+    }else if(shape===3){
+      // Reading garden: book spines belong here, and nowhere else.
+      for(let bay=0;bay<Math.min(3,1+Math.floor(stage/2));bay++){
+        const dx=(bay-1)*w*.27,dz=5.6;
+        box(wood,dx,.55,dz,1.15,.14,.56);box(trim,dx,.88,dz-.24,1.15,.62,.10);
+        for(const side of [-1,1])box(metal,dx+side*.43,.29,dz,.08,.52,.40);
+        if(stage>=2){box(wood,dx,1.15,dz+2.0,1.16,2.05,.45);for(let shelf=0;shelf<3;shelf++){
+          box(cream,dx,.54+shelf*.57,dz+2,1.17,.07,.48);
+          for(let book=0;book<5;book++)box([0x638a91,0xc17358,0xc1a761][book%3],dx+(book-2)*.19,.80+shelf*.57,dz+2.13,.14,.42,.17);
+        }}
+      }
+      if(stage>=4)for(const side of [-1,1])table(side*w*.25,-d*.26,false,height+.65);
+    }else if(shape===4){
+      // Accessible approach, illuminated medicine collection lockers.
+      box(0xd4ddd7,0,.16,3.3,2.35,.25,4.2);
+      for(const side of [-1,1]){box(metal,side*1.10,.72,3.3,.07,.07,4.0);for(const dz of [1.5,3.3,5.1])box(metal,side*1.10,.41,dz,.06,.59,.06);}
+      if(stage>=1)for(const side of [-1,1]){box(cream,side*w*.32,1.13,7.0,1.05,2.05,.53);for(let row=0;row<3;row++)for(let col=0;col<2;col++)box(trim,side*w*.32+(col-.5)*.45,.50+row*.55,7.29,.40,.48,.04);}
+    }else if(shape===5){
+      // Mannequins and clothes rails outside the boutique.
+      for(let rack=0;rack<Math.min(3,1+Math.floor(stage/2));rack++){
+        const dx=(rack-1)*w*.28,dz=5.2;
+        for(const side of [-1,1])box(metal,dx+side*.65,1.12,dz,.07,2.05,.07);
+        box(metal,dx,2.13,dz,1.39,.08,.08);
+        for(let garment=0;garment<3;garment++)part('tradeDress',[0xd57888,0x78a4b2,0xd8bc68][garment],dx+(garment-1)*.38,1.56,dz,.43,.69,.30);
+      }
+      if(stage>=2)for(const side of [-1,1]){round(cream,side*w*.31,.15,8.0,.82,.12,.82);soft(cream,side*w*.31,1.83,8.0,.30,.36,.30);box(trim,side*w*.31,1.30,8.0,.42,.65,.22);}
+    }else if(shape===6){
+      // Service bays with cars, tool cabinets and marked parking.
+      for(let bay=0;bay<Math.min(3,1+Math.floor(stage/3));bay++){
+        const dx=(bay-1)*w*.27,dz=5.5;part('shopPaving',0x6e7b80,dx,.11,dz,3.15,.10,4.2);car(dx,dz,[0xb85e55,0xd8bb63,0x7b9bac][bay]);
+        if(stage>=2){box(0xc47843,dx-1.1,1.0,dz-.8,.43,1.7,.58);for(let drawer=0;drawer<4;drawer++)box(metal,dx-1.1,.5+drawer*.3,dz-.49,.32,.035,.04);}
+      }
+    }else if(shape===7){
+      // Bread is rounded and golden; displays cannot be mistaken for books.
+      for(let stall=0;stall<Math.min(3,1+Math.floor(stage/2));stall++){
+        const dx=(stall-1)*w*.28,dz=5.3;box(wood,dx,.70,dz,1.48,1.24,1.0);
+        for(let loaf=0;loaf<5;loaf++)soft(loaf%2?0xc5863e:0xe4b769,dx+(loaf-2)*.23,1.43,dz,.22,.23,.74);
+        if(stage>=2){box(trim,dx,2.45,dz,1.72,.15,1.3);for(const side of [-1,1])box(wood,dx+side*.72,1.68,dz,.08,1.47,.08);}
+      }
+    }else if(shape===8){
+      // Red-carpet approach, ticket booths and velvet-rope queues.
+      part('shopPaving',0x9a3e49,0,.13,6.7,w*.46,.12,7.5);
+      for(const side of [-1,1]){
+        for(let post=0;post<2+Math.min(stage,3);post++){const dz=3.4+post*1.2;round(0xc8ad72,side*w*.25,.77,dz,.075,1.28,.075);soft(0xd8bb78,side*w*.25,1.46,dz,.19,.19,.19);if(post)box(0x9a3e49,side*w*.25,1.27,dz-.60,.07,.07,1.2);}
+        if(stage>=1){box(trim,side*w*.36,1.28,6.0,1.26,2.2,1.12);box(glass,side*w*.36,1.64,6.58,.96,.60,.06);box(cream,side*w*.36,2.49,6.0,1.48,.20,1.36);}
+      }
+    }else if(shape===9){
+      // Outdoor workout stations: weights and pull-up bars.
+      for(let station=0;station<Math.min(3,1+Math.floor(stage/2));station++){
+        const dx=(station-1)*w*.28,dz=5.6;box(0x577d78,dx,.12,dz,2.12,.10,3.3);
+        box(metal,dx,1.10,dz,1.5,.10,.10);for(const side of [-1,1])part('tradeBar',0x34434b,dx+side*.61,1.1,dz,.15,.55,.55);
+        if(stage>=2){for(const side of [-1,1])box(trim,dx+side*.87,1.66,dz+1.18,.13,3.05,.13);box(metal,dx,3.20,dz+1.18,1.88,.13,.13);}
+      }
+    }else if(shape===10){
+      // A hotel arrival court with luggage trolleys and valet cars.
+      for(const side of [-1,1]){
+        round(0x416d51,side*w*.34,.65,4.8,1.12,1.05,1.12);soft(0x719249,side*w*.34,1.34,4.8,1.30,1.10,1.30);
+        if(stage>=1){box(0xc9ac68,side*1.25,.30,5.7,.70,.10,1.06);for(const post of [-1,1])box(0xc9ac68,side*1.25+post*.32,1.08,5.7,.055,1.52,.06);box(0xb07a4d,side*1.25,.68,5.7,.59,.58,.60);}
+        if(stage>=3)car(side*w*.31,9.0,premium?0x3e4d61:0x9c7c67);
+      }
+    }else if(shape===11){
+      // Separate striped market stalls with fruit, rather than an empty hall.
+      for(let stall=0;stall<Math.min(4,1+Math.floor(stage/2));stall++){
+        const dx=(stall%2?1:-1)*w*.26,dz=4.7+Math.floor(stall/2)*3.4;
+        box(wood,dx,.63,dz,2.55,1.12,1.40);
+        for(const side of [-1,1])box(wood,dx+side*1.17,1.55,dz,.10,2.80,.10);
+        for(let stripe=0;stripe<6;stripe++)box(stripe%2?cream:trim,dx+(stripe-2.5)*.47,2.93,dz,.47,.17,2.08);
+        for(let item=0;item<7;item++)soft(item%2?0xdca848:0x719a48,dx+(item-3)*.30,1.34,dz,.37,.32,.48);
+      }
+    }
   }
   for(const shop of shopPurchases){
     const style=shopStyles[shop.id%shopStyles.length];
@@ -2732,7 +2884,7 @@ function drawShops(){
 
     const baseHeight=[4.2,5.1,5.2,6.4,4.7,4.0,5.0,4.5,9.0,6.8,4.6,4.3][shape]
       *(.88+rnd(seed*41+2)*.22)*(district==='centro'?1.08:1);
-    const height=shape===10?baseHeight+stage*3.35:baseHeight*(1+growth*heightGrowth)+(stage>=3?2.8:0);
+    const height=shape===10?[4.6,7.8,12,18,27,40,58,82][stage]*(baseHeight/4.6):baseHeight*(1+growth*heightGrowth)+(stage>=3?2.8:0);
 
     const x=shop.x,z=shop.z;
     const wallColor=progress.premium?coordinatedHouseColor(style.walls,0xffe8c5,shape===1?.68:.32):style.walls;
@@ -2740,6 +2892,7 @@ function drawShops(){
     put('shopPaving',paving,shop,x,.055,z,17.7,.06,17.5);
     put('body',wallColor,shop,x,height/2,z,w,height,d);
     const front=z+d/2, trim=style.trim, glass=style.glass;
+    let serviceRear=z-d/2;
 
     if(stage>=1){
       const canopyDepth=shape===0||shape===2||shape===7?4.15:shape===6?2.75:2.15;
@@ -2785,7 +2938,7 @@ function drawShops(){
           put('evolutionTerraceSideBaluster',trim,shop,x+side*w*.465,deckY+.49,z+bay*d,.07,.91,.07);
         }
         const seatX=x+side*w*.27;
-        put('evolutionTerraceSeat',0xd8bb8b,shop,seatX,deckY+.49,z+d*.16,w*.19,.16,1.03);
+        if(![0,2,3].includes(shape))put('evolutionTerraceSeat',0xd8bb8b,shop,seatX,deckY+.49,z+d*.16,w*.19,.16,1.03);
       }
     }
     if(stage>=5&&shape!==10){
@@ -2798,9 +2951,10 @@ function drawShops(){
         put('evolutionTerracePavilionPost',wallColor,shop,x+side*pavilionWidth*.46,height+1.75,pavilionZ+face*pavilionDepth*.43,.18,2.48,.18);
     }
     if(stage>=6){
-      const gardenZ=front+4.46;
+      const gardenZ=front+2.35;
+      const gardenEdge=Math.min(9.25,w/2+1,(shop.right??x+10.225)-x-.85,x-(shop.left??x-10.225)-.85);
       for(const side of [-1,1]){
-        const gardenX=x+side*w*.37;
+        const gardenX=x+side*gardenEdge;
         put('evolutionGardenBox',0xdec9a6,shop,gardenX,.35,gardenZ,1.45,.55,1.15);
         put('evolutionGardenHedge',0x53804c,shop,gardenX,.91,gardenZ,1.31,.72,1.02);
         put('evolutionGardenLamp',trim,shop,gardenX,2.14,gardenZ,.15,2.08,.15);
@@ -2859,9 +3013,14 @@ function drawShops(){
           const tx=x+side*annexWidth*.25;
           put('shopDiningPedestal',trim,shop,tx,.60,back-1.47,.22,.84,.22);
           put('shopDiningTable',0xf4dab1,shop,tx,1.04,back-1.47,1.18,.13,.94);
+          for(const end of [-1,1]){
+            put('shopForecourtDetail',0xb98350,shop,tx,.55,back-1.47+end*.85,.53,.13,.56);
+            put('shopForecourtDetail',0xb98350,shop,tx,.87,back-1.47+end*1.10,.53,.62,.10);
+            for(const sideLeg of [-1,1])put('shopForecourtDetail',trim,shop,tx+sideLeg*.19,.29,back-1.47+end*.85,.06,.48,.42);
+          }
           if(stage>=6){
-            put('shopPergolaPost',trim,shop,tx,1.65,back-2.45,.14,2.99,.14);
-            put('shopPergolaBeam',trim,shop,tx,3.13,back-1.31,.16,.18,2.50);
+            put('shopPergolaPost',trim,shop,tx+side*.70,1.65,back-2.45,.14,2.99,.14);
+            put('shopPergolaBeam',trim,shop,tx+side*.70,3.13,back-1.31,.16,.18,2.50);
           }
         }
       }
@@ -2876,6 +3035,7 @@ function drawShops(){
       put('body',wallColor,shop,x,extensionHeight/2,extensionZ,extensionWidth,extensionHeight,extensionDepth);
       put('roof',trim,shop,x,extensionHeight+.13,extensionZ,extensionWidth+.28,.26,extensionDepth+.28);
       const back=extensionZ-extensionDepth/2;
+      serviceRear=back;
       if(restaurant){
         for(const bay of [-1,0,1]){
           put('displayGlass',glass,shop,x+bay*extensionWidth*.27,extensionHeight*.51,back-.08,extensionWidth*.19,extensionHeight*.56,.17);
@@ -2886,6 +3046,11 @@ function drawShops(){
             const tx=x+side*extensionWidth*.25;
             put('shopDiningTable',0xf0ca91,shop,tx,1.08,back-1.59,1.18,.14,.95);
             put('shopDiningPedestal',trim,shop,tx,.60,back-1.59,.23,.83,.23);
+            for(const end of [-1,1]){
+              put('shopForecourtDetail',0x88534b,shop,tx,.55,back-1.59+end*.88,.57,.13,.58);
+              put('shopForecourtDetail',0x88534b,shop,tx,.87,back-1.59+end*1.14,.57,.62,.10);
+              for(const sideLeg of [-1,1])put('shopForecourtDetail',trim,shop,tx+sideLeg*.21,.29,back-1.59+end*.88,.06,.48,.44);
+            }
           }
         }
       }else if(cinema){
@@ -2990,13 +3155,24 @@ function drawShops(){
     }
 
     if(shape===10){
-      for(let floor=0;floor<=stage;floor++){
+      for(let floor=0;floor<Math.ceil(height/3.35);floor++){
         const levelY=3.70+floor*3.35;
         if(levelY+1>height)continue;
         for(const side of [-1,1]){
           for(const bay of [-1,0,1]){
             put('hotelUpperWindow',glass,shop,x+bay*w*.29,levelY,z+side*(d/2+.07),w*.20,1.79,.15);
             put('hotelUpperWindow',glass,shop,x+side*(w/2+.07),levelY,z+bay*d*.28,.15,1.79,d*.20);
+            if(progress.premium){
+              put('shopPremiumSill',0xf2dfbf,shop,x+bay*w*.29,levelY-.98,z+side*(d/2+.16),w*.24,.14,.30);
+              put('shopPremiumSill',0xf2dfbf,shop,x+side*(w/2+.16),levelY-.98,z+bay*d*.28,.30,.14,d*.24);
+              put('shopPremiumMullion',0xf2dfbf,shop,x+bay*w*.29,levelY,z+side*(d/2+.17),.07,1.79,.10);
+              put('shopPremiumMullion',0xf2dfbf,shop,x+side*(w/2+.17),levelY,z+bay*d*.28,.10,1.79,.07);
+            }
+          }
+          if(progress.premium&&floor>=3&&floor%3===0){
+            put('hotelBalcony',0xf2dfbf,shop,x,levelY-1.03,z+side*(d/2+.46),w*.88,.12,.94);
+            put('hotelBalconyRail',trim,shop,x,levelY-.10,z+side*(d/2+.91),w*.89,.09,.09);
+            for(const bay of [-.42,-.21,0,.21,.42])put('hotelBalconyPost',trim,shop,x+bay*w,levelY-.55,z+side*(d/2+.91),.07,.90,.07);
           }
           put('evolutionStoreyBand',trim,shop,x,levelY+1.23,z+side*(d/2+.09),w+.10,.16,.22);
           put('evolutionSideStoreyBand',trim,shop,x+side*(w/2+.09),levelY+1.23,z,.22,.16,d+.10);
@@ -3020,15 +3196,19 @@ function drawShops(){
       }
     }
     if(shape===0){
-      put('cafeCupSign',0xffefcd,shop,x,height+.93,front-.65,1.68,1.26,1.59);
-      put('cafeHandleSign',0xffefcd,shop,x+.84,height+.94,front-.65,1.17,1.22,1.16);
+      put('tradeMark',trim,shop,x,height+.63,front+.18,.14,.34,.22);
+      put('tradeMark',trim,shop,x,height+.73,front+.64,.14,.12,1.20);
+      put('cafeCupSign',0xffefcd,shop,x,height+1.35,front+1.10,1.68,1.26,1.59);
+      put('cafeHandleSign',0xffefcd,shop,x+.84,height+1.36,front+1.10,1.17,1.22,1.16);
     }
     if(shape===2&&shop.id%24===14){
-      put('pizzaDiscSign',0xc47b30,shop,x,height+1.39,front-.39,2.85,2.85,.39);
-      put('pizzaSauceSign',0xffc260,shop,x,height+1.39,front-.16,2.46,2.46,.09);
+      put('tradeMark',trim,shop,x,height+.25,front+.30,.16,.10,.65);
+      put('tradeMark',trim,shop,x,height+.93,front+.55,.16,1.70,.10);
+      put('pizzaDiscSign',0xc47b30,shop,x,height+2.13,front+.60,2.85,2.85,.39);
+      put('pizzaSauceSign',0xffc260,shop,x,height+2.13,front+.83,2.46,2.46,.09);
       for(let topping=0;topping<6;topping++){
         const angle=topping*Math.PI/3;
-        put('pizzaToppingSign',0xc24438,shop,x+Math.cos(angle)*.73,height+1.39+Math.sin(angle)*.73,front-.09,.34,.34,.07);
+        put('pizzaToppingSign',0xc24438,shop,x+Math.cos(angle)*.73,height+2.13+Math.sin(angle)*.73,front+.90,.34,.34,.07);
       }
     }
     const pizzeria=shape===2&&shop.id%24===14;
@@ -3089,7 +3269,10 @@ function drawShops(){
         for(const side of [-1,1])mark(side*.31,.46,.23,.42,ivory,'tradeSculpt',0,.46);
       }else if(shape===7){ // Rounded loaf with scored crust
         mark(0,0,1.69,.95,0xe1a34c,'tradeSculpt',0,.96);
-        for(const score of [-.40,0,.40])mark(score,.39,.10,.08,0xffd287,'tradeSculpt',0,.44);
+        for(const score of [-.40,0,.40])for(const dz of [-.28,-.14,0,.14,.28]){
+          const surface=.475*Math.sqrt(Math.max(0,1-(score/.845)**2-(dz/.48)**2));
+          mark(score,surface+.012,.10,.045,0xb8793a,'tradeSculpt',dz,.16);
+        }
       }else if(shape===8){ // Clapperboard with a projecting hinged top
         mark(0,-.19,1.42,.82,0xf2d9a9,'tradeMark',0,.52);
         for(const face of [-1,1]){
@@ -3356,24 +3539,24 @@ function drawShops(){
       for(let slat=-3;slat<=3;slat++)
         put('shopPergolaSlat',slat%2?0xe3b88b:trim,shop,terraceX+slat*.34,3.22,terraceZ,.14,.14,4.30);
     }
-    if(progress.premium&&(shape===9||shape===10)){
-      const hotel=shape===10;
+    if(progress.premium&&shape===9){
       const rear=z-d/2;
-      for(const level of hotel?[.32,.61,.82]:[.33]){
+      for(const level of [.33]){
         const windowY=height*level;
         for(const bay of [-1,1]){
           const windowX=x+bay*w*.23,windowZ=z+bay*d*.23;
-          put('displayGlass',glass,shop,windowX,windowY,rear-.066,w*.29,hotel?1.28:1.62,.15);
+          put('displayGlass',glass,shop,windowX,windowY,rear-.066,w*.29,1.62,.15);
           put('shopPremiumSill',trim,shop,windowX,windowY-.85,rear-.13,w*.33,.15,.30);
           for(const side of [-1,1]){
             const sideX=x+side*(w/2+.066);
-            put('displayGlass',glass,shop,sideX,windowY,windowZ,.15,hotel?1.28:1.62,d*.29);
+            put('displayGlass',glass,shop,sideX,windowY,windowZ,.15,1.62,d*.29);
             put('shopPremiumSill',trim,shop,sideX+side*.06,windowY-.85,windowZ,.30,.15,d*.33);
           }
         }
       }
     }
 
+    furnishBusiness(shop,shape,stage,progress.premium,w,d,height,trim,glass,serviceRear);
   }
   const material=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.77,metalness:.02});
   const instanceColor=new THREE.Color();
