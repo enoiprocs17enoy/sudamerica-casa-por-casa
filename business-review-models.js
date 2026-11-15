@@ -109,7 +109,7 @@ function drawShops(){
           part('entryDoorGlass',shape===8?0x485463:glass,dx,1.35,rear-.19,.99,1.54,.06);
           box(metal,dx+(shape===8?0:.40),1.08,rear-.25,shape===8?.76:.045,shape===8?.065:.27,.06);
         }
-        if(shape!==8&&!(premium&&(shape===9||shape===10)))for(const side of [-1,1]){
+        if(shape!==8&&shape!==9&&!(premium&&shape===10))for(const side of [-1,1]){
           part('displayGlass',glass,side*w*.29,2.08,rear-.08,w*.20,1.18,.13);
           box(cream,side*w*.29,1.45,rear-.16,w*.22,.12,.24);
         }
@@ -551,9 +551,11 @@ function drawShops(){
         for(const side of [-1,1])for(const bay of [-1,1]){
           const wx=x+bay*w*.24,wz=z+bay*d*.24;
           if(side<0)put('displayGlass',glass,shop,wx,level,z-d/2-.08,w*.36,1.8,.16);
+          if(side>0&&level>=6)put('displayGlass',glass,shop,wx,level,front+.08,w*.36,1.8,.16);
           put('displayGlass',glass,shop,x+side*(w/2+.08),level,wz,.16,1.8,d*.36);
           if(progress.premium){
             if(side<0)put('body',0xdde7cd,shop,wx,level,z-d/2-.19,.10,1.8,.10);
+            if(side>0&&level>=6)put('body',0xdde7cd,shop,wx,level,front+.19,.10,1.8,.10);
             put('body',0xdde7cd,shop,x+side*(w/2+.19),level,wz,.10,1.8,.10);
           }
         }
