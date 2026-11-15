@@ -2701,13 +2701,13 @@ function drawShops(){
   function put(kind,color,shop,x,y,z,w,h,d){
     // Preserve low-cost architecture at all zoom levels. Decorative pieces
     // are spatially batched so only the visible nearby shops are detailed.
-    const detailed=!structuralKinds.has(kind)&&kind!=='libraryDome'&&kind!=='libraryDrum';
+    const detailed=!structuralKinds.has(kind)&&!['libraryDome','libraryDrum','gymVault'].includes(kind);
     const cx=shop?Math.floor(shop.x/90):0,cz=shop?Math.floor(shop.z/90):0;
-    const geometry=kind==='libraryDome'?libraryDome:kind==='libraryDrum'?furnitureRound:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:
+    const geometry=kind==='libraryDome'||kind==='gymVault'?libraryDome:kind==='libraryDrum'?furnitureRound:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:
       kind==='shopRoundFurniture'?furnitureRound:(kind==='shopSoftFurniture'||kind==='shopUmbrellaCanopy')?furnitureSoft:
       kind==='tradeDress'?dress:kind==='tradeSculpt'?sculpt:kind==='tradeBar'?bar:
       kind.startsWith('pizza')||kind==='tradeRound'?disc:box;
-    const casts=/^(body|libraryDome|libraryDrum|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof|evolutionSignatureHall|evolutionEntranceCanopy|evolutionEntranceColumn|evolutionRoofTerrace|evolutionTerracePavilion|evolutionGrandEntrance|evolutionGrandPier|shopForecourtDetail|shopRoundFurniture|shopUmbrellaCanopy)$/.test(kind);
+    const casts=/^(body|libraryDome|libraryDrum|gymVault|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof|evolutionSignatureHall|evolutionEntranceCanopy|evolutionEntranceColumn|evolutionRoofTerrace|evolutionTerracePavilion|evolutionGrandEntrance|evolutionGrandPier|shopForecourtDetail|shopRoundFurniture|shopUmbrellaCanopy)$/.test(kind);
     const receives=casts||kind==='shopPaving';
     const key=[geometry.id,casts,receives,detailed?cx:'all',detailed?cz:'all'].join(':');
     if(!batches.has(key))batches.set(key,{geo:geometry,casts,receives,entries:[],detailed,
@@ -2885,7 +2885,7 @@ function drawShops(){
 
     const baseHeight=[4.2,5.1,5.2,6.4,4.7,4.0,5.0,4.5,9.0,6.8,4.6,4.3][shape]
       *(.88+rnd(seed*41+2)*.22)*(district==='centro'?1.08:1);
-    const height=shape===10?[4.6,7.8,12,18,27,40,58,82][stage]*(baseHeight/4.6):shape===8?[9,9.8,11.2,12.8,14.6,16.8,19.4,23][stage]*(baseHeight/9):shape===3?[6.4,7.0,8.3,10.5,12.9,15.8,19.2,23][stage]*(baseHeight/6.4):baseHeight*(1+growth*heightGrowth)+(stage>=3?2.8:0);
+    const height=shape===10?[4.6,7.8,12,18,27,40,58,82][stage]*(baseHeight/4.6):shape===8?[9,9.8,11.2,12.8,14.6,16.8,19.4,23][stage]*(baseHeight/9):shape===3?[6.4,7.0,8.3,10.5,12.9,15.8,19.2,23][stage]*(baseHeight/6.4):shape===9?[6.8,7.2,8.0,9.1,10.5,12.2,14.3,17][stage]*(baseHeight/6.8):baseHeight*(1+growth*heightGrowth)+(stage>=3?2.8:0);
 
     const x=shop.x,z=shop.z;
     // Premium enriches finishes without changing the activity's base colour.
@@ -2930,7 +2930,7 @@ function drawShops(){
           put('evolutionEntrancePlanter',0x66894b,shop,x+side*canopyWidth*.46,.40,front+3.05,.72,.65,.72);
       }
     }
-    if(stage>=3&&![3,8,10].includes(shape)){
+    if(stage>=3&&![3,8,9,10].includes(shape)){
       const upperY=height-1.36;
       for(const side of [-1,1]){
         for(const bay of [-1,0,1]){
@@ -2941,7 +2941,7 @@ function drawShops(){
         put('evolutionSideStoreyBand',trim,shop,x+side*(w/2+.10),height-2.80,z,.24,.18,d+.18);
       }
     }
-    if(stage>=4&&![3,8,10].includes(shape)){
+    if(stage>=4&&![3,8,9,10].includes(shape)){
       const deckY=height+.50;
       put('evolutionRoofTerrace',0xbca68b,shop,x,deckY,z,w*.94,.14,d*.94);
       for(const side of [-1,1]){
@@ -2955,7 +2955,7 @@ function drawShops(){
         if(![0,2,3].includes(shape))put('evolutionTerraceSeat',0xd8bb8b,shop,seatX,deckY+.49,z+d*.16,w*.19,.16,1.03);
       }
     }
-    if(stage>=5&&![3,8,10].includes(shape)){
+    if(stage>=5&&![3,8,9,10].includes(shape)){
       const pavilionY=height+3.05;
       const pavilionWidth=w*(stage>=6?.82:.50);
       const pavilionDepth=d*(stage>=6?.43:.25);
@@ -2977,7 +2977,7 @@ function drawShops(){
     }
     if(stage>=7){
 
-      if(![3,8,10].includes(shape)){
+      if(![3,8,9,10].includes(shape)){
         const hallZ=z-d*.22,hallWidth=w*.66,hallDepth=d*.35;
         put('evolutionSignatureHall',wallColor,shop,x,height+1.77,hallZ,hallWidth,2.40,hallDepth);
         for(const side of [-1,1]){
@@ -3195,6 +3195,19 @@ function drawShops(){
         for(const side of [-1,1])for(const bay of [-.45,-.15,.15,.45]){
           put('body',stone,shop,x+bay*w,height*.48,z+side*(d/2+.16),.24,height*.94,.31);
           put('body',stone,shop,x+side*(w/2+.16),height*.48,z+bay*d,.31,height*.94,.24);
+        }
+      }
+    }
+    if(shape===9){
+      for(let level=2.4;level+1<height;level+=3.6){
+        for(const side of [-1,1])for(const bay of [-1,1]){
+          const wx=x+bay*w*.24,wz=z+bay*d*.24;
+          if(side<0)put('displayGlass',glass,shop,wx,level,z-d/2-.08,w*.36,1.8,.16);
+          put('displayGlass',glass,shop,x+side*(w/2+.08),level,wz,.16,1.8,d*.36);
+          if(progress.premium){
+            if(side<0)put('body',0xdde7cd,shop,wx,level,z-d/2-.19,.10,1.8,.10);
+            put('body',0xdde7cd,shop,x+side*(w/2+.19),level,wz,.10,1.8,.10);
+          }
         }
       }
     }
@@ -3593,10 +3606,11 @@ function drawShops(){
       roofPut('cinemaProjectionCap',0x486078,shop,x,rooftop+1.59,z-d*.14,w*(stage>=2?.32:.39),.16,d*.35);
       for(const side of [-1,1])
         put('cinemaMarqueeFin',0xf0c876,shop,x+side*w*.43,signY+.10,front+.38,.18,1.10,.55);
-    }else if(shape===9){ // Gym: rooftop skylight and facade side bands.
-      for(const side of [-1,1]){
-        roofPut('gymSkylight',0x83b8c0,shop,x+side*w*.24,rooftop+.17,z,1.70,.24,d*.53);
-        roofPut('gymSkylightEdge',0x3f6f68,shop,x+side*w*.24,rooftop+.33,z,1.85,.08,d*.55);
+    }else if(shape===9){ // Sports hall: a rising vaulted roof, not extra floors above a shop.
+      const rise=[.7,.9,1.2,1.5,1.9,2.4,3.0,3.8][stage];
+      put('gymVault',0x527f72,shop,x,height+.47,z,w+.25,rise*2,d+.25);
+      if(stage>=3)for(const side of [-1,1]){
+        for(const bay of [-.40,0,.40])put('body',trim,shop,x+side*(w/2+.15),height*.49,z+bay*d,.26,height*.95,.23);
       }
     }else if(shape===10){ // Hotel: unmistakable rooftop penthouse + canopy.
       roofPut('hotelPenthouse',style.walls,shop,x,rooftop+.91,z-d*.09,w*.58,1.75,d*.60);
@@ -3610,7 +3624,7 @@ function drawShops(){
         roofPut('marketRoofCap',0xe3d5ad,shop,x+side*w*.23,rooftop+.38,z,w*.40,.08,d*.64);
       }
     }
-    if(seed%3===0&&!(progress.premium&&shape===9)&&!(shape===3&&stage>=2))put('side',style.glass,shop,x+w/2+.1,height*.55,z, .2,1.6,d*.45);
+    if(seed%3===0&&shape!==9&&!(shape===3&&stage>=2))put('side',style.glass,shop,x+w/2+.1,height*.55,z, .2,1.6,d*.45);
     if(progress.premium&&shape===2){
       const terraceX=x+w/2+1.19,terraceZ=z-d*.17;
       put('shopDiningDeck',0xbd9a74,shop,terraceX,.15,terraceZ,2.48,.23,4.55);
@@ -3623,22 +3637,6 @@ function drawShops(){
       }
       for(let slat=-3;slat<=3;slat++)
         put('shopPergolaSlat',slat%2?0xe3b88b:trim,shop,terraceX+slat*.34,3.22,terraceZ,.14,.14,4.30);
-    }
-    if(progress.premium&&shape===9){
-      const rear=z-d/2;
-      for(const level of [.33]){
-        const windowY=height*level;
-        for(const bay of [-1,1]){
-          const windowX=x+bay*w*.23,windowZ=z+bay*d*.23;
-          put('displayGlass',glass,shop,windowX,windowY,rear-.066,w*.29,1.62,.15);
-          put('shopPremiumSill',trim,shop,windowX,windowY-.85,rear-.13,w*.33,.15,.30);
-          for(const side of [-1,1]){
-            const sideX=x+side*(w/2+.066);
-            put('displayGlass',glass,shop,sideX,windowY,windowZ,.15,1.62,d*.29);
-            put('shopPremiumSill',trim,shop,sideX+side*.06,windowY-.85,windowZ,.30,.15,d*.33);
-          }
-        }
-      }
     }
 
     furnishBusiness(shop,shape,stage,progress.premium,w,d,height,trim,glass,serviceRear);
