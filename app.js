@@ -6213,9 +6213,23 @@ function* flightClearanceStages(group){
   for(let x=Math.floor(bounds.min.x/cellSize);x<=Math.floor(bounds.max.x/cellSize);x++){
    for(let z=Math.floor(bounds.min.z/cellSize);z<=Math.floor(bounds.max.z/cellSize);z++){
     const key=x+','+z;
-    heights.set(key,Math.max(heights.get(key)||0,bounds.max.y));
+    if((heights.get(key)||0)<bounds.max.y)heights.set(key,bounds.max.y);
    }
   }
+ }
+ function recordGeometry(box,matrix){
+  const e=matrix.elements,a=box.min,b=box.max;
+  // Object transforms are affine. Select the same extremal corners as Box3's
+  // eight-corner pass, retaining its multiplication and addition order exactly.
+  if(e[3]!==0||e[7]!==0||e[11]!==0||e[15]!==1){bounds.copy(box).applyMatrix4(matrix);record();return;}
+  const highY=e[1]*(e[1]<0?a.x:b.x)+e[5]*(e[5]<0?a.y:b.y)+e[9]*(e[9]<0?a.z:b.z)+e[13];
+  if(highY<=12)return;
+  bounds.max.y=highY;
+  bounds.min.x=e[0]*(e[0]<0?b.x:a.x)+e[4]*(e[4]<0?b.y:a.y)+e[8]*(e[8]<0?b.z:a.z)+e[12];
+  bounds.max.x=e[0]*(e[0]<0?a.x:b.x)+e[4]*(e[4]<0?a.y:b.y)+e[8]*(e[8]<0?a.z:b.z)+e[12];
+  bounds.min.z=e[2]*(e[2]<0?b.x:a.x)+e[6]*(e[6]<0?b.y:a.y)+e[10]*(e[10]<0?b.z:a.z)+e[14];
+  bounds.max.z=e[2]*(e[2]<0?a.x:b.x)+e[6]*(e[6]<0?a.y:b.y)+e[10]*(e[10]<0?a.z:b.z)+e[14];
+  record();
  }
  const meshes=[];group.traverse(mesh=>{if(mesh.isMesh)meshes.push(mesh);});
  let meshBudget=0;
@@ -6234,12 +6248,10 @@ function* flightClearanceStages(group){
     if(i>0&&i%1024===0)yield;
     mesh.getMatrixAt(i,instance);
     world.multiplyMatrices(mesh.matrixWorld,instance);
-    bounds.copy(geometry.boundingBox).applyMatrix4(world);
-    record();
+    recordGeometry(geometry.boundingBox,world);
    }
   }else{
-   bounds.copy(geometry.boundingBox).applyMatrix4(mesh.matrixWorld);
-   record();
+   recordGeometry(geometry.boundingBox,mesh.matrixWorld);
   }
  }
  return (x,z,rx,rz)=>{
