@@ -496,15 +496,18 @@ function drawShops(){
       }
     }
     if(shape===0){
-      put('cafeCupSign',0xffefcd,shop,x,height+.93,front-.65,1.68,1.26,1.59);
-      put('cafeHandleSign',0xffefcd,shop,x+.84,height+.94,front-.65,1.17,1.22,1.16);
+      put('tradeMark',trim,shop,x,height+.63,front+.18,.14,.34,.22);
+      put('tradeMark',trim,shop,x,height+.73,front+.64,.14,.12,1.20);
+      put('cafeCupSign',0xffefcd,shop,x,height+1.35,front+1.10,1.68,1.26,1.59);
+      put('cafeHandleSign',0xffefcd,shop,x+.84,height+1.36,front+1.10,1.17,1.22,1.16);
     }
     if(shape===2&&shop.id%24===14){
-      put('pizzaDiscSign',0xc47b30,shop,x,height+1.39,front-.39,2.85,2.85,.39);
-      put('pizzaSauceSign',0xffc260,shop,x,height+1.39,front-.16,2.46,2.46,.09);
+      put('tradeMark',trim,shop,x,height+.93,front+.55,.16,1.70,.10);
+      put('pizzaDiscSign',0xc47b30,shop,x,height+2.13,front+.60,2.85,2.85,.39);
+      put('pizzaSauceSign',0xffc260,shop,x,height+2.13,front+.83,2.46,2.46,.09);
       for(let topping=0;topping<6;topping++){
         const angle=topping*Math.PI/3;
-        put('pizzaToppingSign',0xc24438,shop,x+Math.cos(angle)*.73,height+1.39+Math.sin(angle)*.73,front-.09,.34,.34,.07);
+        put('pizzaToppingSign',0xc24438,shop,x+Math.cos(angle)*.73,height+2.13+Math.sin(angle)*.73,front+.90,.34,.34,.07);
       }
     }
     const pizzeria=shape===2&&shop.id%24===14;
