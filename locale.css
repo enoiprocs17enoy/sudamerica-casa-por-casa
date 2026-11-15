@@ -18,3 +18,5 @@
 @media(max-height:600px){body #languageSwitcher>span{display:none}}
 
 @media(max-width:720px){body #nearbyCities{font-size:0!important;padding:0!important}body #nearbyCities::before{content:"🏙";font-size:18px}}
+/* Very narrow phones keep whole labels on two comfortable rows. */
+@media(max-width:360px){.v4Nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px}.v4Nav button{width:100%;min-height:48px;padding:4px 2px}.v4Nav button span{font-size:10px;min-height:2.3em}.v4Panel{bottom:146px}.city-view .hud,.hud{bottom:142px}.city-view .squareAttribution{bottom:130px}}
