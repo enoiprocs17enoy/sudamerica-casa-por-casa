@@ -1,0 +1,50 @@
+{
+  "source": "it",
+  "languages": [
+    {
+      "code": "it",
+      "name": "Italiano",
+      "complete": true
+    },
+    {
+      "code": "ar",
+      "name": "العربية",
+      "complete": true
+    },
+    {
+      "code": "de",
+      "name": "Deutsch",
+      "complete": true
+    },
+    {
+      "code": "en",
+      "name": "English",
+      "complete": true
+    },
+    {
+      "code": "es",
+      "name": "Español",
+      "complete": true
+    },
+    {
+      "code": "fr",
+      "name": "Français",
+      "complete": true
+    },
+    {
+      "code": "ja",
+      "name": "日本語",
+      "complete": true
+    },
+    {
+      "code": "pt-BR",
+      "name": "Português (Brasil)",
+      "complete": true
+    },
+    {
+      "code": "zh-Hans",
+      "name": "简体中文",
+      "complete": true
+    }
+  ]
+}

@@ -1487,7 +1487,10 @@ let regionalWaterUniform=null;
 function worldCityCells(selected=homes){
  const cells=new Map();for(const h of selected){const p=spiralCell(h.blockIndex);cells.set(p.col+':'+p.row,p);}for(const shop of shopPurchases){const p=spiralCell(shop.block);cells.set(p.col+':'+p.row,p);}for(const zone of publicZones()){const p=spiralCell(zone.block);cells.set(p.col+':'+p.row,p);}return [...cells.values()];
 }
-function buildRegionalLandscape(houses){
+function buildRegionalLandscape(houses){const steps=buildRegionalStages(houses);while(!steps.next().done){}}
+function* buildRegionalStages(houses){
+ let regionalMark=window.ReviewPerformance?performance.now():null;
+ const markRegion=label=>{if(regionalMark===null)return;const now=performance.now();window.ReviewPerformance.recordStage(label,now-regionalMark);regionalMark=now;};
  const city=currentCity;
  const roadPlan=typeof window!=='undefined'&&window.WorldRoads&&window.WorldAtlas?window.WorldRoads.cityPlan(city,worldCityCells(houses),window.WorldAtlas):null;
  regionalWaterUniform=null;
@@ -1509,6 +1512,8 @@ function buildRegionalLandscape(houses){
   shore=Math.max(shore,x*east+z*south+Math.abs(east)*halfX+Math.abs(south)*halfZ);
  }
  const region=window.WorldGeography?WorldGeography.makeRegion(city,{minX,maxX,minZ,maxZ,neighbors:roadPlan?.neighbors||[]}):null;
+ markRegion('Geografia e costa');
+ yield;
  if(region){group.userData.geography=region;for(const ground of scene.children.filter(m=>m.userData.regionalGround))WorldGeography.clipMaterial(ground.material,region);}
  const coastFrame=coast&&typeof window!=='undefined'&&window.WorldTerrain?window.WorldTerrain.coastFrame(coast,{minX,maxX,minZ,maxZ}):null;
  shore=coastFrame?coastFrame.shore:shore+85+(coast?.[1]||0)*1000;
@@ -1591,10 +1596,14 @@ function buildRegionalLandscape(houses){
 
 
 
+ markRegion('Rilievi e materiali');
+ yield;
  if(roadPlan&&window.WorldTerrain)window.WorldTerrain.prepare(roadPlan,terrainHeight,region||coastFrame);
  if(roadPlan)group.userData.roadPlan=roadPlan;
  group.userData.terrainHeight=terrainHeight;
  if(roadPlan)window.WorldRoads.draw3D(roadPlan,group,terrainHeight,(x,z)=>region?region.landDistance(x,z)>15:!coast||x*east+z*south<shore-20);
+ markRegion('Strade esterne');
+ yield;
  const candidates=[],spacing=48,horizon=6500;
  for(let col=Math.floor(-horizon/spacing);col<=Math.ceil(horizon/spacing);col++){
   for(let row=Math.floor(-horizon/spacing);row<=Math.ceil(horizon/spacing);row++){
@@ -1650,8 +1659,13 @@ function buildRegionalLandscape(houses){
   group.add(mesh);
  }
 
- if(region&&window.WorldForest)WorldForest.build({group,region,plan:roadPlan,height:terrainHeight,city,bounds:{minX,maxX,minZ,maxZ}});
+ markRegion('Alberi vicini');
+ yield;
+ if(region&&window.WorldForest){const options={group,region,plan:roadPlan,height:terrainHeight,city,bounds:{minX,maxX,minZ,maxZ}};if(WorldForest.buildSteps)yield* WorldForest.buildSteps(options);else WorldForest.build(options);}
+ markRegion('Bosco lontano');
+ yield;
  if(roadPlan&&window.WorldNeighbors)WorldNeighbors.build({group,camera,container:$('threeLayer'),plan:roadPlan,height:terrainHeight,states:cityStates,getCamera:()=>({target:{...target},distance,azimuth,elevation}),setCamera:state=>{Object.assign(target,state.target);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();},onEnter:enterNeighborCity});
+ markRegion('Anteprime città vicine');
 }
 function regionalMountain(city){
  if(typeof window!=='undefined'&&window.WorldAtlas)return window.WorldAtlas.mountain(city);
@@ -1874,7 +1888,20 @@ function updateShopDetailLOD(now){
   mesh.visible=shopDetailFrustum.intersectsSphere(shopDetailSphere);
  }
 }
-let lastRenderedFrame=0;
+function reviewSceneWorkload(){
+ const categories={},residents=new Set(residentBatches?.meshes||[]);
+ group.traverse(mesh=>{
+  if(!mesh.isMesh)return;
+  for(let parent=mesh;parent;parent=parent.parent)if(!parent.visible)return;
+  const data=mesh.userData;
+  const category=data.birdInstances?'birds':data.urbanTreeTrunk||data.urbanTreeCanopy||data.urbanTreeCanopyBatch||data.urbanTreeTrunkBatch?'urbanTrees':residents.has(mesh)?'residents':data.homes||data.home?'houses':data.shops?'shops':data.regionalForest||data.farForest||data.farForestCanopies?'forest':data.regionalWater?'water':'other';
+  const value=categories[category]||(categories[category]={meshes:0,instances:0,triangles:0});
+  const instances=mesh.isInstancedMesh?mesh.count:1;
+  value.meshes++;value.instances+=instances;value.triangles+=(mesh.geometry.index?.count||mesh.geometry.attributes.position.count)/3*instances;
+ });
+ return {scope:'Scene totals before frustum culling',categories};
+}
+let lastRenderedFrame=0,measuredRenderGroup=null;
 function animate(now=0){
   if(!renderer)return;
   requestAnimationFrame(animate);
@@ -1893,8 +1920,11 @@ function animate(now=0){
   animateLife(t);
   updateAvatarLabels(t);
   if(releaseSky)releaseSky.position.copy(camera.position);
+  const measureFirst=window.ReviewPerformance&&measuredRenderGroup!==group;
+  const drawStarted=measureFirst?performance.now():0;
   if(window.SudamericaRender8)SudamericaRender8.render(scene,camera,renderer,minInterval);
   else renderer.render(scene,camera);
+  if(measureFirst){measuredRenderGroup=group;window.ReviewPerformance.recordStage('Primo disegno della città',performance.now()-drawStarted);window.ReviewPerformance.recordFirstDraw?.({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,programs:renderer.info.programs?.length||0,scene:reviewSceneWorkload()});}
 }
 const walls = [0xd98972,0xb4d8b3,0xdca1ad,0x89b9df,0xc6a7de,0xe6b768,0x9bc9bd,0xd9a184,0xbac8d5];
 const roofs = [0xa44d3f,0x518a70,0x627bb2,0x9d5a73,0x886b9c,0xc07943,0x4d8b8c,0x795d48,0xc66a50];
@@ -1944,7 +1974,7 @@ function addTree(x,z,seed,scale=1,flowering=false) {
  const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.12,.27,height,7),bark);
  trunk.scale.setScalar(scale);
  trunk.position.set(x,height*scale/2,z);
- trunk.castShadow=true;
+ trunk.castShadow=true;trunk.userData.urbanTreeTrunk=true;
  group.add(trunk);
 
  const palette=[0x55992e,0x78a932,0x3c893e,0x9b51c4,0x508f35,0x82af38];
@@ -1967,7 +1997,7 @@ function addTree(x,z,seed,scale=1,flowering=false) {
  }
  canopy.scale.setScalar(scale);
  canopy.position.set(x,(height-.1)*scale,z);
- canopy.castShadow=true;
+ canopy.castShadow=true;canopy.userData.urbanTreeCanopy=true;
  canopy.receiveShadow=true;
  canopy.computeBoundingSphere();
  group.add(canopy);
@@ -4871,7 +4901,7 @@ function* renderHouseStages(selected){
     const profile=[batch.geo.id,texture,normalStrength,roughness,metalness,casts,receives].join(':');
     for(const entry of batch.entries){
       // Dense cities cull whole neighborhoods instead of submitting every house.
-      const key=spatialBatches?profile+':'+Math.floor(entry.h.x/184)+':'+Math.floor(entry.h.z/184):profile;
+      const key=spatialBatches?profile+':'+Math.floor(entry.h.x/368)+':'+Math.floor(entry.h.z/368):profile;
       if(!renderBatches.has(key))renderBatches.set(key,{
         profile,geo:batch.geo,texture,normalStrength,roughness,metalness,casts,receives,entries:[]
       });
@@ -5417,6 +5447,101 @@ function renderFallbackHouses(selected){
   mesh.userData.homes=items.map(e=>e.h);group.add(mesh);houseMeshes.push(mesh);
  }
 }
+function* staticTreeStages(){
+ const batches=new Map(),part=new THREE.Matrix4(),matrix=new THREE.Matrix4(),color=new THREE.Color();
+ for(const source of group.children.slice()){
+  if(!source.userData.urbanTreeCanopy||!source.visible||!source.isInstancedMesh||source.geometry.parameters?.radius!==1||source.geometry.parameters?.detail!==1)continue;
+  const key=Math.floor(source.position.x/368)+':'+Math.floor(source.position.z/368);
+  if(!batches.has(key))batches.set(key,[]);batches.get(key).push(source);
+ }
+ let merged=0;
+ for(const sources of batches.values()){
+  if(sources.length<2)continue;
+  const first=sources[0],count=sources.reduce((n,s)=>n+s.count,0),mesh=new THREE.InstancedMesh(first.geometry,first.material.clone(),count);
+  mesh.castShadow=first.castShadow;mesh.receiveShadow=first.receiveShadow;mesh.userData.urbanTreeCanopyBatch=true;
+  let at=0;
+  for(const source of sources){
+   if(source.matrixAutoUpdate)source.updateMatrix();
+   for(let i=0;i<source.count;i++){
+    source.getMatrixAt(i,part);matrix.multiplyMatrices(source.matrix,part);mesh.setMatrixAt(at,matrix);
+    source.getColorAt(i,color);mesh.setColorAt(at++,color);
+   }
+  }
+  mesh.instanceMatrix.needsUpdate=true;mesh.instanceColor.needsUpdate=true;mesh.computeBoundingSphere();group.add(mesh);
+  for(const source of sources){source.visible=false;source.userData.staticTreeProxy=true;}
+  merged+=sources.length;yield;
+ }
+ group.userData.batchedUrbanTrees=merged;
+}
+function* staticTrunkStages(){
+ const batches=new Map(),stretch=new THREE.Matrix4(),matrix=new THREE.Matrix4();
+ for(const source of group.children.slice()){
+  if(!source.userData.urbanTreeTrunk||!source.visible||source.isInstancedMesh)continue;
+  const p=source.geometry.parameters;
+  if(source.geometry.type!=='CylinderGeometry'||p?.radiusTop!==.12||p.radiusBottom!==.27||p.radialSegments!==7||p.heightSegments!==1||p.openEnded)continue;
+  const key=Math.floor(source.position.x/368)+':'+Math.floor(source.position.z/368);
+  if(!batches.has(key))batches.set(key,[]);batches.get(key).push(source);
+ }
+ let geometry=null,merged=0;
+ for(const sources of batches.values()){
+  if(sources.length<2)continue;
+  geometry=geometry||new THREE.CylinderGeometry(.12,.27,1,7);
+  const first=sources[0],mesh=new THREE.InstancedMesh(geometry,first.material.clone(),sources.length);
+  mesh.castShadow=first.castShadow;mesh.receiveShadow=first.receiveShadow;mesh.userData.urbanTreeTrunkBatch=true;
+  for(let i=0;i<sources.length;i++){
+   const source=sources[i];if(source.matrixAutoUpdate)source.updateMatrix();
+   stretch.makeScale(1,source.geometry.parameters.height,1);matrix.multiplyMatrices(source.matrix,stretch);mesh.setMatrixAt(i,matrix);
+  }
+  mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();group.add(mesh);
+  for(const source of sources){source.visible=false;source.userData.staticTreeProxy=true;}
+  merged+=sources.length;yield;
+ }
+ group.userData.batchedUrbanTrunks=merged;
+}
+function batchStaticBoxes(){const steps=staticBoxStages();while(!steps.next().done){}}
+function* staticBoxStages(){
+ const batches=new Map(),geometryKeys=new WeakMap(),materialKeys=new WeakMap();
+ const excluded=new Set([...roadDetailMeshes,...shopDetailMeshes]);
+ const materialTypes=new Set(['MeshBasicMaterial','MeshLambertMaterial','MeshPhongMaterial','MeshStandardMaterial']);
+ const textures=['map','normalMap','roughnessMap','metalnessMap','emissiveMap','alphaMap','bumpMap','aoMap','lightMap','displacementMap','specularMap','envMap'];
+ let scanned=0;
+ for(const source of group.children.slice()){
+  if(scanned++%128===127)yield;
+  if(!source.isMesh||source.isInstancedMesh||!source.visible||excluded.has(source)||source.geometry.type!=='BoxGeometry')continue;
+  if(source.isSkinnedMesh||source.customDepthMaterial||source.customDistanceMaterial||source.matrixWorldAutoUpdate===false)continue;
+  if(source.onBeforeRender!==THREE.Object3D.prototype.onBeforeRender||source.onAfterRender!==THREE.Object3D.prototype.onAfterRender)continue;
+  const data=source.userData,material=source.material,geometry=source.geometry;
+  if(data.homes||data.home||data.shops||data.neighborCity||data.neighborCities)continue;
+  if(Array.isArray(material)||!materialTypes.has(material.type)||material.transparent||material.opacity!==1||!material.depthWrite||!material.depthTest||!material.colorWrite||material.blending!==THREE.NormalBlending||material.alphaTest||material.vertexColors||textures.some(key=>material[key]))continue;
+  if(material.onBeforeCompile!==THREE.Material.prototype.onBeforeCompile||Object.keys(material.userData).length)continue;
+  if(Object.keys(geometry.morphAttributes).length||geometry.isInstancedBufferGeometry||geometry.drawRange.start!==0||geometry.drawRange.count!==Infinity)continue;
+  let geometryKey=geometryKeys.get(geometry);
+  if(!geometryKey){geometryKey=JSON.stringify({attributes:Object.entries(geometry.attributes).sort(([a],[b])=>a.localeCompare(b)).map(([name,a])=>[name,a.itemSize,a.normalized,a.array.constructor.name,Array.from(a.array)]),index:geometry.index?Array.from(geometry.index.array):null});geometryKeys.set(geometry,geometryKey);}
+  let materialKey=materialKeys.get(material);
+  if(!materialKey){const description=material.toJSON();delete description.uuid;delete description.metadata;delete description.name;delete description.color;description.linearColors=[material.emissive?.toArray()||null,material.specular?.toArray()||null];materialKey=JSON.stringify(description);materialKeys.set(material,materialKey);}
+  const key=geometryKey+'|'+materialKey+'|'+source.castShadow+'|'+source.receiveShadow+'|'+source.renderOrder+'|'+source.layers.mask;
+  if(!batches.has(key))batches.set(key,[]);batches.get(key).push(source);
+ }
+ const color=new THREE.Color();let merged=0;
+ for(const sources of batches.values()){
+  if(sources.length<3)continue;
+  const first=sources[0],material=first.material.clone();material.color.setHex(0xffffff);
+  const mesh=new THREE.InstancedMesh(first.geometry,material,sources.length);
+  mesh.castShadow=first.castShadow;mesh.receiveShadow=first.receiveShadow;mesh.renderOrder=first.renderOrder;mesh.layers.mask=first.layers.mask;
+  mesh.userData.staticBoxInstances=true;
+  for(let i=0;i<sources.length;i++){
+   const source=sources[i];if(source.matrixAutoUpdate)source.updateMatrix();
+   mesh.setMatrixAt(i,source.matrix);mesh.setColorAt(i,color.copy(source.material.color));
+  }
+  mesh.instanceMatrix.needsUpdate=true;mesh.instanceColor.needsUpdate=true;mesh.computeBoundingSphere();group.add(mesh);
+  // Keep original geometry/metadata as exact selection proxies; Three.js
+  // raycasting in the pinned engine is independent of render visibility.
+  for(const source of sources){source.visible=false;source.userData.staticBoxProxy=true;}
+  merged+=sources.length;yield;
+ }
+ group.userData.staticBoxSources=merged;
+}
+
 let cityBuildDepth=0;
 function* rebuildStages(){
  if(!threeReady)return;
@@ -5440,7 +5565,9 @@ function* rebuildStages(){
   while(group.children.length>before){group.remove(group.children[group.children.length-1]);}
   safe('Edifici di emergenza',()=>renderFallbackHouses(selected));
  }
- safe('Paesaggio regionale',()=>buildRegionalLandscape(selected));
+ const regionalStarted=window.ReviewPerformance?performance.now():null;
+ try{yield* buildRegionalStages(selected);}catch(err){console.error('Paesaggio regionale',err);errors.push('Paesaggio regionale: '+err.message);}
+ finally{if(regionalStarted!==null)window.ReviewPerformance.recordStage('Paesaggio regionale',performance.now()-regionalStarted);}
  yield;
  safe('Paesaggio',()=>addUrbanLandscaping(selected));
  yield;
@@ -5453,6 +5580,10 @@ function* rebuildStages(){
  const peopleStarted=window.ReviewPerformance?performance.now():null;
  try{yield* createLifeStages(selected);}catch(err){console.error('Persone',err);errors.push('Persone: '+err.message);}
  finally{if(peopleStarted!==null)window.ReviewPerformance.recordStage('Persone',performance.now()-peopleStarted);}
+ yield;
+ const staticStarted=window.ReviewPerformance?performance.now():null;
+ try{yield* staticBoxStages();yield* staticTreeStages();yield* staticTrunkStages();}catch(err){console.error('Modelli statici',err);errors.push('Modelli statici: '+err.message);}
+ finally{if(staticStarted!==null)window.ReviewPerformance.recordStage('Modelli statici',performance.now()-staticStarted);}
  yield;
  scene.add(group);
  // Near-detail failures must not undo the entire city.
@@ -5537,7 +5668,7 @@ function pick(e){
  const pointer=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
  raycaster.setFromCamera(pointer,camera);
  const candidates=group.userData.pickables||houseMeshes;
- const hits=raycaster.intersectObjects(candidates.filter(mesh=>mesh.visible),false);
+ const hits=raycaster.intersectObjects(candidates.filter(mesh=>mesh.visible||mesh.userData.staticBoxProxy||mesh.userData.staticTreeProxy),false);
  const structure=hits.map(resolveStructureHit).find(Boolean);
  const click=new THREE.Vector2(e.clientX-r.left,e.clientY-r.top);
  let closest=null,best=23;
@@ -6014,6 +6145,38 @@ function v45Bird(i,x,z,phase){
  g.position.set(x,24+i%6*3,z);group.add(g);
  return {g,x,z,i,wings,phase,rx,rz};
 }
+let birdBatches=null;
+function buildBirdBatches(birds){
+ const batches=new Map();
+ for(const bird of birds)bird.g.traverse(part=>{
+  if(!part.isMesh)return;
+  const key=part.geometry.id+':'+part.material.id;
+  if(!batches.has(key))batches.set(key,{geometry:part.geometry,material:part.material,castShadow:part.castShadow,receiveShadow:part.receiveShadow,parts:[]});
+  batches.get(key).parts.push(part);
+ });
+ const meshes=[];
+ for(const batch of batches.values()){
+  const mesh=new THREE.InstancedMesh(batch.geometry,batch.material,batch.parts.length);
+  mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);mesh.frustumCulled=false;
+  mesh.castShadow=batch.castShadow;mesh.receiveShadow=batch.receiveShadow;
+  mesh.userData.birdInstances=true;group.add(mesh);
+  for(const part of batch.parts)part.visible=false;
+  meshes.push({mesh,parts:batch.parts});
+ }
+ birdBatches={birds,meshes,inverse:new THREE.Matrix4(),matrix:new THREE.Matrix4()};
+ updateBirdBatches();
+}
+function updateBirdBatches(){
+ if(!birdBatches)return;
+ const {birds,meshes,inverse,matrix}=birdBatches;
+ group.updateWorldMatrix(true,false);inverse.copy(group.matrixWorld).invert();
+ for(const bird of birds)bird.g.updateWorldMatrix(true,true);
+ for(const {mesh,parts}of meshes){
+  for(let i=0;i<parts.length;i++){matrix.multiplyMatrices(inverse,parts[i].matrixWorld);mesh.setMatrixAt(i,matrix);}
+  mesh.instanceMatrix.needsUpdate=true;
+ }
+}
+
 function v45Balloon(i,home){
  const g=new THREE.Group();
  const palette=[0xf33751,0xffae28,0xffd15b,0x2d8bd4,0xe84fa3];
@@ -6091,7 +6254,7 @@ function* flightClearanceStages(group){
 }
 function createV4Life(selected){const steps=createLifeStages(selected);while(!steps.next().done){}}
 function* createLifeStages(selected){
- life.people.length=0;life.birds.length=0;life.balloons.length=0;residentBatches=null;
+ life.people.length=0;life.birds.length=0;life.balloons.length=0;residentBatches=null;birdBatches=null;
  // Scene cleanup owns these resources; do not retain a previous city's pool.
  v45Bird.assets=null;
  if(!selected.length)return;
@@ -6126,6 +6289,7 @@ function* createLifeStages(selected){
    life.birds.push(bird);
   }
  }
+ buildBirdBatches(life.birds);
  // Use evenly distributed owners, never selected[i] (which stacks them
  // over the first houses of a spiral-growing city).
  const balloonCount=Math.min(20,v4.balloons);
@@ -6241,6 +6405,7 @@ function animateLife(t){if(!active||!v4.motion)return;
   b.g.rotation.set(0,Math.atan2(-vx,-vz),Math.sin(ang)*.08);
   for(const wing of b.wings)wing.pivot.rotation.z=wing.side*(.05+Math.sin(t*4.7+b.i)*.32);
  }
+ updateBirdBatches();
  for(const b of life.balloons){
   b.g.position.y=b.baseY+Math.sin(t*.45+b.i)*BALLOON_BOB;
   b.g.position.x=b.x+Math.sin(t*.13+b.i)*BALLOON_SWAY_X;
