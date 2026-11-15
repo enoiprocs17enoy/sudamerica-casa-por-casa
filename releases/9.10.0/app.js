@@ -2925,9 +2925,10 @@ function drawShops(){
         put('evolutionTerracePavilionPost',wallColor,shop,x+side*pavilionWidth*.46,height+1.75,pavilionZ+face*pavilionDepth*.43,.18,2.48,.18);
     }
     if(stage>=6){
-      const gardenZ=front+4.46;
+      const gardenZ=front+2.35;
+      const gardenEdge=Math.min(9.25,w/2+1,(shop.right??x+10.225)-x-.85,x-(shop.left??x-10.225)-.85);
       for(const side of [-1,1]){
-        const gardenX=x+side*w*.37;
+        const gardenX=x+side*gardenEdge;
         put('evolutionGardenBox',0xdec9a6,shop,gardenX,.35,gardenZ,1.45,.55,1.15);
         put('evolutionGardenHedge',0x53804c,shop,gardenX,.91,gardenZ,1.31,.72,1.02);
         put('evolutionGardenLamp',trim,shop,gardenX,2.14,gardenZ,.15,2.08,.15);
