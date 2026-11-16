@@ -1902,15 +1902,21 @@ function reviewSceneWorkload(){
  return {scope:'Scene totals before frustum culling',categories};
 }
 let lastRenderedFrame=0,measuredRenderGroup=null;
+function renderFrameDue(now,minInterval){
+  const elapsed=now-lastRenderedFrame;
+  // Browser timestamps can be rounded to tenths of a millisecond.
+  if(elapsed+.75<minInterval)return false;
+  lastRenderedFrame+=Math.max(1,Math.floor(elapsed/minInterval))*minInterval;
+  lastRenderedFrame=Math.min(now,lastRenderedFrame);
+  return true;
+}
 function animate(now=0){
   if(!renderer)return;
   requestAnimationFrame(animate);
   if(!active||document.hidden||cityBuildDepth>0)return;
-  // Cap expensive large-city rendering at 30 FPS; smaller towns stay at 60.
+  // Keep a stable60FPS ceiling without skipping frames due to timestamp rounding.
   const minInterval=1000/60;
-  const elapsed=now-lastRenderedFrame;
-  if(elapsed+.001<minInterval)return;
-  lastRenderedFrame+=Math.floor((elapsed+.001)/minInterval)*minInterval;
+  if(!renderFrameDue(now,minInterval))return;
   const t=now*.001;
   if(window.WorldNeighbors)WorldNeighbors.update(now);
   if(regionalWaterUniform)regionalWaterUniform.value=t;
