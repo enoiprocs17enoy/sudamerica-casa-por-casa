@@ -132,7 +132,7 @@ function drawShops(){
           if(premium&&row%2===1){round(metal,dx+.78,1.78,dz,.055,3.02,.055);box(metal,dx+.39,3.08,dz,.83,.06,.06);part('shopUmbrellaCanopy',trim,dx,3.23,dz,2.15,.28,2.15);}
         }
       }
-      if(stage>=4)for(const side of [-1,1])table(side*w*.25,-d*.14,dining,5.43);
+      if(stage>=4)for(const side of [-1,1])table(side*w*.25,-d*.14,dining,5.22);
     }else if(shape===1){
       // Produce islands and a dedicated cart corral, not restaurant tables.
       for(let rack=0;rack<Math.min(4,1+Math.floor(stage/2));rack++){
@@ -156,7 +156,7 @@ function drawShops(){
           for(let book=0;book<5;book++)box([0x638a91,0xc17358,0xc1a761][book%3],dx+(book-2)*.19,.80+shelf*.57,dz+2.13,.14,.42,.17);
         }}
       }
-      if(stage>=4)for(const side of [-1,1])table(side*w*.25,-d*.26,false,height+.47);
+      if(stage>=4)for(const side of [-1,1])table(side*w*.25,-d*.26,false,height+.275);
     }else if(shape===4){
       // Accessible approach, illuminated medicine collection lockers.
       box(0xd4ddd7,0,.16,3.3,2.35,.25,4.2);
@@ -262,6 +262,10 @@ function drawShops(){
     }else if(diningUpper){
       put('body',wallColor,shop,x,2.60,z,w,5.20,d);
       put('body',wallColor,shop,x,(height+5.20)/2,upperZ,upperWidth,height-5.20,upperDepth);
+      for(const side of [-1,1]){
+        put('displayGlass',glass,shop,x+side*(w/2+.08),2.45,z,.16,1.75,d*.48);
+        put('body',trim,shop,x+side*(w/2+.17),1.50,z,.26,.14,d*.51);
+      }
       put('diningTerraceDeck',0xc7aa88,shop,x,5.30,front-d*.16,w+.14,.20,d*.32);
       if(stage>=4){
         put('diningBalustrade',trim,shop,x,6.26,front-.12,w*.97,.12,.12);
@@ -379,7 +383,10 @@ function drawShops(){
       const back=annexZ-annexDepth/2;
       for(const bay of [-1,0,1]){
         const bx=x+bay*annexWidth*.28;
-        put('displayGlass',glass,shop,bx,annexHeight*.49,back-.07,annexWidth*.20,annexHeight*.55,.16);
+        if(!library&&bay===0){
+          put('entryDoor',trim,shop,bx,1.26,back-.12,1.31,2.48,.19);
+          put('entryDoorGlass',glass,shop,bx,1.38,back-.24,1.07,1.95,.07);
+        }else put('displayGlass',glass,shop,bx,annexHeight*.49,back-.07,annexWidth*.20,annexHeight*.55,.16);
       }
       if(library&&progress.premium){
         for(const side of [-1,1]){
@@ -433,7 +440,10 @@ function drawShops(){
       serviceRear=back;
       if(restaurant){
         for(const bay of [-1,0,1]){
-          put('displayGlass',glass,shop,x+bay*extensionWidth*.27,extensionHeight*.51,back-.08,extensionWidth*.19,extensionHeight*.56,.17);
+          if(bay===0){
+            put('entryDoor',trim,shop,x,1.26,back-.13,1.42,2.48,.19);
+            put('entryDoorGlass',glass,shop,x,1.38,back-.25,1.17,1.95,.07);
+          }else put('displayGlass',glass,shop,x+bay*extensionWidth*.27,extensionHeight*.51,back-.08,extensionWidth*.19,extensionHeight*.56,.17);
         }
         if(stage>=2){
           put('shopPaving',0xc19b76,shop,x,.16,back-1.65,extensionWidth,.20,3.25);
