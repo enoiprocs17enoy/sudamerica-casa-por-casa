@@ -2700,6 +2700,8 @@ function drawShops(){
   const pizzaRoofShape=new THREE.Shape();
   pizzaRoofShape.moveTo(-.5,-.5);pizzaRoofShape.lineTo(.5,-.5);pizzaRoofShape.lineTo(0,.5);pizzaRoofShape.closePath();
   const pizzaGable=new THREE.ExtrudeGeometry(pizzaRoofShape,{depth:1,bevelEnabled:false});pizzaGable.translate(0,0,-.5);
+  // Keep the exact triangle order while using the indexed instancing path.
+  pizzaGable.setIndex(Array.from({length:pizzaGable.attributes.position.count},(_,index)=>index));
   const furnitureSoft=new THREE.SphereGeometry(.5,8,6);
   const structuralKinds=new Set(['evolutionSignatureHall','evolutionSignatureHallWindow','evolutionSignatureHallSide','evolutionEntranceCanopy','evolutionEntranceColumn','evolutionUpperWindow','evolutionSideWindow','evolutionRoofTerrace','evolutionTerraceRail','evolutionTerraceSideRail','evolutionTerracePavilion','evolutionTerracePavilionPost','evolutionGrandEntrance','evolutionGrandPier','cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeMark','tradeRound','tradeDress','tradeSculpt','tradeBar','shopPaving','shopUpperBody','shopUpperGlass','shopUpperCap','body','roof','hotelRoof','cinemaRoof',
       'garageRoof','superRoof','displayGlass','entryDoor','entryDoorGlass',
