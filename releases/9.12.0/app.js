@@ -2698,10 +2698,11 @@ function drawShops(){
   const structuralKinds=new Set(['evolutionSignatureHall','evolutionSignatureHallWindow','evolutionSignatureHallSide','evolutionEntranceCanopy','evolutionEntranceColumn','evolutionUpperWindow','evolutionSideWindow','evolutionRoofTerrace','evolutionTerraceRail','evolutionTerraceSideRail','evolutionTerracePavilion','evolutionTerracePavilionPost','evolutionGrandEntrance','evolutionGrandPier','cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeMark','tradeRound','tradeDress','tradeSculpt','tradeBar','shopPaving','shopUpperBody','shopUpperGlass','shopUpperCap','body','roof','hotelRoof','cinemaRoof',
       'garageRoof','superRoof','displayGlass','entryDoor','entryDoorGlass',
       'signFascia','signInset','garageGate','cinemaParapet','hotelUpperWindow']);
+  for(const kind of ['libraryDome','libraryDrum','gymVault','diningTerraceDeck','diningBalustrade','diningTerraceAwning'])structuralKinds.add(kind);
   function put(kind,color,shop,x,y,z,w,h,d){
     // Preserve low-cost architecture at all zoom levels. Decorative pieces
     // are spatially batched so only the visible nearby shops are detailed.
-    const detailed=!structuralKinds.has(kind)&&!['libraryDome','libraryDrum','gymVault','diningTerraceDeck','diningBalustrade','diningTerraceAwning'].includes(kind);
+    const detailed=!structuralKinds.has(kind);
     const cx=shop?Math.floor(shop.x/90):0,cz=shop?Math.floor(shop.z/90):0;
     const geometry=kind==='libraryDome'||kind==='gymVault'?libraryDome:kind==='libraryDrum'?furnitureRound:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:
       kind==='shopRoundFurniture'?furnitureRound:(kind==='shopSoftFurniture'||kind==='shopUmbrellaCanopy')?furnitureSoft:
@@ -2929,7 +2930,7 @@ function drawShops(){
       }
       if(stage>=5){
         put('diningTerraceAwning',trim,shop,x,8.20,front-d*.16,w*.94,.18,d*.32);
-        for(const side of [-1,1])put('diningBalustrade',trim,shop,x+side*w*.45,6.84,front-.22,.13,2.70,.13);
+        for(const side of [-1,1])put('diningBalustrade',trim,shop,x+side*w*.45,6.75,front-.22,.13,2.70,.13);
       }
       for(let level=6.45;level+.75<height;level+=2.95){
         for(const side of [-1,1])for(const bay of [-1,0,1]){
