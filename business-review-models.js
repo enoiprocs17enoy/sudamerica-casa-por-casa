@@ -243,6 +243,7 @@ function drawShops(){
     const diningProfiles={0:[4.2,4.6,5.2,7.4,8.7,10.1,11.8,13.8],2:[5.2,5.8,6.8,8.8,10.8,13,15.8,19]};
     const height=shape===4?[4.7,5.1,5.8,7.5,9.1,11.1,13.6,16.7][stage]*(baseHeight/4.7):shape===5?[4,4.5,5.3,8.5,10.6,13,16,20][stage]*(baseHeight/4):shape===1?[4.6,4.9,5.3,5.7,6.2,6.8,7.5,8.4][stage]*(baseHeight/5.1):diningProfiles[shape]?diningProfiles[shape][stage]*(baseHeight/diningProfiles[shape][0]):shape===10?[4.6,7.8,12,18,27,40,58,82][stage]*(baseHeight/4.6):shape===8?[9,9.8,11.2,12.8,14.6,16.8,19.4,23][stage]*(baseHeight/9):shape===3?[6.4,7.0,8.3,10.5,12.9,15.8,19.2,23][stage]*(baseHeight/6.4):shape===9?[6.8,7.2,8.0,9.1,10.5,12.2,14.3,17][stage]*(baseHeight/6.8):baseHeight*(1+growth*heightGrowth)+(stage>=3?2.8:0);
 
+    const fashionAnnexHeight=Math.min(height*.83,stage>=5?7.3:5.1);
     const x=shop.x,z=shop.z;
     // Premium enriches finishes without changing the activity's base colour.
     const wallColor=style.walls;
@@ -287,7 +288,7 @@ function drawShops(){
       }
       for(let level=6.65;level+1.05<height;level+=3.60){
         for(const face of [-1,1])for(const bay of [-1,0,1]){
-          if(face<0&&level-1.025<=height*.83+.30)continue;
+          if(face<0&&level-1.025<=fashionAnnexHeight+.30)continue;
           put('displayGlass',glass,shop,x+bay*upperWidth*.29,level,upperZ+face*(upperDepth/2+.08),upperWidth*.24,2.05,.16);
           put('body',trim,shop,x+bay*upperWidth*.29,level-1.10,upperZ+face*(upperDepth/2+.15),upperWidth*.26,.14,.24);
           if(face>0){
@@ -535,7 +536,7 @@ function drawShops(){
       const annexDepth=2.1+growth*3.7;
       const annexZ=rear-annexDepth/2+.08;
       const annexW=w*[.76,.89,.92,.75][shape-4];
-      const annexH=height*[.63,.83,.73,.59][shape-4];
+      const annexH=shape===5?fashionAnnexHeight:height*[.63,.83,.73,.59][shape-4];
       put('body',wallColor,shop,x,annexH/2,annexZ,annexW,annexH,annexDepth);
       put('roof',trim,shop,x,annexH+.13,annexZ,annexW+.24,.26,annexDepth+.24);
       const back=annexZ-annexDepth/2;
