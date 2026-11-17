@@ -1,0 +1,699 @@
+{
+  "locale": "id",
+  "name": "Bahasa Indonesia",
+  "reviewStatus": "verified",
+  "messages": {
+    "Esplora il mondo": "Jelajahi dunia",
+    "Scegli una città": "Pilih kota",
+    "Cerca utente Instagram": "Cari pengguna Instagram",
+    "Cerca": "Cari",
+    "Nome utente": "Nama pengguna",
+    "@nomeutente": "@namapengguna",
+    "case nella città": "rumah di kota",
+    "La città cresce": "Kota terus berkembang",
+    "Ingrandisci la mappa per scoprire le città e avvicinarti ai loro quartieri.": "Perbesar peta untuk menemukan kota dan menjelajahi lingkungannya.",
+    "Un mondo virtuale di città da esplorare, una casa alla volta.": "Dunia virtual berisi kota untuk dijelajahi, satu rumah demi satu rumah.",
+    "Un luogo, tante storie": "Satu tempat, banyak cerita",
+    "Benvenuto, esploratore.": "Selamat datang, penjelajah.",
+    "Carichiamo il mondo e le sue città.": "Memuat dunia dan kota-kotanya.",
+    "Una casa alla volta, il mondo prende vita.": "Satu rumah demi satu rumah, dunia menjadi hidup.",
+    "La tua città prende forma.": "Kotamu mulai terbentuk.",
+    "Prepariamo edifici, strade e paesaggio.": "Menyiapkan bangunan, jalan, dan pemandangan.",
+    "La città si rinnova.": "Kotamu sedang diperbarui.",
+    "Aggiorniamo edifici, dettagli e abitanti.": "Memperbarui bangunan, detail, dan penduduk.",
+    "Una città sempre più viva.": "Kota yang semakin hidup.",
+    "Prepariamo le case e i servizi per i suoi abitanti.": "Menyiapkan rumah dan layanan untuk penduduk.",
+    "Il mondo continua, intorno a te.": "Dunia terus terbentang di sekitarmu.",
+    "Prepariamo le città vicine, le strade e il paesaggio.": "Menyiapkan kota sekitar, jalan, dan pemandangan.",
+    "Esploriamo nuovi luoghi.": "Menjelajahi tempat baru.",
+    "Carichiamo le località della regione.": "Memuat lokasi di wilayah ini.",
+    "Prepariamo le località e la mappa della regione.": "Menyiapkan lokasi dan peta wilayah.",
+    "Caricamento in corso": "Sedang memuat",
+    "Non è stato possibile completare il caricamento. Puoi riprovare.": "Pemuatan belum dapat diselesaikan. Silakan coba lagi.",
+    "Motore 3D non caricato. Verifica Internet e ricarica.": "Mesin 3D tidak dapat dimuat. Periksa koneksi internet dan muat ulang.",
+    "Continente": "Benua",
+    "Paese o territorio": "Negara atau wilayah",
+    "Cerca una località": "Cari lokasi",
+    "Nome città o regione": "Nama kota atau wilayah",
+    "Tutti i continenti": "Semua benua",
+    "Antartide": "Antarktika",
+    "Europa": "Eropa",
+    "America del Nord e centrale": "Amerika Utara dan Tengah",
+    "America del Sud": "Amerika Selatan",
+    "🌐 Vedi tutto il mondo": "🌐 Lihat seluruh dunia",
+    "Seleziona una città…": "Pilih kota…",
+    "Caricamento delle località…": "Memuat lokasi…",
+    "Nessuna località trovata in questo paese": "Tidak ada lokasi yang ditemukan di negara ini",
+    "Catalogo non caricato. Controlla la connessione e riseleziona il paese.": "Katalog tidak dapat dimuat. Periksa koneksi dan pilih kembali negara.",
+    "Vai alla città selezionata": "Ke kota yang dipilih",
+    "Entra nel 3D": "Masuk ke 3D",
+    "Torna alla mappa": "Kembali ke peta",
+    "Controlli 3D": "Kontrol 3D",
+    "↻ Ruota": "↻ Putar",
+    "✥ Sposta": "✥ Geser",
+    "⌂ Centro": "⌂ Pusatkan",
+    "⛶ Vista ampia": "⛶ Tampilan luas",
+    "☰ Comandi": "☰ Kontrol",
+    "Orienta a nord": "Hadapkan ke utara",
+    "Alterna vista dall’alto e inclinata": "Beralih antara tampilan atas dan miring",
+    "Avvicina": "Perbesar",
+    "Allontana": "Perkecil",
+    "Ruota e inclina la visuale": "Putar dan miringkan pandangan",
+    "Sposta la visuale": "Geser pandangan",
+    "🏙 Città vicine": "🏙 Kota sekitar",
+    "Città vicine": "Kota sekitar",
+    "Avvicinati alle città collegate": "Dekati kota yang terhubung",
+    "Nessuna città collegata visibile in questa zona. Puoi cercare altre località nella mappa.": "Tidak ada kota terhubung yang terlihat di sini. Cari lokasi lain di peta.",
+    "Mappa geografica · le città sono posizionate con coordinate reali": "Peta dunia · kota ditempatkan pada koordinat aslinya",
+    "Un mondo. Milioni di storie. Una casa per ognuno.": "Satu dunia. Jutaan cerita. Rumah untuk setiap orang.",
+    "🌎 Città selezionata:": "🌎 Kota yang dipilih:",
+    "Tienda": "Usaha",
+    "Attività": "Usaha",
+    "La mia casa": "Rumahku",
+    "Personaggio": "Karakter",
+    "Il mio personaggio": "Karakterku",
+    "Mondo": "Dunia",
+    "Ranking": "Peringkat",
+    "Trova": "Temukan",
+    "Obras": "Fasilitas umum",
+    "Opere": "Fasilitas umum",
+    "Menu mondo": "Menu dunia",
+    "Chiudi": "Tutup",
+    "Casa": "Rumah",
+    "Negozio": "Usaha",
+    "Mongolfiera": "Balon udara",
+    "Scopri le attività della città e le loro evoluzioni.": "Temukan usaha di kota dan tahap perkembangannya.",
+    "🏪 Esplora le attività": "🏪 Jelajahi usaha",
+    "Cerca il tuo nome utente per trovare la casa, il personaggio e le proprietà collegate.": "Cari nama penggunamu untuk menemukan rumah, karakter, dan properti terkait.",
+    "Trova nella città": "Temukan di kota",
+    "🌎 Entra nel 3D": "🌎 Masuk ke 3D",
+    "🧭 Panoramica": "🧭 Ikhtisar",
+    "Animazioni ambientali": "Animasi lingkungan",
+    "Strutture e obiettivi": "Fasilitas dan target",
+    "Ricostruzione 3D stilizzata: la planimetria e gli elementi documentati sono affiancati da arredi di integrazione.": "Rekonstruksi 3D bergaya: tata letak dan unsur yang terdokumentasi dilengkapi dengan perabot tambahan.",
+    "Le fonti disponibili non descrivono ancora statue e fontane di questa piazza.": "Sumber yang tersedia belum menjelaskan patung dan air mancur di alun-alun ini.",
+    "Presenza mappata · forma 3D da completare": "Unsur terpetakan · bentuk 3D belum selesai",
+    "Riferimento documentato · modello 3D stilizzato": "Referensi terdokumentasi · model 3D bergaya",
+    "Tipologia mappata · modello 3D da verificare nei dettagli": "Jenis terpetakan · detail 3D masih perlu diperiksa",
+    "Fonte": "Sumber",
+    "Torna agli obiettivi": "Kembali ke target",
+    "Parco di quartiere": "Taman lingkungan",
+    "Acquedotto e serbatoio": "Saluran dan penampungan air",
+    "Ambulatorio e pronto soccorso": "Klinik dan unit gawat darurat",
+    "Stazione di polizia": "Kantor polisi",
+    "Caserma dei pompieri": "Pos pemadam kebakaran",
+    "Primi servizi": "Layanan dasar",
+    "Asilo e area giochi": "Penitipan anak dan taman bermain",
+    "Scuola primaria": "Sekolah dasar",
+    "Centro raccolta e riciclo": "Pusat pengumpulan dan daur ulang",
+    "Campo da calcio": "Lapangan sepak bola",
+    "Biblioteca pubblica": "Perpustakaan umum",
+    "Ospedale generale": "Rumah sakit umum",
+    "Municipio": "Balai kota",
+    "Autostazione": "Terminal bus",
+    "Centrale elettrica di quartiere": "Pembangkit listrik lingkungan",
+    "Giardini e area giochi": "Taman dan area bermain",
+    "Centro commerciale": "Pusat perbelanjaan",
+    "Campo da baseball": "Lapangan bisbol",
+    "Centro sportivo": "Pusat olahraga",
+    "Museo civico": "Museum kota",
+    "Teatro e auditorium": "Teater dan auditorium",
+    "Piscina comunale": "Kolam renang umum",
+    "Stadio cittadino": "Stadion kota",
+    "Università e campus": "Universitas dan kampus",
+    "Stazione ferroviaria": "Stasiun kereta api",
+    "Palazzo di giustizia": "Gedung pengadilan",
+    "Depuratore e servizi ambientali": "Pengolahan air limbah dan layanan lingkungan",
+    "Piazza monumentale": "Alun-alun monumental",
+    "Eliporto di soccorso": "Helipad penyelamatan",
+    "Orto botanico e serre": "Kebun botani dan rumah kaca",
+    "Servizi di quartiere": "Layanan lingkungan",
+    "Città in crescita": "Kota berkembang",
+    "Grande città": "Kota besar",
+    "Strutture pubbliche": "Fasilitas umum",
+    "Tutti gli edifici": "Semua bangunan",
+    "Case": "Rumah",
+    "Cerca edifici": "Cari bangunan",
+    "Nome, nickname o numero…": "Nama, nama pengguna, atau nomor…",
+    "Mostra altri risultati": "Tampilkan hasil lainnya",
+    "📍 Raggiungi e apri": "📍 Kunjungi dan buka",
+    "Nessuna struttura trovata.": "Tidak ada fasilitas yang ditemukan.",
+    "Raggiunto": "Tercapai",
+    "Caffetteria": "Kafe",
+    "Supermercato": "Supermarket",
+    "Ristorante": "Restoran",
+    "Libreria": "Toko buku",
+    "Farmacia": "Apotek",
+    "Negozio di moda": "Toko pakaian",
+    "Officina": "Bengkel",
+    "Panetteria": "Toko roti",
+    "Palestra": "Pusat kebugaran",
+    "Mercato": "Pasar",
+    "PIAZZA CIVICA": "ALUN-ALUN KOTA",
+    "PIAZZA PRINCIPALE": "ALUN-ALUN UTAMA",
+    "SERVIZI PUBBLICI": "LAYANAN PUBLIK",
+    "Monolocale": "Rumah studio",
+    "Casa piccola": "Rumah kecil",
+    "Villetta": "Rumah tunggal",
+    "Palazzina": "Gedung apartemen kecil",
+    "Condominio": "Gedung apartemen",
+    "Torre residenziale": "Menara hunian",
+    "Grattacielo": "Pencakar langit",
+    "Grattacielo monumentale": "Pencakar langit monumental",
+    "Crema": "Krem",
+    "Bianco": "Putih",
+    "Rosa": "Merah muda",
+    "Azzurro": "Biru muda",
+    "Verde salvia": "Hijau sage",
+    "Ocra": "Oker",
+    "Grigio": "Abu-abu",
+    "Gratis": "Gratis",
+    "Base": "Standar",
+    "Accesso proprietario": "Masuk pemilik",
+    "Accedi per aprire gli strumenti di simulazione.": "Masuk untuk membuka alat simulasi.",
+    "Ricevi link di accesso": "Kirim tautan masuk",
+    "Apri l’email ricevuta e premi il link di accesso. Il link è personale e utilizzabile una sola volta.": "Buka email yang diterima dan ikuti tautan masuk. Tautan ini bersifat pribadi dan hanya dapat digunakan sekali.",
+    "Apri simulazione": "Buka simulasi",
+    "Torna alla vista pubblica": "Kembali ke tampilan publik",
+    "Apri gli strumenti proprietario": "Buka alat pemilik",
+    "Esci dal tuo account": "Keluar dari akun",
+    "Vista pubblica ripristinata.": "Tampilan publik dipulihkan.",
+    "Accedi nuovamente per continuare.": "Masuk kembali untuk melanjutkan.",
+    "Strumenti riservati non disponibili.": "Alat pribadi tidak tersedia.",
+    "Il sito sta ancora terminando il caricamento.": "Situs masih menyelesaikan pemuatan.",
+    "Sei uscito. Il sito è tornato alla vista pubblica.": "Kamu telah keluar. Situs kembali ke tampilan publik.",
+    "Accesso chiuso su questo dispositivo. Connessione al servizio non disponibile.": "Akses ditutup di perangkat ini. Layanan masuk tidak dapat dihubungi.",
+    "Troppe richieste. Attendi un minuto e riprova.": "Terlalu banyak permintaan. Tunggu satu menit dan coba lagi.",
+    "Accesso non disponibile. Controlla i dati e riprova.": "Akses tidak tersedia. Periksa data dan coba lagi.",
+    "Verifichiamo il tuo accesso.": "Memverifikasi aksesmu.",
+    "Tra poco tornerai alla tua città.": "Sebentar lagi kamu akan kembali ke kotamu.",
+    "Il link non è valido oppure è già stato utilizzato. Richiedi un nuovo accesso.": "Tautan tidak valid atau sudah digunakan. Minta tautan masuk baru.",
+    "Questo account non è autorizzato ad aprire la simulazione.": "Akun ini tidak diizinkan membuka simulasi.",
+    "Torna al sito": "Kembali ke situs",
+    "🧪 Simulazione e test": "🧪 Simulasi dan pengujian",
+    "Le modifiche di prova restano in questa sessione. Torna alla vista pubblica per ripristinare la città.": "Perubahan uji hanya berlaku dalam sesi ini. Kembali ke tampilan publik untuk memulihkan kota.",
+    "👥 Abitanti simulati:": "👥 Penduduk simulasi:",
+    "Numero di case simulate": "Jumlah rumah simulasi",
+    "Numero esatto di case": "Jumlah rumah yang tepat",
+    "Applica": "Terapkan",
+    "Sposta il cursore per scegliere. Rilascia per generare la città; oppure inserisci il numero esatto e premi Applica.": "Geser untuk memilih jumlah. Lepaskan untuk membuat kota, atau masukkan jumlah yang tepat lalu tekan Terapkan.",
+    "🏗️ Evoluzione casa (demo)": "🏗️ Perkembangan rumah (demo)",
+    "Clicca qualsiasi casa nel 3D per scegliere quale far evolvere: il lotto rimane fisso.": "Pilih rumah mana pun dalam 3D untuk mengembangkannya. Letak lahannya tidak berubah.",
+    "Attività di prova": "Usaha uji coba",
+    "+1 negozio": "+1 usaha",
+    "+100 negozi": "+100 usaha",
+    "Azzera negozi": "Atur ulang usaha",
+    "Lingua": "Bahasa",
+    "Prepariamo la tua lingua.": "Menyiapkan bahasamu.",
+    "Aggiorniamo testi e cartelli della città.": "Memperbarui teks dan papan nama kota.",
+    "Lingua non disponibile. Controlla la connessione e riprova.": "Bahasa tidak dapat dimuat. Periksa koneksi dan coba lagi.",
+    "Classifica": "Peringkat",
+    "abitanti": "penduduk",
+    "Negozi": "Usaha",
+    "Email": "Email",
+    "Premium": "Premium",
+    "Hotel": "Hotel",
+    "Cinema": "Bioskop",
+    "Africa": "Afrika",
+    "Asia": "Asia",
+    "Oceania": "Oseania",
+    "Terracotta": "Terakota",
+    "Zoom in": "Perbesar",
+    "Zoom out": "Perkecil",
+    "A JavaScript library for interactive maps": "Pustaka JavaScript untuk peta interaktif",
+    "Località:": "Lokasi:",
+    "· Terre: Natural Earth": "· Daratan: Natural Earth",
+    "· Terreno:": "· Medan:",
+    "Seleziona una città del mondo: ogni città ha case evolute, negozi e mongolfiere. Avvicinati per scoprire giardini, attività e piazze. Puoi ruotare, spostarti liberamente e selezionare le case.": "Pilih kota di dunia untuk menjelajahi rumah, usaha, dan balon udaranya. Dekati untuk melihat taman, toko, dan alun-alun. Kamu dapat memutar pandangan, bergerak bebas, dan memilih rumah.",
+    "Trascina per spostarti. Usa Ruota per inclinare la visuale. Su telefono allarga due dita per avvicinarti e chiudile per allontanarti. Tocca una casa, un’attività o una persona per aprire la sua scheda.": "Seret untuk bergerak. Gunakan Putar untuk memiringkan pandangan. Di ponsel, renggangkan dua jari untuk memperbesar dan rapatkan untuk memperkecil. Pilih rumah, usaha, atau orang untuk membuka informasinya.",
+    "Statue, fontane e dettagli della piazza": "Patung, air mancur, dan detail alun-alun",
+    "Cerca una struttura…": "Cari fasilitas…",
+    "Cerca strutture pubbliche": "Cari fasilitas umum",
+    "IL TUO NEGOZIO": "USAHAMU",
+    "PUÒ ESSERE QUI": "BISA ADA DI SINI",
+    "PROSSIMA OPERA": "FASILITAS BERIKUTNYA",
+    "LA CITTÀ CRESCE": "KOTA TERUS BERKEMBANG",
+    "Scopri il traguardo": "Lihat target berikutnya",
+    "Scopri le attività": "Jelajahi usaha",
+    "PIAZZA DI QUARTIERE": "ALUN-ALUN LINGKUNGAN",
+    "Cespuglio": "Semak",
+    "Sfera fiorita": "Semak berbunga bulat",
+    "Arbusto a foglie": "Semak berdaun",
+    "Siepe compatta": "Pagar tanaman rapat",
+    "Cespuglio a tre chiome": "Semak bertajuk tiga",
+    "Vialetto": "Jalan taman",
+    "Pietra chiara": "Batu terang",
+    "Pietra scura": "Batu gelap",
+    "Cotto": "Ubin terakota",
+    "Lastre separate": "Batu pijakan",
+    "Aiuola": "Petak bunga",
+    "Fiori misti": "Bunga campuran",
+    "Rose rosse": "Mawar merah",
+    "Margherite": "Bunga aster",
+    "Lavanda": "Lavendel",
+    "Lampioncino": "Lampu taman",
+    "Classico": "Klasik",
+    "Globo": "Bola",
+    "Lanterna quadrata": "Lentera persegi",
+    "Paletto moderno": "Lampu tiang modern",
+    "Barbecue Premium": "Pemanggang Premium",
+    "Muratura con cappa": "Pemanggang bata dengan cerobong",
+    "Griglia con coperchio": "Panggangan bertutup",
+    "Forno a legna": "Oven kayu bakar",
+    "Cucina BBQ moderna": "Dapur luar ruangan modern",
+    "Cassetta postale": "Kotak surat",
+    "Rossa": "Merah",
+    "Nera": "Hitam",
+    "Casetta": "Bentuk rumah",
+    "Acciaio": "Baja",
+    "Recinzione": "Pagar",
+    "Legno": "Kayu",
+    "Ferro": "Besi",
+    "Siepe": "Pagar tanaman",
+    "Muretto": "Tembok rendah",
+    "Piscina Premium": "Kolam Premium",
+    "Piscina classica": "Kolam klasik",
+    "Piscina ovale": "Kolam oval",
+    "Piscina sportiva": "Kolam lintasan",
+    "Piscina rotonda": "Kolam bundar",
+    "🌿 Giardino: non sbloccato": "🌿 Taman: belum terbuka",
+    "PARCO DI QUARTIERE": "TAMAN LINGKUNGAN",
+    "ACQUEDOTTO E SERBATOIO": "SALURAN DAN PENAMPUNGAN AIR",
+    "AMBULATORIO E PRONTO SOCCORSO": "KLINIK DAN UNIT GAWAT DARURAT",
+    "STAZIONE DI POLIZIA": "KANTOR POLISI",
+    "CASERMA DEI POMPIERI": "POS PEMADAM KEBAKARAN",
+    "ASILO E AREA GIOCHI": "PENITIPAN ANAK DAN TAMAN BERMAIN",
+    "SCUOLA PRIMARIA": "SEKOLAH DASAR",
+    "CENTRO RACCOLTA E RICICLO": "PUSAT PENGUMPULAN DAN DAUR ULANG",
+    "CAMPO DA CALCIO": "LAPANGAN SEPAK BOLA",
+    "BIBLIOTECA PUBBLICA": "PERPUSTAKAAN UMUM",
+    "OSPEDALE GENERALE": "RUMAH SAKIT UMUM",
+    "MUNICIPIO": "BALAI KOTA",
+    "AUTOSTAZIONE": "TERMINAL BUS",
+    "CENTRALE ELETTRICA DI QUARTIERE": "PEMBANGKIT LISTRIK LINGKUNGAN",
+    "GIARDINI E AREA GIOCHI": "TAMAN DAN AREA BERMAIN",
+    "CENTRO COMMERCIALE": "PUSAT PERBELANJAAN",
+    "CAMPO DA BASEBALL": "LAPANGAN BISBOL",
+    "CENTRO SPORTIVO": "PUSAT OLAHRAGA",
+    "MUSEO CIVICO": "MUSEUM KOTA",
+    "TEATRO E AUDITORIUM": "TEATER DAN AUDITORIUM",
+    "PISCINA COMUNALE": "KOLAM RENANG UMUM",
+    "STADIO CITTADINO": "STADION KOTA",
+    "UNIVERSITÀ E CAMPUS": "UNIVERSITAS DAN KAMPUS",
+    "STAZIONE FERROVIARIA": "STASIUN KERETA API",
+    "PALAZZO DI GIUSTIZIA": "GEDUNG PENGADILAN",
+    "DEPURATORE E SERVIZI AMBIENTALI": "PENGOLAHAN AIR LIMBAH DAN LAYANAN LINGKUNGAN",
+    "PIAZZA MONUMENTALE": "ALUN-ALUN MONUMENTAL",
+    "ELIPORTO DI SOCCORSO": "HELIPAD PENYELAMATAN",
+    "ORTO BOTANICO E SERRE": "KEBUN BOTANI DAN RUMAH KACA",
+    "CAFFETTERIA": "KAFE",
+    "SUPERMERCATO": "SUPERMARKET",
+    "RISTORANTE": "RESTORAN",
+    "LIBRERIA": "TOKO BUKU",
+    "FARMACIA": "APOTEK",
+    "NEGOZIO DI MODA": "TOKO PAKAIAN",
+    "OFFICINA": "BENGKEL",
+    "PANETTERIA": "TOKO ROTI",
+    "CINEMA": "BIOSKOP",
+    "PALESTRA": "PUSAT KEBUGARAN",
+    "HOTEL": "HOTEL",
+    "MERCATO": "PASAR",
+    "Scegli una città del mondo. Il puntatore della città rimane della stessa dimensione.": "Pilih kota untuk mulai menjelajahi dunia.",
+    "📍 Conegliano e dintorni · Veneto": "📍 Conegliano dan kota sekitar · Veneto",
+    "Cerca città nel mondo": "Cari kota di dunia",
+    "N ↑": "U ↑",
+    "Evoluzione attività": "Perkembangan usaha",
+    "Design Premium (demo)": "Desain Premium (demo)",
+    "Applica evoluzione": "Terapkan perkembangan",
+    "🏗️ Evoluzione di questa casa (demo)": "🏗️ Kembangkan rumah ini (demo)",
+    "Scegli i punti e il design: cambia solo questa casa, senza spostare il lotto.": "Pilih poin dan desain: hanya rumah ini yang berubah, tanpa memindahkan lahannya.",
+    "Punti esatti per questa casa": "Poin tepat untuk rumah ini",
+    "Applica punti": "Terapkan poin",
+    "🎨 Design per questa evoluzione": "🎨 Desain untuk tahap ini",
+    "Gratis · Casa standard": "Gratis · Rumah standar",
+    "Abbonamento · Casa con balconi, camino e dettagli": "Langganan · Rumah dengan balkon, cerobong, dan detail",
+    "🎨 Colore della casa": "🎨 Warna rumah",
+    "🌿 Personalizza le decorazioni · 4 modelli per sblocco": "🌿 Sesuaikan dekorasi · 4 model per pembukaan",
+    "Casa senza piante a 0 punti.": "Tidak ada tanaman pada 0 poin.",
+    "4 piante con Premium": "4 tanaman dengan Premium",
+    "2 piante con Gratis": "2 tanaman dengan Gratis",
+    "posizioni automatiche.": "posisi otomatis.",
+    "Simulazione dell’abbonamento: non viene effettuato alcun pagamento.": "Simulasi langganan: tidak ada pembayaran yang dilakukan.",
+    "Acquisti dimostrativi: nessun pagamento reale.": "Pembelian demo: tidak ada pembayaran nyata.",
+    "🏪 Aggiungi negozio": "🏪 Tambahkan usaha",
+    "🎈 Aggiungi mongolfiera": "🎈 Tambahkan balon udara",
+    "📍 Vai alla mia casa": "📍 Ke rumahku",
+    "La personalizzazione della facciata sarà ampliata nelle prossime versioni.": "Pilihan penyesuaian fasad akan diperluas pada versi mendatang.",
+    "Colore della pelle": "Warna kulit",
+    "Vestiti": "Pakaian",
+    "📍 Trova il mio personaggio": "📍 Temukan karakterku",
+    "Personaggio non generato": "Karakter belum dibuat",
+    "Pizzeria": "Pizzeria",
+    "PIZZERIA": "PIZZERIA",
+    "Opera mappata": "Karya seni terpetakan",
+    "Fontana mappata": "Air mancur terpetakan",
+    "Prepariamo la città e i suoi dintorni.": "Menyiapkan kota dan sekitarnya.",
+    "Design Premium (demo abbonamento)": "Desain Premium (demo langganan)",
+    "Design Gratis": "Desain Gratis",
+    "San Martín anziano in abiti civili con mantello al vento, sopra base rocciosa con tre rilievi. Il monumento equestre appartiene al Parque San Martín, non a questa piazza.": "San Martín pada usia lanjut dengan pakaian sipil dan jubah tertiup angin, di atas dasar berbatu dengan tiga relief. Monumen berkudanya berada di Parque San Martín, bukan di alun-alun ini.",
+    "Giardino-calendario cartografato: aiuola floreale con anno corrente. Disegno delle fioriture interpretato, non un rilievo fotografico.": "Taman kalender terpetakan: petak bunga menampilkan tahun berjalan. Pola bunga merupakan interpretasi, bukan hasil survei fotografis.",
+    "San Martín equestre, bronzo su basamento in granito con rilievi.": "Patung San Martín berkuda dari perunggu di atas alas granit dengan relief.",
+    "Arenales a cavallo con quindici figure allegoriche alla base.": "Arenales berkuda dengan lima belas figur alegoris di sekitar alasnya.",
+    "Libertà di Lola Mora, marmo di Carrara, panneggio e catene spezzate; nessuno scudo o cavallo.": "Patung Liberty karya Lola Mora dari marmer Carrara, dengan kain berlipat dan rantai putus; tanpa perisai atau kuda.",
+    "Posizione: cartografia · orientamento e dettagli fini ancora da verificare": "Posisi: terpetakan · orientasi dan detail halus masih perlu diperiksa",
+    "Accesso proprietario · Casa por Casa": "Masuk pemilik · Casa por Casa",
+    "Alcuni elementi della città non sono stati caricati. Puoi riprovare.": "Sebagian unsur kota tidak dapat dimuat. Silakan coba lagi."
+  },
+  "templates": [
+    {
+      "source": "{count} risultati",
+      "target": "{count} hasil"
+    },
+    {
+      "source": "{city} · {count} case · {shops} attività",
+      "target": "{city} · {count} rumah · {shops} usaha"
+    },
+    {
+      "source": "Casa · {city}",
+      "target": "Rumah · {city}"
+    },
+    {
+      "source": "🌿 Giardino: {plant} · {count} piante",
+      "target": "🌿 Taman: {plant} · {count} tanaman",
+      "translateSlots": [
+        "plant"
+      ]
+    },
+    {
+      "source": "🎨 Colore: {color}",
+      "target": "🎨 Warna: {color}",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "🏗️ {tier} · {floors} piani",
+      "target": "🏗️ {tier} · {floors} lantai",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "🎨 Design: {design}",
+      "target": "🎨 Desain: {design}",
+      "translateSlots": [
+        "design"
+      ]
+    },
+    {
+      "source": "⭐ {points} punti",
+      "target": "⭐ {points} poin"
+    },
+    {
+      "source": "{count} case mancanti",
+      "target": "Masih perlu {count} rumah"
+    },
+    {
+      "source": "{version} · Edizione mondiale",
+      "target": "{version} · Edisi dunia"
+    },
+    {
+      "source": "Prossima fermata: {city}.",
+      "target": "Tujuan berikutnya: {city}."
+    },
+    {
+      "source": "{city} · {count} case · {shops} negozi · {facilities} strutture pubbliche",
+      "target": "{city} · {count} rumah · {shops} usaha · {facilities} fasilitas umum"
+    },
+    {
+      "source": "{city} · città raggiunta · {count} case",
+      "target": "{city} · tujuan tercapai · {count} rumah"
+    },
+    {
+      "source": "{city} · {count} case · scegli Entra nel 3D",
+      "target": "{city} · {count} rumah · pilih Masuk ke 3D"
+    },
+    {
+      "source": "{count} risultati mostrati · scrivi per restringere la ricerca",
+      "target": "{count} hasil ditampilkan · ketik untuk mempersempit pencarian"
+    },
+    {
+      "source": "{count} risultati mostrati",
+      "target": "{count} hasil ditampilkan"
+    },
+    {
+      "source": "Utente non presente in {city}",
+      "target": "Pengguna tidak ditemukan di {city}"
+    },
+    {
+      "source": "Esplora {city} con la telecamera libera.",
+      "target": "Jelajahi {city} dengan kamera bebas."
+    },
+    {
+      "source": "🏠 Casa #{id} · @{user}",
+      "target": "🏠 Rumah #{id} · @{user}"
+    },
+    {
+      "source": "🏠 Casa #{id}",
+      "target": "🏠 Rumah #{id}"
+    },
+    {
+      "source": "Casa #{id}",
+      "target": "Rumah #{id}"
+    },
+    {
+      "source": "{points} punti",
+      "target": "{points} poin"
+    },
+    {
+      "source": "{count} case",
+      "target": "{count} rumah"
+    },
+    {
+      "source": "{count} negozi · lotti misti",
+      "target": "{count} usaha · lahan campuran"
+    },
+    {
+      "source": "{count} mongolfiere",
+      "target": "{count} balon udara"
+    },
+    {
+      "source": "Livello {level}/{total}",
+      "target": "Tingkat {level}/{total}"
+    },
+    {
+      "source": "Proprietà raggiungibili ({count})",
+      "target": "Properti terkait ({count})"
+    },
+    {
+      "source": "Raggiungi {city}",
+      "target": "Kunjungi {city}"
+    },
+    {
+      "source": "{city} · {count} abitanti virtuali",
+      "target": "{city} · {count} penduduk virtual"
+    },
+    {
+      "source": "{business} · {city} · Livello {level}/{total} · {points} punti · {design}",
+      "target": "{business} · {city} · Tingkat {level}/{total} · {points} poin · {design}",
+      "translateSlots": [
+        "business",
+        "design"
+      ]
+    },
+    {
+      "source": "{business} #{id} · @{user}",
+      "target": "{business} #{id} · @{user}",
+      "translateSlots": [
+        "business"
+      ]
+    },
+    {
+      "source": "🏪 {business} #{id}",
+      "target": "🏪 {business} #{id}",
+      "translateSlots": [
+        "business"
+      ]
+    },
+    {
+      "source": "{tier} ({floors} piani)",
+      "target": "{tier} ({floors} lantai)",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{tier} ({floors} piano)",
+      "target": "{tier} ({floors} lantai)",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{count} CASE",
+      "target": "{count} RUMAH"
+    },
+    {
+      "source": "{city} · {count} case · {reached}/{total} obiettivi raggiunti",
+      "target": "{city} · {count} rumah · {reached}/{total} target tercapai"
+    },
+    {
+      "source": "🏙 {city} · {distance} km",
+      "target": "🏙 {city} · {distance} km"
+    },
+    {
+      "source": "📍 Trova {facility}",
+      "target": "📍 Temukan {facility}",
+      "translateSlots": [
+        "facility"
+      ]
+    },
+    {
+      "source": "Personaggio · {city}",
+      "target": "Karakter · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Mongolfiera · {city}",
+      "target": "Balon udara · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Negozio · {city}",
+      "target": "Usaha · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Livello {level} · {points} punti",
+      "target": "Tingkat {level} · {points} poin",
+      "translateSlots": []
+    },
+    {
+      "source": "{points} punti · {tier} ({floors} piani)",
+      "target": "{points} poin · {tier} ({floors} lantai)",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{color} · pareti e tetto",
+      "target": "{color} · dinding dan atap",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "🎈 Mongolfiera #{id}",
+      "target": "🎈 Balon udara #{id}",
+      "translateSlots": []
+    },
+    {
+      "source": "Casa demo di @{user}",
+      "target": "Rumah demo milik @{user}",
+      "translateSlots": []
+    },
+    {
+      "source": "@{user} · personaggio selezionato (freccia gialla)",
+      "target": "@{user} · karakter dipilih (panah kuning)",
+      "translateSlots": []
+    },
+    {
+      "source": "Nella demo la prima casa appartiene a @{user}. Non è ancora presente un sistema di accesso personale.",
+      "target": "Rumah pertama dalam demo adalah milik @{user}. Akses pribadi untuk penduduk belum tersedia.",
+      "translateSlots": []
+    },
+    {
+      "source": "Un personaggio gratuito per ogni casa. In questa demo puoi individuare il personaggio di @{user}.",
+      "target": "Satu karakter gratis untuk setiap rumah. Dalam demo ini, kamu dapat menemukan karakter milik @{user}.",
+      "translateSlots": []
+    },
+    {
+      "source": "Cespuglio: {variant}",
+      "target": "Semak: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Vialetto: {variant}",
+      "target": "Jalan taman: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Aiuola: {variant}",
+      "target": "Petak bunga: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Lampioncino: {variant}",
+      "target": "Lampu taman: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Barbecue Premium: {variant}",
+      "target": "Pemanggang Premium: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Cassetta postale: {variant}",
+      "target": "Kotak surat: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Recinzione: {variant}",
+      "target": "Pagar: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Piscina Premium: {variant}",
+      "target": "Kolam Premium: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Casa #{id} · colore {color}",
+      "target": "Rumah #{id} · warna {color}",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "Demo @{user} · Casa #{id} · {points} punti · {tier}",
+      "target": "Demo @{user} · Rumah #{id} · {points} poin · {tier}",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{count} località nel catalogo · {countries} paesi e territori · simulazione · {residents} in {city} · {points} punti città · {homes} case 3D caricate",
+      "target": "{count} lokasi dalam katalog · {countries} negara dan wilayah · simulasi · {residents} di {city} · {points} poin kota · {homes} rumah 3D dimuat",
+      "translateSlots": []
+    },
+    {
+      "source": "Piazza civica di {city}",
+      "target": "Alun-alun kota {city}",
+      "translateSlots": []
+    }
+  ],
+  "verification": {
+    "messages": 360,
+    "templates": 61,
+    "browserEvidence": "Indonesiano_obiettivi_contrasto_v9.8.0.jpg",
+    "additionalEvidence": "Indonesiano_scheda_attivita_v9.8.0.jpg",
+    "audit": "indonesian-browser-audit.json",
+    "scope": "Current UI catalogue; public panels, city labels, business card, owner sign-in text and 390px responsive layout verified. Further world languages and the overall Goal remain incomplete."
+  }
+}
