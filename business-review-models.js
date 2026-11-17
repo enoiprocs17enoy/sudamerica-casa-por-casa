@@ -1111,8 +1111,8 @@ function drawShops(){
       put('garagePipe',0x5c696c,shop,x-w*.43,(industrialSplit?height*.90:height)+1.26,z-d*.28,.27,1.38,.27);
     }else if(shape===7){ // Bakery: two brick chimneys and warm cornice.
       for(const side of [-1,1]){
-        roofPut('bakeryChimney',0xb96e52,shop,x+side*w*.25,rooftop+(bakerySplit?1.19:.59),z-d*.15,.62,1.10,.60);
-        roofPut('bakeryChimneyCap',0x695c52,shop,x+side*w*.25,rooftop+(bakerySplit?1.78:1.18),z-d*.15,.78,.13,.76);
+        roofPut('bakeryChimney',0xb96e52,shop,x+side*w*.25,rooftop+(bakerySplit?1.19:.49),z-d*.15,.62,1.10,.60);
+        roofPut('bakeryChimneyCap',0x695c52,shop,x+side*w*.25,rooftop+(bakerySplit?1.78:1.08),z-d*.15,.78,.13,.76);
       }
       if(!bakerySplit)roofPut('bakeryRoofTrim',0xd49b6a,shop,x,rooftop-.07,front-.15,w*.78,.18,.28);
     }else if(shape===8){ // Cinema: roof projector tower, bold marquee fins.
