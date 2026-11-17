@@ -47,21 +47,26 @@ function drawShops(){
   const pizzaGable=new THREE.ExtrudeGeometry(pizzaRoofShape,{depth:1,bevelEnabled:false});pizzaGable.translate(0,0,-.5);
   // Keep the exact triangle order while using the indexed instancing path.
   pizzaGable.setIndex(Array.from({length:pizzaGable.attributes.position.count},(_,index)=>index));
+  const readingRafterShape=new THREE.Shape();
+  readingRafterShape.moveTo(-.5,-.5);readingRafterShape.lineTo(0,.5);readingRafterShape.lineTo(.5,-.5);
+  readingRafterShape.lineTo(.48,-.5);readingRafterShape.lineTo(0,.42);readingRafterShape.lineTo(-.48,-.5);readingRafterShape.closePath();
+  const readingRafter=new THREE.ExtrudeGeometry(readingRafterShape,{depth:1,bevelEnabled:false});readingRafter.translate(0,0,-.5);
+  readingRafter.setIndex(Array.from({length:readingRafter.attributes.position.count},(_,index)=>index));
   const furnitureSoft=new THREE.SphereGeometry(.5,8,6);
   const structuralKinds=new Set(['evolutionSignatureHall','evolutionSignatureHallWindow','evolutionSignatureHallSide','evolutionEntranceCanopy','evolutionEntranceColumn','evolutionUpperWindow','evolutionSideWindow','evolutionRoofTerrace','evolutionTerraceRail','evolutionTerraceSideRail','evolutionTerracePavilion','evolutionTerracePavilionPost','evolutionGrandEntrance','evolutionGrandPier','cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeMark','tradeRound','tradeDress','tradeSculpt','tradeBar','shopPaving','shopUpperBody','shopUpperGlass','shopUpperCap','body','roof','hotelRoof','cinemaRoof',
       'garageRoof','superRoof','displayGlass','entryDoor','entryDoorGlass',
       'signFascia','signInset','garageGate','cinemaParapet','hotelUpperWindow']);
-  for(const kind of ['libraryGardenDeck','libraryGardenRoof','libraryGardenGlass','libraryGardenBeam','libraryGardenPost','libraryGardenRidge','gymTrainingPost','gymTrainingBeam','gymTrainingSlat','gymPoolDeck','gymPoolBasin','gymPoolWater','gymTreadmillBase','cinemaPremiereCanopy','cinemaPremiereColumn','cinemaPremiereFascia','cinemaPosterCase','cinemaPosterArtwork','cinemaTicketBooth','cinemaTicketGlass','hotelBalcony','hotelBalconyGlass','hotelBalconyRail','hotelBalconySideRail','hotelPoolBase','hotelPoolWater','hotelRoofGuard','hotelRoofGuardCap','marketServiceDoor','marketGable','marketHallPost','bakeryGable','workshopDaylightRoof','pharmacyWingRoof','fashionTerraceDeck','fashionBalustrade','superClerestory','libraryDome','libraryDrum','gymVault','pizzaGable','diningTerraceDeck','diningBalustrade','diningTerraceAwning'])structuralKinds.add(kind);
+  for(const kind of ['libraryGardenRafter','libraryGardenDeck','libraryGardenRoof','libraryGardenGlass','libraryGardenBeam','libraryGardenPost','libraryGardenRidge','gymTrainingPost','gymTrainingBeam','gymTrainingSlat','gymPoolDeck','gymPoolBasin','gymPoolWater','gymTreadmillBase','cinemaPremiereCanopy','cinemaPremiereColumn','cinemaPremiereFascia','cinemaPosterCase','cinemaPosterArtwork','cinemaTicketBooth','cinemaTicketGlass','hotelBalcony','hotelBalconyGlass','hotelBalconyRail','hotelBalconySideRail','hotelPoolBase','hotelPoolWater','hotelRoofGuard','hotelRoofGuardCap','marketServiceDoor','marketGable','marketHallPost','bakeryGable','workshopDaylightRoof','pharmacyWingRoof','fashionTerraceDeck','fashionBalustrade','superClerestory','libraryDome','libraryDrum','gymVault','pizzaGable','diningTerraceDeck','diningBalustrade','diningTerraceAwning'])structuralKinds.add(kind);
   function put(kind,color,shop,x,y,z,w,h,d){
     // Preserve low-cost architecture at all zoom levels. Decorative pieces
     // are spatially batched so only the visible nearby shops are detailed.
     const detailed=!structuralKinds.has(kind);
     const cx=shop?Math.floor(shop.x/90):0,cz=shop?Math.floor(shop.z/90):0;
-    const geometry=kind==='libraryGardenRoof'?pizzaGable:kind==='cinemaPosterMoon'?disc:kind==='cinemaSidePosterMoon'?bar:kind==='pizzaGable'||kind==='bakeryGable'||kind==='marketGable'?pizzaGable:kind==='libraryDome'||kind==='gymVault'?libraryDome:kind==='libraryDrum'?furnitureRound:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:
+    const geometry=kind==='libraryGardenRafter'?readingRafter:kind==='libraryGardenRoof'?pizzaGable:kind==='cinemaPosterMoon'?disc:kind==='cinemaSidePosterMoon'?bar:kind==='pizzaGable'||kind==='bakeryGable'||kind==='marketGable'?pizzaGable:kind==='libraryDome'||kind==='gymVault'?libraryDome:kind==='libraryDrum'?furnitureRound:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:
       kind==='shopRoundFurniture'?furnitureRound:(kind==='shopSoftFurniture'||kind==='shopUmbrellaCanopy')?furnitureSoft:
       kind==='tradeDress'||kind==='fashionShowroomDress'?dress:kind==='tradeSculpt'?sculpt:kind==='tradeBar'?bar:
       kind.startsWith('pizza')||kind==='tradeRound'?disc:box;
-    const casts=/^(libraryGardenDeck|libraryGardenRoof|libraryGardenBeam|libraryGardenPost|libraryReadingDesk|gymTrainingPost|gymTrainingBeam|gymTrainingSlat|gymPoolDeck|gymTreadmillBase|cinemaPremiereCanopy|cinemaPremiereColumn|cinemaTicketBooth|hotelBalcony|hotelPoolBase|hotelSunbedFrame|marketServiceDoor|marketGable|marketHallPost|bakeryGable|workshopDaylightRoof|pharmacyWingRoof|fashionTerraceDeck|fashionBalustrade|superClerestory|body|libraryDome|libraryDrum|gymVault|pizzaGable|diningTerraceDeck|diningBalustrade|diningTerraceAwning|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof|evolutionSignatureHall|evolutionEntranceCanopy|evolutionEntranceColumn|evolutionRoofTerrace|evolutionTerracePavilion|evolutionGrandEntrance|evolutionGrandPier|shopForecourtDetail|shopRoundFurniture|shopUmbrellaCanopy)$/.test(kind)&&kind!=='libraryGardenRoof';
+    const casts=/^(libraryGardenRafter|libraryGardenDeck|libraryGardenRoof|libraryGardenBeam|libraryGardenPost|libraryReadingDesk|gymTrainingPost|gymTrainingBeam|gymTrainingSlat|gymPoolDeck|gymTreadmillBase|cinemaPremiereCanopy|cinemaPremiereColumn|cinemaTicketBooth|hotelBalcony|hotelPoolBase|hotelSunbedFrame|marketServiceDoor|marketGable|marketHallPost|bakeryGable|workshopDaylightRoof|pharmacyWingRoof|fashionTerraceDeck|fashionBalustrade|superClerestory|body|libraryDome|libraryDrum|gymVault|pizzaGable|diningTerraceDeck|diningBalustrade|diningTerraceAwning|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof|evolutionSignatureHall|evolutionEntranceCanopy|evolutionEntranceColumn|evolutionRoofTerrace|evolutionTerracePavilion|evolutionGrandEntrance|evolutionGrandPier|shopForecourtDetail|shopRoundFurniture|shopUmbrellaCanopy)$/.test(kind)&&kind!=='libraryGardenRoof';
     const receives=casts||kind==='shopPaving';
     const glow=kind==='cinemaPremiumBulb',clearGlass=kind==='libraryGardenGlass'||kind==='libraryGardenRoof';
     const key=[geometry.id,casts,receives,detailed?cx:'all',detailed?cz:'all',glow,clearGlass].join(':');
@@ -169,6 +174,7 @@ function drawShops(){
         part('libraryGardenDeck',0xd9c9aa,0,.14,roomZ,roomW+.70,.32,5.30);
         part('libraryGardenRoof',0x93c4c8,0,3.40,roomZ,roomW+.24,.80,4.94);
         part('libraryGardenRidge',trim,0,3.83,roomZ,.14,.12,5.02);
+        for(const bay of [-1,0,1])part('libraryGardenRafter',trim,0,3.40,roomZ+bay*2.35,roomW+.24,.80,.14);
         for(const side of [-1,1]){
           const edge=side*roomW/2;
           part('libraryGardenGlass',glass,edge,1.68,roomZ,.10,2.46,4.70);
