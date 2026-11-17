@@ -4891,7 +4891,7 @@ function* renderHouseStages(selected){
       const height=levels*storeyHeight+1.8,x=h.x,z=h.z;
       // No parcel decorations: landscaping unlocks at one point.
       place('towerBase',boxGeo,wall,h,x,height/2,z,footW,height,footD);
-      if(tier===3){
+      if(tier===3&&!premium){
         // Small apartment blocks keep tile roofs. Towers have open roof terraces.
         place('apartmentTiledRoof',roofGeo,trim,h,x,height-.04,z,
           (footW+.42)/2,Math.max(1.35,footW*.15),(footD+.42)/2);
@@ -4964,7 +4964,7 @@ function* renderHouseStages(selected){
         const bx=x+footW*.24,bz=z+footD*.24,by=height+.95;
         const bbqColors=[0xc69d7a,0x66747a,0xb77750,0xa5b2b5];
         const c=bbqColors[v];
-        place('roofBBQPad',boxGeo,0xd9d1be,h,bx,by-.16,bz,2.55,.18,2.15);
+        place('roofBBQPad',boxGeo,0xd9d1be,h,bx,by-.26,bz,2.55,.40,2.15);
         if(v===0){ // tall brick barbecue with extraction hood
           place('roofBBQBrick',boxGeo,c,h,bx,by+.42,bz,1.52,.96,.94);
           place('roofBBQOpening',boxGeo,0x35373a,h,bx,by+.61,bz+.49,1.03,.43,.07);
@@ -4996,7 +4996,7 @@ function* renderHouseStages(selected){
         const edge=[0xf4e4c8,0xe5ece9,0xd9c6a2,0xf1f0e7][v];
         // A single compact terrace, fully above the roof surface.
         const pw=Math.min(8.4,footW*.52),pd=Math.min(7.2,footD*.37);
-        place('poolRoofDeck',boxGeo,0xded9cb,h,px,py-.21,pz,pw+.46,.20,pd+.46);
+        place('poolRoofDeck',boxGeo,0xded9cb,h,px,py-.29,pz,pw+.46,.38,pd+.46);
         if(v===1||v===3){
           // oval pool vs round plunge pool: two distinct proportions
           const ow=v===1?pw*.86:Math.min(pw,pd)*.91;
@@ -5021,14 +5021,17 @@ function* renderHouseStages(selected){
       // One instanced window strip per floor, visible on front and rear.
       for(let floor=0;floor<levels;floor++){
         const wy=1.6+floor*storeyHeight;
+        const balconyDoor=premium&&floor>0&&floor%2===1;
+        const openingY=balconyDoor?floor*storeyHeight+1.50:wy;
+        const openingHeight=balconyDoor?2.20:1.15;
         for(const side of [-1,1]){
           const wx=x+side*footW*.26, width=footW*.24;
           for(const face of [-1,1]){
             const wz=z+face*(footD/2+.055);
-            place('towerWindowFrame',boxGeo,0xf0dfc8,h,wx,wy,wz,width+.22,1.33,.12);
-            place('towerWindow',boxGeo,0x39738f,h,wx,wy,wz+face*.075,width,1.15,.075);
-            place('towerWindowMullion',boxGeo,0xe5d7c5,h,wx,wy,wz+face*.12,.065,1.15,.045);
-            place('towerWindowSill',boxGeo,0xf0dfc8,h,wx,wy-.67,wz+face*.13,width+.37,.12,.34);
+            place('towerWindowFrame',boxGeo,0xf0dfc8,h,wx,openingY,wz,width+.22,balconyDoor?2.38:1.33,.12);
+            place('towerWindow',boxGeo,0x39738f,h,wx,openingY,wz+face*.075,width,openingHeight,.075);
+            place('towerWindowMullion',boxGeo,0xe5d7c5,h,wx,openingY,wz+face*.12,.065,openingHeight,.045);
+            place('towerWindowSill',boxGeo,0xf0dfc8,h,wx,balconyDoor?floor*storeyHeight+.42:wy-.67,wz+face*.13,width+.37,.12,.34);
           }
         }
         if(premium&&floor>0&&floor%3===0){
@@ -5055,11 +5058,23 @@ function* renderHouseStages(selected){
       }
       place('towerDoor',boxGeo,0x66564d,h,x,1.05,z+footD/2+.12,1.6,2.1,.16);
       if(premium){
-        // Balconies are recessed within the parcel's free margin.
-        for(let floor=1;floor<Math.min(levels,12);floor+=2){
-          const by=floor*storeyHeight+.3;
-          place('premiumTowerBalcony',boxGeo,0xb9c7bf,h,x,by,z+footD/2+.24,footW*.50,.18,.38);
-          place('premiumTowerRail',boxGeo,0x53777d,h,x,by+.42,z+footD/2+.41,footW*.50,.66,.07);
+        // Usable balconies articulate both elevations, through the full tower height.
+        const balconyStone=coordinatedHouseColor(wall,0xffefd4,.32);
+        for(let floor=1;floor<levels;floor+=2){
+          const by=floor*storeyHeight+.30,balconyWidth=footW*.80;
+          for(const face of [-1,1]){
+            const facade=z+face*footD/2,edge=facade+face*1.29;
+            place('premiumTowerBalconySlab',boxGeo,balconyStone,h,x,by,facade+face*.64,balconyWidth,.18,1.35);
+            place('premiumTowerBalconyGlass',boxGeo,0x679bad,h,x,by+.62,edge,balconyWidth,.84,.07);
+            place('premiumTowerBalconyCap',boxGeo,trim,h,x,by+1.12,edge,balconyWidth+.08,.08,.12);
+            place('premiumTowerBalconyBottom',boxGeo,trim,h,x,by+.16,edge,balconyWidth,.12,.11);
+            for(const side of [-1,1]){
+              const bx=x+side*balconyWidth/2;
+              place('premiumTowerBalconySideGlass',boxGeo,0x679bad,h,bx,by+.62,facade+face*.64,.07,.84,1.27);
+              place('premiumTowerBalconySideCap',boxGeo,trim,h,bx,by+1.12,facade+face*.64,.12,.08,1.35);
+            }
+            for(const bay of [-.5,0,.5])place('premiumTowerBalconyPost',boxGeo,trim,h,x+bay*balconyWidth,by+.59,edge,.09,1.00,.12);
+          }
         }
       }
       continue;
@@ -5164,24 +5179,21 @@ function* renderHouseStages(selected){
       // pavilion was pushed through the main facade and produced a roof
       // intersecting the house, with windows embedded in its geometry.
       // Premium distinction comes from the veranda, pilasters and dormer.
-      place('premiumVerandaFloor',boxGeo,plinth,h,x,.13,z+depth/2+.62,
-        Math.min(4.3,width*.42),.22,1.00);
-      for(const side of [-1,1])
-        place('premiumVerandaPost',boxGeo,stone,h,x+side*1.65,1.29,
-          z+depth/2+.72,.16,2.3,.16);
-      place('premiumVerandaRoof',roofGeo,roof,h,x,2.56,z+depth/2+.51,
-        2.1,.48,.68);
+      const verandaWidth=coreW*.86;
+      place('premiumVerandaFloor',boxGeo,plinth,h,x,.13,z+depth/2+.85,verandaWidth,.22,1.80);
+      for(const side of [-1,1])place('premiumVerandaPost',boxGeo,stone,h,x+side*verandaWidth*.44,1.28,z+depth/2+1.50,.18,2.56,.18);
+      place('premiumVerandaRoof',roofGeo,roof,h,x,2.56,z+depth/2+.85,coreW*.41,.48,1.00);
       place('premiumChimney',boxGeo,0xa47765,h,x-width*.18,height+.85,
         z-depth*.12,.50,1.60,.50);
       // Do not add the former floating balcony/door assembly: it had no
       // coherent supporting facade and covered the second-floor windows.
       // Dormer is visible from above even on the first evolution.
-      place('premiumDormer',boxGeo,lightTrim,h,x+coreW*.18,height+.45,
-        z+coreZ+coreD*.10,1.10,.72,.85);
-      place('premiumDormerTop',roofGeo,roof,h,x+coreW*.18,height+.85,
-        z+coreZ+coreD*.10,.65,.30,.52);
-      place('premiumDormerGlass',boxGeo,0x86c7d7,h,x+coreW*.18,height+.48,
-        z+coreZ+coreD*.10+.45,.56,.45,.08);
+      const dormerX=coreW*.18,dormerZ=z+coreZ+coreD*.10;
+      const dormerSurface=roofBase+roofRise*(1-dormerX/roofHalf);
+      place('premiumDormer',boxGeo,lightTrim,h,x+dormerX,dormerSurface+.32,dormerZ,.90,.72,1.10);
+      place('premiumDormerTop',roofGeo,roof,h,x+dormerX,dormerSurface+.68,dormerZ,.65,.32,.56,Math.PI/2);
+      place('premiumDormerGlass',boxGeo,0x86c7d7,h,x+dormerX+.49,dormerSurface+.32,dormerZ,.08,.45,.70);
+
     }
     // v6.2: Architectural geometry, not just a brighter lighting preset.
     // Every addition is instanced and attached to the original house, so
@@ -5319,14 +5331,18 @@ function* renderHouseStages(selected){
     const normalStrength=/(roof|gable|hip)/i.test(key)?.88:.56;
     const roughness=/(window|glass|mullion)/i.test(key)?.26:/roof/i.test(key)?.79:.87;
     const metalness=/(mullion|sconce|handle)/i.test(key)?.48:.02;
-    const casts=/(gardenTree|towerBase|towerRoof|towerMain|towerMid|homeMain|homeWing|homeRoof|homeCore|homeWall|towerWall|towerBody|mainBody|wingBody|mainRoof|gable|hipRoof)/i.test(key);
+    const casts=/(premiumVerandaRoof|premiumDormerTop|premiumChimney|premiumTowerBalconySlab|gardenTree|towerBase|towerRoof|towerMain|towerMid|homeMain|homeWing|homeRoof|homeCore|homeWall|towerWall|towerBody|mainBody|wingBody|mainRoof|gable|hipRoof)/i.test(key);
     const receives=casts||/(facade|pier|window|door|balcony|pilaster)/i.test(key);
-    const profile=[batch.geo.id,texture,normalStrength,roughness,metalness,casts,receives].join(':');
+    const premiumDetail=/^premiumTowerBalcony(Post|Bottom|SideCap)_/.test(key);
+    const profile=[batch.geo.id,texture,normalStrength,roughness,metalness,casts,receives].join(':')+(premiumDetail?':premiumDetail':'');
     for(const entry of batch.entries){
       // Dense cities cull whole neighborhoods instead of submitting every house.
-      const key=spatialBatches?profile+':'+Math.floor(entry.h.x/368)+':'+Math.floor(entry.h.z/368):profile;
+      const span=premiumDetail?120:368;
+      const key=spatialBatches||premiumDetail?profile+':'+Math.floor(entry.h.x/span)+':'+Math.floor(entry.h.z/span):profile;
       if(!renderBatches.has(key))renderBatches.set(key,{
-        profile,geo:batch.geo,texture,normalStrength,roughness,metalness,casts,receives,entries:[]
+        profile,geo:batch.geo,texture,normalStrength,roughness,metalness,casts,receives,premiumDetail,
+        originX:premiumDetail?(Math.floor(entry.h.x/span)+.5)*span:0,
+        originZ:premiumDetail?(Math.floor(entry.h.z/span)+.5)*span:0,entries:[]
       });
       // Placements are already complete. Reuse them rather than cloning every
       // window, roof tile and trim piece into a second temporary object graph.
@@ -5352,12 +5368,19 @@ function* renderHouseStages(selected){
     mesh.userData.homes=batch.entries.map(e=>e.h);
     for(let i=0;i<batch.entries.length;i++){
       if(i>0&&i%2048===0)yield;
-      const e=batch.entries[i];dummy.position.set(e.x,e.y,e.z);
+      const e=batch.entries[i];dummy.position.set(e.x-batch.originX,e.y,e.z-batch.originZ);
       let rotation=placementRotations.get(e.rotation);
       if(!rotation){rotation=new THREE.Quaternion().setFromEuler(placementEuler.set(0,e.rotation,0));placementRotations.set(e.rotation,rotation);}
       dummy.scale.set(e.w,e.height,e.d);dummy.matrix.compose(dummy.position,rotation,dummy.scale);mesh.setMatrixAt(i,dummy.matrix); mesh.setColorAt(i,tint.setHex(e.color));
     }
-    mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();group.add(mesh);
+    mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();
+    if(batch.premiumDetail){
+      // Rails and posts are subpixel in distant panoramas. Keep the slab,
+      // glass and front cap at every distance, restoring fine metalwork nearby.
+      const lod=new THREE.LOD();lod.name='premium-balcony-detail';
+      lod.position.set(batch.originX,0,batch.originZ);
+      lod.addLevel(mesh,0);lod.addLevel(new THREE.Group(),480,.12);group.add(lod);
+    }else group.add(mesh);
     if(batch.entries[0].h)houseMeshes.push(mesh);
   }
   if(selected.length){

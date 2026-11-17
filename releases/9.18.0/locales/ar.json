@@ -1,0 +1,1036 @@
+{
+  "locale": "ar",
+  "name": "العربية",
+  "reviewStatus": "verified",
+  "messages": {
+    "Esplora il mondo": "استكشف العالم",
+    "Scegli una città": "اختر مدينة",
+    "Cerca utente Instagram": "ابحث عن مستخدم إنستغرام",
+    "Cerca": "بحث",
+    "Nome utente": "اسم المستخدم",
+    "@nomeutente": "@اسم_المستخدم",
+    "case nella città": "منازل في المدينة",
+    "La città cresce": "المدينة تنمو",
+    "Ingrandisci la mappa per scoprire le città e avvicinarti ai loro quartieri.": "كبّر الخريطة لاكتشاف المدن واستكشاف أحيائها.",
+    "Un mondo virtuale di città da esplorare, una casa alla volta.": "عالم افتراضي من المدن لاستكشافه، منزلًا بعد منزل.",
+    "Un luogo, tante storie": "مكان واحد، وقصص كثيرة",
+    "Benvenuto, esploratore.": "أهلًا بك أيها المستكشف.",
+    "Carichiamo il mondo e le sue città.": "جارٍ تحميل العالم ومدنه.",
+    "Una casa alla volta, il mondo prende vita.": "منزلًا بعد منزل، تدب الحياة في العالم.",
+    "La tua città prende forma.": "مدينتك تتشكّل.",
+    "Prepariamo edifici, strade e paesaggio.": "جارٍ تجهيز المباني والطرق والمناظر الطبيعية.",
+    "La città si rinnova.": "المدينة تتجدّد.",
+    "Aggiorniamo edifici, dettagli e abitanti.": "جارٍ تحديث المباني والتفاصيل والسكان.",
+    "Una città sempre più viva.": "مدينة تنبض بالحياة.",
+    "Prepariamo le case e i servizi per i suoi abitanti.": "جارٍ تجهيز المنازل والخدمات لسكان المدينة.",
+    "Il mondo continua, intorno a te.": "العالم يمتد من حولك.",
+    "Prepariamo le città vicine, le strade e il paesaggio.": "جارٍ تجهيز المدن القريبة والطرق والمناظر الطبيعية.",
+    "Esploriamo nuovi luoghi.": "نستكشف أماكن جديدة.",
+    "Carichiamo le località della regione.": "جارٍ تحميل الأماكن في المنطقة.",
+    "Prepariamo le località e la mappa della regione.": "جارٍ تجهيز الأماكن وخريطة المنطقة.",
+    "Caricamento in corso": "جارٍ التحميل",
+    "Non è stato possibile completare il caricamento. Puoi riprovare.": "تعذّر إكمال التحميل. يمكنك المحاولة مجددًا.",
+    "Motore 3D non caricato. Verifica Internet e ricarica.": "تعذّر تحميل المحرك ثلاثي الأبعاد. تحقّق من اتصالك بالإنترنت وأعد تحميل الصفحة.",
+    "Continente": "القارة",
+    "Paese o territorio": "الدولة أو الإقليم",
+    "Cerca una località": "ابحث عن مكان",
+    "Nome città o regione": "اسم المدينة أو المنطقة",
+    "Tutti i continenti": "كل القارات",
+    "Antartide": "القارة القطبية الجنوبية",
+    "Europa": "أوروبا",
+    "America del Nord e centrale": "أمريكا الشمالية والوسطى",
+    "America del Sud": "أمريكا الجنوبية",
+    "🌐 Vedi tutto il mondo": "🌐 عرض العالم كله",
+    "Seleziona una città…": "اختر مدينة…",
+    "Caricamento delle località…": "جارٍ تحميل الأماكن…",
+    "Nessuna località trovata in questo paese": "لم يُعثر على أماكن في هذه الدولة",
+    "Catalogo non caricato. Controlla la connessione e riseleziona il paese.": "تعذّر تحميل الدليل. تحقّق من اتصالك وأعد اختيار الدولة.",
+    "Vai alla città selezionata": "انتقل إلى المدينة المختارة",
+    "Entra nel 3D": "افتح العرض ثلاثي الأبعاد",
+    "Torna alla mappa": "العودة إلى الخريطة",
+    "Controlli 3D": "أدوات العرض ثلاثي الأبعاد",
+    "↻ Ruota": "↻ تدوير",
+    "✥ Sposta": "✥ تحريك",
+    "⌂ Centro": "⌂ توسيط",
+    "⛶ Vista ampia": "⛶ عرض موسّع",
+    "☰ Comandi": "☰ أدوات التحكم",
+    "Orienta a nord": "التوجيه نحو الشمال",
+    "Alterna vista dall’alto e inclinata": "التبديل بين العرض العلوي والمائل",
+    "Avvicina": "تكبير",
+    "Allontana": "تصغير",
+    "Ruota e inclina la visuale": "تدوير زاوية الرؤية وإمالتها",
+    "Sposta la visuale": "تحريك زاوية الرؤية",
+    "🏙 Città vicine": "🏙 المدن القريبة",
+    "Città vicine": "المدن القريبة",
+    "Avvicinati alle città collegate": "اقترب من المدن المتصلة",
+    "Nessuna città collegata visibile in questa zona. Puoi cercare altre località nella mappa.": "لا تظهر مدن متصلة في هذه المنطقة. يمكنك البحث عن أماكن أخرى على الخريطة.",
+    "Mappa geografica · le città sono posizionate con coordinate reali": "خريطة جغرافية · المدن موزّعة وفق إحداثياتها الحقيقية",
+    "Un mondo. Milioni di storie. Una casa per ognuno.": "عالم واحد. ملايين القصص. منزل لكل شخص.",
+    "🌎 Città selezionata:": "🌎 المدينة المختارة:",
+    "Tienda": "المتجر",
+    "Attività": "الأنشطة التجارية",
+    "La mia casa": "منزلي",
+    "Personaggio": "الشخصية",
+    "Il mio personaggio": "شخصيتي",
+    "Mondo": "العالم",
+    "Ranking": "الترتيب",
+    "Trova": "اعثر",
+    "Obras": "المرافق العامة",
+    "Opere": "المرافق العامة",
+    "Menu mondo": "قائمة العالم",
+    "Chiudi": "إغلاق",
+    "Casa": "منزل",
+    "Negozio": "نشاط تجاري",
+    "Mongolfiera": "منطاد",
+    "Scopri le attività della città e le loro evoluzioni.": "اكتشف الأنشطة التجارية في المدينة ومراحل تطورها.",
+    "🏪 Esplora le attività": "🏪 استكشف الأنشطة التجارية",
+    "Cerca il tuo nome utente per trovare la casa, il personaggio e le proprietà collegate.": "ابحث عن اسم المستخدم الخاص بك للعثور على منزلك وشخصيتك والممتلكات المرتبطة بك.",
+    "Trova nella città": "اعثر داخل المدينة",
+    "🌎 Entra nel 3D": "🌎 افتح العرض ثلاثي الأبعاد",
+    "🧭 Panoramica": "🧭 نظرة عامة",
+    "Animazioni ambientali": "حركة عناصر البيئة",
+    "Strutture e obiettivi": "المرافق والأهداف",
+    "Ricostruzione 3D stilizzata: la planimetria e gli elementi documentati sono affiancati da arredi di integrazione.": "إعادة بناء ثلاثية الأبعاد بأسلوب مبسّط: يُستكمل المخطط والعناصر الموثّقة بتجهيزات إضافية.",
+    "Le fonti disponibili non descrivono ancora statue e fontane di questa piazza.": "لا تصف المصادر المتاحة حتى الآن التماثيل والنوافير في هذه الساحة.",
+    "Presenza mappata · forma 3D da completare": "عنصر موثّق على الخريطة · النموذج ثلاثي الأبعاد غير مكتمل",
+    "Riferimento documentato · modello 3D stilizzato": "مرجع موثّق · نموذج ثلاثي الأبعاد مبسّط",
+    "Tipologia mappata · modello 3D da verificare nei dettagli": "نوع موثّق على الخريطة · تفاصيل النموذج ثلاثي الأبعاد تحتاج إلى التحقّق",
+    "Fonte": "المصدر",
+    "Torna agli obiettivi": "العودة إلى الأهداف",
+    "Parco di quartiere": "حديقة الحي",
+    "Acquedotto e serbatoio": "قناة مياه وخزّان",
+    "Ambulatorio e pronto soccorso": "عيادة وقسم طوارئ",
+    "Stazione di polizia": "مركز الشرطة",
+    "Caserma dei pompieri": "مركز الإطفاء",
+    "Primi servizi": "الخدمات الأساسية",
+    "Asilo e area giochi": "حضانة ومنطقة ألعاب",
+    "Scuola primaria": "مدرسة ابتدائية",
+    "Centro raccolta e riciclo": "مركز جمع النفايات وإعادة التدوير",
+    "Campo da calcio": "ملعب كرة قدم",
+    "Biblioteca pubblica": "مكتبة عامة",
+    "Ospedale generale": "مستشفى عام",
+    "Municipio": "مبنى البلدية",
+    "Autostazione": "محطة حافلات",
+    "Centrale elettrica di quartiere": "محطة كهرباء الحي",
+    "Giardini e area giochi": "حدائق ومنطقة ألعاب",
+    "Centro commerciale": "مركز تجاري",
+    "Campo da baseball": "ملعب بيسبول",
+    "Centro sportivo": "مركز رياضي",
+    "Museo civico": "متحف المدينة",
+    "Teatro e auditorium": "مسرح وقاعة عروض",
+    "Piscina comunale": "مسبح بلدي",
+    "Stadio cittadino": "استاد المدينة",
+    "Università e campus": "جامعة وحرم جامعي",
+    "Stazione ferroviaria": "محطة قطارات",
+    "Palazzo di giustizia": "قصر العدل",
+    "Depuratore e servizi ambientali": "محطة معالجة مياه وخدمات بيئية",
+    "Piazza monumentale": "ساحة تذكارية",
+    "Eliporto di soccorso": "مهبط مروحيات إنقاذ",
+    "Orto botanico e serre": "حديقة نباتية وبيوت زجاجية",
+    "Servizi di quartiere": "خدمات الحي",
+    "Città in crescita": "مدينة نامية",
+    "Grande città": "مدينة كبرى",
+    "Strutture pubbliche": "المرافق العامة",
+    "Tutti gli edifici": "كل المباني",
+    "Case": "المنازل",
+    "Cerca edifici": "البحث عن مبانٍ",
+    "Nome, nickname o numero…": "الاسم أو اسم المستخدم أو الرقم…",
+    "Mostra altri risultati": "عرض المزيد من النتائج",
+    "📍 Raggiungi e apri": "📍 انتقل وافتح",
+    "Nessuna struttura trovata.": "لم يُعثر على أي مرفق.",
+    "Raggiunto": "تم تحقيقه",
+    "Caffetteria": "مقهى",
+    "Supermercato": "سوبرماركت",
+    "Ristorante": "مطعم",
+    "Libreria": "متجر كتب",
+    "Farmacia": "صيدلية",
+    "Negozio di moda": "متجر ملابس",
+    "Officina": "ورشة صيانة",
+    "Panetteria": "مخبز",
+    "Palestra": "نادي لياقة",
+    "Mercato": "سوق",
+    "PIAZZA CIVICA": "الساحة المدنية",
+    "PIAZZA PRINCIPALE": "الساحة الرئيسية",
+    "SERVIZI PUBBLICI": "الخدمات العامة",
+    "Monolocale": "شقة استوديو",
+    "Casa piccola": "منزل صغير",
+    "Villetta": "فيلا صغيرة",
+    "Palazzina": "مبنى سكني صغير",
+    "Condominio": "مبنى شقق",
+    "Torre residenziale": "برج سكني",
+    "Grattacielo": "ناطحة سحاب",
+    "Grattacielo monumentale": "ناطحة سحاب شاهقة",
+    "Crema": "كريمي",
+    "Bianco": "أبيض",
+    "Rosa": "وردي",
+    "Azzurro": "أزرق سماوي",
+    "Verde salvia": "أخضر مريمي",
+    "Ocra": "مغرة",
+    "Grigio": "رمادي",
+    "Gratis": "مجاني",
+    "Base": "عادي",
+    "Accesso proprietario": "دخول مالك الموقع",
+    "Accedi per aprire gli strumenti di simulazione.": "سجّل الدخول لفتح أدوات المحاكاة.",
+    "Ricevi link di accesso": "الحصول على رابط الدخول",
+    "Apri l’email ricevuta e premi il link di accesso. Il link è personale e utilizzabile una sola volta.": "افتح البريد الإلكتروني الذي وصلك واضغط على رابط الدخول. الرابط شخصي ولا يُستخدم إلا مرة واحدة.",
+    "Apri simulazione": "فتح المحاكاة",
+    "Torna alla vista pubblica": "العودة إلى العرض العام",
+    "Apri gli strumenti proprietario": "فتح أدوات مالك الموقع",
+    "Esci dal tuo account": "تسجيل الخروج",
+    "Vista pubblica ripristinata.": "تمت استعادة العرض العام.",
+    "Accedi nuovamente per continuare.": "سجّل الدخول مجددًا للمتابعة.",
+    "Strumenti riservati non disponibili.": "الأدوات الخاصة غير متاحة.",
+    "Il sito sta ancora terminando il caricamento.": "الموقع ما زال يُكمل التحميل.",
+    "Sei uscito. Il sito è tornato alla vista pubblica.": "تم تسجيل خروجك. عاد الموقع إلى العرض العام.",
+    "Accesso chiuso su questo dispositivo. Connessione al servizio non disponibile.": "أُغلقت الجلسة على هذا الجهاز. الاتصال بالخدمة غير متاح.",
+    "Troppe richieste. Attendi un minuto e riprova.": "الطلبات كثيرة جدًا. انتظر دقيقة ثم أعد المحاولة.",
+    "Accesso non disponibile. Controlla i dati e riprova.": "الدخول غير متاح. تحقّق من البيانات ثم أعد المحاولة.",
+    "Verifichiamo il tuo accesso.": "جارٍ التحقّق من دخولك.",
+    "Tra poco tornerai alla tua città.": "ستعود إلى مدينتك بعد قليل.",
+    "Il link non è valido oppure è già stato utilizzato. Richiedi un nuovo accesso.": "الرابط غير صالح أو استُخدم من قبل. اطلب رابط دخول جديدًا.",
+    "Questo account non è autorizzato ad aprire la simulazione.": "هذا الحساب غير مخوّل بفتح المحاكاة.",
+    "Torna al sito": "العودة إلى الموقع",
+    "🧪 Simulazione e test": "🧪 المحاكاة والاختبار",
+    "Le modifiche di prova restano in questa sessione. Torna alla vista pubblica per ripristinare la città.": "تبقى تغييرات الاختبار في هذه الجلسة فقط. عد إلى العرض العام لاستعادة المدينة.",
+    "👥 Abitanti simulati:": "👥 السكان في المحاكاة:",
+    "Numero di case simulate": "عدد المنازل في المحاكاة",
+    "Numero esatto di case": "العدد الدقيق للمنازل",
+    "Applica": "تطبيق",
+    "Sposta il cursore per scegliere. Rilascia per generare la città; oppure inserisci il numero esatto e premi Applica.": "حرّك شريط الاختيار ثم اتركه لإنشاء المدينة، أو أدخل العدد الدقيق واضغط على تطبيق.",
+    "🏗️ Evoluzione casa (demo)": "🏗️ تطور المنزل (تجريبي)",
+    "Clicca qualsiasi casa nel 3D per scegliere quale far evolvere: il lotto rimane fisso.": "اختر أي منزل في العرض ثلاثي الأبعاد لتطويره. تبقى قطعة الأرض في مكانها.",
+    "Attività di prova": "أنشطة تجارية للاختبار",
+    "+1 negozio": "+1 نشاط تجاري",
+    "+100 negozi": "+100 نشاط تجاري",
+    "Azzera negozi": "إزالة الأنشطة التجارية التجريبية",
+    "Lingua": "اللغة",
+    "Prepariamo la tua lingua.": "جارٍ تجهيز لغتك.",
+    "Aggiorniamo testi e cartelli della città.": "جارٍ تحديث نصوص المدينة ولافتاتها.",
+    "Lingua non disponibile. Controlla la connessione e riprova.": "تعذّر تحميل هذه اللغة. تحقّق من اتصالك ثم أعد المحاولة.",
+    "Classifica": "الترتيب",
+    "abitanti": "سكان",
+    "Negozi": "أنشطة تجارية",
+    "Email": "البريد الإلكتروني",
+    "Premium": "بريميوم",
+    "Hotel": "فندق",
+    "Cinema": "سينما",
+    "Africa": "أفريقيا",
+    "Asia": "آسيا",
+    "Oceania": "أوقيانوسيا",
+    "Terracotta": "طيني",
+    "Zoom in": "تكبير",
+    "Zoom out": "تصغير",
+    "A JavaScript library for interactive maps": "مكتبة للخرائط التفاعلية",
+    "Località:": "الأماكن:",
+    "· Terre: Natural Earth": "· اليابسة: ⁨Natural Earth⁩",
+    "· Terreno:": "· التضاريس:",
+    "Seleziona una città del mondo: ogni città ha case evolute, negozi e mongolfiere. Avvicinati per scoprire giardini, attività e piazze. Puoi ruotare, spostarti liberamente e selezionare le case.": "اختر مدينة لاستكشاف منازلها وأنشطتها التجارية ومناطيدها. اقترب لاكتشاف الحدائق والمتاجر والساحات. يمكنك تدوير الرؤية والتحرك بحرية واختيار المنازل.",
+    "Trascina per spostarti. Usa Ruota per inclinare la visuale. Su telefono allarga due dita per avvicinarti e chiudile per allontanarti. Tocca una casa, un’attività o una persona per aprire la sua scheda.": "اسحب للتحرك، واستخدم تدوير لإمالة الرؤية. على الهاتف، باعد بين إصبعين للتكبير وقرّبهما للتصغير. اضغط على منزل أو نشاط تجاري أو شخص لفتح تفاصيله.",
+    "Statue, fontane e dettagli della piazza": "التماثيل والنوافير وتفاصيل الساحة",
+    "Cerca una struttura…": "ابحث عن مرفق…",
+    "Cerca strutture pubbliche": "البحث عن مرافق عامة",
+    "IL TUO NEGOZIO": "نشاطك التجاري",
+    "PUÒ ESSERE QUI": "يمكن أن يكون هنا",
+    "PROSSIMA OPERA": "المرفق القادم",
+    "LA CITTÀ CRESCE": "المدينة تنمو",
+    "Scopri il traguardo": "اكتشف الهدف التالي",
+    "Scopri le attività": "اكتشف الأنشطة التجارية",
+    "PIAZZA DI QUARTIERE": "ساحة الحي",
+    "Cespuglio": "شجيرة",
+    "Sfera fiorita": "شجيرة مزهرة كروية",
+    "Arbusto a foglie": "شجيرة مورقة",
+    "Siepe compatta": "سياج نباتي كثيف",
+    "Cespuglio a tre chiome": "شجيرة بثلاث تيجان",
+    "Vialetto": "ممر حديقة",
+    "Pietra chiara": "حجر فاتح",
+    "Pietra scura": "حجر داكن",
+    "Cotto": "فخار",
+    "Lastre separate": "بلاطات منفصلة",
+    "Aiuola": "حوض زهور",
+    "Fiori misti": "زهور متنوعة",
+    "Rose rosse": "ورود حمراء",
+    "Margherite": "أقحوان",
+    "Lavanda": "خزامى",
+    "Lampioncino": "مصباح حديقة",
+    "Classico": "كلاسيكي",
+    "Globo": "كروي",
+    "Lanterna quadrata": "فانوس مربع",
+    "Paletto moderno": "مصباح عمودي حديث",
+    "Barbecue Premium": "شواية بريميوم",
+    "Muratura con cappa": "مبنية بالطوب مع مدخنة",
+    "Griglia con coperchio": "شواية بغطاء",
+    "Forno a legna": "فرن حطب",
+    "Cucina BBQ moderna": "مطبخ شواء حديث",
+    "Cassetta postale": "صندوق بريد",
+    "Rossa": "أحمر",
+    "Nera": "أسود",
+    "Casetta": "بيت صغير",
+    "Acciaio": "فولاذ",
+    "Recinzione": "سياج",
+    "Legno": "خشب",
+    "Ferro": "حديد",
+    "Siepe": "سياج نباتي",
+    "Muretto": "جدار منخفض",
+    "Piscina Premium": "مسبح بريميوم",
+    "Piscina classica": "مسبح كلاسيكي",
+    "Piscina ovale": "مسبح بيضاوي",
+    "Piscina sportiva": "مسبح رياضي",
+    "Piscina rotonda": "مسبح دائري",
+    "🌿 Giardino: non sbloccato": "🌿 الحديقة: لم تُفتح بعد",
+    "Scegli una città del mondo. Il puntatore della città rimane della stessa dimensione.": "اختر مدينة لبدء استكشاف العالم.",
+    "📍 Conegliano e dintorni · Veneto": "📍 ⁨Conegliano⁩ والمناطق المجاورة · ⁨Veneto⁩",
+    "Cerca città nel mondo": "البحث عن مدن حول العالم",
+    "N ↑": "N ↑",
+    "Evoluzione attività": "تطور النشاط التجاري",
+    "Design Premium (demo)": "تصميم بريميوم (تجريبي)",
+    "Applica evoluzione": "تطبيق التطور",
+    "🏗️ Evoluzione di questa casa (demo)": "🏗️ تطور هذا المنزل (تجريبي)",
+    "Scegli i punti e il design: cambia solo questa casa, senza spostare il lotto.": "اختر النقاط والتصميم. يتغير هذا المنزل وحده دون نقل قطعة الأرض.",
+    "Punti esatti per questa casa": "العدد الدقيق لنقاط هذا المنزل",
+    "Applica punti": "تطبيق النقاط",
+    "🎨 Design per questa evoluzione": "🎨 تصميم مرحلة التطور هذه",
+    "Gratis · Casa standard": "مجاني · منزل عادي",
+    "Abbonamento · Casa con balconi, camino e dettagli": "اشتراك · منزل بشرفات ومدخنة وتفاصيل",
+    "🎨 Colore della casa": "🎨 لون المنزل",
+    "🌿 Personalizza le decorazioni · 4 modelli per sblocco": "🌿 خصّص الزينة · 4 نماذج لكل عنصر يُفتح",
+    "Casa senza piante a 0 punti.": "المنزل بلا نباتات عند 0 نقطة.",
+    "4 piante con Premium": "4 نباتات مع بريميوم",
+    "2 piante con Gratis": "نباتان في النسخة المجانية",
+    "posizioni automatiche.": "توزيع تلقائي.",
+    "Simulazione dell’abbonamento: non viene effettuato alcun pagamento.": "محاكاة للاشتراك: لا تُجرى أي عملية دفع.",
+    "Acquisti dimostrativi: nessun pagamento reale.": "مشتريات تجريبية: لا توجد مدفوعات حقيقية.",
+    "🏪 Aggiungi negozio": "🏪 أضف نشاطًا تجاريًا",
+    "🎈 Aggiungi mongolfiera": "🎈 أضف منطادًا",
+    "📍 Vai alla mia casa": "📍 انتقل إلى منزلي",
+    "La personalizzazione della facciata sarà ampliata nelle prossime versioni.": "ستُضاف خيارات أكثر لتخصيص الواجهة في الإصدارات القادمة.",
+    "Colore della pelle": "لون البشرة",
+    "Vestiti": "الملابس",
+    "📍 Trova il mio personaggio": "📍 اعثر على شخصيتي",
+    "Personaggio non generato": "لم تُنشأ الشخصية",
+    "Pizzeria": "مطعم بيتزا",
+    "PIZZERIA": "مطعم بيتزا",
+    "Opera mappata": "عمل فني موثّق على الخريطة",
+    "Fontana mappata": "نافورة موثّقة على الخريطة",
+    "Prepariamo la città e i suoi dintorni.": "جارٍ تجهيز المدينة ومحيطها.",
+    "Design Premium (demo abbonamento)": "تصميم بريميوم (اشتراك تجريبي)",
+    "Design Gratis": "تصميم مجاني",
+    "San Martín anziano in abiti civili con mantello al vento, sopra base rocciosa con tre rilievi. Il monumento equestre appartiene al Parque San Martín, non a questa piazza.": "سان مارتين متقدمًا في السن بملابس مدنية وعباءة ترفرف، فوق قاعدة صخرية بثلاثة نقوش بارزة. يقع تمثاله على ظهر حصان في متنزه سان مارتين، وليس في هذه الساحة.",
+    "Giardino-calendario cartografato: aiuola floreale con anno corrente. Disegno delle fioriture interpretato, non un rilievo fotografico.": "حديقة تقويم موثّقة على الخريطة: حوض زهور يعرض السنة الحالية. ترتيب الزهور تفسير فني، وليس توثيقًا فوتوغرافيًا.",
+    "San Martín equestre, bronzo su basamento in granito con rilievi.": "تمثال برونزي لسان مارتين على ظهر حصان، فوق قاعدة من الغرانيت بنقوش بارزة.",
+    "Arenales a cavallo con quindici figure allegoriche alla base.": "أريناليس على ظهر حصان، وحول القاعدة خمس عشرة شخصية رمزية.",
+    "Libertà di Lola Mora, marmo di Carrara, panneggio e catene spezzate; nessuno scudo o cavallo.": "تمثال الحرية للولا مورا من رخام كارارا، مع طيات قماش وسلاسل مكسورة؛ من دون درع أو حصان.",
+    "Posizione: cartografia · orientamento e dettagli fini ancora da verificare": "الموقع: موثّق على الخريطة · الاتجاه والتفاصيل الدقيقة ما زالت تحتاج إلى التحقّق",
+    "Accesso proprietario · Casa por Casa": "دخول مالك الموقع · ⁨Casa por Casa⁩",
+    "PARCO DI QUARTIERE": "حديقة الحي",
+    "ACQUEDOTTO E SERBATOIO": "قناة مياه وخزّان",
+    "AMBULATORIO E PRONTO SOCCORSO": "عيادة وقسم طوارئ",
+    "STAZIONE DI POLIZIA": "مركز الشرطة",
+    "CASERMA DEI POMPIERI": "مركز الإطفاء",
+    "ASILO E AREA GIOCHI": "حضانة ومنطقة ألعاب",
+    "SCUOLA PRIMARIA": "مدرسة ابتدائية",
+    "CENTRO RACCOLTA E RICICLO": "مركز جمع النفايات وإعادة التدوير",
+    "CAMPO DA CALCIO": "ملعب كرة قدم",
+    "BIBLIOTECA PUBBLICA": "مكتبة عامة",
+    "OSPEDALE GENERALE": "مستشفى عام",
+    "MUNICIPIO": "مبنى البلدية",
+    "AUTOSTAZIONE": "محطة حافلات",
+    "CENTRALE ELETTRICA DI QUARTIERE": "محطة كهرباء الحي",
+    "GIARDINI E AREA GIOCHI": "حدائق ومنطقة ألعاب",
+    "CENTRO COMMERCIALE": "مركز تجاري",
+    "CAMPO DA BASEBALL": "ملعب بيسبول",
+    "CENTRO SPORTIVO": "مركز رياضي",
+    "MUSEO CIVICO": "متحف المدينة",
+    "TEATRO E AUDITORIUM": "مسرح وقاعة عروض",
+    "PISCINA COMUNALE": "مسبح بلدي",
+    "STADIO CITTADINO": "استاد المدينة",
+    "UNIVERSITÀ E CAMPUS": "جامعة وحرم جامعي",
+    "STAZIONE FERROVIARIA": "محطة قطارات",
+    "PALAZZO DI GIUSTIZIA": "قصر العدل",
+    "DEPURATORE E SERVIZI AMBIENTALI": "محطة معالجة مياه وخدمات بيئية",
+    "PIAZZA MONUMENTALE": "ساحة تذكارية",
+    "ELIPORTO DI SOCCORSO": "مهبط مروحيات إنقاذ",
+    "ORTO BOTANICO E SERRE": "حديقة نباتية وبيوت زجاجية",
+    "CAFFETTERIA": "مقهى",
+    "SUPERMERCATO": "سوبرماركت",
+    "RISTORANTE": "مطعم",
+    "LIBRERIA": "متجر كتب",
+    "FARMACIA": "صيدلية",
+    "NEGOZIO DI MODA": "متجر ملابس",
+    "OFFICINA": "ورشة صيانة",
+    "PANETTERIA": "مخبز",
+    "CINEMA": "سينما",
+    "PALESTRA": "نادي لياقة",
+    "HOTEL": "فندق",
+    "MERCATO": "سوق",
+    "Alcuni elementi della città non sono stati caricati. Puoi riprovare.": "تعذّر تحميل بعض عناصر المدينة. يمكنك المحاولة مجددًا."
+  },
+  "templates": [
+    {
+      "source": "{count} risultati",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "zero": "{count} نتائج",
+          "one": "{count} نتيجة",
+          "two": "نتيجتان ({count})",
+          "few": "{count} نتائج",
+          "many": "{count} نتيجة",
+          "other": "{count} نتيجة"
+        }
+      }
+    },
+    {
+      "source": "{city} · {count} case · {shops} attività",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "zero": "{count} منازل",
+            "one": "{count} منزل",
+            "two": "منزلان ({count})",
+            "few": "{count} منازل",
+            "many": "{count} منزلًا",
+            "other": "{count} منزل"
+          }
+        },
+        " · ",
+        {
+          "plural": "shops",
+          "forms": {
+            "zero": "{shops} أنشطة تجارية",
+            "one": "{shops} نشاط تجاري",
+            "two": "نشاطان تجاريان ({shops})",
+            "few": "{shops} أنشطة تجارية",
+            "many": "{shops} نشاطًا تجاريًا",
+            "other": "{shops} نشاط تجاري"
+          }
+        }
+      ]
+    },
+    {
+      "source": "Casa · {city}",
+      "target": "منزل · {city}"
+    },
+    {
+      "source": "🌿 Giardino: {plant} · {count} piante",
+      "target": [
+        "🌿 الحديقة: {plant} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "zero": "{count} نباتات",
+            "one": "{count} نبات",
+            "two": "نباتان ({count})",
+            "few": "{count} نباتات",
+            "many": "{count} نباتًا",
+            "other": "{count} نبات"
+          }
+        }
+      ],
+      "translateSlots": [
+        "plant"
+      ]
+    },
+    {
+      "source": "🎨 Colore: {color}",
+      "target": "🎨 اللون: {color}",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "🏗️ {tier} · {floors} piani",
+      "target": [
+        "🏗️ {tier} · ",
+        {
+          "plural": "floors",
+          "forms": {
+            "zero": "{floors} طوابق",
+            "one": "{floors} طابق",
+            "two": "طابقان ({floors})",
+            "few": "{floors} طوابق",
+            "many": "{floors} طابقًا",
+            "other": "{floors} طابق"
+          }
+        }
+      ],
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "🎨 Design: {design}",
+      "target": "🎨 التصميم: {design}",
+      "translateSlots": [
+        "design"
+      ]
+    },
+    {
+      "source": "⭐ {points} punti",
+      "target": [
+        "⭐ ",
+        {
+          "plural": "points",
+          "forms": {
+            "zero": "{points} نقاط",
+            "one": "{points} نقطة",
+            "two": "نقطتان ({points})",
+            "few": "{points} نقاط",
+            "many": "{points} نقطة",
+            "other": "{points} نقطة"
+          }
+        }
+      ]
+    },
+    {
+      "source": "{count} case mancanti",
+      "target": [
+        "المطلوب أيضًا: ",
+        {
+          "plural": "count",
+          "forms": {
+            "zero": "{count} منازل",
+            "one": "{count} منزل",
+            "two": "منزلان ({count})",
+            "few": "{count} منازل",
+            "many": "{count} منزلًا",
+            "other": "{count} منزل"
+          }
+        }
+      ]
+    },
+    {
+      "source": "{version} · Edizione mondiale",
+      "target": "{version} · الإصدار العالمي"
+    },
+    {
+      "source": "Prossima fermata: {city}.",
+      "target": "المحطة التالية: {city}."
+    },
+    {
+      "source": "{city} · {count} case · {shops} negozi · {facilities} strutture pubbliche",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "zero": "{count} منازل",
+            "one": "{count} منزل",
+            "two": "منزلان ({count})",
+            "few": "{count} منازل",
+            "many": "{count} منزلًا",
+            "other": "{count} منزل"
+          }
+        },
+        " · ",
+        {
+          "plural": "shops",
+          "forms": {
+            "zero": "{shops} أنشطة تجارية",
+            "one": "{shops} نشاط تجاري",
+            "two": "نشاطان تجاريان ({shops})",
+            "few": "{shops} أنشطة تجارية",
+            "many": "{shops} نشاطًا تجاريًا",
+            "other": "{shops} نشاط تجاري"
+          }
+        },
+        " · ",
+        {
+          "plural": "facilities",
+          "forms": {
+            "zero": "{facilities} مرافق عامة",
+            "one": "{facilities} مرفق عام",
+            "two": "مرفقان عامان ({facilities})",
+            "few": "{facilities} مرافق عامة",
+            "many": "{facilities} مرفقًا عامًا",
+            "other": "{facilities} مرفق عام"
+          }
+        }
+      ]
+    },
+    {
+      "source": "{city} · città raggiunta · {count} case",
+      "target": [
+        "{city} · تم الوصول إلى الوجهة · ",
+        {
+          "plural": "count",
+          "forms": {
+            "zero": "{count} منازل",
+            "one": "{count} منزل",
+            "two": "منزلان ({count})",
+            "few": "{count} منازل",
+            "many": "{count} منزلًا",
+            "other": "{count} منزل"
+          }
+        }
+      ]
+    },
+    {
+      "source": "{city} · {count} case · scegli Entra nel 3D",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "zero": "{count} منازل",
+            "one": "{count} منزل",
+            "two": "منزلان ({count})",
+            "few": "{count} منازل",
+            "many": "{count} منزلًا",
+            "other": "{count} منزل"
+          }
+        },
+        " · اختر افتح العرض ثلاثي الأبعاد"
+      ]
+    },
+    {
+      "source": "{count} risultati mostrati · scrivi per restringere la ricerca",
+      "target": [
+        "النتائج المعروضة: ",
+        {
+          "plural": "count",
+          "forms": {
+            "zero": "{count} نتائج",
+            "one": "{count} نتيجة",
+            "two": "نتيجتان ({count})",
+            "few": "{count} نتائج",
+            "many": "{count} نتيجة",
+            "other": "{count} نتيجة"
+          }
+        },
+        " · اكتب لتضييق البحث"
+      ]
+    },
+    {
+      "source": "{count} risultati mostrati",
+      "target": [
+        "النتائج المعروضة: ",
+        {
+          "plural": "count",
+          "forms": {
+            "zero": "{count} نتائج",
+            "one": "{count} نتيجة",
+            "two": "نتيجتان ({count})",
+            "few": "{count} نتائج",
+            "many": "{count} نتيجة",
+            "other": "{count} نتيجة"
+          }
+        }
+      ]
+    },
+    {
+      "source": "Utente non presente in {city}",
+      "target": "لم يُعثر على المستخدم في {city}"
+    },
+    {
+      "source": "Esplora {city} con la telecamera libera.",
+      "target": "استكشف {city} بالكاميرا الحرة."
+    },
+    {
+      "source": "🏠 Casa #{id} · @{user}",
+      "target": "🏠 المنزل رقم {id} · @{user}"
+    },
+    {
+      "source": "🏠 Casa #{id}",
+      "target": "🏠 المنزل رقم {id}"
+    },
+    {
+      "source": "Casa #{id}",
+      "target": "المنزل رقم {id}"
+    },
+    {
+      "source": "{points} punti",
+      "target": {
+        "plural": "points",
+        "forms": {
+          "zero": "{points} نقاط",
+          "one": "{points} نقطة",
+          "two": "نقطتان ({points})",
+          "few": "{points} نقاط",
+          "many": "{points} نقطة",
+          "other": "{points} نقطة"
+        }
+      }
+    },
+    {
+      "source": "{count} case",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "zero": "{count} منازل",
+          "one": "{count} منزل",
+          "two": "منزلان ({count})",
+          "few": "{count} منازل",
+          "many": "{count} منزلًا",
+          "other": "{count} منزل"
+        }
+      }
+    },
+    {
+      "source": "{count} negozi · lotti misti",
+      "target": [
+        {
+          "plural": "count",
+          "forms": {
+            "zero": "{count} أنشطة تجارية",
+            "one": "{count} نشاط تجاري",
+            "two": "نشاطان تجاريان ({count})",
+            "few": "{count} أنشطة تجارية",
+            "many": "{count} نشاطًا تجاريًا",
+            "other": "{count} نشاط تجاري"
+          }
+        },
+        " · قطع أراضٍ متنوعة"
+      ]
+    },
+    {
+      "source": "{count} mongolfiere",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "zero": "{count} مناطيد",
+          "one": "{count} منطاد",
+          "two": "منطادان ({count})",
+          "few": "{count} مناطيد",
+          "many": "{count} منطادًا",
+          "other": "{count} منطاد"
+        }
+      }
+    },
+    {
+      "source": "Livello {level}/{total}",
+      "target": "المستوى {level}/{total}"
+    },
+    {
+      "source": "Proprietà raggiungibili ({count})",
+      "target": "الممتلكات المرتبطة ({count})"
+    },
+    {
+      "source": "Raggiungi {city}",
+      "target": "انتقل إلى {city}"
+    },
+    {
+      "source": "{city} · {count} abitanti virtuali",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "zero": "{count} سكان افتراضيون",
+            "one": "{count} ساكن افتراضي",
+            "two": "ساكنان افتراضيان ({count})",
+            "few": "{count} سكان افتراضيون",
+            "many": "{count} ساكنًا افتراضيًا",
+            "other": "{count} ساكن افتراضي"
+          }
+        }
+      ]
+    },
+    {
+      "source": "{business} · {city} · Livello {level}/{total} · {points} punti · {design}",
+      "target": [
+        "{business} · {city} · المستوى {level}/{total} · ",
+        {
+          "plural": "points",
+          "forms": {
+            "zero": "{points} نقاط",
+            "one": "{points} نقطة",
+            "two": "نقطتان ({points})",
+            "few": "{points} نقاط",
+            "many": "{points} نقطة",
+            "other": "{points} نقطة"
+          }
+        },
+        " · {design}"
+      ],
+      "translateSlots": [
+        "business",
+        "design"
+      ]
+    },
+    {
+      "source": "{business} #{id} · @{user}",
+      "target": "{business} رقم {id} · @{user}",
+      "translateSlots": [
+        "business"
+      ]
+    },
+    {
+      "source": "🏪 {business} #{id}",
+      "target": "🏪 {business} رقم {id}",
+      "translateSlots": [
+        "business"
+      ]
+    },
+    {
+      "source": "{tier} ({floors} piani)",
+      "target": [
+        "{tier} (",
+        {
+          "plural": "floors",
+          "forms": {
+            "zero": "{floors} طوابق",
+            "one": "{floors} طابق",
+            "two": "طابقان ({floors})",
+            "few": "{floors} طوابق",
+            "many": "{floors} طابقًا",
+            "other": "{floors} طابق"
+          }
+        },
+        ")"
+      ],
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{tier} ({floors} piano)",
+      "target": "{tier} ({floors} طابق)",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{count} CASE",
+      "target": {
+        "plural": "count",
+        "forms": {
+          "zero": "{count} منازل",
+          "one": "{count} منزل",
+          "two": "منزلان ({count})",
+          "few": "{count} منازل",
+          "many": "{count} منزلًا",
+          "other": "{count} منزل"
+        }
+      }
+    },
+    {
+      "source": "{city} · {count} case · {reached}/{total} obiettivi raggiunti",
+      "target": [
+        "{city} · ",
+        {
+          "plural": "count",
+          "forms": {
+            "zero": "{count} منازل",
+            "one": "{count} منزل",
+            "two": "منزلان ({count})",
+            "few": "{count} منازل",
+            "many": "{count} منزلًا",
+            "other": "{count} منزل"
+          }
+        },
+        " · الأهداف المحققة: {reached}/{total}"
+      ]
+    },
+    {
+      "source": "🏙 {city} · {distance} km",
+      "target": "🏙 {city} · {distance} كم"
+    },
+    {
+      "source": "📍 Trova {facility}",
+      "target": "📍 اعثر على {facility}",
+      "translateSlots": [
+        "facility"
+      ]
+    },
+    {
+      "source": "Personaggio · {city}",
+      "target": "الشخصية · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Mongolfiera · {city}",
+      "target": "منطاد · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Negozio · {city}",
+      "target": "نشاط تجاري · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Livello {level} · {points} punti",
+      "target": [
+        "المستوى {level} · ",
+        {
+          "plural": "points",
+          "forms": {
+            "zero": "{points} نقاط",
+            "one": "{points} نقطة",
+            "two": "نقطتان ({points})",
+            "few": "{points} نقاط",
+            "many": "{points} نقطة",
+            "other": "{points} نقطة"
+          }
+        }
+      ],
+      "translateSlots": []
+    },
+    {
+      "source": "{points} punti · {tier} ({floors} piani)",
+      "target": [
+        {
+          "plural": "points",
+          "forms": {
+            "zero": "{points} نقاط",
+            "one": "{points} نقطة",
+            "two": "نقطتان ({points})",
+            "few": "{points} نقاط",
+            "many": "{points} نقطة",
+            "other": "{points} نقطة"
+          }
+        },
+        " · {tier} (",
+        {
+          "plural": "floors",
+          "forms": {
+            "zero": "{floors} طوابق",
+            "one": "{floors} طابق",
+            "two": "طابقان ({floors})",
+            "few": "{floors} طوابق",
+            "many": "{floors} طابقًا",
+            "other": "{floors} طابق"
+          }
+        },
+        ")"
+      ],
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{color} · pareti e tetto",
+      "target": "{color} · الجدران والسقف",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "🎈 Mongolfiera #{id}",
+      "target": "🎈 المنطاد رقم {id}",
+      "translateSlots": []
+    },
+    {
+      "source": "Casa demo di @{user}",
+      "target": "المنزل التجريبي للمستخدم @{user}",
+      "translateSlots": []
+    },
+    {
+      "source": "@{user} · personaggio selezionato (freccia gialla)",
+      "target": "@{user} · تم اختيار الشخصية (السهم الأصفر)",
+      "translateSlots": []
+    },
+    {
+      "source": "Nella demo la prima casa appartiene a @{user}. Non è ancora presente un sistema di accesso personale.",
+      "target": "المنزل التجريبي الأول يخص المستخدم @{user}. دخول السكان بحسابات شخصية غير متاح بعد.",
+      "translateSlots": []
+    },
+    {
+      "source": "Un personaggio gratuito per ogni casa. In questa demo puoi individuare il personaggio di @{user}.",
+      "target": "شخصية مجانية لكل منزل. يمكنك في هذه التجربة العثور على شخصية المستخدم @{user}.",
+      "translateSlots": []
+    },
+    {
+      "source": "Cespuglio: {variant}",
+      "target": "شجيرة: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Vialetto: {variant}",
+      "target": "ممر حديقة: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Aiuola: {variant}",
+      "target": "حوض زهور: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Lampioncino: {variant}",
+      "target": "مصباح حديقة: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Barbecue Premium: {variant}",
+      "target": "شواية بريميوم: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Cassetta postale: {variant}",
+      "target": "صندوق بريد: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Recinzione: {variant}",
+      "target": "سياج: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Piscina Premium: {variant}",
+      "target": "مسبح بريميوم: {variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Casa #{id} · colore {color}",
+      "target": "المنزل رقم {id} · اللون {color}",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "Demo @{user} · Casa #{id} · {points} punti · {tier}",
+      "target": [
+        "تجربة @{user} · المنزل رقم {id} · ",
+        {
+          "plural": "points",
+          "forms": {
+            "zero": "{points} نقاط",
+            "one": "{points} نقطة",
+            "two": "نقطتان ({points})",
+            "few": "{points} نقاط",
+            "many": "{points} نقطة",
+            "other": "{points} نقطة"
+          }
+        },
+        " · {tier}"
+      ],
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{count} località nel catalogo · {countries} paesi e territori · simulazione · {residents} in {city} · {points} punti città · {homes} case 3D caricate",
+      "target": "الأماكن في الدليل: {count} · الدول والأقاليم: {countries} · محاكاة · السكان في {city}: {residents} · نقاط المدينة: {points} · المنازل ثلاثية الأبعاد المحمّلة: {homes}",
+      "translateSlots": []
+    },
+    {
+      "source": "Piazza civica di {city}",
+      "target": "الساحة المدنية في {city}",
+      "translateSlots": []
+    }
+  ],
+  "verification": {
+    "messages": 360,
+    "templates": 61,
+    "browserEvidence": "Lingue_mobile_arabo_Cairo_v9.4.0.jpg",
+    "privateOptions": "all eight tiers; source normalization and translation regression checked",
+    "scope": "Current game UI; further languages remain in development"
+  }
+}
