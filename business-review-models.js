@@ -51,17 +51,17 @@ function drawShops(){
   const structuralKinds=new Set(['evolutionSignatureHall','evolutionSignatureHallWindow','evolutionSignatureHallSide','evolutionEntranceCanopy','evolutionEntranceColumn','evolutionUpperWindow','evolutionSideWindow','evolutionRoofTerrace','evolutionTerraceRail','evolutionTerraceSideRail','evolutionTerracePavilion','evolutionTerracePavilionPost','evolutionGrandEntrance','evolutionGrandPier','cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeMark','tradeRound','tradeDress','tradeSculpt','tradeBar','shopPaving','shopUpperBody','shopUpperGlass','shopUpperCap','body','roof','hotelRoof','cinemaRoof',
       'garageRoof','superRoof','displayGlass','entryDoor','entryDoorGlass',
       'signFascia','signInset','garageGate','cinemaParapet','hotelUpperWindow']);
-  for(const kind of ['bakeryGable','workshopDaylightRoof','pharmacyWingRoof','fashionTerraceDeck','fashionBalustrade','superClerestory','libraryDome','libraryDrum','gymVault','pizzaGable','diningTerraceDeck','diningBalustrade','diningTerraceAwning'])structuralKinds.add(kind);
+  for(const kind of ['marketGable','marketHallPost','bakeryGable','workshopDaylightRoof','pharmacyWingRoof','fashionTerraceDeck','fashionBalustrade','superClerestory','libraryDome','libraryDrum','gymVault','pizzaGable','diningTerraceDeck','diningBalustrade','diningTerraceAwning'])structuralKinds.add(kind);
   function put(kind,color,shop,x,y,z,w,h,d){
     // Preserve low-cost architecture at all zoom levels. Decorative pieces
     // are spatially batched so only the visible nearby shops are detailed.
     const detailed=!structuralKinds.has(kind);
     const cx=shop?Math.floor(shop.x/90):0,cz=shop?Math.floor(shop.z/90):0;
-    const geometry=kind==='pizzaGable'||kind==='bakeryGable'?pizzaGable:kind==='libraryDome'||kind==='gymVault'?libraryDome:kind==='libraryDrum'?furnitureRound:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:
+    const geometry=kind==='pizzaGable'||kind==='bakeryGable'||kind==='marketGable'?pizzaGable:kind==='libraryDome'||kind==='gymVault'?libraryDome:kind==='libraryDrum'?furnitureRound:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:
       kind==='shopRoundFurniture'?furnitureRound:(kind==='shopSoftFurniture'||kind==='shopUmbrellaCanopy')?furnitureSoft:
       kind==='tradeDress'||kind==='fashionShowroomDress'?dress:kind==='tradeSculpt'?sculpt:kind==='tradeBar'?bar:
       kind.startsWith('pizza')||kind==='tradeRound'?disc:box;
-    const casts=/^(bakeryGable|workshopDaylightRoof|pharmacyWingRoof|fashionTerraceDeck|fashionBalustrade|superClerestory|body|libraryDome|libraryDrum|gymVault|pizzaGable|diningTerraceDeck|diningBalustrade|diningTerraceAwning|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof|evolutionSignatureHall|evolutionEntranceCanopy|evolutionEntranceColumn|evolutionRoofTerrace|evolutionTerracePavilion|evolutionGrandEntrance|evolutionGrandPier|shopForecourtDetail|shopRoundFurniture|shopUmbrellaCanopy)$/.test(kind);
+    const casts=/^(marketGable|marketHallPost|bakeryGable|workshopDaylightRoof|pharmacyWingRoof|fashionTerraceDeck|fashionBalustrade|superClerestory|body|libraryDome|libraryDrum|gymVault|pizzaGable|diningTerraceDeck|diningBalustrade|diningTerraceAwning|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof|evolutionSignatureHall|evolutionEntranceCanopy|evolutionEntranceColumn|evolutionRoofTerrace|evolutionTerracePavilion|evolutionGrandEntrance|evolutionGrandPier|shopForecourtDetail|shopRoundFurniture|shopUmbrellaCanopy)$/.test(kind);
     const receives=casts||kind==='shopPaving';
     const key=[geometry.id,casts,receives,detailed?cx:'all',detailed?cz:'all'].join(':');
     if(!batches.has(key))batches.set(key,{geo:geometry,casts,receives,entries:[],detailed,
@@ -235,13 +235,13 @@ function drawShops(){
     const widthGrowth=[.76,.15,.28,.64,.42,.80,.24,.57,.12,.30,.23,.22][shape];
     const depthGrowth=[.78,.44,.62,.67,.54,.65,.51,.68,.34,.56,.38,.62][shape];
     const heightGrowth=[.27,.26,.23,.52,.29,.36,.22,.33,.32,.29,.12,.22][shape];
-    const w=shape===7?Math.min(16,width*[.72,.84,.98,1.12,1.28,1.42,1.58,1.75][stage]):shape===6?Math.min(17,width*[.68,.77,.88,1,1.08,1.16,1.23,1.31][stage]):shape===1?Math.min(17,width*[.65,.76,.88,.98,1.06,1.12,1.20,1.27][stage]):stage?Math.min(shape===2?14.5:17,width*(1+growth*widthGrowth)):width;
-    const d=shape===7?depth*[.80,.94,1.08,1.24,1.40,1.56,1.73,1.92][stage]:shape===6?depth*[.76,.87,1,1.10,1.21,1.33,1.45,1.57][stage]:shape===1?depth*[.75,.88,1,1.10,1.20,1.30,1.40,1.50][stage]:depth*(1+growth*depthGrowth);
+    const w=shape===11?Math.min(17,width*[.58,.72,.86,1,1.12,1.23,1.33,1.44][stage]):shape===7?Math.min(16,width*[.72,.84,.98,1.12,1.28,1.42,1.58,1.75][stage]):shape===6?Math.min(17,width*[.68,.77,.88,1,1.08,1.16,1.23,1.31][stage]):shape===1?Math.min(17,width*[.65,.76,.88,.98,1.06,1.12,1.20,1.27][stage]):stage?Math.min(shape===2?14.5:17,width*(1+growth*widthGrowth)):width;
+    const d=shape===11?depth*[.70,.86,1.03,1.22,1.42,1.63,1.85,2.08][stage]:shape===7?depth*[.80,.94,1.08,1.24,1.40,1.56,1.73,1.92][stage]:shape===6?depth*[.76,.87,1,1.10,1.21,1.33,1.45,1.57][stage]:shape===1?depth*[.75,.88,1,1.10,1.20,1.30,1.40,1.50][stage]:depth*(1+growth*depthGrowth);
 
     const baseHeight=[4.2,5.1,5.2,6.4,4.7,4.0,5.0,4.5,9.0,6.8,4.6,4.3][shape]
       *(.88+rnd(seed*41+2)*.22)*(district==='centro'?1.08:1)*(isPizzeria?.90:1);
     const diningProfiles={0:[4.2,4.6,5.2,7.4,8.7,10.1,11.8,13.8],2:[5.2,5.8,6.8,8.8,10.8,13,15.8,19]};
-    const height=shape===7?[4.5,5,5.8,6.8,7.9,9.2,10.7,12.5][stage]*(baseHeight/4.5):shape===6?[5,5.3,5.8,6.4,7.1,8,9.1,10.4][stage]*(baseHeight/5):shape===4?[4.7,5.1,5.8,7.5,9.1,11.1,13.6,16.7][stage]*(baseHeight/4.7):shape===5?[4,4.5,5.3,8.5,10.6,13,16,20][stage]*(baseHeight/4):shape===1?[4.6,4.9,5.3,5.7,6.2,6.8,7.5,8.4][stage]*(baseHeight/5.1):diningProfiles[shape]?diningProfiles[shape][stage]*(baseHeight/diningProfiles[shape][0]):shape===10?[4.6,7.8,12,18,27,40,58,82][stage]*(baseHeight/4.6):shape===8?[9,9.8,11.2,12.8,14.6,16.8,19.4,23][stage]*(baseHeight/9):shape===3?[6.4,7.0,8.3,10.5,12.9,15.8,19.2,23][stage]*(baseHeight/6.4):shape===9?[6.8,7.2,8.0,9.1,10.5,12.2,14.3,17][stage]*(baseHeight/6.8):baseHeight*(1+growth*heightGrowth)+(stage>=3?2.8:0);
+    const height=shape===11?[4.3,4.6,5,5.5,6.1,6.8,7.6,8.6][stage]*(baseHeight/4.3):shape===7?[4.5,5,5.8,6.8,7.9,9.2,10.7,12.5][stage]*(baseHeight/4.5):shape===6?[5,5.3,5.8,6.4,7.1,8,9.1,10.4][stage]*(baseHeight/5):shape===4?[4.7,5.1,5.8,7.5,9.1,11.1,13.6,16.7][stage]*(baseHeight/4.7):shape===5?[4,4.5,5.3,8.5,10.6,13,16,20][stage]*(baseHeight/4):shape===1?[4.6,4.9,5.3,5.7,6.2,6.8,7.5,8.4][stage]*(baseHeight/5.1):diningProfiles[shape]?diningProfiles[shape][stage]*(baseHeight/diningProfiles[shape][0]):shape===10?[4.6,7.8,12,18,27,40,58,82][stage]*(baseHeight/4.6):shape===8?[9,9.8,11.2,12.8,14.6,16.8,19.4,23][stage]*(baseHeight/9):shape===3?[6.4,7.0,8.3,10.5,12.9,15.8,19.2,23][stage]*(baseHeight/6.4):shape===9?[6.8,7.2,8.0,9.1,10.5,12.2,14.3,17][stage]*(baseHeight/6.8):baseHeight*(1+growth*heightGrowth)+(stage>=3?2.8:0);
 
     const fashionAnnexHeight=Math.min(height*.83,stage>=5?7.3:5.1);
     const x=shop.x,z=shop.z;
@@ -250,6 +250,7 @@ function drawShops(){
     const paving=progress.premium?0xc7ad8b:[0xaba99f,0xb8b5a9,0x9ba9a8][seed%3];
     const front=z+d/2, trim=style.trim, glass=style.glass;
     const diningUpper=(shape===0||shape===2)&&stage>=3;
+    const marketHall=shape===11&&stage>=2;
     const bakerySplit=shape===7&&stage>=3;
     const industrialSplit=shape===6&&stage>=3;
     const fashionUpper=shape===5&&stage>=3,steppedPharmacy=shape===4&&stage>=3;
@@ -257,9 +258,24 @@ function drawShops(){
     const upperWidth=w*(bakerySplit?1:shape===5?.90:shape===0?(stage>=7?.86:stage>=5?.80:.72):(stage>=7?.93:stage>=5?.89:.83));
     const upperDepth=d*(bakerySplit?.60:fashionUpper?.70:.68),upperZ=z-(d-upperDepth)/2,upperFront=upperZ+upperDepth/2;
     // The cup bracket starts .46m above this reference, on the5.40m terrace surface.
-    const signRoof=bakerySplit?5.2:industrialSplit?height*.78:diningUpper?5.40-.46:fashionUpper?5.09-.46:height;
+    const signRoof=marketHall?height+.30:bakerySplit?5.2:industrialSplit?height*.78:diningUpper?5.40-.46:fashionUpper?5.09-.46:height;
     put('shopPaving',paving,shop,x,.055,z,17.7,.06,17.5);
-    if(bakerySplit){
+    if(marketHall){
+      // Covered market with two rows of shops and an unobstructed central aisle.
+      const pavilionHeight=height*(stage>=4?.76:.66),pavilionFront=z+d*.42;
+      for(const side of [-1,1]){
+        const sx=x+side*w*.36;
+        put('body',wallColor,shop,sx,pavilionHeight/2,z-d*.04,w*.28,pavilionHeight,d*.92);
+        put('roof',trim,shop,sx,pavilionHeight+.13,z-d*.04,w*.28+.12,.26,d*.92+.12);
+        put('displayGlass',glass,shop,sx,1.80,pavilionFront+.08,w*.20,2.30,.16);
+        put('shopForecourtDetail',0x9d7048,shop,sx,.78,pavilionFront+.24,w*.20,.85,.18);
+        for(let fruit=0;fruit<5;fruit++)put('shopSoftFurniture',fruit%2?0xdab750:0x8fbd52,shop,sx+(fruit-2)*w*.035,1.27,pavilionFront+.36,.25,.23,.25);
+        for(const bay of [-.43,0,.43])put('marketHallPost',trim,shop,x+side*w*.47,height/2,z+bay*d,.20,height,.20);
+        if(stage>=4)for(const bay of [-.28,0,.28])put('displayGlass',glass,shop,x+side*(w/2+.08),pavilionHeight-.70,z+bay*d,.16,.80,d*.19);
+      }
+      put('body',wallColor,shop,x,height*.35,z-d*.42,w,height*.70,d*.16);
+      put('roof',trim,shop,x,height*.70+.13,z-d*.42,w+.16,.26,d*.16+.16);
+    }else if(bakerySplit){
       // A low shop and cafe frontage joins the taller baking and preparation hall.
       put('body',wallColor,shop,x,2.60,z+d*.30,w,5.20,d*.40);
       put('body',wallColor,shop,x,height/2,upperZ,w,height,upperDepth);
@@ -398,40 +414,6 @@ function drawShops(){
           put('evolutionEntrancePlanter',0x66894b,shop,x+side*canopyWidth*.46,.40,front+3.05,.72,.65,.72);
       }
     }
-    if(stage>=3&&![0,1,2,3,4,5,6,7,8,9,10].includes(shape)){
-      const upperY=height-1.36;
-      for(const side of [-1,1]){
-        for(const bay of [-1,0,1]){
-          put('evolutionUpperWindow',glass,shop,x+bay*w*.29,upperY,z+side*(d/2+.065),w*.21,1.51,.15);
-          put('evolutionSideWindow',glass,shop,x+side*(w/2+.065),upperY,z+bay*d*.28,.15,1.51,d*.20);
-        }
-        put('evolutionStoreyBand',trim,shop,x,height-2.80,z+side*(d/2+.10),w+.18,.18,.24);
-        put('evolutionSideStoreyBand',trim,shop,x+side*(w/2+.10),height-2.80,z,.24,.18,d+.18);
-      }
-    }
-    if(stage>=4&&![0,1,2,3,4,5,6,7,8,9,10].includes(shape)){
-      const deckY=height+.50;
-      put('evolutionRoofTerrace',0xbca68b,shop,x,deckY,z,w*.94,.14,d*.94);
-      for(const side of [-1,1]){
-        put('evolutionTerraceRail',trim,shop,x,deckY+.94,z+side*d*.465,w*.95,.10,.10);
-        put('evolutionTerraceSideRail',trim,shop,x+side*w*.465,deckY+.94,z,.10,.10,d*.95);
-        for(const bay of [-.42,-.21,0,.21,.42]){
-          put('evolutionTerraceBaluster',trim,shop,x+bay*w,deckY+.49,z+side*d*.465,.07,.91,.07);
-          put('evolutionTerraceSideBaluster',trim,shop,x+side*w*.465,deckY+.49,z+bay*d,.07,.91,.07);
-        }
-        const seatX=x+side*w*.27;
-        if(![0,2,3].includes(shape))put('evolutionTerraceSeat',0xd8bb8b,shop,seatX,deckY+.49,z+d*.16,w*.19,.16,1.03);
-      }
-    }
-    if(stage>=5&&![0,1,2,3,4,5,6,7,8,9,10].includes(shape)){
-      const pavilionY=height+3.05;
-      const pavilionWidth=w*(stage>=6?.82:.50);
-      const pavilionDepth=d*(stage>=6?.43:.25);
-      const pavilionZ=z-d*.22;
-      put('evolutionTerracePavilion',trim,shop,x,pavilionY,pavilionZ,pavilionWidth,.25,pavilionDepth);
-      for(const side of [-1,1])for(const face of [-1,1])
-        put('evolutionTerracePavilionPost',wallColor,shop,x+side*pavilionWidth*.46,height+1.75,pavilionZ+face*pavilionDepth*.43,.18,2.48,.18);
-    }
     if(stage>=6){
       const gardenZ=front+2.35;
       const gardenEdge=Math.min(9.25,w/2+1,(shop.right??x+10.225)-x-.85,x-(shop.left??x-10.225)-.85);
@@ -444,15 +426,6 @@ function drawShops(){
       }
     }
     if(stage>=7){
-
-      if(![0,1,2,3,4,5,6,7,8,9,10].includes(shape)){
-        const hallZ=z-d*.22,hallWidth=w*.66,hallDepth=d*.35;
-        put('evolutionSignatureHall',wallColor,shop,x,height+1.77,hallZ,hallWidth,2.40,hallDepth);
-        for(const side of [-1,1]){
-          put('evolutionSignatureHallWindow',glass,shop,x+side*hallWidth*.25,height+1.90,hallZ+hallDepth/2+.07,hallWidth*.32,1.22,.15);
-          put('evolutionSignatureHallSide',glass,shop,x+side*(hallWidth/2+.07),height+1.90,hallZ,.15,1.22,hallDepth*.67);
-        }
-      }
 
       const portalWidth=w*.55;
       put('evolutionGrandEntrance',wallColor,shop,x,3.65,front+.35,portalWidth,.46,.72);
@@ -843,7 +816,7 @@ function drawShops(){
     // The door is central, with two uninterrupted display windows either side.
     const wingW=(w-entranceW-1.0)/2;
     const displayH=Math.min(2.85,height*.55),displayY=1.05+displayH/2;
-    for(const side of shape===6?[]:[-1,1]){
+    for(const side of shape===6||marketHall?[]:[-1,1]){
       const wx=x+side*(entranceW/2+.22+wingW/2);
       if(shape!==6)put('displayGlass',glass,shop,wx,displayY,front+.11,wingW-.28,displayH,.11);
       put('displayTop',trim,shop,wx,displayY+displayH/2+.06,front+.19,wingW,.13,.18);
@@ -892,18 +865,22 @@ function drawShops(){
       // Only a single subtle central mullion on wide shop windows.
       if(wingW>2.8)put('displayDivider',0x5d7073,shop,wx,displayY,front+.19,.06,displayH,.07);
     }
+    if(!marketHall){
     put('entryDoor',0x455d64,shop,x,doorH/2+.12,front+.17,entranceW-.14,doorH,.16);
     put('entryDoorGlass',glass,shop,x,doorH*.69+.10,front+.265,entranceW-.43,doorH*.42,.055);
     put('entryDoorFrame',trim,shop,x,doorH+.22,front+.20,entranceW+.12,.15,.20);
     for(const side of [-1,1])put('entryDoorJamb',trim,shop,x+side*entranceW/2,doorH/2+.10,front+.20,.12,doorH,.20);
     put('entryHandle',0xe6c68c,shop,x+.65,1.15,front+.30,.055,.20,.06);
     put('threshold',0xc5b9a8,shop,x,.105,front+.31,entranceW+.26,.12,.54);
+    }
     // One clean sign band and one restrained canopy, no stacked horizontal bars.
     const signY=Math.min(height-.58,displayY+displayH/2+.68);
+    if(!marketHall){
     put('signFascia',trim,shop,x,signY,front+.15,w*.84,.57,.22);
     put('signInset',0xe6dfd2,shop,x,signY,front+.275,w*.74,.32,.06);
+    }
     const canopyY=signY-.46;
-    if(![6,8,10].includes(shape)){
+    if(![6,8,10].includes(shape)&&!marketHall){
       put('singleCanopy',trim,shop,x,canopyY,front+.47,w*.81,.13,.76);
       if(shape!==1){
         const stripeW=w*.81/11;
@@ -987,6 +964,9 @@ function drawShops(){
         for(const side of [-1,1])put('evolutionEntranceColumn',wallColor,shop,x+side*w*.46,1.80,front+1.70,.20,3.60,.20);
       }
       put('superCanopy',trim,shop,x,canopyY,front+.58,w*.91,.20,1.00);
+    }else if(marketHall){
+      put('roof',trim,shop,x,height+.23,z,w+.40,.45,d+.40);
+      put('marketGable',stage>=5?0x6b9277:0xb47d49,shop,x,height+1.255,z,w+.40,1.60,d+.40);
     }else if(bakerySplit){
       put('roof',trim,shop,x,5.43,z+d*.30,w+.40,.45,d*.40+.20);
       put('roof',trim,shop,x,height+.23,upperZ,w+.40,.45,upperDepth+.40);
@@ -1131,14 +1111,14 @@ function drawShops(){
       roofPut('hotelPenthouseRoof',trim,shop,x,rooftop+1.87,z-d*.09,w*.62,.20,d*.64);
       for(const side of [-1,1])
         roofPut('hotelPenthouseWindow',glass,shop,x+side*w*.17,rooftop+.96,front-d*.22,1.05,.92,.11);
-    }else{ // Market: open stall canopy modules above the roof.
+    }else if(!marketHall){ // Small market kiosks keep their low canopy modules.
       for(const side of [-1,1]){
         roofPut('marketRoofAwning',side<0?0xd29b5b:0x6c9e83,shop,
           x+side*w*.23,rooftop+.19,z, w*.38,.29,d*.61);
         roofPut('marketRoofCap',0xe3d5ad,shop,x+side*w*.23,rooftop+.38,z,w*.40,.08,d*.64);
       }
     }
-    if(seed%3===0&&shape!==6&&shape!==7&&shape!==9&&!(shape===3&&stage>=2)&&!diningUpper)put('side',style.glass,shop,x+w/2+.1,height*.55,z, .2,1.6,d*.45);
+    if(seed%3===0&&shape!==6&&shape!==7&&shape!==11&&shape!==9&&!(shape===3&&stage>=2)&&!diningUpper)put('side',style.glass,shop,x+w/2+.1,height*.55,z, .2,1.6,d*.45);
     if(progress.premium&&shape===2){
       const terraceX=x+w/2+1.19,terraceZ=z-d*.17;
       put('shopDiningDeck',0xbd9a74,shop,terraceX,.15,terraceZ,2.48,.23,4.55);
