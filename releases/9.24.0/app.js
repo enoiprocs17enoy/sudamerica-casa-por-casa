@@ -5601,7 +5601,7 @@ function* renderHouseStages(selected){
 // All houses remain in the existing instanced city meshes at every zoom.
 // Extra detail is generated only around the camera's ground focus, with
 // capped geometry and infrequent updates while panning.
-let nearDetailGroup=null,nearDetailCenter={x:Infinity,z:Infinity},nearDetailTier=-1,nearDetailBuild=null;
+let nearDetailGroup=null,nearDetailCenter={x:Infinity,z:Infinity},nearDetailTier=-1,nearDetailBuild=null,nearDetailMaterial=null;
 const detailGeo=new Map();
 function lodTier(){
  if(distance>1250)return 0;
@@ -5609,22 +5609,23 @@ function lodTier(){
  if(distance>155)return 2;
  return 3;
 }
-function* makeCloseDetailMeshStages(geo,color,placements,destination){
+function* makeCloseDetailMeshStages(geo,placements,destination){
  if(!placements.length)return;
- const mesh=new THREE.InstancedMesh(geo,new THREE.MeshStandardMaterial({color,roughness:.91,flatShading:true}),placements.length);
+ nearDetailMaterial=nearDetailMaterial||new THREE.MeshStandardMaterial({color:0xffffff,roughness:.91,flatShading:true});
+ const mesh=new THREE.InstancedMesh(geo,nearDetailMaterial,placements.length);
  // The destination is detached until complete; cancellation can dispose even a partial mesh.
  destination.add(mesh);
- const dummy=new THREE.Object3D();
+ const dummy=new THREE.Object3D(),tint=new THREE.Color();
  for(let i=0;i<placements.length;i++){
   const p=placements[i];dummy.position.set(p[0],p[1],p[2]);dummy.rotation.set(0,p[6]||0,0);
-  dummy.scale.set(p[3],p[4],p[5]);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);
+  dummy.scale.set(p[3],p[4],p[5]);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);mesh.setColorAt(i,tint.setHex(p[7]));
   if((i+1)%256===0)yield;
  }
- mesh.instanceMatrix.needsUpdate=true;mesh.frustumCulled=false;
+ mesh.instanceMatrix.needsUpdate=true;mesh.instanceColor.needsUpdate=true;mesh.frustumCulled=false;
 }
 function disposeCloseDetailGroup(old){
  if(!old)return;old.parent?.remove(old);
- old.traverse(o=>{if(o.isInstancedMesh)o.dispose();if(o.material)o.material.dispose()});
+ old.traverse(o=>{if(o.isInstancedMesh)o.dispose();if(o.material&&o.material!==nearDetailMaterial)o.material.dispose()});
  // Shared geometries are deliberately retained.
 }
 function cancelCloseDetailBuild(){
@@ -6062,12 +6063,13 @@ function* progressiveDetailStages(tier,focus,output){
   detailGeo.set('box',new THREE.BoxGeometry(1,1,1));
   detailGeo.set('sphere',new THREE.IcosahedronGeometry(.5,1));
  }
+ const shapes=new Map();let packed=0;
  for(const [key,arr] of placements){
-  const shape=key.endsWith('_sphere')?'sphere':'box';
-  const color=Number(key.split('_')[0]);
-  yield* makeCloseDetailMeshStages(detailGeo.get(shape),color,arr,output);
-  yield;
+  const shape=key.endsWith('_sphere')?'sphere':'box',color=Number(key.split('_')[0]);
+  if(!shapes.has(shape))shapes.set(shape,[]);
+  for(const p of arr){p.push(color);shapes.get(shape).push(p);if(++packed%512===0)yield;}
  }
+ for(const [shape,arr]of shapes){yield* makeCloseDetailMeshStages(detailGeo.get(shape),arr,output);yield;}
 }
 
 // Emergency-safe, fully instanced fallback: an exception in a detailed model
