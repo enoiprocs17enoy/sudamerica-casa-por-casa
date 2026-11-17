@@ -688,12 +688,16 @@ function* renderHouseStages(selected){
     const metalness=/(mullion|sconce|handle)/i.test(key)?.48:.02;
     const casts=/(premiumVerandaRoof|premiumDormerTop|premiumChimney|premiumTowerBalconySlab|gardenTree|towerBase|towerRoof|towerMain|towerMid|homeMain|homeWing|homeRoof|homeCore|homeWall|towerWall|towerBody|mainBody|wingBody|mainRoof|gable|hipRoof)/i.test(key);
     const receives=casts||/(facade|pier|window|door|balcony|pilaster)/i.test(key);
-    const profile=[batch.geo.id,texture,normalStrength,roughness,metalness,casts,receives].join(':');
+    const premiumDetail=/^premiumTowerBalcony(Post|Bottom|SideCap)_/.test(key);
+    const profile=[batch.geo.id,texture,normalStrength,roughness,metalness,casts,receives].join(':')+(premiumDetail?':premiumDetail':'');
     for(const entry of batch.entries){
       // Dense cities cull whole neighborhoods instead of submitting every house.
-      const key=spatialBatches?profile+':'+Math.floor(entry.h.x/368)+':'+Math.floor(entry.h.z/368):profile;
+      const span=premiumDetail?120:368;
+      const key=spatialBatches||premiumDetail?profile+':'+Math.floor(entry.h.x/span)+':'+Math.floor(entry.h.z/span):profile;
       if(!renderBatches.has(key))renderBatches.set(key,{
-        profile,geo:batch.geo,texture,normalStrength,roughness,metalness,casts,receives,entries:[]
+        profile,geo:batch.geo,texture,normalStrength,roughness,metalness,casts,receives,premiumDetail,
+        originX:premiumDetail?(Math.floor(entry.h.x/span)+.5)*span:0,
+        originZ:premiumDetail?(Math.floor(entry.h.z/span)+.5)*span:0,entries:[]
       });
       // Placements are already complete. Reuse them rather than cloning every
       // window, roof tile and trim piece into a second temporary object graph.
@@ -719,12 +723,19 @@ function* renderHouseStages(selected){
     mesh.userData.homes=batch.entries.map(e=>e.h);
     for(let i=0;i<batch.entries.length;i++){
       if(i>0&&i%2048===0)yield;
-      const e=batch.entries[i];dummy.position.set(e.x,e.y,e.z);
+      const e=batch.entries[i];dummy.position.set(e.x-batch.originX,e.y,e.z-batch.originZ);
       let rotation=placementRotations.get(e.rotation);
       if(!rotation){rotation=new THREE.Quaternion().setFromEuler(placementEuler.set(0,e.rotation,0));placementRotations.set(e.rotation,rotation);}
       dummy.scale.set(e.w,e.height,e.d);dummy.matrix.compose(dummy.position,rotation,dummy.scale);mesh.setMatrixAt(i,dummy.matrix); mesh.setColorAt(i,tint.setHex(e.color));
     }
-    mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();group.add(mesh);
+    mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();
+    if(batch.premiumDetail){
+      // Rails and posts are subpixel in distant panoramas. Keep the slab,
+      // glass and front cap at every distance, restoring fine metalwork nearby.
+      const lod=new THREE.LOD();lod.name='premium-balcony-detail';
+      lod.position.set(batch.originX,0,batch.originZ);
+      lod.addLevel(mesh,0);lod.addLevel(new THREE.Group(),480,.12);group.add(lod);
+    }else group.add(mesh);
     if(batch.entries[0].h)houseMeshes.push(mesh);
   }
   if(selected.length){
