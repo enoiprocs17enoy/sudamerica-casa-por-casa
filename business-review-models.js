@@ -244,8 +244,11 @@ function drawShops(){
           part('gymPoolRim',0xf0e4ca,side*(poolW/2-.045),.49,poolZ,.09,.18,3.65);
           part('gymPoolRim',0xf0e4ca,0,.49,poolZ+side*1.78,poolW,.18,.09);
           const seatZ=poolZ+side*2.38;
-          part('gymPoolBench',trim,0,.65,seatZ,w*.52,.16,.55);
-          for(const leg of [-1,1])part('gymPoolBenchLeg',metal,leg*w*.20,.47,seatZ,.10,.36,.40);
+          for(const bay of [-1,1]){
+            const benchX=bay*w*.27;
+            part('gymPoolBench',trim,benchX,.65,seatZ,w*.22,.16,.55);
+            for(const leg of [-1,1])part('gymPoolBenchLeg',metal,benchX+leg*w*.075,.47,seatZ,.10,.36,.40);
+          }
         }
         for(const lane of [-1,1])part('gymPoolLane',0xe8ead5,lane*poolW/6,.477,poolZ,.035,.012,3.30);
         for(const side of [-1,1])part('gymPoolLadder',0xc5d6cf,poolW*.29+side*.22,.87,poolZ+1.55,.055,1.08,.055);
