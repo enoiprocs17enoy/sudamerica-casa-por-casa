@@ -247,7 +247,7 @@ function* renderHouseStages(selected){
       const height=levels*storeyHeight+1.8,x=h.x,z=h.z;
       // No parcel decorations: landscaping unlocks at one point.
       place('towerBase',boxGeo,wall,h,x,height/2,z,footW,height,footD);
-      if(tier===3){
+      if(tier===3&&!premium){
         // Small apartment blocks keep tile roofs. Towers have open roof terraces.
         place('apartmentTiledRoof',roofGeo,trim,h,x,height-.04,z,
           (footW+.42)/2,Math.max(1.35,footW*.15),(footD+.42)/2);
@@ -377,14 +377,17 @@ function* renderHouseStages(selected){
       // One instanced window strip per floor, visible on front and rear.
       for(let floor=0;floor<levels;floor++){
         const wy=1.6+floor*storeyHeight;
+        const balconyDoor=premium&&floor>0&&floor%2===1;
+        const openingY=balconyDoor?floor*storeyHeight+1.50:wy;
+        const openingHeight=balconyDoor?2.20:1.15;
         for(const side of [-1,1]){
           const wx=x+side*footW*.26, width=footW*.24;
           for(const face of [-1,1]){
             const wz=z+face*(footD/2+.055);
-            place('towerWindowFrame',boxGeo,0xf0dfc8,h,wx,wy,wz,width+.22,1.33,.12);
-            place('towerWindow',boxGeo,0x39738f,h,wx,wy,wz+face*.075,width,1.15,.075);
-            place('towerWindowMullion',boxGeo,0xe5d7c5,h,wx,wy,wz+face*.12,.065,1.15,.045);
-            place('towerWindowSill',boxGeo,0xf0dfc8,h,wx,wy-.67,wz+face*.13,width+.37,.12,.34);
+            place('towerWindowFrame',boxGeo,0xf0dfc8,h,wx,openingY,wz,width+.22,openingHeight+.18,.12);
+            place('towerWindow',boxGeo,0x39738f,h,wx,openingY,wz+face*.075,width,openingHeight,.075);
+            place('towerWindowMullion',boxGeo,0xe5d7c5,h,wx,openingY,wz+face*.12,.065,openingHeight,.045);
+            place('towerWindowSill',boxGeo,0xf0dfc8,h,wx,balconyDoor?floor*storeyHeight+.42:wy-.67,wz+face*.13,width+.37,.12,.34);
           }
         }
         if(premium&&floor>0&&floor%3===0){
@@ -411,11 +414,23 @@ function* renderHouseStages(selected){
       }
       place('towerDoor',boxGeo,0x66564d,h,x,1.05,z+footD/2+.12,1.6,2.1,.16);
       if(premium){
-        // Balconies are recessed within the parcel's free margin.
-        for(let floor=1;floor<Math.min(levels,12);floor+=2){
-          const by=floor*storeyHeight+.3;
-          place('premiumTowerBalcony',boxGeo,0xb9c7bf,h,x,by,z+footD/2+.24,footW*.50,.18,.38);
-          place('premiumTowerRail',boxGeo,0x53777d,h,x,by+.42,z+footD/2+.41,footW*.50,.66,.07);
+        // Usable balconies articulate both elevations, through the full tower height.
+        const balconyStone=coordinatedHouseColor(wall,0xffefd4,.32);
+        for(let floor=1;floor<levels;floor+=2){
+          const by=floor*storeyHeight+.30,balconyWidth=footW*.80;
+          for(const face of [-1,1]){
+            const facade=z+face*footD/2,edge=facade+face*1.29;
+            place('premiumTowerBalconySlab',boxGeo,balconyStone,h,x,by,facade+face*.64,balconyWidth,.18,1.35);
+            place('premiumTowerBalconyGlass',boxGeo,0x679bad,h,x,by+.62,edge,balconyWidth,.84,.07);
+            place('premiumTowerBalconyCap',boxGeo,trim,h,x,by+1.12,edge,balconyWidth+.08,.08,.12);
+            place('premiumTowerBalconyBottom',boxGeo,trim,h,x,by+.16,edge,balconyWidth,.12,.11);
+            for(const side of [-1,1]){
+              const bx=x+side*balconyWidth/2;
+              place('premiumTowerBalconySideGlass',boxGeo,0x679bad,h,bx,by+.62,facade+face*.64,.07,.84,1.27);
+              place('premiumTowerBalconySideCap',boxGeo,trim,h,bx,by+1.12,facade+face*.64,.12,.08,1.35);
+            }
+            for(const bay of [-.5,0,.5])place('premiumTowerBalconyPost',boxGeo,trim,h,x+bay*balconyWidth,by+.59,edge,.09,1.00,.12);
+          }
         }
       }
       continue;
@@ -675,7 +690,7 @@ function* renderHouseStages(selected){
     const normalStrength=/(roof|gable|hip)/i.test(key)?.88:.56;
     const roughness=/(window|glass|mullion)/i.test(key)?.26:/roof/i.test(key)?.79:.87;
     const metalness=/(mullion|sconce|handle)/i.test(key)?.48:.02;
-    const casts=/(gardenTree|towerBase|towerRoof|towerMain|towerMid|homeMain|homeWing|homeRoof|homeCore|homeWall|towerWall|towerBody|mainBody|wingBody|mainRoof|gable|hipRoof)/i.test(key);
+    const casts=/(premiumTowerBalconySlab|gardenTree|towerBase|towerRoof|towerMain|towerMid|homeMain|homeWing|homeRoof|homeCore|homeWall|towerWall|towerBody|mainBody|wingBody|mainRoof|gable|hipRoof)/i.test(key);
     const receives=casts||/(facade|pier|window|door|balcony|pilaster)/i.test(key);
     const profile=[batch.geo.id,texture,normalStrength,roughness,metalness,casts,receives].join(':');
     for(const entry of batch.entries){
@@ -768,7 +783,7 @@ function build(){dispose();const id=Number(picker.value),premium=mode.value==='p
  render();
 }
 function render(){if(!fixtures.length)return;const root=document.querySelector('#models'),width=root.clientWidth,height=root.clientHeight;renderer.setSize(width,height);renderer.setScissorTest(true);const cellW=width/4,cellH=height/2,common=new THREE.Box3();for(const item of fixtures)common.union(item.box);
- fixtures.forEach((item,index)=>{const box=scale.value==='common'?common:item.box,center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3()),az=angle.value==='back'?Math.PI*7/6:angle.value==='side'?Math.PI*2/3:Math.PI/6,elev=angle.value==='top'?1.35:.58;const span=Math.max(size.y,size.x,size.z*.82,14),distance=span*2.05;
+ fixtures.forEach((item,index)=>{const box=scale.value==='common'?common:item.box,center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3()),az=angle.value==='back'?Math.PI*7/6:angle.value==='side'?Math.PI*2/3:Math.PI/6,elev=angle.value==='top'?1.35:.58;const span=Math.max(size.y,size.x,size.z*.82,14),distance=size.length()*.5/Math.sin(38*Math.PI/360)*1.16;
   item.camera.aspect=cellW/cellH;item.camera.position.set(center.x+Math.sin(az)*Math.cos(elev)*distance,center.y+Math.sin(elev)*distance,center.z+Math.cos(az)*Math.cos(elev)*distance);item.camera.lookAt(center);item.camera.updateProjectionMatrix();const col=index%4,row=Math.floor(index/4);renderer.setViewport(col*cellW,height-(row+1)*cellH,cellW,cellH);renderer.setScissor(col*cellW,height-(row+1)*cellH,cellW,cellH);renderer.clear();renderer.render(item.scene,item.camera);document.querySelector('#level'+index).textContent='Livello '+(index+1)+' · '+item.box.max.y.toFixed(1)+' m';
  });document.querySelector('#status').textContent=picker.selectedOptions[0].textContent+' · '+mode.selectedOptions[0].textContent+' · 8 modelli di verifica senza modificare la città';
 }
