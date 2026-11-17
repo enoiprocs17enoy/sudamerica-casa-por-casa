@@ -51,7 +51,7 @@ function drawShops(){
   const structuralKinds=new Set(['evolutionSignatureHall','evolutionSignatureHallWindow','evolutionSignatureHallSide','evolutionEntranceCanopy','evolutionEntranceColumn','evolutionUpperWindow','evolutionSideWindow','evolutionRoofTerrace','evolutionTerraceRail','evolutionTerraceSideRail','evolutionTerracePavilion','evolutionTerracePavilionPost','evolutionGrandEntrance','evolutionGrandPier','cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeMark','tradeRound','tradeDress','tradeSculpt','tradeBar','shopPaving','shopUpperBody','shopUpperGlass','shopUpperCap','body','roof','hotelRoof','cinemaRoof',
       'garageRoof','superRoof','displayGlass','entryDoor','entryDoorGlass',
       'signFascia','signInset','garageGate','cinemaParapet','hotelUpperWindow']);
-  for(const kind of ['marketGable','marketHallPost','bakeryGable','workshopDaylightRoof','pharmacyWingRoof','fashionTerraceDeck','fashionBalustrade','superClerestory','libraryDome','libraryDrum','gymVault','pizzaGable','diningTerraceDeck','diningBalustrade','diningTerraceAwning'])structuralKinds.add(kind);
+  for(const kind of ['marketServiceDoor','marketGable','marketHallPost','bakeryGable','workshopDaylightRoof','pharmacyWingRoof','fashionTerraceDeck','fashionBalustrade','superClerestory','libraryDome','libraryDrum','gymVault','pizzaGable','diningTerraceDeck','diningBalustrade','diningTerraceAwning'])structuralKinds.add(kind);
   function put(kind,color,shop,x,y,z,w,h,d){
     // Preserve low-cost architecture at all zoom levels. Decorative pieces
     // are spatially batched so only the visible nearby shops are detailed.
@@ -61,7 +61,7 @@ function drawShops(){
       kind==='shopRoundFurniture'?furnitureRound:(kind==='shopSoftFurniture'||kind==='shopUmbrellaCanopy')?furnitureSoft:
       kind==='tradeDress'||kind==='fashionShowroomDress'?dress:kind==='tradeSculpt'?sculpt:kind==='tradeBar'?bar:
       kind.startsWith('pizza')||kind==='tradeRound'?disc:box;
-    const casts=/^(marketGable|marketHallPost|bakeryGable|workshopDaylightRoof|pharmacyWingRoof|fashionTerraceDeck|fashionBalustrade|superClerestory|body|libraryDome|libraryDrum|gymVault|pizzaGable|diningTerraceDeck|diningBalustrade|diningTerraceAwning|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof|evolutionSignatureHall|evolutionEntranceCanopy|evolutionEntranceColumn|evolutionRoofTerrace|evolutionTerracePavilion|evolutionGrandEntrance|evolutionGrandPier|shopForecourtDetail|shopRoundFurniture|shopUmbrellaCanopy)$/.test(kind);
+    const casts=/^(marketServiceDoor|marketGable|marketHallPost|bakeryGable|workshopDaylightRoof|pharmacyWingRoof|fashionTerraceDeck|fashionBalustrade|superClerestory|body|libraryDome|libraryDrum|gymVault|pizzaGable|diningTerraceDeck|diningBalustrade|diningTerraceAwning|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof|evolutionSignatureHall|evolutionEntranceCanopy|evolutionEntranceColumn|evolutionRoofTerrace|evolutionTerracePavilion|evolutionGrandEntrance|evolutionGrandPier|shopForecourtDetail|shopRoundFurniture|shopUmbrellaCanopy)$/.test(kind);
     const receives=casts||kind==='shopPaving';
     const key=[geometry.id,casts,receives,detailed?cx:'all',detailed?cz:'all'].join(':');
     if(!batches.has(key))batches.set(key,{geo:geometry,casts,receives,entries:[],detailed,
@@ -275,6 +275,10 @@ function drawShops(){
       }
       put('body',wallColor,shop,x,height*.35,z-d*.42,w,height*.70,d*.16);
       put('roof',trim,shop,x,height*.70+.13,z-d*.42,w+.16,.26,d*.16+.16);
+      put('marketServiceDoor',trim,shop,x,1.35,z-d/2-.09,1.90,2.60,.18);
+      put('displayGlass',glass,shop,x,1.70,z-d/2-.20,1.45,1.30,.06);
+      for(let level=2.10;level+.70<height*.70;level+=2.60)for(const side of [-1,1])
+        put('displayGlass',glass,shop,x+side*w*.31,level,z-d/2-.08,w*.20,1.30,.16);
     }else if(bakerySplit){
       // A low shop and cafe frontage joins the taller baking and preparation hall.
       put('body',wallColor,shop,x,2.60,z+d*.30,w,5.20,d*.40);
@@ -595,6 +599,7 @@ function drawShops(){
         const sx=x+(i-(stalls-1)/2)*w*.29;
         put('shopPaving',0xc6ac89,shop,sx,.14,stallZ,stallWidth+.34,.18,3.82);
         put('body',0xb88a62,shop,sx,.66,stallZ-.58,stallWidth,.91,.90);
+        for(let fruit=0;fruit<5;fruit++)put('shopSoftFurniture',fruit%2?0xe5b456:0x93b950,shop,sx+(fruit-2)*stallWidth*.15,1.22,stallZ-.58,.25,.22,.25);
         for(const side of [-1,1])
           put('shopPergolaPost',trim,shop,sx+side*stallWidth*.45,1.56,stallZ,.14,2.83,.14);
         put('roof',i%2?0xbd6954:trim,shop,sx,3.08,stallZ,stallWidth+.36,.23,3.40);
