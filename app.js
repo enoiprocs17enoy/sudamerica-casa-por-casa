@@ -6080,7 +6080,7 @@ function* staticTreeStages(){
   const key=Math.floor(source.position.x/368)+':'+Math.floor(source.position.z/368);
   if(!batches.has(key))batches.set(key,[]);batches.get(key).push(source);
  }
- let merged=0;
+ let merged=0,distantGeometry=null;
  for(const sources of batches.values()){
   if(sources.length<2)continue;
   const first=sources[0],count=sources.reduce((n,s)=>n+s.count,0),mesh=new THREE.InstancedMesh(first.geometry,first.material.clone(),count);
@@ -6093,7 +6093,17 @@ function* staticTreeStages(){
     source.getColorAt(i,color);mesh.setColorAt(at++,color);
    }
   }
-  mesh.instanceMatrix.needsUpdate=true;mesh.instanceColor.needsUpdate=true;mesh.computeBoundingSphere();group.add(mesh);
+  mesh.instanceMatrix.needsUpdate=true;mesh.instanceColor.needsUpdate=true;mesh.computeBoundingSphere();
+  // Keep every crown and its exact near geometry. Only distant facet density changes.
+  distantGeometry=distantGeometry||new THREE.IcosahedronGeometry(1,0);
+  const distant=new THREE.InstancedMesh(distantGeometry,mesh.material,count);
+  distant.instanceMatrix=mesh.instanceMatrix;distant.instanceColor=mesh.instanceColor;
+  distant.castShadow=mesh.castShadow;distant.receiveShadow=mesh.receiveShadow;
+  distant.userData={urbanTreeCanopyBatch:true,urbanTreeCanopyFar:true};distant.computeBoundingSphere();
+  const center=mesh.boundingSphere.center.clone(),lod=new THREE.LOD();
+  lod.name='urban-tree-crown-detail';lod.userData.fullDetailShadow=true;lod.position.copy(center);
+  mesh.position.copy(center).multiplyScalar(-1);distant.position.copy(mesh.position);
+  lod.addLevel(mesh,0);lod.addLevel(distant,900,.14);group.add(lod);
   for(const source of sources){source.visible=false;source.userData.staticTreeProxy=true;}
   merged+=sources.length;yield;
  }

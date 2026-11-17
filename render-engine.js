@@ -5,6 +5,7 @@
  'use strict';
  const target=new THREE.Vector3(),direction=new THREE.Vector3(),offset=new THREE.Vector3(-155,156,115);
  const shadowCenter=new THREE.Vector3(Infinity,0,Infinity);
+ const guardedShadowMaps=new WeakSet();
  let sun=null,lastShadow=-Infinity;
  let shadowDirty=true,previousCity=null;
  const shadowInterval=1000/12;
@@ -15,6 +16,22 @@
   renderer.useLegacyLights=false;
   renderer.shadowMap.enabled=true;
   renderer.shadowMap.autoUpdate=false;
+  // Render every crown at full detail into the cached shadow map, even when
+  // its distant visible model uses fewer facets. Restore main-camera visibility.
+  if(!guardedShadowMaps.has(renderer.shadowMap)){
+   const shadowMap=renderer.shadowMap,drawShadows=shadowMap.render;
+   guardedShadowMaps.add(shadowMap);
+   shadowMap.render=function(...args){
+    if(!shadowMap.enabled||(!shadowMap.autoUpdate&&!shadowMap.needsUpdate))return drawShadows.apply(this,args);
+    const held=[];
+    args[1].traverse(o=>{
+     if(!o.isLOD||!o.userData.fullDetailShadow||o.levels.length<2)return;
+     for(let i=0;i<o.levels.length;i++){const mesh=o.levels[i].object;held.push([mesh,mesh.visible]);mesh.visible=i===0;}
+    });
+    try{return drawShadows.apply(this,args);}finally{for(const [mesh,visible]of held)mesh.visible=visible;}
+   };
+  }
+
   maxRatio=Math.min(renderer.getPixelRatio(),1.5);
   renderer.setPixelRatio(maxRatio);
   renderer.shadowMap.type=THREE.PCFSoftShadowMap;
