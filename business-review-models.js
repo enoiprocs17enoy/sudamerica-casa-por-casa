@@ -59,7 +59,7 @@ function drawShops(){
     const cx=shop?Math.floor(shop.x/90):0,cz=shop?Math.floor(shop.z/90):0;
     const geometry=kind==='pizzaGable'?pizzaGable:kind==='libraryDome'||kind==='gymVault'?libraryDome:kind==='libraryDrum'?furnitureRound:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:
       kind==='shopRoundFurniture'?furnitureRound:(kind==='shopSoftFurniture'||kind==='shopUmbrellaCanopy')?furnitureSoft:
-      kind==='tradeDress'?dress:kind==='tradeSculpt'?sculpt:kind==='tradeBar'?bar:
+      kind==='tradeDress'||kind==='fashionShowroomDress'?dress:kind==='tradeSculpt'?sculpt:kind==='tradeBar'?bar:
       kind.startsWith('pizza')||kind==='tradeRound'?disc:box;
     const casts=/^(pharmacyWingRoof|fashionTerraceDeck|fashionBalustrade|superClerestory|body|libraryDome|libraryDrum|gymVault|pizzaGable|diningTerraceDeck|diningBalustrade|diningTerraceAwning|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof|evolutionSignatureHall|evolutionEntranceCanopy|evolutionEntranceColumn|evolutionRoofTerrace|evolutionTerracePavilion|evolutionGrandEntrance|evolutionGrandPier|shopForecourtDetail|shopRoundFurniture|shopUmbrellaCanopy)$/.test(kind);
     const receives=casts||kind==='shopPaving';
@@ -263,12 +263,12 @@ function drawShops(){
         const wingHeight=Math.max(5.30,height*(side<0?(stage>=5?.84:.72):(stage>=6?.91:.65)));
         put('body',wallColor,shop,x+side*w*.395,wingHeight/2,z,w*.21,wingHeight,d);
         put('pharmacyWingRoof',trim,shop,x+side*w*.395,wingHeight+.23,z,w*.21+.16,.46,d+.26);
-        for(let level=6.45;level+.75<wingHeight;level+=3.10){
+        for(let level=6.45;level+.80<wingHeight;level+=3.10){
           for(const bay of [-.30,0,.30])put('displayGlass',glass,shop,x+side*(w/2+.08),level,z+bay*d,.16,1.55,d*.20);
           for(const face of [-1,1])if(face>0||level-.775>height*.63+.30)put('displayGlass',glass,shop,x+side*w*.395,level,z+face*(d/2+.08),w*.14,1.55,.16);
         }
       }
-      for(let level=6.45;level+.75<height;level+=3.10)for(const face of [-1,1])for(const bay of [-1,0,1]){
+      for(let level=6.45;level+.80<height;level+=3.10)for(const face of [-1,1])for(const bay of [-1,0,1]){
         if(face<0&&level-.775<=height*.63+.30)continue;
         put('displayGlass',glass,shop,x+bay*w*.17,level,z+face*(d/2+.08),w*.125,1.55,.16);
         put('body',0xe4eee0,shop,x+bay*w*.17,level-.86,z+face*(d/2+.15),w*.145,.13,.22);
@@ -285,11 +285,18 @@ function drawShops(){
         for(const bay of [.05,.15,.25])put('fashionBalustrade',trim,shop,x+side*w*.48,5.54,front-d*bay,.06,.85,.06);
         }
       }
-      for(let level=6.65;level+1<height;level+=3.60){
+      for(let level=6.65;level+1.05<height;level+=3.60){
         for(const face of [-1,1])for(const bay of [-1,0,1]){
           if(face<0&&level-1.025<=height*.83+.30)continue;
           put('displayGlass',glass,shop,x+bay*upperWidth*.29,level,upperZ+face*(upperDepth/2+.08),upperWidth*.24,2.05,.16);
           put('body',trim,shop,x+bay*upperWidth*.29,level-1.10,upperZ+face*(upperDepth/2+.15),upperWidth*.26,.14,.24);
+          if(face>0){
+            const mannequinX=x+bay*upperWidth*.29,windowZ=upperFront+.24;
+            put('fashionShowroomDress',bay===0?0xc54e79:0x447da3,shop,mannequinX,level-.10,windowZ,.62,1.36,.55);
+            put('shopSoftFurniture',0xe4c5a8,shop,mannequinX,level+.86,windowZ+.04,.18,.22,.18);
+            put('shopForecourtDetail',0x52606b,shop,mannequinX,level-.87,windowZ,.09,.24,.09);
+            put('shopForecourtDetail',0x52606b,shop,mannequinX,level-.98,windowZ,.45,.10,.12);
+          }
         }
         for(const side of [-1,1])for(const bay of [-1,1])put('displayGlass',glass,shop,x+side*(upperWidth/2+.08),level,upperZ+bay*upperDepth*.25,.16,2.05,upperDepth*.37);
       }
