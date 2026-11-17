@@ -1123,10 +1123,15 @@ function drawShops(){
       roofPut('hotelPenthouse',style.walls,shop,x,rooftop+.91,z-d*.09,w*.58,1.75,d*.60);
       roofPut('hotelPenthouseRoof',trim,shop,x,rooftop+1.87,z-d*.09,w*.62,.20,d*.64);
       for(const side of [-1,1])
-        roofPut('hotelPenthouseWindow',glass,shop,x+side*w*.17,rooftop+.96,front-d*.22,1.05,.92,.11);
+        roofPut('hotelPenthouseWindow',glass,shop,x+side*w*.17,rooftop+.96,progress.premium?z+d*.21+.08:front-d*.22,1.05,.92,.11);
       if(progress.premium){
         // Pool and loungers flank the penthouse; its doorway and the bed emblem stay clear.
         const surface=height+.49,poolX=x+w*.405,poolW=w*.18,poolD=d*.64,poolZ=z-d*.04;
+        put('hotelTerraceDoorFrame',trim,shop,x,surface+.80,z+d*.21+.07,1.24,1.60,.13);
+        put('hotelTerraceDoorGlass',glass,shop,x,surface+.80,z+d*.21+.15,1.04,1.40,.05);
+        put('hotelTerraceThreshold',0xf1dfbb,shop,x,surface+.05,z+d*.21+.23,1.35,.10,.46);
+        for(const side of [-1,1])put('hotelPoolLadder',0xbac9c4,shop,poolX+side*.25,surface+.70,poolZ+poolD/2-.24,.055,.90,.055);
+        for(const rung of [.40,.65,.90])put('hotelPoolLadder',0xbac9c4,shop,poolX,surface+rung,poolZ+poolD/2-.24,.55,.055,.055);
         put('hotelPoolBase',0xf1dfbb,shop,poolX,surface+.10,poolZ,poolW,.20,poolD);
         put('hotelPoolWater',0x4bbccc,shop,poolX,surface+.215,poolZ,poolW-.18,.03,poolD-.22);
         for(const side of [-1,1]){
