@@ -320,7 +320,7 @@ function* renderHouseStages(selected){
         const bx=x+footW*.24,bz=z+footD*.24,by=height+.95;
         const bbqColors=[0xc69d7a,0x66747a,0xb77750,0xa5b2b5];
         const c=bbqColors[v];
-        place('roofBBQPad',boxGeo,0xd9d1be,h,bx,by-.16,bz,2.55,.18,2.15);
+        place('roofBBQPad',boxGeo,0xd9d1be,h,bx,by-.26,bz,2.55,.40,2.15);
         if(v===0){ // tall brick barbecue with extraction hood
           place('roofBBQBrick',boxGeo,c,h,bx,by+.42,bz,1.52,.96,.94);
           place('roofBBQOpening',boxGeo,0x35373a,h,bx,by+.61,bz+.49,1.03,.43,.07);
@@ -352,7 +352,7 @@ function* renderHouseStages(selected){
         const edge=[0xf4e4c8,0xe5ece9,0xd9c6a2,0xf1f0e7][v];
         // A single compact terrace, fully above the roof surface.
         const pw=Math.min(8.4,footW*.52),pd=Math.min(7.2,footD*.37);
-        place('poolRoofDeck',boxGeo,0xded9cb,h,px,py-.21,pz,pw+.46,.20,pd+.46);
+        place('poolRoofDeck',boxGeo,0xded9cb,h,px,py-.29,pz,pw+.46,.38,pd+.46);
         if(v===1||v===3){
           // oval pool vs round plunge pool: two distinct proportions
           const ow=v===1?pw*.86:Math.min(pw,pd)*.91;
@@ -384,7 +384,7 @@ function* renderHouseStages(selected){
           const wx=x+side*footW*.26, width=footW*.24;
           for(const face of [-1,1]){
             const wz=z+face*(footD/2+.055);
-            place('towerWindowFrame',boxGeo,0xf0dfc8,h,wx,openingY,wz,width+.22,openingHeight+.18,.12);
+            place('towerWindowFrame',boxGeo,0xf0dfc8,h,wx,openingY,wz,width+.22,balconyDoor?2.38:1.33,.12);
             place('towerWindow',boxGeo,0x39738f,h,wx,openingY,wz+face*.075,width,openingHeight,.075);
             place('towerWindowMullion',boxGeo,0xe5d7c5,h,wx,openingY,wz+face*.12,.065,openingHeight,.045);
             place('towerWindowSill',boxGeo,0xf0dfc8,h,wx,balconyDoor?floor*storeyHeight+.42:wy-.67,wz+face*.13,width+.37,.12,.34);
@@ -535,24 +535,21 @@ function* renderHouseStages(selected){
       // pavilion was pushed through the main facade and produced a roof
       // intersecting the house, with windows embedded in its geometry.
       // Premium distinction comes from the veranda, pilasters and dormer.
-      place('premiumVerandaFloor',boxGeo,plinth,h,x,.13,z+depth/2+.62,
-        Math.min(4.3,width*.42),.22,1.00);
-      for(const side of [-1,1])
-        place('premiumVerandaPost',boxGeo,stone,h,x+side*1.65,1.29,
-          z+depth/2+.72,.16,2.3,.16);
-      place('premiumVerandaRoof',roofGeo,roof,h,x,2.56,z+depth/2+.51,
-        2.1,.48,.68);
+      const verandaWidth=coreW*.86;
+      place('premiumVerandaFloor',boxGeo,plinth,h,x,.13,z+depth/2+.85,verandaWidth,.22,1.80);
+      for(const side of [-1,1])place('premiumVerandaPost',boxGeo,stone,h,x+side*verandaWidth*.44,1.28,z+depth/2+1.50,.18,2.56,.18);
+      place('premiumVerandaRoof',roofGeo,roof,h,x,2.56,z+depth/2+.85,coreW*.41,.48,1.00);
       place('premiumChimney',boxGeo,0xa47765,h,x-width*.18,height+.85,
         z-depth*.12,.50,1.60,.50);
       // Do not add the former floating balcony/door assembly: it had no
       // coherent supporting facade and covered the second-floor windows.
       // Dormer is visible from above even on the first evolution.
-      place('premiumDormer',boxGeo,lightTrim,h,x+coreW*.18,height+.45,
-        z+coreZ+coreD*.10,1.10,.72,.85);
-      place('premiumDormerTop',roofGeo,roof,h,x+coreW*.18,height+.85,
-        z+coreZ+coreD*.10,.65,.30,.52);
-      place('premiumDormerGlass',boxGeo,0x86c7d7,h,x+coreW*.18,height+.48,
-        z+coreZ+coreD*.10+.45,.56,.45,.08);
+      const dormerX=coreW*.18,dormerZ=z+coreZ+coreD*.10;
+      const dormerSurface=roofBase+roofRise*(1-dormerX/roofHalf);
+      place('premiumDormer',boxGeo,lightTrim,h,x+dormerX,dormerSurface+.32,dormerZ,.90,.72,1.10);
+      place('premiumDormerTop',roofGeo,roof,h,x+dormerX,dormerSurface+.68,dormerZ,.65,.32,.56,Math.PI/2);
+      place('premiumDormerGlass',boxGeo,0x86c7d7,h,x+dormerX+.49,dormerSurface+.32,dormerZ,.08,.45,.70);
+
     }
     // v6.2: Architectural geometry, not just a brighter lighting preset.
     // Every addition is instanced and attached to the original house, so
@@ -690,7 +687,7 @@ function* renderHouseStages(selected){
     const normalStrength=/(roof|gable|hip)/i.test(key)?.88:.56;
     const roughness=/(window|glass|mullion)/i.test(key)?.26:/roof/i.test(key)?.79:.87;
     const metalness=/(mullion|sconce|handle)/i.test(key)?.48:.02;
-    const casts=/(premiumTowerBalconySlab|gardenTree|towerBase|towerRoof|towerMain|towerMid|homeMain|homeWing|homeRoof|homeCore|homeWall|towerWall|towerBody|mainBody|wingBody|mainRoof|gable|hipRoof)/i.test(key);
+    const casts=/(premiumVerandaRoof|premiumDormerTop|premiumChimney|premiumTowerBalconySlab|gardenTree|towerBase|towerRoof|towerMain|towerMid|homeMain|homeWing|homeRoof|homeCore|homeWall|towerWall|towerBody|mainBody|wingBody|mainRoof|gable|hipRoof)/i.test(key);
     const receives=casts||/(facade|pier|window|door|balcony|pilaster)/i.test(key);
     const profile=[batch.geo.id,texture,normalStrength,roughness,metalness,casts,receives].join(':');
     for(const entry of batch.entries){
