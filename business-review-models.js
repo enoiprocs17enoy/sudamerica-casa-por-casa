@@ -1199,7 +1199,7 @@ function drawShops(){
 // milestone unlocks. They are contained entirely within their reserved plots.
 
 
-const picker=document.querySelector('#business'),mode=document.querySelector('#finish'),angle=document.querySelector('#angle'),scale=document.querySelector('#scale');
+const picker=document.querySelector('#business'),mode=document.querySelector('#finish'),angle=document.querySelector('#angle'),scale=document.querySelector('#scale'),focus=document.querySelector('#focus');
 for(const id of [...Array(12).keys(),14]){const option=document.createElement('option');option.value=id;option.textContent=id===14?'Pizzeria':shopStyles[id].name;picker.append(option);}
 const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setPixelRatio(1);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.18;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.autoClear=false;document.querySelector('#models').append(renderer.domElement);
 let fixtures=[];
@@ -1215,10 +1215,10 @@ function build(){dispose();const id=Number(picker.value),premium=mode.value==='p
  }
  render();
 }
-function render(){if(!fixtures.length)return;const root=document.querySelector('#models'),width=root.clientWidth,height=root.clientHeight;renderer.setSize(width,height);renderer.setScissorTest(true);const cellW=width/4,cellH=height/2,common=new THREE.Box3();for(const item of fixtures)common.union(item.box);
- fixtures.forEach((item,index)=>{const box=scale.value==='common'?common:item.box,center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3()),az=angle.value==='back'?Math.PI*7/6:angle.value==='side'?Math.PI*2/3:Math.PI/6,elev=angle.value==='top'?1.35:.58;const span=Math.max(size.y,size.x,size.z*.82,14),distance=span*2.05;
-  item.camera.aspect=cellW/cellH;item.camera.position.set(center.x+Math.sin(az)*Math.cos(elev)*distance,center.y+Math.sin(elev)*distance,center.z+Math.cos(az)*Math.cos(elev)*distance);item.camera.lookAt(center);item.camera.updateProjectionMatrix();const col=index%4,row=Math.floor(index/4);renderer.setViewport(col*cellW,height-(row+1)*cellH,cellW,cellH);renderer.setScissor(col*cellW,height-(row+1)*cellH,cellW,cellH);renderer.clear();renderer.render(item.scene,item.camera);document.querySelector('#level'+index).textContent='Livello '+(index+1)+' · '+item.box.max.y.toFixed(1)+' m';
+function render(){if(!fixtures.length)return;const root=document.querySelector('#models'),width=root.clientWidth,height=root.clientHeight;renderer.setSize(width,height);renderer.setScissorTest(true);const focused=focus.value!=='all',cellW=width/(focused?1:4),cellH=height/(focused?1:2),common=new THREE.Box3();for(const item of fixtures)common.union(item.box);
+ fixtures.forEach((item,index)=>{document.querySelector('#level'+index).style.gridArea=focused?'1 / 1':'auto';document.querySelector('#level'+index).hidden=focused&&index!==Number(focus.value);if(focused&&index!==Number(focus.value))return;const box=scale.value==='common'?common:item.box,center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3()),az=angle.value==='back'?Math.PI*7/6:angle.value==='side'?Math.PI*2/3:Math.PI/6,elev=angle.value==='top'?1.35:.58;const span=Math.max(size.y,size.x,size.z*.82,14),distance=span*2.05;
+  item.camera.aspect=cellW/cellH;item.camera.position.set(center.x+Math.sin(az)*Math.cos(elev)*distance,center.y+Math.sin(elev)*distance,center.z+Math.cos(az)*Math.cos(elev)*distance);item.camera.lookAt(center);item.camera.updateProjectionMatrix();const col=focused?0:index%4,row=focused?0:Math.floor(index/4);renderer.setViewport(col*cellW,height-(row+1)*cellH,cellW,cellH);renderer.setScissor(col*cellW,height-(row+1)*cellH,cellW,cellH);renderer.clear();renderer.render(item.scene,item.camera);document.querySelector('#level'+index).textContent='Livello '+(index+1)+' · '+item.box.max.y.toFixed(1)+' m';
  });document.querySelector('#status').textContent=picker.selectedOptions[0].textContent+' · '+mode.selectedOptions[0].textContent+' · 8 modelli di verifica senza modificare la città';
 }
-picker.onchange=mode.onchange=build;angle.onchange=scale.onchange=render;window.addEventListener('resize',render);build();
+picker.onchange=mode.onchange=build;angle.onchange=scale.onchange=focus.onchange=render;window.addEventListener('resize',render);build();
 })();
