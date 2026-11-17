@@ -51,7 +51,7 @@ function drawShops(){
   const structuralKinds=new Set(['evolutionSignatureHall','evolutionSignatureHallWindow','evolutionSignatureHallSide','evolutionEntranceCanopy','evolutionEntranceColumn','evolutionUpperWindow','evolutionSideWindow','evolutionRoofTerrace','evolutionTerraceRail','evolutionTerraceSideRail','evolutionTerracePavilion','evolutionTerracePavilionPost','evolutionGrandEntrance','evolutionGrandPier','cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeMark','tradeRound','tradeDress','tradeSculpt','tradeBar','shopPaving','shopUpperBody','shopUpperGlass','shopUpperCap','body','roof','hotelRoof','cinemaRoof',
       'garageRoof','superRoof','displayGlass','entryDoor','entryDoorGlass',
       'signFascia','signInset','garageGate','cinemaParapet','hotelUpperWindow']);
-  for(const kind of ['hotelBalcony','hotelBalconyGlass','hotelBalconyRail','hotelBalconySideRail','hotelPoolBase','hotelPoolWater','hotelRoofGuard','hotelRoofGuardCap','marketServiceDoor','marketGable','marketHallPost','bakeryGable','workshopDaylightRoof','pharmacyWingRoof','fashionTerraceDeck','fashionBalustrade','superClerestory','libraryDome','libraryDrum','gymVault','pizzaGable','diningTerraceDeck','diningBalustrade','diningTerraceAwning'])structuralKinds.add(kind);
+  for(const kind of ['cinemaPremiereCanopy','cinemaPremiereColumn','cinemaPremiereFascia','cinemaPosterCase','cinemaPosterArtwork','cinemaTicketBooth','cinemaTicketGlass','hotelBalcony','hotelBalconyGlass','hotelBalconyRail','hotelBalconySideRail','hotelPoolBase','hotelPoolWater','hotelRoofGuard','hotelRoofGuardCap','marketServiceDoor','marketGable','marketHallPost','bakeryGable','workshopDaylightRoof','pharmacyWingRoof','fashionTerraceDeck','fashionBalustrade','superClerestory','libraryDome','libraryDrum','gymVault','pizzaGable','diningTerraceDeck','diningBalustrade','diningTerraceAwning'])structuralKinds.add(kind);
   function put(kind,color,shop,x,y,z,w,h,d){
     // Preserve low-cost architecture at all zoom levels. Decorative pieces
     // are spatially batched so only the visible nearby shops are detailed.
@@ -61,10 +61,11 @@ function drawShops(){
       kind==='shopRoundFurniture'?furnitureRound:(kind==='shopSoftFurniture'||kind==='shopUmbrellaCanopy')?furnitureSoft:
       kind==='tradeDress'||kind==='fashionShowroomDress'?dress:kind==='tradeSculpt'?sculpt:kind==='tradeBar'?bar:
       kind.startsWith('pizza')||kind==='tradeRound'?disc:box;
-    const casts=/^(hotelBalcony|hotelPoolBase|hotelSunbedFrame|marketServiceDoor|marketGable|marketHallPost|bakeryGable|workshopDaylightRoof|pharmacyWingRoof|fashionTerraceDeck|fashionBalustrade|superClerestory|body|libraryDome|libraryDrum|gymVault|pizzaGable|diningTerraceDeck|diningBalustrade|diningTerraceAwning|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof|evolutionSignatureHall|evolutionEntranceCanopy|evolutionEntranceColumn|evolutionRoofTerrace|evolutionTerracePavilion|evolutionGrandEntrance|evolutionGrandPier|shopForecourtDetail|shopRoundFurniture|shopUmbrellaCanopy)$/.test(kind);
+    const casts=/^(cinemaPremiereCanopy|cinemaPremiereColumn|cinemaTicketBooth|hotelBalcony|hotelPoolBase|hotelSunbedFrame|marketServiceDoor|marketGable|marketHallPost|bakeryGable|workshopDaylightRoof|pharmacyWingRoof|fashionTerraceDeck|fashionBalustrade|superClerestory|body|libraryDome|libraryDrum|gymVault|pizzaGable|diningTerraceDeck|diningBalustrade|diningTerraceAwning|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof|evolutionSignatureHall|evolutionEntranceCanopy|evolutionEntranceColumn|evolutionRoofTerrace|evolutionTerracePavilion|evolutionGrandEntrance|evolutionGrandPier|shopForecourtDetail|shopRoundFurniture|shopUmbrellaCanopy)$/.test(kind);
     const receives=casts||kind==='shopPaving';
-    const key=[geometry.id,casts,receives,detailed?cx:'all',detailed?cz:'all'].join(':');
-    if(!batches.has(key))batches.set(key,{geo:geometry,casts,receives,entries:[],detailed,
+    const glow=kind==='cinemaPremiumBulb';
+    const key=[geometry.id,casts,receives,detailed?cx:'all',detailed?cz:'all',glow].join(':');
+    if(!batches.has(key))batches.set(key,{geo:geometry,casts,receives,glow,entries:[],detailed,
       chunk:{x:(cx+.5)*90,z:(cz+.5)*90}});
     let rotation=0;
     if(shop){rotation=facadeAngle(shop);
@@ -195,7 +196,17 @@ function drawShops(){
       part('shopPaving',0x9a3e49,0,.13,6.7,w*.46,.12,7.5);
       for(const side of [-1,1]){
         for(let post=0;post<2+Math.min(stage,3);post++){const dz=3.4+post*1.2;round(0xc8ad72,side*w*.25,.77,dz,.075,1.28,.075);soft(0xd8bb78,side*w*.25,1.46,dz,.19,.19,.19);if(post)box(0x9a3e49,side*w*.25,1.27,dz-.60,.07,.07,1.2);}
-        if(stage>=1){box(trim,side*w*.36,1.28,6.0,1.26,2.2,1.12);box(glass,side*w*.36,1.64,6.58,.96,.60,.06);box(cream,side*w*.36,2.49,6.0,1.48,.20,1.36);}
+        if(premium){
+          const boothX=side*w*.36,boothZ=6.0;
+          part('cinemaTicketBooth',trim,boothX,1.43,boothZ,1.52,2.60,1.35);
+          box(0xe7bc68,boothX,2.84,boothZ,1.75,.22,1.56);
+          part('cinemaTicketGlass',glass,boothX,1.83,boothZ+.73,1.27,1.06,.08);
+          box(cream,boothX,1.22,boothZ+.82,1.40,.13,.32);
+          box(0x273b50,boothX,1.40,boothZ+.91,.32,.20,.10);
+          box(0xffe8b4,boothX,1.41,boothZ+.975,.24,.11,.03);
+          part('cinemaPremiumBulb',0xffda83,boothX,2.55,boothZ+.74,1.10,.13,.06);
+          for(const edge of [-1,1])box(0xe7bc68,boothX+edge*.65,1.54,boothZ+.74,.08,2.12,.10);
+        }else if(stage>=1){box(trim,side*w*.36,1.28,6.0,1.26,2.2,1.12);box(glass,side*w*.36,1.64,6.58,.96,.60,.06);box(cream,side*w*.36,2.49,6.0,1.48,.20,1.36);}
       }
     }else if(shape===9){
       // Outdoor workout stations: weights and pull-up bars.
@@ -396,7 +407,7 @@ function drawShops(){
     }else put('body',wallColor,shop,x,height/2,z,w,height,d);
     let serviceRear=z-d/2;
 
-    if(stage>=1){
+    if(stage>=1&&!(shape===8&&progress.premium)){
       const canopyDepth=shape===0||shape===2||shape===7?4.15:shape===6?1.45:2.15;
       const canopyWidth=w*(shape===8?.90:.82);
       const canopyY=shape===8||shape===6?3.55:3.04;
@@ -918,8 +929,38 @@ function drawShops(){
     }else if(shape===8){ // Cinema: bold marquee and tall front parapet.
       put('cinemaRoof',0x364b66,shop,x,height+.24,z,w*(stage>=2?.48:1)+.36,.48,d+.36);
       put('cinemaParapet',trim,shop,x,height+.78,front-.13,w*(stage>=2?.46:.94),1.10,.38);
-      put('cinemaMarquee',0xe7bc68,shop,x,signY+.04,front+.46,w*.80,.44,.70);
-      for(const side of [-1,1])put('cinemaLight',0xffe3a4,shop,x+side*w*.36,signY+.04,front+.85,.13,.13,.12);
+      put(progress.premium?'cinemaPremiereCanopy':'cinemaMarquee',0xe7bc68,shop,x,progress.premium?3.55:signY+.04,front+(progress.premium?1.90:.46),w*(progress.premium?.94:.80),.44,progress.premium?4.0:.70);
+      if(progress.premium){
+        const canopyW=w*.94;
+        for(const side of [-1,1]){
+          put('cinemaPremiereColumn',trim,shop,x+side*canopyW*.46,1.78,front+3.68,.26,3.30,.26);
+          put('cinemaPremiereCapital',0xe7bc68,shop,x+side*canopyW*.46,3.24,front+3.68,.46,.18,.46);
+          put('cinemaPremiereSideTrim',trim,shop,x+side*canopyW*.495,3.55,front+1.90,.10,.31,3.94);
+          for(let row=0;row<6;row++)put('cinemaPremiumBulb',0xffda83,shop,x+side*canopyW*.43,3.28,front+.24+row*.66,.14,.14,.14);
+        }
+        put('cinemaPremiereFascia',trim,shop,x,3.55,front+3.94,canopyW,.29,.12);
+        for(let lamp=0;lamp<Math.max(8,Math.round(w/.65));lamp++){
+          const count=Math.max(8,Math.round(w/.65)),px=x+((lamp/(count-1))-.5)*canopyW*.91;
+          put('cinemaPremiumBulb',0xffda83,shop,px,3.55,front+4.025,.12,.12,.12);
+        }
+        const posterY=2.20,posterH=2.65;
+        for(const side of [-1,1])for(const bay of [-1,1]){
+          const posterZ=z+bay*d*.22,posterDepth=d*.25;
+          put('cinemaPosterCase',0xe7bc68,shop,x+side*(w/2+.105),posterY,posterZ,.17,posterH,posterDepth);
+          put('cinemaPosterArtwork',bay<0?0x872d4d:0x24547f,shop,x+side*(w/2+.21),posterY,posterZ,.06,posterH-.22,posterDepth-.22);
+          put('cinemaPosterMoon',0xffd58c,shop,x+side*(w/2+.25),posterY+.50,posterZ-posterDepth*.18,.04,.42,posterDepth*.23);
+          put('cinemaPosterTitle',0xf8deb6,shop,x+side*(w/2+.25),posterY-.77,posterZ,.04,.12,posterDepth*.65);
+        }
+        for(const bay of [-1,0,1]){
+          const px=x+bay*w*.29,pw=w*.23,back=serviceRear-(stage>=4?.35:0),rearPosterY=4.55;
+          if(stage>=4)for(const side of [-1,1])put('cinemaPosterMount',trim,shop,px+side*pw*.39,rearPosterY,serviceRear-.22,.12,.20,.45);
+          put('cinemaPosterCase',0xe7bc68,shop,px,rearPosterY,back-.105,pw,posterH,.17);
+          put('cinemaPosterArtwork',[0x872d4d,0x24547f,0x356b5a][bay+1],shop,px,rearPosterY,back-.21,pw-.22,posterH-.22,.06);
+          put('cinemaPosterMoon',0xffd58c,shop,px-pw*.18,rearPosterY+.50,back-.25,pw*.23,.42,.04);
+          put('cinemaPosterTitle',0xf8deb6,shop,px,rearPosterY-.77,back-.25,pw*.65,.12,.04);
+        }
+      }
+      for(const side of [-1,1])put('cinemaLight',0xffe3a4,shop,x+side*w*.36,signY+.04,front+(progress.premium?.36:.85),.13,.13,.12);
       if(stage>=2){
         for(const side of [-1,1]){
           const pierX=x+side*w*.225;
@@ -1176,9 +1217,10 @@ function drawShops(){
     furnishBusiness(shop,shape,stage,progress.premium,w,d,height,trim,glass,serviceRear);
   }
   const material=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.77,metalness:.02});
+  const glowMaterial=[...batches.values()].some(batch=>batch.glow)?new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xffcf7a,emissiveIntensity:.75,roughness:.40}):material;
   const instanceColor=new THREE.Color();
   for(const batch of batches.values()){
-    const mesh=new THREE.InstancedMesh(batch.geo,material,batch.entries.length);
+    const mesh=new THREE.InstancedMesh(batch.geo,batch.glow?glowMaterial:material,batch.entries.length);
     mesh.castShadow=batch.casts;
     mesh.receiveShadow=batch.receives;
     for(let i=0;i<batch.entries.length;i++){
