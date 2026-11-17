@@ -237,6 +237,13 @@ function drawShops(){
           for(const edge of [-1,1])part('gymTreadmillButton',edge<0?0x91be63:0xd96a55,tx+edge*.47,1.72,tz-.68,.09,.09,.05);
         }
         const poolZ=serviceRear-front-3.15,deckW=w*.86,poolW=w*.66;
+        if(stage>=2){
+          const rear=serviceRear-front;
+          part('gymPoolDoorFrame',trim,0,1.50,rear-.10,1.82,2.68,.18);
+          part('gymPoolDoorGlass',glass,0,1.50,rear-.22,1.58,2.40,.05);
+          part('gymPoolDoorHandle',metal,.58,1.40,rear-.27,.08,.32,.04);
+          part('gymPoolThreshold',0xd8ccb1,0,.19,rear-.30,1.94,.18,.60);
+        }
         part('gymPoolDeck',0xd8ccb1,0,.14,poolZ,deckW,.32,5.80);
         part('gymPoolBasin',0x699ba0,0,.34,poolZ,poolW,.20,3.65);
         part('gymPoolWater',0x48afc0,0,.455,poolZ,poolW-.16,.03,3.47);
