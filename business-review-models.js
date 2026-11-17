@@ -698,9 +698,10 @@ function drawShops(){
       }
     }
     if(progress.premium){
+      const crownHeight=industrialSplit?height*.78:height;
       const crownWidth=industrialSplit?w*.22:recessedUpper?upperWidth:steppedPharmacy?w*.58:shape===8&&stage>=2?w*.48:w;
-      put('shopPremiumCornice',0xf2dfbf,shop,x,height-.12,(recessedUpper?upperFront:front)+.14,crownWidth,.25,.34);
-      put('shopPremiumRearCornice',0xf2dfbf,shop,x,height-.12,z-d/2-.12,crownWidth,.25,.31);
+      put('shopPremiumCornice',0xf2dfbf,shop,x,crownHeight-.12,(recessedUpper?upperFront:front)+.14,crownWidth,.25,.34);
+      put('shopPremiumRearCornice',0xf2dfbf,shop,x,crownHeight-.12,z-d/2-.12,crownWidth,.25,.31);
       for(const side of [-1,1]){
         const sideX=x+side*((recessedUpper?upperWidth:w)/2+.12);
         const sideHeight=industrialSplit?height*(side<0?.90:1):steppedPharmacy?Math.max(5.30,height*(side<0?(stage>=5?.84:.72):(stage>=6?.91:.65))):shape===8&&stage>=2?height*(side<0?(stage>=4?.87:.70):(stage>=6?.94:.77)):height;
