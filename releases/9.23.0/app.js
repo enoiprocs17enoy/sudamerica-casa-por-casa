@@ -6101,7 +6101,7 @@ function* staticTreeStages(){
   distant.castShadow=mesh.castShadow;distant.receiveShadow=mesh.receiveShadow;
   distant.userData={urbanTreeCanopyBatch:true,urbanTreeCanopyFar:true};distant.computeBoundingSphere();
   const center=mesh.boundingSphere.center.clone(),lod=new THREE.LOD();
-  lod.name='urban-tree-crown-detail';lod.position.copy(center);
+  lod.name='urban-tree-crown-detail';lod.userData.fullDetailShadow=true;lod.position.copy(center);
   mesh.position.copy(center).multiplyScalar(-1);distant.position.copy(mesh.position);
   lod.addLevel(mesh,0);lod.addLevel(distant,900,.14);group.add(lod);
   for(const source of sources){source.visible=false;source.userData.staticTreeProxy=true;}
