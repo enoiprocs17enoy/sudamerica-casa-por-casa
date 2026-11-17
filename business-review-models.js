@@ -57,7 +57,7 @@ function drawShops(){
     // are spatially batched so only the visible nearby shops are detailed.
     const detailed=!structuralKinds.has(kind);
     const cx=shop?Math.floor(shop.x/90):0,cz=shop?Math.floor(shop.z/90):0;
-    const geometry=kind==='pizzaGable'||kind==='bakeryGable'||kind==='marketGable'?pizzaGable:kind==='libraryDome'||kind==='gymVault'?libraryDome:kind==='libraryDrum'?furnitureRound:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:
+    const geometry=kind==='cinemaPosterMoon'?disc:kind==='cinemaSidePosterMoon'?bar:kind==='pizzaGable'||kind==='bakeryGable'||kind==='marketGable'?pizzaGable:kind==='libraryDome'||kind==='gymVault'?libraryDome:kind==='libraryDrum'?furnitureRound:kind==='cafeCupSign'?cup:kind==='cafeHandleSign'?handle:
       kind==='shopRoundFurniture'?furnitureRound:(kind==='shopSoftFurniture'||kind==='shopUmbrellaCanopy')?furnitureSoft:
       kind==='tradeDress'||kind==='fashionShowroomDress'?dress:kind==='tradeSculpt'?sculpt:kind==='tradeBar'?bar:
       kind.startsWith('pizza')||kind==='tradeRound'?disc:box;
@@ -943,12 +943,22 @@ function drawShops(){
           const count=Math.max(8,Math.round(w/.65)),px=x+((lamp/(count-1))-.5)*canopyW*.91;
           put('cinemaPremiumBulb',0xffda83,shop,px,3.55,front+4.025,.12,.12,.12);
         }
+        if(stage<3){
+          const panelY=Math.max(6.4,height*.72),panelH=Math.min(2.6,height*.24),panelW=w*.43;
+          put('cinemaPosterCase',0xe7bc68,shop,x,panelY,front+.16,panelW,panelH,.20);
+          put('cinemaPosterArtwork',0x1d405c,shop,x,panelY,front+.30,panelW-.22,panelH-.20,.05);
+          put('cinemaPosterMoon',0xffd58c,shop,x-panelW*.26,panelY+panelH*.18,front+.35,.58,.58,.04);
+          for(let tower=0;tower<5;tower++){
+            const rise=.35+(tower%3)*.18;
+            put('cinemaPosterSkyline',0x72a6b0,shop,x+(tower-2)*panelW*.13,panelY-panelH*.28+rise/2,front+.35,panelW*.10,rise,.04);
+          }
+        }
         const posterY=2.20,posterH=2.65;
         for(const side of [-1,1])for(const bay of [-1,1]){
           const posterZ=z+bay*d*.22,posterDepth=d*.25;
           put('cinemaPosterCase',0xe7bc68,shop,x+side*(w/2+.105),posterY,posterZ,.17,posterH,posterDepth);
           put('cinemaPosterArtwork',bay<0?0x872d4d:0x24547f,shop,x+side*(w/2+.21),posterY,posterZ,.06,posterH-.22,posterDepth-.22);
-          put('cinemaPosterMoon',0xffd58c,shop,x+side*(w/2+.25),posterY+.50,posterZ-posterDepth*.18,.04,.42,posterDepth*.23);
+          put('cinemaSidePosterMoon',0xffd58c,shop,x+side*(w/2+.25),posterY+.50,posterZ-posterDepth*.18,.04,.42,posterDepth*.23);
           put('cinemaPosterTitle',0xf8deb6,shop,x+side*(w/2+.25),posterY-.77,posterZ,.04,.12,posterDepth*.65);
         }
         for(const bay of [-1,0,1]){
