@@ -2709,7 +2709,7 @@ function drawShops(){
   const structuralKinds=new Set(['evolutionSignatureHall','evolutionSignatureHallWindow','evolutionSignatureHallSide','evolutionEntranceCanopy','evolutionEntranceColumn','evolutionUpperWindow','evolutionSideWindow','evolutionRoofTerrace','evolutionTerraceRail','evolutionTerraceSideRail','evolutionTerracePavilion','evolutionTerracePavilionPost','evolutionGrandEntrance','evolutionGrandPier','cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeMark','tradeRound','tradeDress','tradeSculpt','tradeBar','shopPaving','shopUpperBody','shopUpperGlass','shopUpperCap','body','roof','hotelRoof','cinemaRoof',
       'garageRoof','superRoof','displayGlass','entryDoor','entryDoorGlass',
       'signFascia','signInset','garageGate','cinemaParapet','hotelUpperWindow']);
-  for(const kind of ['cinemaPremiereCanopy','cinemaPremiereColumn','cinemaPremiereFascia','cinemaPosterCase','cinemaPosterArtwork','cinemaTicketBooth','cinemaTicketGlass','hotelBalcony','hotelBalconyGlass','hotelBalconyRail','hotelBalconySideRail','hotelPoolBase','hotelPoolWater','hotelRoofGuard','hotelRoofGuardCap','marketServiceDoor','marketGable','marketHallPost','bakeryGable','workshopDaylightRoof','pharmacyWingRoof','fashionTerraceDeck','fashionBalustrade','superClerestory','libraryDome','libraryDrum','gymVault','pizzaGable','diningTerraceDeck','diningBalustrade','diningTerraceAwning'])structuralKinds.add(kind);
+  for(const kind of ['gymTrainingPost','gymTrainingBeam','gymTrainingSlat','gymPoolDeck','gymPoolBasin','gymPoolWater','gymTreadmillBase','cinemaPremiereCanopy','cinemaPremiereColumn','cinemaPremiereFascia','cinemaPosterCase','cinemaPosterArtwork','cinemaTicketBooth','cinemaTicketGlass','hotelBalcony','hotelBalconyGlass','hotelBalconyRail','hotelBalconySideRail','hotelPoolBase','hotelPoolWater','hotelRoofGuard','hotelRoofGuardCap','marketServiceDoor','marketGable','marketHallPost','bakeryGable','workshopDaylightRoof','pharmacyWingRoof','fashionTerraceDeck','fashionBalustrade','superClerestory','libraryDome','libraryDrum','gymVault','pizzaGable','diningTerraceDeck','diningBalustrade','diningTerraceAwning'])structuralKinds.add(kind);
   function put(kind,color,shop,x,y,z,w,h,d){
     // Preserve low-cost architecture at all zoom levels. Decorative pieces
     // are spatially batched so only the visible nearby shops are detailed.
@@ -2719,7 +2719,7 @@ function drawShops(){
       kind==='shopRoundFurniture'?furnitureRound:(kind==='shopSoftFurniture'||kind==='shopUmbrellaCanopy')?furnitureSoft:
       kind==='tradeDress'||kind==='fashionShowroomDress'?dress:kind==='tradeSculpt'?sculpt:kind==='tradeBar'?bar:
       kind.startsWith('pizza')||kind==='tradeRound'?disc:box;
-    const casts=/^(cinemaPremiereCanopy|cinemaPremiereColumn|cinemaTicketBooth|hotelBalcony|hotelPoolBase|hotelSunbedFrame|marketServiceDoor|marketGable|marketHallPost|bakeryGable|workshopDaylightRoof|pharmacyWingRoof|fashionTerraceDeck|fashionBalustrade|superClerestory|body|libraryDome|libraryDrum|gymVault|pizzaGable|diningTerraceDeck|diningBalustrade|diningTerraceAwning|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof|evolutionSignatureHall|evolutionEntranceCanopy|evolutionEntranceColumn|evolutionRoofTerrace|evolutionTerracePavilion|evolutionGrandEntrance|evolutionGrandPier|shopForecourtDetail|shopRoundFurniture|shopUmbrellaCanopy)$/.test(kind);
+    const casts=/^(gymTrainingPost|gymTrainingBeam|gymTrainingSlat|gymPoolDeck|gymTreadmillBase|cinemaPremiereCanopy|cinemaPremiereColumn|cinemaTicketBooth|hotelBalcony|hotelPoolBase|hotelSunbedFrame|marketServiceDoor|marketGable|marketHallPost|bakeryGable|workshopDaylightRoof|pharmacyWingRoof|fashionTerraceDeck|fashionBalustrade|superClerestory|body|libraryDome|libraryDrum|gymVault|pizzaGable|diningTerraceDeck|diningBalustrade|diningTerraceAwning|shopUpperBody|shopUpperCap|roof|cinemaRoof|hotelRoof|superRoof|garageRoof|evolutionSignatureHall|evolutionEntranceCanopy|evolutionEntranceColumn|evolutionRoofTerrace|evolutionTerracePavilion|evolutionGrandEntrance|evolutionGrandPier|shopForecourtDetail|shopRoundFurniture|shopUmbrellaCanopy)$/.test(kind);
     const receives=casts||kind==='shopPaving';
     const glow=kind==='cinemaPremiumBulb';
     const key=[geometry.id,casts,receives,detailed?cx:'all',detailed?cz:'all',glow].join(':');
@@ -2872,6 +2872,52 @@ function drawShops(){
         const dx=(station-1)*w*.28,dz=5.6;box(0x577d78,dx,.12,dz,2.12,.10,3.3);
         box(metal,dx,1.10,dz,1.5,.10,.10);for(const side of [-1,1])part('tradeBar',0x34434b,dx+side*.61,1.1,dz,.15,.55,.55);
         if(stage>=2){for(const side of [-1,1])box(trim,dx+side*.87,1.66,dz+1.18,.13,3.05,.13);box(metal,dx,3.20,dz+1.18,1.88,.13,.13);}
+      }
+      if(premium){
+        // A covered training court, with real cardio machines and an independent pool garden.
+        const shadeW=w*.92;
+        for(const side of [-1,1])for(const end of [4.0,10.8]){
+          part('gymTrainingPost',trim,side*w*.43,1.92,end,.18,3.60,.18);
+          part('gymTrainingFoot',0xe2d6b8,side*w*.43,.17,end,.38,.20,.38);
+        }
+        for(const side of [-1,1])part('gymTrainingBeam',trim,side*w*.43,3.80,7.4,.23,.22,7.20);
+        for(let slat=0;slat<10;slat++)part('gymTrainingSlat',slat%2?0x9fb88d:trim,0,3.96,4.0+slat*6.8/9,shadeW,.16,.40);
+        for(const side of [-1,1]){
+          const tx=side*w*.21,tz=9.0;
+          part('gymTreadmillBase',metal,tx,.32,tz,1.32,.35,2.35);
+          part('gymTreadmillBelt',0x202f35,tx,.515,tz,1.04,.04,1.98);
+          for(const edge of [-1,1]){
+            part('gymTreadmillUpright',trim,tx+edge*.54,1.11,tz-.80,.09,1.45,.12);
+            part('gymTreadmillHandle',metal,tx+edge*.54,1.65,tz-.37,.09,.10,.95);
+          }
+          part('gymTreadmillConsole',metal,tx,1.76,tz-.80,1.19,.42,.18);
+          part('gymTreadmillDisplay',0x79c7cf,tx,1.80,tz-.69,.70,.23,.04);
+          for(const edge of [-1,1])part('gymTreadmillButton',edge<0?0x91be63:0xd96a55,tx+edge*.47,1.72,tz-.68,.09,.09,.05);
+        }
+        const poolZ=serviceRear-front-3.15,deckW=w*.86,poolW=w*.66;
+        if(stage>=2){
+          const rear=serviceRear-front;
+          part('gymPoolDoorFrame',trim,0,1.50,rear-.10,1.82,2.68,.18);
+          part('gymPoolDoorGlass',glass,0,1.50,rear-.22,1.58,2.40,.05);
+          part('gymPoolDoorHandle',metal,.58,1.40,rear-.27,.08,.32,.04);
+          part('gymPoolThreshold',0xd8ccb1,0,.19,rear-.30,1.94,.18,.60);
+        }
+        part('gymPoolDeck',0xd8ccb1,0,.14,poolZ,deckW,.32,5.80);
+        part('gymPoolBasin',0x699ba0,0,.34,poolZ,poolW,.20,3.65);
+        part('gymPoolWater',0x48afc0,0,.455,poolZ,poolW-.16,.03,3.47);
+        for(const side of [-1,1]){
+          part('gymPoolRim',0xf0e4ca,side*(poolW/2-.045),.49,poolZ,.09,.18,3.65);
+          part('gymPoolRim',0xf0e4ca,0,.49,poolZ+side*1.78,poolW,.18,.09);
+          const seatZ=poolZ+side*2.38;
+          for(const bay of [-1,1]){
+            const benchX=bay*w*.27;
+            part('gymPoolBench',trim,benchX,.65,seatZ,w*.22,.16,.55);
+            for(const leg of [-1,1])part('gymPoolBenchLeg',metal,benchX+leg*w*.075,.47,seatZ,.10,.36,.40);
+          }
+        }
+        for(const lane of [-1,1])part('gymPoolLane',0xe8ead5,lane*poolW/6,.477,poolZ,.035,.012,3.30);
+        for(const side of [-1,1])part('gymPoolLadder',0xc5d6cf,poolW*.29+side*.22,.87,poolZ+1.55,.055,1.08,.055);
+        for(const rung of [.57,.80,1.03])part('gymPoolLadder',0xc5d6cf,poolW*.29,rung,poolZ+1.55,.49,.055,.055);
       }
     }else if(shape===10){
       // A hotel arrival court with luggage trolleys and valet cars.
@@ -3252,6 +3298,7 @@ function drawShops(){
     if(stage>=2&&shape===9){
       const hallWidth=w*.88,hallDepth=2.7+growth*4.0;
       const hallHeight=height*.72,hallZ=z-d/2-hallDepth/2+.08;
+      serviceRear=hallZ-hallDepth/2;
       put('body',wallColor,shop,x,hallHeight/2,hallZ,hallWidth,hallHeight,hallDepth);
       put('roof',trim,shop,x,hallHeight+.17,hallZ,hallWidth+.22,.34,hallDepth+.23);
       for(const side of [-1,1]){
