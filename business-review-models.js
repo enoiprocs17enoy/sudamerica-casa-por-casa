@@ -362,9 +362,9 @@ function drawShops(){
     let serviceRear=z-d/2;
 
     if(stage>=1){
-      const canopyDepth=shape===0||shape===2||shape===7?4.15:shape===6?2.75:2.15;
+      const canopyDepth=shape===0||shape===2||shape===7?4.15:shape===6?1.45:2.15;
       const canopyWidth=w*(shape===8?.90:.82);
-      const canopyY=shape===8?3.55:3.04;
+      const canopyY=shape===8||shape===6?3.55:3.04;
       put('evolutionEntranceCanopy',trim,shop,x,canopyY,front+canopyDepth*.43,canopyWidth,.24,canopyDepth);
       for(const side of [-1,1])
         put('evolutionEntranceColumn',wallColor,shop,x+side*canopyWidth*.48,canopyY*.50,front+canopyDepth*.80,.18,canopyY-.12,.18);
@@ -737,7 +737,7 @@ function drawShops(){
     }
     const pizzeria=shape===2&&shop.id%24===14;
     if(shape!==0&&!pizzeria){
-      const sculptureScale=shape===8||shape===10?1.70:1.42;
+      const sculptureScale=shape===6?2.00:shape===8||shape===10?1.70:1.42;
       const badgeY=signRoof+2.43,badgeZ=front+.32;
       const mark=(dx,dy,width,markHeight,color,kind='tradeMark',dz=0,depth=.38)=>{
         put(kind,color,shop,x+dx*sculptureScale,badgeY+dy*sculptureScale,
@@ -788,9 +788,9 @@ function drawShops(){
         mark(0,0,.63,.95,0xc44f71,'tradeSculpt',0,.62);
         mark(0,-.12,1.14,1.06,0xd9547c,'tradeDress',0,4.2);
       }else if(shape===6){ // Wrench with a rounded handle and open jaws
-        mark(0,-.25,.29,1.09,0xadc0c5,'tradeSculpt',0,.46);
-        mark(0,.24,.84,.24,ivory,'tradeMark',0,.49);
-        for(const side of [-1,1])mark(side*.31,.46,.23,.42,ivory,'tradeSculpt',0,.46);
+        mark(0,-.25,.29,1.09,0x465f76,'tradeSculpt',0,.46);
+        mark(0,.24,.84,.24,0x6f91ab,'tradeMark',0,.49);
+        for(const side of [-1,1])mark(side*.31,.46,.23,.42,0x6f91ab,'tradeSculpt',0,.46);
       }else if(shape===7){ // Rounded loaf with scored crust
         mark(0,0,1.69,.95,0xe1a34c,'tradeSculpt',0,.96);
         for(const score of [-.40,0,.40])for(const dz of [-.28,-.14,0,.14,.28]){
