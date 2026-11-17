@@ -5601,7 +5601,7 @@ function* renderHouseStages(selected){
 // All houses remain in the existing instanced city meshes at every zoom.
 // Extra detail is generated only around the camera's ground focus, with
 // capped geometry and infrequent updates while panning.
-let nearDetailGroup=null,nearDetailCenter={x:Infinity,z:Infinity},nearDetailTier=-1;
+let nearDetailGroup=null,nearDetailCenter={x:Infinity,z:Infinity},nearDetailTier=-1,nearDetailBuild=null,nearDetailMaterial=null;
 const detailGeo=new Map();
 function lodTier(){
  if(distance>1250)return 0;
@@ -5609,24 +5609,31 @@ function lodTier(){
  if(distance>155)return 2;
  return 3;
 }
-function makeCloseDetailMesh(geo,color,placements){
+function* makeCloseDetailMeshStages(geo,placements,destination){
  if(!placements.length)return;
- const mesh=new THREE.InstancedMesh(geo,new THREE.MeshStandardMaterial({color,roughness:.91,flatShading:true}),placements.length);
- const dummy=new THREE.Object3D();
- placements.forEach((p,i)=>{
-  dummy.position.set(p[0],p[1],p[2]);dummy.rotation.set(0,p[6]||0,0);
-  dummy.scale.set(p[3],p[4],p[5]);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);
- });
- mesh.instanceMatrix.needsUpdate=true;
- mesh.frustumCulled=false; // local set already culled by ground position
- nearDetailGroup.add(mesh);
+ nearDetailMaterial=nearDetailMaterial||new THREE.MeshStandardMaterial({color:0xffffff,roughness:.91,flatShading:true});
+ const mesh=new THREE.InstancedMesh(geo,nearDetailMaterial,placements.length);
+ // The destination is detached until complete; cancellation can dispose even a partial mesh.
+ destination.add(mesh);
+ const dummy=new THREE.Object3D(),tint=new THREE.Color();
+ for(let i=0;i<placements.length;i++){
+  const p=placements[i];dummy.position.set(p[0],p[1],p[2]);dummy.rotation.set(0,p[6]||0,0);
+  dummy.scale.set(p[3],p[4],p[5]);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);mesh.setColorAt(i,tint.setHex(p[7]));
+  if((i+1)%256===0)yield;
+ }
+ mesh.instanceMatrix.needsUpdate=true;mesh.instanceColor.needsUpdate=true;mesh.frustumCulled=false;
+}
+function disposeCloseDetailGroup(old){
+ if(!old)return;old.parent?.remove(old);
+ old.traverse(o=>{if(o.isInstancedMesh)o.dispose();if(o.material&&o.material!==nearDetailMaterial)o.material.dispose()});
+ // Shared geometries are deliberately retained.
+}
+function cancelCloseDetailBuild(){
+ const job=nearDetailBuild;if(!job)return;nearDetailBuild=null;
+ try{job.iterator.return();}finally{disposeCloseDetailGroup(job.output);}
 }
 function clearCloseDetails(){
- if(!nearDetailGroup)return;
- const old=nearDetailGroup;nearDetailGroup=null;
- old.parent?.remove(old);
- old.traverse(o=>{if(o.isInstancedMesh)o.dispose();if(o.material)o.material.dispose()});
- // Shared geometries are deliberately retained.
+ cancelCloseDetailBuild();const old=nearDetailGroup;nearDetailGroup=null;disposeCloseDetailGroup(old);
 }
 // Compact handcrafted procedural bushes; all four are original and use
 // shared instanced box/icosahedron primitives, never image cut-outs.
@@ -5678,20 +5685,33 @@ function addGardenPlant(add,variant,x,z,scale=1){
 const GARDEN_UNLOCKS=GARDEN_CATALOG.map(item=>[item.min,item.label]);
 function updateProgressiveDetails(force=false){
  if(!active||!group||!camera)return;
- const tier=lodTier();
- const movement=Math.hypot(target.x-nearDetailCenter.x,target.z-nearDetailCenter.z);
+ if(nearDetailBuild&&nearDetailBuild.owner!==group){cancelCloseDetailBuild();nearDetailTier=-1;}
+ const tier=lodTier(),movement=Math.hypot(target.x-nearDetailCenter.x,target.z-nearDetailCenter.z);
  const threshold=tier>=3?32:tier===2?70:160;
- if(!force&&tier===nearDetailTier&&movement<threshold)return;
- nearDetailTier=tier;nearDetailCenter={x:target.x,z:target.z};
- clearCloseDetails();
- if(tier===0)return;
- nearDetailGroup=new THREE.Group();
- group.add(nearDetailGroup);
+ if(force||tier!==nearDetailTier||movement>=threshold){
+  cancelCloseDetailBuild();nearDetailTier=tier;nearDetailCenter={x:target.x,z:target.z};
+  if(tier===0){const old=nearDetailGroup;nearDetailGroup=null;disposeCloseDetailGroup(old);return;}
+  const output=new THREE.Group(),focus={...nearDetailCenter};
+  nearDetailBuild={owner:group,output,iterator:progressiveDetailStages(tier,focus,output),started:performance.now(),cpuMs:0,maxSliceMs:0,slices:0};
+ }
+ const job=nearDetailBuild;if(!job)return;
+ const started=performance.now();let done=false;
+ try{
+  do{done=job.iterator.next().done;}while(!done&&performance.now()-started<2);
+  if(done){
+   const old=nearDetailGroup;nearDetailGroup=job.output;job.owner.add(job.output);nearDetailBuild=null;
+   disposeCloseDetailGroup(old);
+  }
+ }catch(error){cancelCloseDetailBuild();console.error('Dettagli vicini',error);return;}
+ const spent=performance.now()-started;job.cpuMs+=spent;job.maxSliceMs=Math.max(job.maxSliceMs,spent);job.slices++;
+ if(done)window.ReviewPerformance?.recordDetailBuild?.({cpuMs:job.cpuMs,maxSliceMs:job.maxSliceMs,slices:job.slices,wallMs:performance.now()-job.started});
+}
+function* progressiveDetailStages(tier,focus,output){
  const radius=tier===1?230:tier===2?180:135;
  const limit=tier===1?90:tier===2?125:170;
  const nearby=[];
  for(const h of homes){
-  const d2=(h.x-target.x)**2+(h.z-target.z)**2;
+  const d2=(h.x-focus.x)**2+(h.z-focus.z)**2;
   if(d2<radius*radius)nearby.push({h,d2});
  }
  nearby.sort((a,b)=>a.d2-b.d2);
@@ -5703,6 +5723,7 @@ function updateProgressiveDetails(force=false){
   placements.get(key).push([x,y,z,w,ht,d,rotation]);
  }
  for(const {h} of selected){
+  yield;
   // Small architectural additions are contained inside the parcel.
   // Colors and decorative patterns are deterministic for every resident.
   const style=h.id%5;
@@ -6042,11 +6063,13 @@ function updateProgressiveDetails(force=false){
   detailGeo.set('box',new THREE.BoxGeometry(1,1,1));
   detailGeo.set('sphere',new THREE.IcosahedronGeometry(.5,1));
  }
+ const shapes=new Map();let packed=0;
  for(const [key,arr] of placements){
-  const shape=key.endsWith('_sphere')?'sphere':'box';
-  const color=Number(key.split('_')[0]);
-  makeCloseDetailMesh(detailGeo.get(shape),color,arr);
+  const shape=key.endsWith('_sphere')?'sphere':'box',color=Number(key.split('_')[0]);
+  if(!shapes.has(shape))shapes.set(shape,[]);
+  for(const p of arr){p.push(color);shapes.get(shape).push(p);if(++packed%512===0)yield;}
  }
+ for(const [shape,arr]of shapes){yield* makeCloseDetailMeshStages(detailGeo.get(shape),arr,output);yield;}
 }
 
 // Emergency-safe, fully instanced fallback: an exception in a detailed model
