@@ -25,3 +25,11 @@ All 236,953 catalogue coordinates in 246 country/territory files were checked: 2
 
 ### Neighbor previews and flight clearance (v9.28.0)
 Preview roof/body footprints reserve free space outside developed city blocks and regional roads, and cannot overlap other preview buildings. Geographic city centers and directory entries are unchanged. Centers inside the current urban fabric are entered explicitly from their label/menu; automatic handoff inside active blocks is suppressed. Flight collision grids cover complete city bird/balloon orbits plus 120m, rather than indexing entire 100km mountain bounding boxes. Nearby terrain triangles remain collision obstacles. Regression: 441 actual terrain raycasts, 500 equal local queries, 20,000-instance reference checks, crowded 31-city preview fixture with no building/block/road overlaps.
+
+
+## v9.29.0 — growth-aware urban areas
+Regional urban components use complete permanent lot-template bounds for each known city population and shop count, including unlocked civic parcels and milestones above 6,000 homes. Population growth recomputes components; intersecting footprints share one regional representation. The active component never spawns independent miniature cities or city labels over the open city. Other components use one representative preview and label; every original center remains in the nearby-places menu and retains its own houses/points. Real geographic coordinates, roads and building lots are unchanged. This is a visual agglomeration rule for the procedural game, not a change to administrative borders.
+
+District metadata: GeoNames cities500 snapshot already bundled in the project, CC BY 4.0. 10,779 PPLX identifiers are recognized as sections of a populated place: https://www.geonames.org/export/codes.html . São Paulo official district references: https://prefeitura.sp.gov.br/licenciamento/w/servicos/312207 . No city-name special cases are used. Menu descriptions are provided in all ten supported languages.
+
+Tests compare predicted bounds against actual allocated lots at 1–200,000 homes. Growth grouping was exercised on real São Paulo-region coordinates at 100, 500, 5,000, 20,000 and 100,000 homes, and on a growing neighboring city whose center remains outside the active city. These are layout/placement tests, not rendering-performance claims at 200,000 homes.
