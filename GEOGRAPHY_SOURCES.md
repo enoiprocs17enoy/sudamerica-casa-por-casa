@@ -9,3 +9,7 @@ This project extracts biome 13 (deserts and xeric shrublands) and biome 11 (tund
 Intercity roads share the map graph and local east/north directions. Connections terminate at actual graph destinations; roads beyond the regional view are clipped inside atmospheric fog. No synthetic island loops are added. Mountain roads use contour search and follow the actual triangulated terrain surface.
 
 Biome weights are spatially softened before shading; vegetation density uses the same continuous weights. Far woodland uses procedural instanced silhouettes and canopy patches up to 52 km, overlapping the near geometry from 4.7 to 6.6 km. Neighbor previews use east/north projection from the same coordinates as road endpoints. Scene handoff rebases camera coordinates without rotating the view. These are regional approximations, not surveyed terrain or real building reconstructions.
+
+
+## v9.27.1 — correzione longitudini dei biomi
+I poligoni vengono ora srotolati in modo continuo prima della proiezione locale: le regioni al lato opposto del globo non possono attraversare la città osservata. Corretto anche il trattamento delle cavità nei poligoni sovrapposti. Verifica automatica sulle coordinate di 236.953 città contro un calcolo geografico indipendente: zero discrepanze. São Paulo non è più classificata come deserto; deserti reali e tundra conservati. La fonte resta una classificazione regionale RESOLVE 2017 semplificata, non una mappa del suolo a livello di singolo edificio.
