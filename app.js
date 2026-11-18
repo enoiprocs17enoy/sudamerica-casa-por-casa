@@ -1504,6 +1504,7 @@ function cityGrowthBounds(population,shopCount){
  for(let i=PUBLIC_STEPS.length;n>=6000+(i-PUBLIC_STEPS.length)*1000;i++)include(facilityBlock(i));
  const result={minX,maxX,minZ,maxZ};if(cityGrowthBoundsCache.size>=256)cityGrowthBoundsCache.delete(cityGrowthBoundsCache.keys().next().value);cityGrowthBoundsCache.set(key,result);return {...result};
 }
+function cityPreviewLots(population,limit){const n=Math.max(1,Math.floor(population)),m=Math.min(n,Math.max(1,Math.floor(limit))),wanted=new Set(Array.from({length:m},(_,i)=>Math.round(i*(n-1)/Math.max(1,m-1)))),out=[];let index=0,block=0;while(index<n){const cell=spiralCell(block);for(let slot=0;slot<LOT_COLS*LOT_ROWS&&index<n;slot++)if(slotType(block,slot)==='house'){if(wanted.has(index))out.push({x:cell.col*BLOCK_X+(slot%LOT_COLS-(LOT_COLS-1)/2)*LOT_X,z:cell.row*BLOCK_Z+(Math.floor(slot/LOT_COLS)-(LOT_ROWS-1)/2)*LOT_Z,index});index++;}block++;}return out;}
 function worldCityCells(selected=homes){
  const cells=new Map();for(const h of selected){const p=spiralCell(h.blockIndex);cells.set(p.col+':'+p.row,p);}for(const shop of shopPurchases){const p=spiralCell(shop.block);cells.set(p.col+':'+p.row,p);}for(const zone of publicZones()){const p=spiralCell(zone.block);cells.set(p.col+':'+p.row,p);}return [...cells.values()];
 }
@@ -1512,7 +1513,7 @@ function* buildRegionalStages(houses){
  let regionalMark=window.ReviewPerformance?performance.now():null;
  const markRegion=label=>{if(regionalMark===null)return;const now=performance.now();window.ReviewPerformance.recordStage(label,now-regionalMark);regionalMark=now;};
  const city=currentCity;
- const roadPlan=typeof window!=='undefined'&&window.WorldRoads&&window.WorldAtlas?window.WorldRoads.cityPlan(city,worldCityCells(houses),window.WorldAtlas):null;
+ const roadPlan=typeof window!=='undefined'&&window.WorldRoads&&window.WorldAtlas?window.WorldRoads.cityPlan(city,worldCityCells(houses),window.WorldAtlas,{footprintFor:cityGrowthBounds,states:cityStates}):null;
  regionalWaterUniform=null;
  const coast=coastalDirections[city.id]||city.coast;
  const angle=coast?.[0]||0;
@@ -1531,7 +1532,7 @@ function* buildRegionalStages(houses){
   minZ=Math.min(minZ,z-halfZ);maxZ=Math.max(maxZ,z+halfZ);
   shore=Math.max(shore,x*east+z*south+Math.abs(east)*halfX+Math.abs(south)*halfZ);
  }
- const region=window.WorldGeography?WorldGeography.makeRegion(city,{minX,maxX,minZ,maxZ,neighbors:roadPlan?.neighbors||[]}):null;
+ const region=window.WorldGeography?WorldGeography.makeRegion(city,{minX,maxX,minZ,maxZ,neighbors:roadPlan?.neighbors||[],spaceScale:roadPlan?.spaceScale||1}):null;
  markRegion('Geografia e costa');
  yield;
  if(region){group.userData.geography=region;for(const ground of scene.children.filter(m=>m.userData.regionalGround))WorldGeography.clipMaterial(ground.material,region);}
@@ -1687,7 +1688,7 @@ function* buildRegionalStages(houses){
  if(region&&window.WorldForest){const options={group,region,plan:roadPlan,height:terrainHeight,city,bounds:{minX,maxX,minZ,maxZ}};if(WorldForest.buildSteps)yield* WorldForest.buildSteps(options);else WorldForest.build(options);}
  markRegion('Bosco lontano');
  yield;
- if(roadPlan&&window.WorldNeighbors)WorldNeighbors.build({group,city,footprintFor:cityGrowthBounds,camera,container:$('threeLayer'),plan:roadPlan,height:terrainHeight,states:cityStates,getCamera:()=>({target:{...target},distance,azimuth,elevation}),setCamera:state=>{Object.assign(target,state.target);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();},onEnter:enterNeighborCity});
+ if(roadPlan&&window.WorldNeighbors)WorldNeighbors.build({group,city,footprintFor:cityGrowthBounds,previewLots:cityPreviewLots,camera,container:$('threeLayer'),plan:roadPlan,height:terrainHeight,states:cityStates,getCamera:()=>({target:{...target},distance,azimuth,elevation}),setCamera:state=>{Object.assign(target,state.target);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();},onEnter:enterNeighborCity});
  markRegion('Anteprime città vicine');
 }
 function regionalMountain(city){
@@ -1814,7 +1815,7 @@ window.addEventListener('keydown',e=>{
 });
 window.addEventListener('resize',resize);threeReady=true;resize();animate();return true}
 function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
-function zoomBy(factor){distance=clamp(distance/Math.max(.01,factor),12,5200);}
+function zoomBy(factor){distance=clamp(distance/Math.max(.01,factor),12,24000);}
 function panPixels(dx,dy){
  // Pixel-to-ground projection using the camera's actual right and up vectors.
  // This stays consistent at every tilt angle.
@@ -1833,7 +1834,7 @@ function screenToGround(clientX,clientY){
  const ray=new THREE.Raycaster();ray.setFromCamera(ndc,camera);
  if(ray.ray.direction.y>=-.0001)return null;
  const t=-ray.ray.origin.y/ray.ray.direction.y;
- if(t<0||t>20000)return null;
+ if(t<0||t>100000)return null;
  return ray.ray.at(t,new THREE.Vector3());
 }
 function resize(){
@@ -1845,7 +1846,8 @@ function resize(){
 }
 function updateCamera(){
  if(!camera)return;
- distance=clamp(Number.isFinite(distance)?distance:180,12,5200);
+ distance=clamp(Number.isFinite(distance)?distance:180,12,24000);
+ if(scene?.fog?.isFogExp2)scene.fog.density=.000048*Math.min(1,5200/distance);
  azimuth=Number.isFinite(azimuth)?azimuth:.72;
  elevation=clamp(Number.isFinite(elevation)?elevation:.85,.22,1.55);
  target.x=Number.isFinite(target.x)?target.x:0;
@@ -7375,12 +7377,12 @@ cityViewStyle.textContent=`
 document.head.append(cityViewStyle);
 
 // Adjacent towns keep their geographic positions when the local scene origin changes.
-function enterNeighborCity(neighbor,state){if(!active)return;const old=currentCity,geo=WorldRoads.point(old,state.target.x,state.target.z),next=neighbor.city;return CityLoading.run(async()=>{selectCity(next.id,false);WorldRoads.sync(true);await window.WorldBiomes?.load(next);if(!await enterNow(rebuildResponsive))return false;const p=WorldRoads.local(next,{lat:geo[0],lng:geo[1]});target.x=p.x;target.z=p.z;target.y=Math.max(2,state.target.y-neighbor.y);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();$('status').textContent=next.name+' · città raggiunta · '+count.toLocaleString(window.GameI18n?.locale||'it-IT')+' case';return true;},{phase:'travel',priority:30,title:'Prossima fermata: '+next.name+'.',place:next.name,detail:'Prepariamo la città e i suoi dintorni.'}).catch(cityLoadingError);}
+function enterNeighborCity(neighbor,state){if(!active)return;const oldScale=group.userData.roadPlan?.spaceScale||1,offset={x:(state.target.x-neighbor.x)/oldScale,z:(state.target.z-neighbor.z)/oldScale},next=neighbor.city;return CityLoading.run(async()=>{selectCity(next.id,false);WorldRoads.sync(true);await window.WorldBiomes?.load(next);if(!await enterNow(rebuildResponsive))return false;const newScale=group.userData.roadPlan?.spaceScale||1;target.x=offset.x*newScale;target.z=offset.z*newScale;target.y=Math.max(2,state.target.y-neighbor.y);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();$('status').textContent=next.name+' · città raggiunta · '+count.toLocaleString(window.GameI18n?.locale||'it-IT')+' case';return true;},{phase:'travel',priority:30,title:'Prossima fermata: '+next.name+'.',place:next.name,detail:'Prepariamo la città e i suoi dintorni.'}).catch(cityLoadingError);}
 function showNeighborCities(){
  localizedPanelRoute={type:'neighbors'};if(!active)return enter().then(ok=>ok?showNeighborCities():null);const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;$('v4Title').textContent='Città vicine';delete $('v4Title').dataset.i18nSkip;body.replaceChildren();const items=window.WorldNeighbors?.list()||[];
  if(!items.length){const p=document.createElement('p');p.textContent='Nessuna città collegata visibile in questa zona. Puoi cercare altre località nella mappa.';body.append(p);return;}
  const text=key=>WorldNeighbors.text(key);
- const integrated=items.filter(e=>e.integrated),external=items.filter(e=>!e.integrated);
+ const integrated=[],external=items;const explanation=document.createElement('p');explanation.dataset.i18nSkip='';explanation.textContent=text('explanation');body.append(explanation);
  if(integrated.length){const p=document.createElement('p');p.dataset.i18nSkip='';p.textContent=text('explanation');body.append(p);}
  for(const section of [{key:'within',items:integrated},{key:'outside',items:external}]){if(!section.items.length)continue;const heading=document.createElement('h3');heading.dataset.i18nSkip='';heading.textContent=text(section.key)+' · '+section.items.length;body.append(heading);
  for(const e of section.items){const button=document.createElement('button');button.dataset.i18nSkip='';button.textContent=(e.placeKind==='district'?'🏘 '+text('district')+' · ':'🏙 ')+e.city.name+' · '+(e.distance/1000).toLocaleString(window.GameI18n?.locale||'it-IT',{maximumFractionDigits:1})+' km';if(e.groupSize>1)button.title=text('shared')+' · '+e.groupName;button.onclick=()=>{panel.hidden=true;WorldNeighbors.focus(e.city.id);};body.append(button);}}
