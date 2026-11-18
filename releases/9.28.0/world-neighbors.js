@@ -1,24 +1,28 @@
 /* Region-wide city previews, screen-space labels and geographically rebased handoff. */
 (function(){'use strict';
 let entries=[],callbacks=null,flight=null,busy=false,cooldown=0,labelsRoot=null,labelPool=[];
+function occupiedByCity(plan,x,z,half=0){if(!plan.previewDevelopedCells)plan.previewDevelopedCells=new Set((plan.cells||[]).map(c=>c.col+':'+c.row));for(let col=Math.floor((x-half+92)/184);col<=Math.floor((x+half+92)/184);col++)for(let row=Math.floor((z-half+46)/92);row<=Math.floor((z+half+46)/92);row++)if(plan.previewDevelopedCells.has(col+':'+row))return true;return false;}
 function build({group,plan,height,getCamera,setCamera,onEnter,states,camera,container}){
  labelsRoot?.remove();labelsRoot=null;labelPool=[];entries=[];flight=null;callbacks={getCamera,setCamera,onEnter,camera,container,height};
  if(container){labelsRoot=document.createElement('div');labelsRoot.className='regional-city-labels';labelsRoot.style.cssText='position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:4';container.append(labelsRoot);}
- const positions=[],dummy=new THREE.Object3D();
- for(const n of plan.neighbors||[]){
+ const positions=[],dummy=new THREE.Object3D(),placed=new Map(),stats={candidates:0,blockedByActiveCity:0,blockedByRoad:0,blockedByPreview:0,placed:0};
+ const neighbors=[...(plan.neighbors||[])].sort((a,b)=>Math.hypot(a.x,a.z)-Math.hypot(b.x,b.z)||String(a.city.id).localeCompare(String(b.city.id)));
+ function reserve(x,z){const half=11;stats.candidates++;if(occupiedByCity(plan,x,z,half)){stats.blockedByActiveCity++;return false;}if(window.WorldRoads?.distanceToRoad(x,z,plan)<18){stats.blockedByRoad++;return false;}const ix=Math.floor(x/24),iz=Math.floor(z/24);for(let a=ix-1;a<=ix+1;a++)for(let b=iz-1;b<=iz+1;b++)for(const p of placed.get(a+':'+b)||[])if(Math.abs(p.x-x)<half*2&&Math.abs(p.z-z)<half*2){stats.blockedByPreview++;return false;}const key=ix+':'+iz;if(!placed.has(key))placed.set(key,[]);placed.get(key).push({x,z});stats.placed++;return true;}
+ for(const n of neighbors){
   const city=n.city,pop=states?.get(city.id)?.count??city.pop??80,range=Math.hypot(n.x,n.z),count=Math.min(range>18000?16:range>7000?28:70,Math.max(16,Math.round(Math.sqrt(pop)*4))),nx=Math.ceil(Math.sqrt(count*1.45)),nz=Math.ceil(count/nx);
   const begin=positions.length;
-  for(let i=0;i<count;i++){const x=(i%nx-(nx-1)/2)*26,z=(Math.floor(i/nx)-(nz-1)/2)*26;if(Math.abs(x)<14||Math.abs(z)<14)continue;const h=i%19===0?45:i%7===0?22:6+i%3*3;positions.push({city,x:n.x+x,z:n.z+z,h,y:height(n.x+x,n.z+z)});}
-  entries.push({...n,y:height(n.x,n.z),radius:n.radius||220,label:null,buildings:positions.length-begin});
+  for(let i=0;i<count;i++){const x=(i%nx-(nx-1)/2)*26,z=(Math.floor(i/nx)-(nz-1)/2)*26;if(Math.abs(x)<14||Math.abs(z)<14)continue;if(!reserve(n.x+x,n.z+z))continue;const h=i%19===0?45:i%7===0?22:6+i%3*3;positions.push({city,x:n.x+x,z:n.z+z,h,y:height(n.x+x,n.z+z)});}
+  entries.push({...n,y:height(n.x,n.z),radius:n.radius||220,label:null,integrated:occupiedByCity(plan,n.x,n.z,18),buildings:positions.length-begin});
  }
  const body=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshLambertMaterial({color:0xe0cc9a}),positions.length),roofGeo=new THREE.ConeGeometry(.72,1,4);roofGeo.rotateY(Math.PI/4);
  const roofs=new THREE.InstancedMesh(roofGeo,new THREE.MeshLambertMaterial({color:0xac5944}),positions.length);
  positions.forEach((p,i)=>{dummy.position.set(p.x,p.y+p.h/2,p.z);dummy.scale.set(15,p.h,15);dummy.updateMatrix();body.setMatrixAt(i,dummy.matrix);dummy.position.y=p.y+p.h+1.6;dummy.scale.set(18,3.2,18);dummy.updateMatrix();roofs.setMatrixAt(i,dummy.matrix);});
  const owners=positions.map(p=>p.city);for(const m of [body,roofs]){m.computeBoundingSphere();m.receiveShadow=false;m.userData.neighborCities=owners;group.add(m);}
- group.userData.neighborPreviews=entries.map(e=>({id:e.city.id,name:e.city.name,x:e.x,z:e.z,buildings:e.buildings}));
+ group.userData.neighborPreviewPlacement=stats;
+ group.userData.neighborPreviews=entries.map(e=>({id:e.city.id,name:e.city.name,x:e.x,z:e.z,buildings:e.buildings,integrated:e.integrated}));
 }
 function list(){return entries.map(e=>({...e,distance:Math.hypot(e.x,e.z)})).sort((a,b)=>a.distance-b.distance);}
-function focus(id){const e=entries.find(e=>e.city.id===id);if(!e||!callbacks)return;const from=callbacks.getCamera();flight={from,to:{target:{x:e.x,y:e.y+6,z:e.z},distance:650,azimuth:from.azimuth,elevation:.73},start:performance.now(),duration:1300};}
+function focus(id){const e=entries.find(e=>e.city.id===id);if(!e||!callbacks||busy)return;const from=callbacks.getCamera();if(e.integrated){busy=true;flight=null;cooldown=performance.now()+4500;const state={target:{x:e.x,y:e.y+6,z:e.z},distance:650,azimuth:from.azimuth,elevation:.73};Promise.resolve().then(()=>callbacks.onEnter(e,state)).catch(error=>console.error('Passaggio città',error)).finally(()=>{busy=false;});return;}flight={from,to:{target:{x:e.x,y:e.y+6,z:e.z},distance:650,azimuth:from.azimuth,elevation:.73},start:performance.now(),duration:1300};}
 const projected=new THREE.Vector3();let lastLabels=-Infinity;
 function updateLabels(now){
  if(!labelsRoot||!callbacks.camera||now-lastLabels<90)return;lastLabels=now;
@@ -31,7 +35,7 @@ function updateLabels(now){
 function update(now){if(!callbacks)return;updateLabels(now);if(busy)return;
  if(flight){const p=Math.min(1,(now-flight.start)/flight.duration),t=p*p*(3-2*p),a=flight.from,b=flight.to;callbacks.setCamera({target:{x:a.target.x+(b.target.x-a.target.x)*t,y:a.target.y+(b.target.y-a.target.y)*t,z:a.target.z+(b.target.z-a.target.z)*t},distance:a.distance+(b.distance-a.distance)*t,azimuth:a.azimuth,elevation:a.elevation+(b.elevation-a.elevation)*t});if(p>=1)flight=null;}
  if(flight||now<cooldown)return;const state=callbacks.getCamera();if(state.distance>1800||Math.hypot(state.target.x,state.target.z)<160)return;
- const near=entries.filter(e=>Math.hypot(e.x-state.target.x,e.z-state.target.z)<Math.min(240,e.radius)).sort((a,b)=>Math.hypot(a.x-state.target.x,a.z-state.target.z)-Math.hypot(b.x-state.target.x,b.z-state.target.z))[0];if(!near)return;busy=true;flight=null;cooldown=now+4500;Promise.resolve(callbacks.onEnter(near,state)).catch(e=>console.error('Passaggio città',e)).finally(()=>{busy=false;});
+ const near=entries.filter(e=>!e.integrated&&Math.hypot(e.x-state.target.x,e.z-state.target.z)<Math.min(240,e.radius)).sort((a,b)=>Math.hypot(a.x-state.target.x,a.z-state.target.z)-Math.hypot(b.x-state.target.x,b.z-state.target.z))[0];if(!near)return;busy=true;flight=null;cooldown=now+4500;Promise.resolve(callbacks.onEnter(near,state)).catch(e=>console.error('Passaggio città',e)).finally(()=>{busy=false;});
 }
 function cancelFlight(){flight=null;}window.WorldNeighbors={build,list,focus,update,cancelFlight,refreshLabels:()=>{for(const label of labelPool)delete label.dataset.cityId;lastLabels=-Infinity;}};
 })();

@@ -6903,15 +6903,22 @@ function v45Balloon(i,home){
 }
 const BIRD_BOB=.9, BALLOON_BOB=2, BALLOON_SWAY_X=5, BALLOON_SWAY_Z=4;
 // Flight paths use a fixed safe altitude for the entire orbit.
+function flightEnvelope(selected){
+ let minX=0,maxX=0,minZ=0,maxZ=0;for(const h of selected){minX=Math.min(minX,h.x);maxX=Math.max(maxX,h.x);minZ=Math.min(minZ,h.z);maxZ=Math.max(maxZ,h.z);}
+ // Bird centers + formation + full orbit and balloon sway fit inside 120m.
+ // Include origin for the first balloon's fixed (-23,-86) anchor.
+ return {minX:minX-120,maxX:maxX+120,minZ:minZ-120,maxZ:maxZ+120};
+}
 function flightClearance(group){const steps=flightClearanceStages(group);let result;do{result=steps.next();}while(!result.done);return result.value;}
-function* flightClearanceStages(group){
+function* flightClearanceStages(group,envelope=null){
  const cellSize=24, heights=new Map();
+ const minCellX=envelope?Math.floor(envelope.minX/cellSize):-Infinity,maxCellX=envelope?Math.floor(envelope.maxX/cellSize):Infinity,minCellZ=envelope?Math.floor(envelope.minZ/cellSize):-Infinity,maxCellZ=envelope?Math.floor(envelope.maxZ/cellSize):Infinity;
  const bounds=new THREE.Box3(), world=new THREE.Matrix4(), instance=new THREE.Matrix4();
  group.updateMatrixWorld(true);
  function record(){
   if(bounds.max.y<=12)return;
-  for(let x=Math.floor(bounds.min.x/cellSize);x<=Math.floor(bounds.max.x/cellSize);x++){
-   for(let z=Math.floor(bounds.min.z/cellSize);z<=Math.floor(bounds.max.z/cellSize);z++){
+  for(let x=Math.max(minCellX,Math.floor(bounds.min.x/cellSize));x<=Math.min(maxCellX,Math.floor(bounds.max.x/cellSize));x++){
+   for(let z=Math.max(minCellZ,Math.floor(bounds.min.z/cellSize));z<=Math.min(maxCellZ,Math.floor(bounds.max.z/cellSize));z++){
     const key=x+','+z;
     if((heights.get(key)||0)<bounds.max.y)heights.set(key,bounds.max.y);
    }
@@ -6937,6 +6944,17 @@ function* flightClearanceStages(group){
   if(meshBudget++===64){meshBudget=1;yield;}
   const geometry=mesh.geometry;
   if(!geometry.boundingBox)geometry.computeBoundingBox();
+  if(envelope&&mesh.userData.regionalMountain){
+   // Index nearby terrain triangles, never a mountain range's giant AABB.
+   const positions=geometry.attributes.position,indices=geometry.index,count=indices?indices.count:positions.count;
+   const a=new THREE.Vector3(),b=new THREE.Vector3(),c=new THREE.Vector3();
+   for(let i=0;i<count;i+=3){if(i>0&&i%3072===0)yield;
+    a.fromBufferAttribute(positions,indices?indices.getX(i):i).applyMatrix4(mesh.matrixWorld);
+    b.fromBufferAttribute(positions,indices?indices.getX(i+1):i+1).applyMatrix4(mesh.matrixWorld);
+    c.fromBufferAttribute(positions,indices?indices.getX(i+2):i+2).applyMatrix4(mesh.matrixWorld);
+    bounds.makeEmpty().expandByPoint(a).expandByPoint(b).expandByPoint(c);record();
+   }continue;
+  }
   if(mesh.isInstancedMesh){
    // Reuse a pre-existing coarse bound, but do not construct it here:
    // that would transform every instance once before the exact pass below.
@@ -6970,7 +6988,7 @@ function* createLifeStages(selected){
  // Scene cleanup owns these resources; do not retain a previous city's pool.
  v45Bird.assets=null;
  if(!selected.length)return;
- const clearance=yield* flightClearanceStages(group);
+ const clearance=yield* flightClearanceStages(group,flightEnvelope(selected));
  // A sampled owner is visible in every district; the first user's avatar
  // always exists even when there is only one house.
  const peopleCount=selected.length;
