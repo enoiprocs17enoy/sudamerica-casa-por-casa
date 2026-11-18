@@ -1,0 +1,14 @@
+/* Read-only geometry audit, loaded only by the unlinked review entry. */
+(function(){const bar=document.createElement('div');bar.style.cssText='position:fixed;left:8px;bottom:110px;z-index:1400;background:#fffdf5;border:2px solid #234338;padding:7px;border-radius:12px;max-width:90vw';const button=document.createElement('button');button.textContent='Audit ingombri';const report=document.createElement('pre');report.id='placementAudit';report.hidden=true;report.style.cssText='max-height:45vh;max-width:600px;overflow:auto;white-space:pre-wrap;color:#183b32;font-size:11px';bar.append(button,report);document.body.append(bar);
+button.onclick=()=>{if(!active){report.hidden=false;report.textContent='Entra nella città prima del controllo.';return;}const geometryBounds=new WeakMap(),matrix=new THREE.Matrix4(),world=new THREE.Matrix4(),bounds=new THREE.Box3(),inverse=group.matrixWorld.clone().invert(),violations=[],checked={homes:0,shops:0,public:0},cells=new Set(worldCityCells().map(c=>c.col+':'+c.row));let roadTriangles=0,roadViolations=0;
+ group.updateMatrixWorld(true);inverse.copy(group.matrixWorld).invert();
+ group.traverse(mesh=>{if(!mesh.isMesh)return;const data=mesh.userData;
+  if(data.intercityRoad){const p=mesh.geometry.attributes.position;for(let i=0;i<p.count;i+=3){const a={x:p.getX(i),z:p.getZ(i)},b={x:p.getX(i+1),z:p.getZ(i+1)},c={x:p.getX(i+2),z:p.getZ(i+2)};roadTriangles++;if(roadQuadOverlapsDevelopedBlocks([a,b],[c],cells))roadViolations++;}return;}
+  const records=data.shops||data.homes;const one=data.publicZone||data.home;if(!records&&!one)return;
+  if(!geometryBounds.has(mesh.geometry)){if(!mesh.geometry.boundingBox)mesh.geometry.computeBoundingBox();geometryBounds.set(mesh.geometry,mesh.geometry.boundingBox);}const local=geometryBounds.get(mesh.geometry);
+  for(let i=0;i<(mesh.isInstancedMesh?mesh.count:1);i++){const ref=records?.[i]||one;if(!ref)continue;const kind=data.shops?'shops':data.publicZone?'public':'homes';const parcel=kind==='public'?facilityBounds(ref.block):kind==='shops'?ref:plotBounds(ref.blockIndex,ref.slot);
+   if(mesh.isInstancedMesh){mesh.getMatrixAt(i,matrix);world.multiplyMatrices(mesh.matrixWorld,matrix);}else world.copy(mesh.matrixWorld);world.premultiply(inverse);bounds.copy(local).applyMatrix4(world);checked[kind]++;
+   const overflow=Math.max(parcel.left-bounds.min.x,bounds.max.x-parcel.right,parcel.top-bounds.min.z,bounds.max.z-parcel.bottom);if(overflow>.02&&violations.length<80)violations.push({kind,id:ref.id??ref.kind,overflow:+overflow.toFixed(3)});
+  }
+ });report.hidden=false;report.textContent=JSON.stringify({city:currentCity.name,homes:homes.length,shops:shopPurchases.length,checked,violations,regionalRoadTriangles:roadTriangles,regionalRoadViolations:roadViolations,shopFits:group.userData.shopParcelFits?.length||0},null,2);
+};})();

@@ -1318,6 +1318,34 @@ function drawShops(){
 
     furnishBusiness(shop,shape,stage,progress.premium,w,d,height,trim,glass,serviceRear);
   }
+  // Validate the complete architecture, including furniture, roofs and 3D signs.
+  // The road setbacks leave33.04m here, not the nominal45m row spacing.
+  const envelopes=new Map();
+  for(const batch of batches.values()){
+   if(!batch.geo.boundingBox)batch.geo.computeBoundingBox();
+   const g=batch.geo.boundingBox;
+   for(const e of batch.entries){
+    const shop=e.shop;if(!shop)continue;
+    if(!envelopes.has(shop))envelopes.set(shop,{left:Infinity,right:-Infinity,top:Infinity,bottom:-Infinity,entries:[]});
+    const b=envelopes.get(shop),ca=Math.cos(e.rotation),sa=Math.sin(e.rotation),xx=ca*e.w,xz=sa*e.d,zx=-sa*e.w,zz=ca*e.d;
+    b.left=Math.min(b.left,e.x+Math.min(xx*g.min.x,xx*g.max.x)+Math.min(xz*g.min.z,xz*g.max.z));
+    b.right=Math.max(b.right,e.x+Math.max(xx*g.min.x,xx*g.max.x)+Math.max(xz*g.min.z,xz*g.max.z));
+    b.top=Math.min(b.top,e.z+Math.min(zx*g.min.x,zx*g.max.x)+Math.min(zz*g.min.z,zz*g.max.z));
+    b.bottom=Math.max(b.bottom,e.z+Math.max(zx*g.min.x,zx*g.max.x)+Math.max(zz*g.min.z,zz*g.max.z));b.entries.push(e);
+   }
+  }
+  const fits=[];
+  for(const [shop,b]of envelopes){
+   if(![shop.left,shop.right,shop.top,shop.bottom].every(Number.isFinite))continue;
+   const margin=.16,scale=Math.min(1,(shop.right-shop.left-margin*2)/(b.right-b.left),(shop.bottom-shop.top-margin*2)/(b.bottom-b.top));
+   const left=shop.x+(b.left-shop.x)*scale,right=shop.x+(b.right-shop.x)*scale,top=shop.z+(b.top-shop.z)*scale,bottom=shop.z+(b.bottom-shop.z)*scale;
+   const dx=Math.max(shop.left+margin-left,Math.min(0,shop.right-margin-right)),dz=Math.max(shop.top+margin-top,Math.min(0,shop.bottom-margin-bottom));
+   if(scale<1||Math.abs(dx)+Math.abs(dz)>1e-8){
+    for(const e of b.entries){e.x=shop.x+(e.x-shop.x)*scale+dx;e.z=shop.z+(e.z-shop.z)*scale+dz;e.y*=scale;e.w*=scale;e.h*=scale;e.d*=scale;}
+    fits.push({id:shop.id,scale,dx,dz});
+   }
+  }
+  group.userData.shopParcelFits=fits;
   const material=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.77,metalness:.02});
   const glowMaterial=[...batches.values()].some(batch=>batch.glow)?new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xffcf7a,emissiveIntensity:.75,roughness:.40}):material;
   const gardenGlassMaterial=[...batches.values()].some(batch=>batch.clearGlass)?new THREE.MeshStandardMaterial({color:0xffffff,transparent:true,opacity:.24,depthWrite:false,roughness:.28,metalness:.04}):material;
@@ -1351,11 +1379,11 @@ let fixtures=[];
 function dispose(){const geometries=new Set(),materials=new Set();for(const item of fixtures)item.scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);if(o.isLight&&o.shadow?.map)o.shadow.map.dispose();});for(const g of geometries)g.dispose();for(const m of materials)m.dispose();fixtures=[];}
 function build(){dispose();const id=Number(picker.value),premium=mode.value==='premium';
  for(let stage=0;stage<8;stage++){
-  group=new THREE.Group();shopDetailMeshes=[];progress={points:stage,premium};shopPurchases.splice(0,shopPurchases.length,{id,block:0,x:0,z:0});drawShops();group.updateMatrixWorld(true);const box=new THREE.Box3().setFromObject(group),scene=new THREE.Scene();scene.background=new THREE.Color(0xd7e7eb);scene.add(group);
+  group=new THREE.Group();shopDetailMeshes=[];progress={points:stage,premium};shopPurchases.splice(0,shopPurchases.length,{id,block:0,x:0,z:0,left:-10.225,right:10.225,top:-16.52,bottom:16.52,lz:1});drawShops();group.updateMatrixWorld(true);const box=new THREE.Box3().setFromObject(group),scene=new THREE.Scene();scene.background=new THREE.Color(0xd7e7eb);scene.add(group);
   scene.add(new THREE.HemisphereLight(0xe4f4ff,0x696a48,1.25));const sun=new THREE.DirectionalLight(0xffedcd,2.0);sun.position.set(-45,120,75);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-55;sun.shadow.camera.right=55;sun.shadow.camera.top=110;sun.shadow.camera.bottom=-55;sun.shadow.camera.near=1;sun.shadow.camera.far=250;sun.shadow.normalBias=.035;scene.add(sun);
-  const lot=new THREE.Mesh(new THREE.PlaneGeometry(20.45,44.95),new THREE.MeshStandardMaterial({color:0xd4d2bc,roughness:.95}));lot.rotation.x=-Math.PI/2;lot.position.y=.01;lot.receiveShadow=true;scene.add(lot);
+  const lot=new THREE.Mesh(new THREE.PlaneGeometry(20.45,33.04),new THREE.MeshStandardMaterial({color:0xd4d2bc,roughness:.95}));lot.rotation.x=-Math.PI/2;lot.position.y=.01;lot.receiveShadow=true;scene.add(lot);
   const ground=new THREE.Mesh(new THREE.PlaneGeometry(150,150),new THREE.MeshStandardMaterial({color:0xa9bf91,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=-.015;ground.receiveShadow=true;scene.add(ground);
-  const line=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(20.45,.02,44.95)),new THREE.LineBasicMaterial({color:0x547775}));line.position.y=.03;scene.add(line);
+  const line=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(20.45,.02,33.04)),new THREE.LineBasicMaterial({color:0x547775}));line.position.y=.03;scene.add(line);
   fixtures.push({scene,box,camera:new THREE.PerspectiveCamera(38,1,.1,700)});
  }
  render();
