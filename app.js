@@ -1632,7 +1632,8 @@ function* buildRegionalStages(houses){
    const density=.16+.73*transition*transition*(3-2*transition);
    const grove=.91+.09*Math.sin(x*.004)*Math.cos(z*.003);
    const aridity=region?.aridity(x,z)||0,coldness=region?.coldness(x,z)||0;
-   if(rnd(i*79)>density*grove*(1-aridity*.987)*(1-coldness*.97))continue;
+   const vegetation=region?.vegetation?region.vegetation(x,z):(1-aridity*.987)*(1-coldness*.97);
+   if(rnd(i*79)>density*grove*vegetation)continue;
    const ground=terrainHeight(x,z);
    if(rnd(i+731)>1-Math.max(0,Math.min(1,(ground-650)/600)))continue;
    candidates.push({x,z,i,aridity,y:Math.max(0,ground-.15),detailed:gap<220});
@@ -6902,15 +6903,22 @@ function v45Balloon(i,home){
 }
 const BIRD_BOB=.9, BALLOON_BOB=2, BALLOON_SWAY_X=5, BALLOON_SWAY_Z=4;
 // Flight paths use a fixed safe altitude for the entire orbit.
+function flightEnvelope(selected){
+ let minX=0,maxX=0,minZ=0,maxZ=0;for(const h of selected){minX=Math.min(minX,h.x);maxX=Math.max(maxX,h.x);minZ=Math.min(minZ,h.z);maxZ=Math.max(maxZ,h.z);}
+ // Bird centers + formation + full orbit and balloon sway fit inside 120m.
+ // Include origin for the first balloon's fixed (-23,-86) anchor.
+ return {minX:minX-120,maxX:maxX+120,minZ:minZ-120,maxZ:maxZ+120};
+}
 function flightClearance(group){const steps=flightClearanceStages(group);let result;do{result=steps.next();}while(!result.done);return result.value;}
-function* flightClearanceStages(group){
+function* flightClearanceStages(group,envelope=null){
  const cellSize=24, heights=new Map();
+ const minCellX=envelope?Math.floor(envelope.minX/cellSize):-Infinity,maxCellX=envelope?Math.floor(envelope.maxX/cellSize):Infinity,minCellZ=envelope?Math.floor(envelope.minZ/cellSize):-Infinity,maxCellZ=envelope?Math.floor(envelope.maxZ/cellSize):Infinity;
  const bounds=new THREE.Box3(), world=new THREE.Matrix4(), instance=new THREE.Matrix4();
  group.updateMatrixWorld(true);
  function record(){
   if(bounds.max.y<=12)return;
-  for(let x=Math.floor(bounds.min.x/cellSize);x<=Math.floor(bounds.max.x/cellSize);x++){
-   for(let z=Math.floor(bounds.min.z/cellSize);z<=Math.floor(bounds.max.z/cellSize);z++){
+  for(let x=Math.max(minCellX,Math.floor(bounds.min.x/cellSize));x<=Math.min(maxCellX,Math.floor(bounds.max.x/cellSize));x++){
+   for(let z=Math.max(minCellZ,Math.floor(bounds.min.z/cellSize));z<=Math.min(maxCellZ,Math.floor(bounds.max.z/cellSize));z++){
     const key=x+','+z;
     if((heights.get(key)||0)<bounds.max.y)heights.set(key,bounds.max.y);
    }
@@ -6936,6 +6944,17 @@ function* flightClearanceStages(group){
   if(meshBudget++===64){meshBudget=1;yield;}
   const geometry=mesh.geometry;
   if(!geometry.boundingBox)geometry.computeBoundingBox();
+  if(envelope&&mesh.userData.regionalMountain){
+   // Index nearby terrain triangles, never a mountain range's giant AABB.
+   const positions=geometry.attributes.position,indices=geometry.index,count=indices?indices.count:positions.count;
+   const a=new THREE.Vector3(),b=new THREE.Vector3(),c=new THREE.Vector3();
+   for(let i=0;i<count;i+=3){if(i>0&&i%3072===0)yield;
+    a.fromBufferAttribute(positions,indices?indices.getX(i):i).applyMatrix4(mesh.matrixWorld);
+    b.fromBufferAttribute(positions,indices?indices.getX(i+1):i+1).applyMatrix4(mesh.matrixWorld);
+    c.fromBufferAttribute(positions,indices?indices.getX(i+2):i+2).applyMatrix4(mesh.matrixWorld);
+    bounds.makeEmpty().expandByPoint(a).expandByPoint(b).expandByPoint(c);record();
+   }continue;
+  }
   if(mesh.isInstancedMesh){
    // Reuse a pre-existing coarse bound, but do not construct it here:
    // that would transform every instance once before the exact pass below.
@@ -6969,7 +6988,7 @@ function* createLifeStages(selected){
  // Scene cleanup owns these resources; do not retain a previous city's pool.
  v45Bird.assets=null;
  if(!selected.length)return;
- const clearance=yield* flightClearanceStages(group);
+ const clearance=yield* flightClearanceStages(group,flightEnvelope(selected));
  // A sampled owner is visible in every district; the first user's avatar
  // always exists even when there is only one house.
  const peopleCount=selected.length;
@@ -7344,7 +7363,7 @@ cityViewStyle.textContent=`
 document.head.append(cityViewStyle);
 
 // Adjacent towns keep their geographic positions when the local scene origin changes.
-function enterNeighborCity(neighbor,state){if(!active)return;const old=currentCity,geo=WorldRoads.point(old,state.target.x,state.target.z),next=neighbor.city;return CityLoading.run(async()=>{selectCity(next.id,false);WorldRoads.sync(true);if(!await enterNow(rebuildResponsive))return false;const p=WorldRoads.local(next,{lat:geo[0],lng:geo[1]});target.x=p.x;target.z=p.z;target.y=Math.max(2,state.target.y-neighbor.y);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();$('status').textContent=next.name+' · città raggiunta · '+count.toLocaleString(window.GameI18n?.locale||'it-IT')+' case';return true;},{phase:'travel',priority:30,title:'Prossima fermata: '+next.name+'.',place:next.name,detail:'Prepariamo la città e i suoi dintorni.'}).catch(cityLoadingError);}
+function enterNeighborCity(neighbor,state){if(!active)return;const old=currentCity,geo=WorldRoads.point(old,state.target.x,state.target.z),next=neighbor.city;return CityLoading.run(async()=>{selectCity(next.id,false);WorldRoads.sync(true);await window.WorldBiomes?.load(next);if(!await enterNow(rebuildResponsive))return false;const p=WorldRoads.local(next,{lat:geo[0],lng:geo[1]});target.x=p.x;target.z=p.z;target.y=Math.max(2,state.target.y-neighbor.y);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();$('status').textContent=next.name+' · città raggiunta · '+count.toLocaleString(window.GameI18n?.locale||'it-IT')+' case';return true;},{phase:'travel',priority:30,title:'Prossima fermata: '+next.name+'.',place:next.name,detail:'Prepariamo la città e i suoi dintorni.'}).catch(cityLoadingError);}
 function showNeighborCities(){
  localizedPanelRoute={type:'neighbors'};if(!active)return enter().then(ok=>ok?showNeighborCities():null);const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;$('v4Title').textContent='Città vicine';delete $('v4Title').dataset.i18nSkip;body.replaceChildren();const items=window.WorldNeighbors?.list()||[];if(!items.length){const p=document.createElement('p');p.textContent='Nessuna città collegata visibile in questa zona. Puoi cercare altre località nella mappa.';body.append(p);}for(const e of items){const button=document.createElement('button');button.textContent='🏙 '+e.city.name+' · '+(e.distance/1000).toLocaleString(window.GameI18n?.locale||'it-IT',{maximumFractionDigits:1})+' km';button.onclick=()=>{panel.hidden=true;WorldNeighbors.focus(e.city.id);};body.append(button);}}
 const neighborButton=document.createElement('button');neighborButton.id='nearbyCities';neighborButton.textContent='🏙 Città vicine';neighborButton.title='Avvicinati alle città collegate';neighborButton.onclick=showNeighborCities;neighborButton.style.cssText='width:auto;min-width:132px;padding:10px 12px;font-size:13px;white-space:nowrap';$('earthControls').style.alignItems='flex-end';$('earthControls').append(neighborButton);
@@ -7353,7 +7372,7 @@ document.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','A
 
 function ensureRegionalCatalog(city){const atlas=window.WorldAtlas;if(!atlas||atlas.regionReady(city))return Promise.resolve();if(regionalLoad?.id===city.id)return regionalLoad.promise;const promise=CityLoading.run(async()=>{await atlas.loadRegion(city);if(!active||currentCity.id!==city.id)return;WorldRoads.sync(true);await rebuildResponsive();updateCamera();},{phase:'region',priority:25,title:'Il mondo continua, intorno a te.',place:city.name,detail:'Prepariamo le città vicine, le strade e il paesaggio.'}).catch(e=>{console.warn('Catalogo dei dintorni non disponibile',e);});const record={id:city.id,promise};regionalLoad=record;void promise.finally(()=>{if(regionalLoad===record)regionalLoad=null;});return promise;}
 function cityLoadingError(error){console.error('Caricamento città',error);$('status').textContent='Non è stato possibile completare il caricamento. Puoi riprovare.';return false;}
-function enter(){if(cityEntryPromise)return cityEntryPromise;const id=currentCity.id,name=currentCity.name;cityEntryPromise=CityLoading.run(async()=>{if(currentCity.id!==id)return false;await window.SceneAssets?.load();const atlas=window.WorldAtlas;if(atlas&&!atlas.regionReady(currentCity)){try{await atlas.loadRegion(currentCity);WorldRoads.sync(true);}catch(error){console.warn('Catalogo regionale non disponibile',error);}}if(currentCity.id!==id)return false;return enterNow(rebuildResponsive);},{phase:'city',priority:30,title:'La tua città prende forma.',place:name,detail:'Prepariamo edifici, strade e paesaggio.'}).then(async result=>{if(regionalLoad?.id===id)await regionalLoad.promise;return result;}).catch(cityLoadingError).finally(()=>{cityEntryPromise=null;});return cityEntryPromise;}
+function enter(){if(cityEntryPromise)return cityEntryPromise;const id=currentCity.id,name=currentCity.name;cityEntryPromise=CityLoading.run(async()=>{if(currentCity.id!==id)return false;await window.SceneAssets?.load();const atlas=window.WorldAtlas;if(atlas&&!atlas.regionReady(currentCity)){try{await atlas.loadRegion(currentCity);WorldRoads.sync(true);}catch(error){console.warn('Catalogo regionale non disponibile',error);}}if(currentCity.id!==id)return false;await window.WorldBiomes?.load(currentCity);if(currentCity.id!==id)return false;return enterNow(rebuildResponsive);},{phase:'city',priority:30,title:'La tua città prende forma.',place:name,detail:'Prepariamo edifici, strade e paesaggio.'}).then(async result=>{if(regionalLoad?.id===id)await regionalLoad.promise;return result;}).catch(cityLoadingError).finally(()=>{cityEntryPromise=null;});return cityEntryPromise;}
 function rebuild(){if(!threeReady||!active)return Promise.resolve(false);if(pendingRebuildPromise)return pendingRebuildPromise;const id=currentCity.id;pendingRebuildPromise=CityLoading.run(async()=>{if(!active||currentCity.id!==id)return false;await rebuildResponsive();updateCamera();return true;},{phase:'update',priority:20,title:'La città si rinnova.',place:currentCity.name,detail:'Aggiorniamo edifici, dettagli e abitanti.'}).catch(cityLoadingError).finally(()=>{pendingRebuildPromise=null;});return pendingRebuildPromise;}
 function setCount(n){if(!active)return setCountNow(n);return CityLoading.run(async()=>{const result=setCountNow(n,()=>{});if(active)await rebuildResponsive();return result;},{phase:'population',priority:25,title:'Una città sempre più viva.',place:currentCity.name,detail:'Prepariamo le case e i servizi per i suoi abitanti.'}).catch(cityLoadingError);}
 
