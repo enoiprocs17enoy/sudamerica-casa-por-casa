@@ -1,0 +1,698 @@
+{
+  "locale": "zh-Hans",
+  "name": "简体中文",
+  "reviewStatus": "verified",
+  "messages": {
+    "Esplora il mondo": "探索世界",
+    "Scegli una città": "选择城市",
+    "Cerca utente Instagram": "搜索Instagram用户",
+    "Cerca": "搜索",
+    "Nome utente": "用户名",
+    "@nomeutente": "@用户名",
+    "case nella città": "城内住宅",
+    "La città cresce": "城市在成长",
+    "Ingrandisci la mappa per scoprire le città e avvicinarti ai loro quartieri.": "放大地图，发现城市，探索街区。",
+    "Un mondo virtuale di città da esplorare, una casa alla volta.": "一栋栋房屋，构筑可探索的虚拟城市世界。",
+    "Un luogo, tante storie": "一处地方，万千故事",
+    "Benvenuto, esploratore.": "欢迎来探索。",
+    "Carichiamo il mondo e le sue città.": "正在加载世界与城市。",
+    "Una casa alla volta, il mondo prende vita.": "一栋栋房屋，让世界充满生机。",
+    "La tua città prende forma.": "你的城市正在成形。",
+    "Prepariamo edifici, strade e paesaggio.": "正在准备建筑、道路和景观。",
+    "La città si rinnova.": "正在更新城市。",
+    "Aggiorniamo edifici, dettagli e abitanti.": "正在更新建筑、细节和居民。",
+    "Una città sempre più viva.": "让城市更加生机勃勃。",
+    "Prepariamo le case e i servizi per i suoi abitanti.": "正在为居民准备住宅与公共服务。",
+    "Il mondo continua, intorno a te.": "世界在你周围延伸。",
+    "Prepariamo le città vicine, le strade e il paesaggio.": "正在准备周边城市、道路和景观。",
+    "Esploriamo nuovi luoghi.": "正在探索新的地方。",
+    "Carichiamo le località della regione.": "正在加载地区内的地点。",
+    "Prepariamo le località e la mappa della regione.": "正在准备地区地点与地图。",
+    "Caricamento in corso": "正在加载",
+    "Non è stato possibile completare il caricamento. Puoi riprovare.": "无法完成加载。请重试。",
+    "Motore 3D non caricato. Verifica Internet e ricarica.": "无法加载3D引擎。请检查网络并刷新页面。",
+    "Continente": "大洲",
+    "Paese o territorio": "国家或地区",
+    "Cerca una località": "搜索地点",
+    "Nome città o regione": "城市或地区名称",
+    "Tutti i continenti": "所有大洲",
+    "Antartide": "南极洲",
+    "Europa": "欧洲",
+    "America del Nord e centrale": "北美洲与中美洲",
+    "America del Sud": "南美洲",
+    "🌐 Vedi tutto il mondo": "🌐 查看整个世界",
+    "Seleziona una città…": "请选择城市…",
+    "Caricamento delle località…": "正在加载地点…",
+    "Nessuna località trovata in questo paese": "未找到该国家的地点",
+    "Catalogo non caricato. Controlla la connessione e riseleziona il paese.": "无法加载目录。请检查网络并重新选择国家。",
+    "Vai alla città selezionata": "前往所选城市",
+    "Entra nel 3D": "进入3D视图",
+    "Torna alla mappa": "返回地图",
+    "Controlli 3D": "3D操作",
+    "↻ Ruota": "↻ 旋转",
+    "✥ Sposta": "✥ 移动",
+    "⌂ Centro": "⌂ 居中",
+    "⛶ Vista ampia": "⛶ 宽屏视图",
+    "☰ Comandi": "☰ 操作面板",
+    "Orienta a nord": "朝向北方",
+    "Alterna vista dall’alto e inclinata": "切换俯视与倾斜视角",
+    "Avvicina": "放大",
+    "Allontana": "缩小",
+    "Ruota e inclina la visuale": "旋转和倾斜视角",
+    "Sposta la visuale": "移动视角",
+    "🏙 Città vicine": "🏙 周边城市",
+    "Città vicine": "周边城市",
+    "Avvicinati alle città collegate": "靠近道路相连的城市",
+    "Nessuna città collegata visibile in questa zona. Puoi cercare altre località nella mappa.": "当前区域没有可见的相连城市。可以在地图上搜索其他地点。",
+    "Mappa geografica · le città sono posizionate con coordinate reali": "地理地图 · 城市按真实坐标放置",
+    "Un mondo. Milioni di storie. Una casa per ognuno.": "一个世界，无数故事，人人有家。",
+    "🌎 Città selezionata:": "🌎 当前城市：",
+    "Tienda": "商店",
+    "Attività": "商铺",
+    "La mia casa": "我的家",
+    "Personaggio": "角色",
+    "Il mio personaggio": "我的角色",
+    "Mondo": "世界",
+    "Ranking": "排行榜",
+    "Trova": "查找",
+    "Obras": "公共设施",
+    "Opere": "公共设施",
+    "Menu mondo": "世界菜单",
+    "Chiudi": "关闭",
+    "Casa": "住宅",
+    "Negozio": "商铺",
+    "Mongolfiera": "热气球",
+    "Scopri le attività della città e le loro evoluzioni.": "探索城市里的商铺及其进化形态。",
+    "🏪 Esplora le attività": "🏪 探索商铺",
+    "Cerca il tuo nome utente per trovare la casa, il personaggio e le proprietà collegate.": "搜索用户名，找到你的住宅、角色及关联资产。",
+    "Trova nella città": "在城内查找",
+    "🌎 Entra nel 3D": "🌎 进入3D视图",
+    "🧭 Panoramica": "🧭 总览",
+    "Animazioni ambientali": "环境动画",
+    "Strutture e obiettivi": "设施与目标",
+    "Ricostruzione 3D stilizzata: la planimetria e gli elementi documentati sono affiancati da arredi di integrazione.": "风格化3D重建：依据资料中的平面布局和元素，并补充装饰设施。",
+    "Le fonti disponibili non descrivono ancora statue e fontane di questa piazza.": "现有资料尚未描述这座广场的雕像和喷泉。",
+    "Presenza mappata · forma 3D da completare": "地图已记录 · 3D形态待完成",
+    "Riferimento documentato · modello 3D stilizzato": "有资料依据 · 风格化3D模型",
+    "Tipologia mappata · modello 3D da verificare nei dettagli": "地图已记录类型 · 3D模型细节待核实",
+    "Fonte": "来源",
+    "Torna agli obiettivi": "返回目标列表",
+    "Parco di quartiere": "社区公园",
+    "Acquedotto e serbatoio": "供水设施与蓄水池",
+    "Ambulatorio e pronto soccorso": "诊所与急诊中心",
+    "Stazione di polizia": "警察局",
+    "Caserma dei pompieri": "消防站",
+    "Primi servizi": "基础服务",
+    "Asilo e area giochi": "幼儿园与游乐区",
+    "Scuola primaria": "小学",
+    "Centro raccolta e riciclo": "废物收集与回收中心",
+    "Campo da calcio": "足球场",
+    "Biblioteca pubblica": "公共图书馆",
+    "Ospedale generale": "综合医院",
+    "Municipio": "市政厅",
+    "Autostazione": "汽车站",
+    "Centrale elettrica di quartiere": "社区发电站",
+    "Giardini e area giochi": "花园与游乐区",
+    "Centro commerciale": "购物中心",
+    "Campo da baseball": "棒球场",
+    "Centro sportivo": "体育中心",
+    "Museo civico": "市立博物馆",
+    "Teatro e auditorium": "剧院与礼堂",
+    "Piscina comunale": "市立游泳池",
+    "Stadio cittadino": "城市体育场",
+    "Università e campus": "大学与校园",
+    "Stazione ferroviaria": "火车站",
+    "Palazzo di giustizia": "法院",
+    "Depuratore e servizi ambientali": "污水处理与环保设施",
+    "Piazza monumentale": "纪念广场",
+    "Eliporto di soccorso": "救援直升机停机坪",
+    "Orto botanico e serre": "植物园与温室",
+    "Servizi di quartiere": "社区服务",
+    "Città in crescita": "成长中的城市",
+    "Grande città": "大都市",
+    "Strutture pubbliche": "公共设施",
+    "Tutti gli edifici": "所有建筑",
+    "Case": "住宅",
+    "Cerca edifici": "搜索建筑",
+    "Nome, nickname o numero…": "名称、用户名或编号…",
+    "Mostra altri risultati": "显示更多结果",
+    "📍 Raggiungi e apri": "📍 前往并打开",
+    "Nessuna struttura trovata.": "未找到设施。",
+    "Raggiunto": "已达成",
+    "Caffetteria": "咖啡馆",
+    "Supermercato": "超市",
+    "Ristorante": "餐厅",
+    "Libreria": "书店",
+    "Farmacia": "药店",
+    "Negozio di moda": "服装店",
+    "Officina": "修理厂",
+    "Panetteria": "面包店",
+    "Palestra": "健身房",
+    "Mercato": "集市",
+    "PIAZZA CIVICA": "市民广场",
+    "PIAZZA PRINCIPALE": "中心广场",
+    "SERVIZI PUBBLICI": "公共服务",
+    "Monolocale": "单间住宅",
+    "Casa piccola": "小住宅",
+    "Villetta": "独栋住宅",
+    "Palazzina": "小型公寓楼",
+    "Condominio": "公寓楼",
+    "Torre residenziale": "住宅塔楼",
+    "Grattacielo": "摩天大楼",
+    "Grattacielo monumentale": "巨型摩天大楼",
+    "Crema": "奶油色",
+    "Bianco": "白色",
+    "Rosa": "粉色",
+    "Azzurro": "浅蓝色",
+    "Verde salvia": "鼠尾草绿",
+    "Ocra": "赭色",
+    "Grigio": "灰色",
+    "Gratis": "免费",
+    "Base": "标准",
+    "Accesso proprietario": "所有者登录",
+    "Accedi per aprire gli strumenti di simulazione.": "登录以打开模拟工具。",
+    "Ricevi link di accesso": "获取登录链接",
+    "Apri l’email ricevuta e premi il link di accesso. Il link è personale e utilizzabile una sola volta.": "打开收到的邮件并点击登录链接。链接仅限本人使用，且只能使用一次。",
+    "Apri simulazione": "打开模拟模式",
+    "Torna alla vista pubblica": "返回公开视图",
+    "Apri gli strumenti proprietario": "打开所有者工具",
+    "Esci dal tuo account": "退出登录",
+    "Vista pubblica ripristinata.": "已恢复公开视图。",
+    "Accedi nuovamente per continuare.": "请重新登录以继续。",
+    "Strumenti riservati non disponibili.": "专用工具暂不可用。",
+    "Il sito sta ancora terminando il caricamento.": "网站仍在加载中。",
+    "Sei uscito. Il sito è tornato alla vista pubblica.": "已退出登录，网站已返回公开视图。",
+    "Accesso chiuso su questo dispositivo. Connessione al servizio non disponibile.": "已结束此设备上的登录，当前无法连接服务。",
+    "Troppe richieste. Attendi un minuto e riprova.": "请求过多。请等待一分钟后重试。",
+    "Accesso non disponibile. Controlla i dati e riprova.": "无法登录。请检查输入内容后重试。",
+    "Verifichiamo il tuo accesso.": "正在验证登录。",
+    "Tra poco tornerai alla tua città.": "即将返回你的城市。",
+    "Il link non è valido oppure è già stato utilizzato. Richiedi un nuovo accesso.": "链接无效或已使用。请重新获取登录链接。",
+    "Questo account non è autorizzato ad aprire la simulazione.": "此账号无权打开模拟模式。",
+    "Torna al sito": "返回网站",
+    "🧪 Simulazione e test": "🧪 模拟与测试",
+    "Le modifiche di prova restano in questa sessione. Torna alla vista pubblica per ripristinare la città.": "测试修改仅在本次会话中有效。返回公开视图即可恢复城市。",
+    "👥 Abitanti simulati:": "👥 模拟居民数：",
+    "Numero di case simulate": "模拟住宅数量",
+    "Numero esatto di case": "指定住宅数量",
+    "Applica": "应用",
+    "Sposta il cursore per scegliere. Rilascia per generare la città; oppure inserisci il numero esatto e premi Applica.": "拖动滑块选择数量，松开后生成城市；也可输入准确数量并点击“应用”。",
+    "🏗️ Evoluzione casa (demo)": "🏗️ 住宅进化（演示）",
+    "Clicca qualsiasi casa nel 3D per scegliere quale far evolvere: il lotto rimane fisso.": "在3D视图中点击住宅，选择要进化的房屋，地块位置保持不变。",
+    "Attività di prova": "测试商铺",
+    "+1 negozio": "添加1家商铺",
+    "+100 negozi": "添加100家商铺",
+    "Azzera negozi": "重置测试商铺",
+    "Lingua": "语言",
+    "Prepariamo la tua lingua.": "正在准备你的语言。",
+    "Aggiorniamo testi e cartelli della città.": "正在更新城市文本与标牌。",
+    "Lingua non disponibile. Controlla la connessione e riprova.": "无法加载此语言。请检查网络后重试。",
+    "Classifica": "排行榜",
+    "abitanti": "位居民",
+    "Negozi": "商铺",
+    "Email": "电子邮箱",
+    "Premium": "高级版",
+    "Hotel": "酒店",
+    "Cinema": "电影院",
+    "Africa": "非洲",
+    "Asia": "亚洲",
+    "Oceania": "大洋洲",
+    "Terracotta": "陶土色",
+    "Zoom in": "放大",
+    "Zoom out": "缩小",
+    "A JavaScript library for interactive maps": "交互式地图工具库",
+    "Località:": "地点：",
+    "· Terre: Natural Earth": "· 陆地：Natural Earth",
+    "· Terreno:": "· 地形：",
+    "Seleziona una città del mondo: ogni città ha case evolute, negozi e mongolfiere. Avvicinati per scoprire giardini, attività e piazze. Puoi ruotare, spostarti liberamente e selezionare le case.": "选择世界上的一座城市，探索住宅、商铺和热气球。靠近即可发现花园、商店与广场。你可以自由旋转、移动视角并选择住宅。",
+    "Trascina per spostarti. Usa Ruota per inclinare la visuale. Su telefono allarga due dita per avvicinarti e chiudile per allontanarti. Tocca una casa, un’attività o una persona per aprire la sua scheda.": "拖动以移动视角，使用“旋转”调整倾斜角度。手机上双指张开放大，合拢缩小。点击住宅、商铺或人物可打开详情。",
+    "Statue, fontane e dettagli della piazza": "广场的雕像、喷泉与细节",
+    "Cerca una struttura…": "搜索设施…",
+    "Cerca strutture pubbliche": "搜索公共设施",
+    "IL TUO NEGOZIO": "你的商铺",
+    "PUÒ ESSERE QUI": "可以开在这里",
+    "PROSSIMA OPERA": "下一座公共设施",
+    "LA CITTÀ CRESCE": "城市在成长",
+    "Scopri il traguardo": "查看目标",
+    "Scopri le attività": "查看商铺",
+    "PIAZZA DI QUARTIERE": "社区广场",
+    "Cespuglio": "灌木",
+    "Sfera fiorita": "球形花灌木",
+    "Arbusto a foglie": "观叶灌木",
+    "Siepe compatta": "紧凑绿篱",
+    "Cespuglio a tre chiome": "三冠灌木",
+    "Vialetto": "庭院小径",
+    "Pietra chiara": "浅色石材",
+    "Pietra scura": "深色石材",
+    "Cotto": "陶砖",
+    "Lastre separate": "步石",
+    "Aiuola": "花坛",
+    "Fiori misti": "混合花卉",
+    "Rose rosse": "红玫瑰",
+    "Margherite": "雏菊",
+    "Lavanda": "薰衣草",
+    "Lampioncino": "庭院灯",
+    "Classico": "经典款",
+    "Globo": "球形款",
+    "Lanterna quadrata": "方形灯笼",
+    "Paletto moderno": "现代灯柱",
+    "Barbecue Premium": "高级烧烤设施",
+    "Muratura con cappa": "带烟罩的砖砌烤炉",
+    "Griglia con coperchio": "带盖烤架",
+    "Forno a legna": "柴火炉",
+    "Cucina BBQ moderna": "现代烧烤厨房",
+    "Cassetta postale": "信箱",
+    "Rossa": "红色",
+    "Nera": "黑色",
+    "Casetta": "小屋造型",
+    "Acciaio": "钢制",
+    "Recinzione": "围栏",
+    "Legno": "木制",
+    "Ferro": "铁制",
+    "Siepe": "绿篱",
+    "Muretto": "矮墙",
+    "Piscina Premium": "高级泳池",
+    "Piscina classica": "经典泳池",
+    "Piscina ovale": "椭圆泳池",
+    "Piscina sportiva": "运动泳池",
+    "Piscina rotonda": "圆形泳池",
+    "🌿 Giardino: non sbloccato": "🌿 庭院：未解锁",
+    "Scegli una città del mondo. Il puntatore della città rimane della stessa dimensione.": "选择一座城市，开始探索世界。",
+    "📍 Conegliano e dintorni · Veneto": "📍 Conegliano及周边 · Veneto",
+    "Cerca città nel mondo": "搜索全球城市",
+    "N ↑": "北 ↑",
+    "Evoluzione attività": "商铺进化",
+    "Design Premium (demo)": "高级版设计（演示）",
+    "Applica evoluzione": "应用进化",
+    "🏗️ Evoluzione di questa casa (demo)": "🏗️ 这栋住宅的进化（演示）",
+    "Scegli i punti e il design: cambia solo questa casa, senza spostare il lotto.": "选择积分和设计，仅修改这栋住宅，地块位置不变。",
+    "Punti esatti per questa casa": "指定这栋住宅的积分",
+    "Applica punti": "应用积分",
+    "🎨 Design per questa evoluzione": "🎨 当前进化阶段的设计",
+    "Gratis · Casa standard": "免费 · 标准住宅",
+    "Abbonamento · Casa con balconi, camino e dettagli": "订阅 · 带阳台、烟囱和装饰细节的住宅",
+    "🎨 Colore della casa": "🎨 住宅颜色",
+    "🌿 Personalizza le decorazioni · 4 modelli per sblocco": "🌿 自定义装饰 · 每次解锁4种款式",
+    "Casa senza piante a 0 punti.": "0积分时没有植物。",
+    "4 piante con Premium": "高级版可种4株植物",
+    "2 piante con Gratis": "免费版可种2株植物",
+    "posizioni automatiche.": "自动摆放。",
+    "Simulazione dell’abbonamento: non viene effettuato alcun pagamento.": "订阅模拟：不会产生任何付款。",
+    "Acquisti dimostrativi: nessun pagamento reale.": "演示购买：不会产生实际付款。",
+    "🏪 Aggiungi negozio": "🏪 添加商铺",
+    "🎈 Aggiungi mongolfiera": "🎈 添加热气球",
+    "📍 Vai alla mia casa": "📍 前往我的家",
+    "La personalizzazione della facciata sarà ampliata nelle prossime versioni.": "后续版本将提供更多外观自定义选项。",
+    "Colore della pelle": "肤色",
+    "Vestiti": "服装",
+    "📍 Trova il mio personaggio": "📍 查找我的角色",
+    "Personaggio non generato": "角色尚未生成",
+    "Pizzeria": "披萨店",
+    "PIZZERIA": "披萨店",
+    "Opera mappata": "地图记录的艺术品",
+    "Fontana mappata": "地图记录的喷泉",
+    "Prepariamo la città e i suoi dintorni.": "正在准备城市及周边地区。",
+    "Design Premium (demo abbonamento)": "高级版设计（订阅演示）",
+    "Design Gratis": "免费版设计",
+    "San Martín anziano in abiti civili con mantello al vento, sopra base rocciosa con tre rilievi. Il monumento equestre appartiene al Parque San Martín, non a questa piazza.": "晚年的San Martín身着便服，披风随风飘扬，站在带有三幅浮雕的岩石底座上。骑马纪念碑位于Parque San Martín，而非这座广场。",
+    "Giardino-calendario cartografato: aiuola floreale con anno corrente. Disegno delle fioriture interpretato, non un rilievo fotografico.": "地图记录的日历花园：用花坛呈现当前年份。花卉图案为艺术化诠释，并非摄影测绘结果。",
+    "San Martín equestre, bronzo su basamento in granito con rilievi.": "San Martín青铜骑马像，立于带浮雕的花岗岩底座上。",
+    "Arenales a cavallo con quindici figure allegoriche alla base.": "Arenales骑马像，底座周围有十五座寓意雕像。",
+    "Libertà di Lola Mora, marmo di Carrara, panneggio e catene spezzate; nessuno scudo o cavallo.": "Lola Mora的《自由》：采用卡拉拉大理石，刻有衣褶与断裂的锁链，没有盾牌或马。",
+    "Posizione: cartografia · orientamento e dettagli fini ancora da verificare": "位置：依据地图 · 朝向与精细细节尚待核实",
+    "Accesso proprietario · Casa por Casa": "所有者登录 · Casa por Casa",
+    "Alcuni elementi della città non sono stati caricati. Puoi riprovare.": "未能加载城市的部分元素。请重试。",
+    "PARCO DI QUARTIERE": "社区公园",
+    "ACQUEDOTTO E SERBATOIO": "供水设施与蓄水池",
+    "AMBULATORIO E PRONTO SOCCORSO": "诊所与急诊中心",
+    "STAZIONE DI POLIZIA": "警察局",
+    "CASERMA DEI POMPIERI": "消防站",
+    "ASILO E AREA GIOCHI": "幼儿园与游乐区",
+    "SCUOLA PRIMARIA": "小学",
+    "CENTRO RACCOLTA E RICICLO": "废物收集与回收中心",
+    "CAMPO DA CALCIO": "足球场",
+    "BIBLIOTECA PUBBLICA": "公共图书馆",
+    "OSPEDALE GENERALE": "综合医院",
+    "MUNICIPIO": "市政厅",
+    "AUTOSTAZIONE": "汽车站",
+    "CENTRALE ELETTRICA DI QUARTIERE": "社区发电站",
+    "GIARDINI E AREA GIOCHI": "花园与游乐区",
+    "CENTRO COMMERCIALE": "购物中心",
+    "CAMPO DA BASEBALL": "棒球场",
+    "CENTRO SPORTIVO": "体育中心",
+    "MUSEO CIVICO": "市立博物馆",
+    "TEATRO E AUDITORIUM": "剧院与礼堂",
+    "PISCINA COMUNALE": "市立游泳池",
+    "STADIO CITTADINO": "城市体育场",
+    "UNIVERSITÀ E CAMPUS": "大学与校园",
+    "STAZIONE FERROVIARIA": "火车站",
+    "PALAZZO DI GIUSTIZIA": "法院",
+    "DEPURATORE E SERVIZI AMBIENTALI": "污水处理与环保设施",
+    "PIAZZA MONUMENTALE": "纪念广场",
+    "ELIPORTO DI SOCCORSO": "救援直升机停机坪",
+    "ORTO BOTANICO E SERRE": "植物园与温室",
+    "CAFFETTERIA": "咖啡馆",
+    "SUPERMERCATO": "超市",
+    "RISTORANTE": "餐厅",
+    "LIBRERIA": "书店",
+    "FARMACIA": "药店",
+    "NEGOZIO DI MODA": "服装店",
+    "OFFICINA": "修理厂",
+    "PANETTERIA": "面包店",
+    "CINEMA": "电影院",
+    "PALESTRA": "健身房",
+    "HOTEL": "酒店",
+    "MERCATO": "集市"
+  },
+  "templates": [
+    {
+      "source": "{count} risultati",
+      "target": "{count}条结果"
+    },
+    {
+      "source": "{city} · {count} case · {shops} attività",
+      "target": "{city} · {count}栋住宅 · {shops}家商铺"
+    },
+    {
+      "source": "Casa · {city}",
+      "target": "住宅 · {city}"
+    },
+    {
+      "source": "🌿 Giardino: {plant} · {count} piante",
+      "target": "🌿 庭院：{plant} · {count}株植物",
+      "translateSlots": [
+        "plant"
+      ]
+    },
+    {
+      "source": "🎨 Colore: {color}",
+      "target": "🎨 颜色：{color}",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "🏗️ {tier} · {floors} piani",
+      "target": "🏗️ {tier} · {floors}层",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "🎨 Design: {design}",
+      "target": "🎨 设计：{design}",
+      "translateSlots": [
+        "design"
+      ]
+    },
+    {
+      "source": "⭐ {points} punti",
+      "target": "⭐ {points}积分"
+    },
+    {
+      "source": "{count} case mancanti",
+      "target": "还需{count}栋住宅"
+    },
+    {
+      "source": "{version} · Edizione mondiale",
+      "target": "{version} · 全球版"
+    },
+    {
+      "source": "Prossima fermata: {city}.",
+      "target": "下一站：{city}。"
+    },
+    {
+      "source": "{city} · {count} case · {shops} negozi · {facilities} strutture pubbliche",
+      "target": "{city} · {count}栋住宅 · {shops}家商铺 · {facilities}处公共设施"
+    },
+    {
+      "source": "{city} · città raggiunta · {count} case",
+      "target": "{city} · 已抵达 · {count}栋住宅"
+    },
+    {
+      "source": "{city} · {count} case · scegli Entra nel 3D",
+      "target": "{city} · {count}栋住宅 · 选择“进入3D视图”"
+    },
+    {
+      "source": "{count} risultati mostrati · scrivi per restringere la ricerca",
+      "target": "显示{count}条结果 · 输入以缩小搜索范围"
+    },
+    {
+      "source": "{count} risultati mostrati",
+      "target": "显示{count}条结果"
+    },
+    {
+      "source": "Utente non presente in {city}",
+      "target": "在{city}中未找到该用户"
+    },
+    {
+      "source": "Esplora {city} con la telecamera libera.",
+      "target": "使用自由视角探索{city}。"
+    },
+    {
+      "source": "🏠 Casa #{id} · @{user}",
+      "target": "🏠 住宅 #{id} · @{user}"
+    },
+    {
+      "source": "🏠 Casa #{id}",
+      "target": "🏠 住宅 #{id}"
+    },
+    {
+      "source": "Casa #{id}",
+      "target": "住宅 #{id}"
+    },
+    {
+      "source": "{points} punti",
+      "target": "{points}积分"
+    },
+    {
+      "source": "{count} case",
+      "target": "{count}栋住宅"
+    },
+    {
+      "source": "{count} negozi · lotti misti",
+      "target": "{count}家商铺 · 混合地块"
+    },
+    {
+      "source": "{count} mongolfiere",
+      "target": "{count}个热气球"
+    },
+    {
+      "source": "Livello {level}/{total}",
+      "target": "等级{level}/{total}"
+    },
+    {
+      "source": "Proprietà raggiungibili ({count})",
+      "target": "关联资产（{count}项）"
+    },
+    {
+      "source": "Raggiungi {city}",
+      "target": "前往{city}"
+    },
+    {
+      "source": "{city} · {count} abitanti virtuali",
+      "target": "{city} · {count}位虚拟居民"
+    },
+    {
+      "source": "{business} · {city} · Livello {level}/{total} · {points} punti · {design}",
+      "target": "{business} · {city} · 等级{level}/{total} · {points}积分 · {design}",
+      "translateSlots": [
+        "business",
+        "design"
+      ]
+    },
+    {
+      "source": "{business} #{id} · @{user}",
+      "target": "{business} #{id} · @{user}",
+      "translateSlots": [
+        "business"
+      ]
+    },
+    {
+      "source": "🏪 {business} #{id}",
+      "target": "🏪 {business} #{id}",
+      "translateSlots": [
+        "business"
+      ]
+    },
+    {
+      "source": "{tier} ({floors} piani)",
+      "target": "{tier}（{floors}层）",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{tier} ({floors} piano)",
+      "target": "{tier}（{floors}层）",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{count} CASE",
+      "target": "{count}栋住宅"
+    },
+    {
+      "source": "{city} · {count} case · {reached}/{total} obiettivi raggiunti",
+      "target": "{city} · {count}栋住宅 · 已达成{reached}/{total}项目标"
+    },
+    {
+      "source": "🏙 {city} · {distance} km",
+      "target": "🏙 {city} · {distance}公里"
+    },
+    {
+      "source": "📍 Trova {facility}",
+      "target": "📍 查找{facility}",
+      "translateSlots": [
+        "facility"
+      ]
+    },
+    {
+      "source": "Personaggio · {city}",
+      "target": "角色 · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Mongolfiera · {city}",
+      "target": "热气球 · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Negozio · {city}",
+      "target": "商铺 · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Livello {level} · {points} punti",
+      "target": "等级{level} · {points}积分",
+      "translateSlots": []
+    },
+    {
+      "source": "{points} punti · {tier} ({floors} piani)",
+      "target": "{points}积分 · {tier}（{floors}层）",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{color} · pareti e tetto",
+      "target": "{color} · 墙壁与屋顶",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "🎈 Mongolfiera #{id}",
+      "target": "🎈 热气球 #{id}",
+      "translateSlots": []
+    },
+    {
+      "source": "Casa demo di @{user}",
+      "target": "@{user}的演示住宅",
+      "translateSlots": []
+    },
+    {
+      "source": "@{user} · personaggio selezionato (freccia gialla)",
+      "target": "@{user} · 已选中的角色（黄色箭头）",
+      "translateSlots": []
+    },
+    {
+      "source": "Nella demo la prima casa appartiene a @{user}. Non è ancora presente un sistema di accesso personale.",
+      "target": "演示中的第一栋住宅属于@{user}。居民个人登录功能尚未提供。",
+      "translateSlots": []
+    },
+    {
+      "source": "Un personaggio gratuito per ogni casa. In questa demo puoi individuare il personaggio di @{user}.",
+      "target": "每栋住宅都有一位免费角色。在此演示中，你可以找到@{user}的角色。",
+      "translateSlots": []
+    },
+    {
+      "source": "Cespuglio: {variant}",
+      "target": "灌木：{variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Vialetto: {variant}",
+      "target": "庭院小径：{variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Aiuola: {variant}",
+      "target": "花坛：{variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Lampioncino: {variant}",
+      "target": "庭院灯：{variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Barbecue Premium: {variant}",
+      "target": "高级烧烤设施：{variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Cassetta postale: {variant}",
+      "target": "信箱：{variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Recinzione: {variant}",
+      "target": "围栏：{variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Piscina Premium: {variant}",
+      "target": "高级泳池：{variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Casa #{id} · colore {color}",
+      "target": "住宅 #{id} · 颜色：{color}",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "Demo @{user} · Casa #{id} · {points} punti · {tier}",
+      "target": "演示 @{user} · 住宅 #{id} · {points}积分 · {tier}",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{count} località nel catalogo · {countries} paesi e territori · simulazione · {residents} in {city} · {points} punti città · {homes} case 3D caricate",
+      "target": "目录中有{count}处地点 · {countries}个国家和地区 · 模拟 · {city}有{residents}位居民 · 城市积分{points} · 已加载{homes}栋3D住宅",
+      "translateSlots": []
+    },
+    {
+      "source": "Piazza civica di {city}",
+      "target": "{city}市民广场",
+      "translateSlots": []
+    }
+  ],
+  "verification": {
+    "messages": 360,
+    "templates": 61,
+    "browserEvidence": "Cartello_cinese_Shanghai_v9.4.0.jpg",
+    "privateOptions": "all eight tiers; source normalization and translation regression checked",
+    "scope": "Current game UI; further languages remain in development"
+  }
+}
