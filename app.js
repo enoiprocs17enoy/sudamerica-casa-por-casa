@@ -1163,6 +1163,14 @@ function blockBoundsFromCell(col,row){
     top:streetEdgeZ(row-1)+STREET/2+1.23,
     bottom:streetEdgeZ(row)-STREET/2-1.23};
 }
+function roadQuadOverlapsDevelopedBlocks(a,b,cells){
+ const points=[...a,...b],left=Math.min(...points.map(p=>p.x)),right=Math.max(...points.map(p=>p.x)),top=Math.min(...points.map(p=>p.z)),bottom=Math.max(...points.map(p=>p.z));
+ for(let col=Math.round(left/BLOCK_X);col<=Math.round(right/BLOCK_X);col++)for(let row=Math.round(top/BLOCK_Z);row<=Math.round(bottom/BLOCK_Z);row++){
+  if(!cells.has(col+':'+row))continue;const parcel=blockBoundsFromCell(col,row);
+  if(left<parcel.right+.25&&right>parcel.left-.25&&top<parcel.bottom+.25&&bottom>parcel.top-.25)return true;
+ }
+ return false;
+}
 function plotBounds(block,slot){
   if(!Number.isInteger(block)||!Number.isInteger(slot)||slot<0||slot>=LOT_COLS*LOT_ROWS)throw Error('Identificativo lotto non valido: '+block+'/'+slot);
   const {col,row}=spiralCell(block);
@@ -1601,7 +1609,9 @@ function* buildRegionalStages(houses){
  if(roadPlan&&window.WorldTerrain)window.WorldTerrain.prepare(roadPlan,terrainHeight,region||coastFrame);
  if(roadPlan)group.userData.roadPlan=roadPlan;
  group.userData.terrainHeight=terrainHeight;
- if(roadPlan)window.WorldRoads.draw3D(roadPlan,group,terrainHeight,(x,z)=>region?region.landDistance(x,z)>15:!coast||x*east+z*south<shore-20);
+ // The urban street grid owns developed blocks. Regional routes must never
+ // lay a second diagonal carriageway across their public and private parcels.
+ if(roadPlan)window.WorldRoads.draw3D(roadPlan,group,terrainHeight,(x,z)=>region?region.landDistance(x,z)>15:!coast||x*east+z*south<shore-20,(a,b)=>roadQuadOverlapsDevelopedBlocks(a,b,cleared));
  markRegion('Strade esterne');
  yield;
  const candidates=[],spacing=48,horizon=6500;
@@ -3976,6 +3986,34 @@ function drawShops(){
 
     furnishBusiness(shop,shape,stage,progress.premium,w,d,height,trim,glass,serviceRear);
   }
+  // Validate the complete architecture, including furniture, roofs and 3D signs.
+  // The road setbacks leave33.04m here, not the nominal45m row spacing.
+  const envelopes=new Map();
+  for(const batch of batches.values()){
+   if(!batch.geo.boundingBox)batch.geo.computeBoundingBox();
+   const g=batch.geo.boundingBox;
+   for(const e of batch.entries){
+    const shop=e.shop;if(!shop)continue;
+    if(!envelopes.has(shop))envelopes.set(shop,{left:Infinity,right:-Infinity,top:Infinity,bottom:-Infinity,entries:[]});
+    const b=envelopes.get(shop),ca=Math.cos(e.rotation),sa=Math.sin(e.rotation),xx=ca*e.w,xz=sa*e.d,zx=-sa*e.w,zz=ca*e.d;
+    b.left=Math.min(b.left,e.x+Math.min(xx*g.min.x,xx*g.max.x)+Math.min(xz*g.min.z,xz*g.max.z));
+    b.right=Math.max(b.right,e.x+Math.max(xx*g.min.x,xx*g.max.x)+Math.max(xz*g.min.z,xz*g.max.z));
+    b.top=Math.min(b.top,e.z+Math.min(zx*g.min.x,zx*g.max.x)+Math.min(zz*g.min.z,zz*g.max.z));
+    b.bottom=Math.max(b.bottom,e.z+Math.max(zx*g.min.x,zx*g.max.x)+Math.max(zz*g.min.z,zz*g.max.z));b.entries.push(e);
+   }
+  }
+  const fits=[];
+  for(const [shop,b]of envelopes){
+   if(![shop.left,shop.right,shop.top,shop.bottom].every(Number.isFinite))continue;
+   const margin=.16,scale=Math.min(1,(shop.right-shop.left-margin*2)/(b.right-b.left),(shop.bottom-shop.top-margin*2)/(b.bottom-b.top));
+   const left=shop.x+(b.left-shop.x)*scale,right=shop.x+(b.right-shop.x)*scale,top=shop.z+(b.top-shop.z)*scale,bottom=shop.z+(b.bottom-shop.z)*scale;
+   const dx=Math.max(shop.left+margin-left,Math.min(0,shop.right-margin-right)),dz=Math.max(shop.top+margin-top,Math.min(0,shop.bottom-margin-bottom));
+   if(scale<1||Math.abs(dx)+Math.abs(dz)>1e-8){
+    for(const e of b.entries){e.x=shop.x+(e.x-shop.x)*scale+dx;e.z=shop.z+(e.z-shop.z)*scale+dz;e.y*=scale;e.w*=scale;e.h*=scale;e.d*=scale;}
+    fits.push({id:shop.id,scale,dx,dz});
+   }
+  }
+  group.userData.shopParcelFits=fits;
   const material=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.77,metalness:.02});
   const glowMaterial=[...batches.values()].some(batch=>batch.glow)?new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xffcf7a,emissiveIntensity:.75,roughness:.40}):material;
   const gardenGlassMaterial=[...batches.values()].some(batch=>batch.clearGlass)?new THREE.MeshStandardMaterial({color:0xffffff,transparent:true,opacity:.24,depthWrite:false,roughness:.28,metalness:.04}):material;
