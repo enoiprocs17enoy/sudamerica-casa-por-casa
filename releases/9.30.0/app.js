@@ -1814,7 +1814,7 @@ window.addEventListener('keydown',e=>{
 });
 window.addEventListener('resize',resize);threeReady=true;resize();animate();return true}
 function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
-function zoomBy(factor){distance=clamp(distance/Math.max(.01,factor),12,5200);}
+function zoomBy(factor){distance=clamp(distance/Math.max(.01,factor),12,24000);}
 function panPixels(dx,dy){
  // Pixel-to-ground projection using the camera's actual right and up vectors.
  // This stays consistent at every tilt angle.
@@ -1833,7 +1833,7 @@ function screenToGround(clientX,clientY){
  const ray=new THREE.Raycaster();ray.setFromCamera(ndc,camera);
  if(ray.ray.direction.y>=-.0001)return null;
  const t=-ray.ray.origin.y/ray.ray.direction.y;
- if(t<0||t>20000)return null;
+ if(t<0||t>100000)return null;
  return ray.ray.at(t,new THREE.Vector3());
 }
 function resize(){
@@ -1845,7 +1845,7 @@ function resize(){
 }
 function updateCamera(){
  if(!camera)return;
- distance=clamp(Number.isFinite(distance)?distance:180,12,5200);
+ distance=clamp(Number.isFinite(distance)?distance:180,12,24000);
  azimuth=Number.isFinite(azimuth)?azimuth:.72;
  elevation=clamp(Number.isFinite(elevation)?elevation:.85,.22,1.55);
  target.x=Number.isFinite(target.x)?target.x:0;
