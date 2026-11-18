@@ -1504,6 +1504,7 @@ function cityGrowthBounds(population,shopCount){
  for(let i=PUBLIC_STEPS.length;n>=6000+(i-PUBLIC_STEPS.length)*1000;i++)include(facilityBlock(i));
  const result={minX,maxX,minZ,maxZ};if(cityGrowthBoundsCache.size>=256)cityGrowthBoundsCache.delete(cityGrowthBoundsCache.keys().next().value);cityGrowthBoundsCache.set(key,result);return {...result};
 }
+function cityPreviewLots(population,limit){const n=Math.max(1,Math.floor(population)),m=Math.min(n,Math.max(1,Math.floor(limit))),wanted=new Set(Array.from({length:m},(_,i)=>Math.round(i*(n-1)/Math.max(1,m-1)))),out=[];let index=0,block=0;while(index<n){const cell=spiralCell(block);for(let slot=0;slot<LOT_COLS*LOT_ROWS&&index<n;slot++)if(slotType(block,slot)==='house'){if(wanted.has(index))out.push({x:cell.col*BLOCK_X+(slot%LOT_COLS-(LOT_COLS-1)/2)*LOT_X,z:cell.row*BLOCK_Z+(Math.floor(slot/LOT_COLS)-(LOT_ROWS-1)/2)*LOT_Z,index});index++;}block++;}return out;}
 function worldCityCells(selected=homes){
  const cells=new Map();for(const h of selected){const p=spiralCell(h.blockIndex);cells.set(p.col+':'+p.row,p);}for(const shop of shopPurchases){const p=spiralCell(shop.block);cells.set(p.col+':'+p.row,p);}for(const zone of publicZones()){const p=spiralCell(zone.block);cells.set(p.col+':'+p.row,p);}return [...cells.values()];
 }
@@ -1687,7 +1688,7 @@ function* buildRegionalStages(houses){
  if(region&&window.WorldForest){const options={group,region,plan:roadPlan,height:terrainHeight,city,bounds:{minX,maxX,minZ,maxZ}};if(WorldForest.buildSteps)yield* WorldForest.buildSteps(options);else WorldForest.build(options);}
  markRegion('Bosco lontano');
  yield;
- if(roadPlan&&window.WorldNeighbors)WorldNeighbors.build({group,city,footprintFor:cityGrowthBounds,camera,container:$('threeLayer'),plan:roadPlan,height:terrainHeight,states:cityStates,getCamera:()=>({target:{...target},distance,azimuth,elevation}),setCamera:state=>{Object.assign(target,state.target);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();},onEnter:enterNeighborCity});
+ if(roadPlan&&window.WorldNeighbors)WorldNeighbors.build({group,city,footprintFor:cityGrowthBounds,previewLots:cityPreviewLots,camera,container:$('threeLayer'),plan:roadPlan,height:terrainHeight,states:cityStates,getCamera:()=>({target:{...target},distance,azimuth,elevation}),setCamera:state=>{Object.assign(target,state.target);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();},onEnter:enterNeighborCity});
  markRegion('Anteprime città vicine');
 }
 function regionalMountain(city){
@@ -1846,6 +1847,7 @@ function resize(){
 function updateCamera(){
  if(!camera)return;
  distance=clamp(Number.isFinite(distance)?distance:180,12,24000);
+ if(scene?.fog?.isFogExp2)scene.fog.density=.000048*Math.min(1,5200/distance);
  azimuth=Number.isFinite(azimuth)?azimuth:.72;
  elevation=clamp(Number.isFinite(elevation)?elevation:.85,.22,1.55);
  target.x=Number.isFinite(target.x)?target.x:0;
