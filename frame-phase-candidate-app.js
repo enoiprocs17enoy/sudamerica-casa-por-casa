@@ -6821,7 +6821,8 @@ function buildBirdBatches(birds){
   mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);mesh.frustumCulled=false;
   mesh.castShadow=batch.castShadow;mesh.receiveShadow=batch.receiveShadow;
   mesh.userData.birdInstances=true;group.add(mesh);
-  for(const part of batch.parts)part.visible=false;
+  // Only wing pivots and the bird root animate; each mesh keeps its local pose.
+  for(const part of batch.parts){part.updateMatrix();part.matrixAutoUpdate=false;part.visible=false;}
   meshes.push({mesh,parts:batch.parts});
  }
  birdBatches={birds,meshes,inverse:new THREE.Matrix4(),matrix:new THREE.Matrix4()};
