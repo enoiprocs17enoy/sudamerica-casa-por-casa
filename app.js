@@ -6819,7 +6819,8 @@ function buildBirdBatches(birds){
   mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);mesh.frustumCulled=false;
   mesh.castShadow=batch.castShadow;mesh.receiveShadow=batch.receiveShadow;
   mesh.userData.birdInstances=true;group.add(mesh);
-  for(const part of batch.parts)part.visible=false;
+  // Only wing pivots and the bird root animate; each mesh keeps its local pose.
+  for(const part of batch.parts){part.updateMatrix();part.matrixAutoUpdate=false;part.visible=false;}
   meshes.push({mesh,parts:batch.parts});
  }
  birdBatches={birds,meshes,inverse:new THREE.Matrix4(),matrix:new THREE.Matrix4()};
@@ -6829,7 +6830,8 @@ function updateBirdBatches(){
  if(!birdBatches)return;
  const {birds,meshes,inverse,matrix}=birdBatches;
  group.updateWorldMatrix(true,false);inverse.copy(group.matrixWorld).invert();
- for(const bird of birds)bird.g.updateWorldMatrix(true,true);
+ // The city and its ancestors were updated above; update each bird subtree once.
+ for(const bird of birds)bird.g.updateWorldMatrix(false,true);
  for(const {mesh,parts}of meshes){
   for(let i=0;i<parts.length;i++){matrix.multiplyMatrices(inverse,parts[i].matrixWorld);mesh.setMatrixAt(i,matrix);}
   mesh.instanceMatrix.needsUpdate=true;
