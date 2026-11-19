@@ -5004,6 +5004,7 @@ function homeNormalPattern(kind){
 const homeTextures={};
 function homePattern(kind){
  if(homeTextures[kind])return homeTextures[kind];
+ if(kind==='lawn'){const tex=homePattern('grass').clone();tex.repeat.set(3,4);tex.needsUpdate=true;homeTextures[kind]=tex;return tex;}
  const c=document.createElement('canvas');c.width=c.height=512;
  const ctx=c.getContext('2d');
  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,512,512);
@@ -5576,7 +5577,7 @@ function* renderHouseStages(selected){
   const renderBatches=new Map();
   const spatialBatches=selected.length>=2000;
   for(const [key,batch] of batches.entries()){
-    const texture=/homeGardenLawn/i.test(key)?'grass':/(roof|gable|hip|towerTop|cornice)/i.test(key)?'roof':
+    const texture=/homeGardenLawn/i.test(key)?'lawn':/(roof|gable|hip|towerTop|cornice)/i.test(key)?'roof':
       /(wall|body|towerBase|wing|topSetback|penthouse|bay|longWing)/i.test(key)?'wall':'';
     const normalStrength=/(roof|gable|hip)/i.test(key)?.88:.56;
     const roughness=/(window|glass|mullion)/i.test(key)?.26:/roof/i.test(key)?.79:.87;
@@ -5606,7 +5607,7 @@ function* renderHouseStages(selected){
     if(!materials.has(batch.profile))materials.set(batch.profile,new THREE.MeshStandardMaterial({
       color:0xffffff,
       map:batch.texture?homePattern(batch.texture):null,
-      normalMap:batch.texture?homeNormalPattern(batch.texture):null,
+      normalMap:batch.texture&&batch.texture!=='lawn'?homeNormalPattern(batch.texture):null,
       normalScale:new THREE.Vector2(batch.normalStrength,batch.normalStrength),
       side:batch.geo===roofGeo?THREE.DoubleSide:THREE.FrontSide,
       roughness:batch.roughness,
