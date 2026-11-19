@@ -116,7 +116,15 @@ body.game-hub .v4Panel, body.game-hub #card {
   overscroll-behavior: contain;
 }
 body.game-hub .v4Panel { padding: 22px !important; }
-body.game-hub #v4Title { padding-inline-end: 44px; overflow-wrap: anywhere; }
+body.game-hub #v4Title { overflow-wrap: anywhere; }
+body.game-hub .v4Panel > .v4Close {
+  position: sticky;
+  top: 0;
+  right: auto;
+  float: inline-end;
+  margin-inline-start: 8px;
+  z-index: 2;
+}
 body.game-hub :is(.v4Close, .hub-close, .hub-drawer-close) {
   min-width: 44px;
   min-height: 44px;
@@ -282,5 +290,4 @@ body.game-hub .v4Panel .city-rank-resident {
 
 @media (max-height: 460px) {
   .hub-city-strip { display: none; }
-  body.game-hub .v4Panel, body.game-hub #card { max-height: calc(100dvh - 96px); }
 }
