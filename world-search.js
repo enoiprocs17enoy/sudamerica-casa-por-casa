@@ -9,7 +9,44 @@ const countryAliases=new Map();for(const c of atlas.countries.values()){const na
 function searchCountries(query,limit=4){const q=norm(query);if(!q)return[];return [...atlas.countries.values()].map(c=>({c,names:countryAliases.get(c.code)})).filter(e=>e.names.some(n=>n.includes(q))).sort((a,b)=>Number(b.names.includes(q))-Number(a.names.includes(q))||countryName(a.c).localeCompare(countryName(b.c))).slice(0,limit).map(e=>e.c);}
 function bucket(query){let h=0;for(const ch of [...norm(query)].slice(0,2))h=(h*31+ch.codePointAt(0))>>>0;return h%128;}
 async function unpack(path){const r=await fetch(DATA+path);if(!r.ok)throw Error('Search data '+r.status);const p=await r.json();if(p.encoding!=='gzip-base64')throw Error('Invalid search data');const bytes=Uint8Array.from(atob(p.data),c=>c.charCodeAt(0));return JSON.parse(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text());}
-async function searchCities(query,limit=6){const q=norm(query);if(!q)return[];const key=bucket(q);if(!cache.has(key)){const p=unpack(key+'.json').catch(e=>{cache.delete(key);throw e;});cache.set(key,p);while(cache.size>16)cache.delete(cache.keys().next().value);}const rows=await cache.get(key);const rank=row=>{const names=[row[2],row[3],...row[5]].map(norm);return names.includes(q)?0:names.some(n=>n.startsWith(q))?1:2;};return rows.filter(row=>[row[2],row[3],...row[5]].some(n=>[...q].length===1?norm(n)===q:norm(n).includes(q))).sort((a,b)=>rank(a)-rank(b)||b[4]-a[4]||a[0]-b[0]).slice(0,limit).map(r=>({id:'gn-'+r[0],countryCode:r[1],name:r[2],asciiName:r[3]}));}
+// The compact world buckets do not carry every GeoNames alias loaded by the atlas.
+// YesMilano also uses the simplified Chinese name 米兰 for Milan.
+const extraCityAliases=new Map([[3173435,['米兰']]]);
+const cityNames=city=>[city.name,city.asciiName,...(city.aliases||[])].filter(Boolean);
+const atlasAliases=id=>[...(atlas.meta.aliases?.[id]||[]),...(extraCityAliases.get(id)||[])];
+const bootstrapCities=[...new Set(atlas.byId.values())].filter(city=>city.geoVerified!==false&&atlas.countries.has(city.countryCode)).map(city=>{
+ const aliases=[...new Set([...(city.aliases||[]),...atlasAliases(city.geonameId)])];
+ return {id:city.id,countryCode:city.countryCode,name:city.name,asciiName:city.asciiName,aliases,population:city.realPopulation||city.rankWeight||0};
+});
+function cityExact(city,query){const q=norm(query);return !!q&&cityNames(city).some(name=>norm(name)===q);}
+async function searchCities(query,limit=6){
+ const q=norm(query);
+ if(!q)return [];
+ const single=[...q].length===1,matches=new Map();
+ function add(city){
+  const names=cityNames(city).map(name=>({name,normalized:norm(name)}));
+  const exact=names.find(({normalized})=>normalized===q);
+  const rank=exact?0:single?Infinity:names.some(({normalized})=>normalized.startsWith(q))?1:names.some(({normalized})=>normalized.includes(q))?2:Infinity;
+  if(!Number.isFinite(rank))return;
+  const previous=matches.get(city.id);
+  if(!previous||rank<previous.rank)matches.set(city.id,{city,rank,matchedName:exact?.name});
+ }
+ for(const city of bootstrapCities)add(city);
+ const key=bucket(q);
+ if(!cache.has(key)){
+  const pending=unpack(key+'.json').catch(error=>{cache.delete(key);throw error;});
+  cache.set(key,pending);
+  while(cache.size>16)cache.delete(cache.keys().next().value);
+ }
+ try{
+  const rows=await cache.get(key);
+  for(const [id,countryCode,name,asciiName,population,aliases] of rows){
+   const place=atlas.byId.get('gn-'+id);
+   add({id:place?.id||'gn-'+id,countryCode,name:place?.name||name,asciiName:place?.asciiName||asciiName,population,aliases:[name,asciiName,...(aliases||[]),...atlasAliases(id)]});
+  }
+ }catch(error){if(![...matches.values()].some(match=>match.rank===0))throw error;}
+ return [...matches.values()].sort((a,b)=>a.rank-b.rank||b.city.population-a.city.population||a.city.id.localeCompare(b.city.id)).slice(0,limit).map(({city,matchedName})=>({id:city.id,countryCode:city.countryCode,name:city.name,asciiName:city.asciiName,aliases:city.aliases,matchedName}));
+}
 function rememberResidents(city,rows){residentCities.delete(city.id);residentCities.set(city.id,rows.map(h=>({user:h.user,cityId:city.id,cityName:city.name,residentId:h.id})));while(residentCities.size>12)residentCities.delete(residentCities.keys().next().value);}
 function searchResidents(query,limit=4){const q=handle(query);if(!q)return[];const records=new Map();for(const rows of residentCities.values())for(const h of rows)if(handle(h.user).includes(q))records.set(h.cityId+':'+handle(h.user),h);for(const h of simulatedComments){if(!handle(h.user).includes(q))continue;const city=atlas.byId.get(h.cityId);records.set(h.cityId+':'+handle(h.user),{...h,cityName:city?.name||h.cityId});}return [...records.values()].sort((a,b)=>Number(handle(b.user)===q)-Number(handle(a.user)===q)||Number(b.cityId===currentCity.id)-Number(a.cityId===currentCity.id)||a.cityName.localeCompare(b.cityName)).slice(0,limit);}
 async function openCity(c){await (window.WorldDirectory?.selectCountry(c.countryCode)||atlas.loadCountry(c.countryCode));const city=atlas.byId.get(c.id);if(!city)throw Error('City not available');clearCountry();selectCity(city.id,true);return city;}
@@ -20,5 +57,5 @@ function clearCountry(){if(focusLayer)map.removeLayer(focusLayer);focusLayer=nul
 function countryFeature(code){return borderData?.features.find(f=>f.properties.code===code);}
 function frameFor(feature,country){const lng=country.center[1],unwrap=x=>x+360*Math.round((lng-x)/360),polys=feature.geometry.coordinates.map(poly=>poly.map(r=>r.map(p=>[unwrap(p[0]),p[1]]))),boxes=polys.map(p=>{const r=p[0];return{w:Math.min(...r.map(p=>p[0])),e:Math.max(...r.map(p=>p[0])),s:Math.min(...r.map(p=>p[1])),n:Math.max(...r.map(p=>p[1]))};}),distance=b=>Math.hypot(Math.max(b.w-lng,0,lng-b.e),Math.max(b.s-country.center[0],0,country.center[0]-b.n)),main=[...boxes].sort((a,b)=>distance(a)-distance(b)||(b.e-b.w)*(b.n-b.s)-(a.e-a.w)*(a.n-a.s))[0],local=boxes.filter(b=>b.e>=main.w-30&&b.w<=main.e+30&&b.n>=main.s-25&&b.s<=main.n+25);return{feature:{...feature,geometry:{type:'MultiPolygon',coordinates:polys}},bounds:[[Math.max(-85,Math.min(...local.map(b=>b.s))),Math.min(...local.map(b=>b.w))],[Math.min(85,Math.max(...local.map(b=>b.n))),Math.max(...local.map(b=>b.e))]]};}
 async function showCountry(code){const country=atlas.countries.get(code);if(!country)return;await Promise.all([loadBorders(),window.WorldDirectory?.selectCountry(code)||atlas.loadCountry(code)]);const feature=countryFeature(code);if(!feature)throw Error('Country boundary not available');if(active)back();clearCountry();selectedCountry=code;document.body.classList.add('country-focus');const frame=frameFor(feature,country);focusLayer=L.geoJSON(frame.feature,{pane:'countryFocus',interactive:false,style:{color:'#a36a08',weight:2.5,opacity:1,fillColor:'#ffd357',fillOpacity:.27}}).addTo(map);focusLayer.bindTooltip(countryName(country),{permanent:true,direction:'center',className:'world-country-label'}).openTooltip([(frame.bounds[0][0]+frame.bounds[1][0])/2,(frame.bounds[0][1]+frame.bounds[1][1])/2]);manualCityNavigation=true;suppressMapEntry=true;try{map.fitBounds(frame.bounds,{paddingTopLeft:[22,225],paddingBottomRight:[22,145],maxZoom:16});}finally{manualCityNavigation=false;suppressMapEntry=false;}document.getElementById('status').textContent=countryName(country);return country;}
-window.WorldSearch={normalize:norm,bucket,t,countryExact:(c,q)=>countryAliases.get(c.code)?.includes(norm(q)),searchCountries,searchCities,searchResidents,rememberResidents,openCity,openResident,showCountry,clearCountry,loadBorders,frameFor,getSelectedCountry:()=>selectedCountry};rememberResidents(currentCity,homes);window.GameI18n?.onChange(()=>{if(selectedCountry&&focusLayer)focusLayer.setTooltipContent(countryName(atlas.countries.get(selectedCountry)));});void loadBorders().catch(()=>{});
+window.WorldSearch={normalize:norm,bucket,t,countryExact:(c,q)=>countryAliases.get(c.code)?.includes(norm(q)),cityExact,searchCountries,searchCities,searchResidents,rememberResidents,openCity,openResident,showCountry,clearCountry,loadBorders,frameFor,getSelectedCountry:()=>selectedCountry};rememberResidents(currentCity,homes);window.GameI18n?.onChange(()=>{if(selectedCountry&&focusLayer)focusLayer.setTooltipContent(countryName(atlas.countries.get(selectedCountry)));});void loadBorders().catch(()=>{});
 })();

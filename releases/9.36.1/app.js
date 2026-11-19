@@ -1816,7 +1816,7 @@ canvas.addEventListener('wheel',e=>{
 },{passive:false});
  resize();
  window.addEventListener('keydown',e=>{
- if(!active||['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;
+ if(!active||document.activeElement?.closest('#v4Panel')||['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;
  const step=Math.max(2,distance*.045);
  const forward={x:Math.sin(azimuth),z:Math.cos(azimuth)};
  const right={x:Math.cos(azimuth),z:-Math.sin(azimuth)};
@@ -7241,9 +7241,31 @@ function cityPanelSearchText(...parts){
  const value=parts.join(' ');
  return window.WorldSearch?.normalize(value)??value.trim().toLocaleLowerCase();
 }
-function openSquareDetailPanel(){
+let civicPanelOpener=null;
+function revealCivicPanel(focusHeading){
+ const panel=$('v4Panel');
+ const focused=document.activeElement;
+ if(focusHeading&&!panel.contains(focused)){
+  civicPanelOpener=focused?.matches('button,a[href],input,select,textarea,[tabindex]')?focused:null;
+ }
+ panel.hidden=false;
+ return panel;
+}
+function focusCivicTitle(panel){
+ panel.scrollTop=0;
+ const heading=$('v4Title');
+ heading.tabIndex=-1;
+ heading.focus({preventScroll:true});
+}
+function closeCivicPanel(){
+ $('v4Panel').hidden=true;
+ const opener=civicPanelOpener?.isConnected?civicPanelOpener:document.querySelector('[data-v4="works"]');
+ civicPanelOpener=null;
+ opener?.focus({preventScroll:true});
+}
+function openSquareDetailPanel(focusHeading=true){
  localizedPanelRoute={type:'square'};
- const panel=$('v4Panel'),body=$('v4Body'),profile=citySquareProfile(currentCity);panel.hidden=false;$('v4Title').textContent=profile.name;if(profile.name.startsWith('Piazza civica di '))delete $('v4Title').dataset.i18nSkip;else $('v4Title').dataset.i18nSkip='true';body.replaceChildren();
+ const panel=revealCivicPanel(focusHeading),body=$('v4Body'),profile=citySquareProfile(currentCity);$('v4Title').textContent=profile.name;if(profile.name.startsWith('Piazza civica di '))delete $('v4Title').dataset.i18nSkip;else $('v4Title').dataset.i18nSkip='true';body.replaceChildren();
  const intro=document.createElement('p');intro.textContent='Ricostruzione 3D stilizzata: la planimetria e gli elementi documentati sono affiancati da arredi di integrazione.';body.append(intro);
  const features=profile.landmarks||[];
  if(!features.length){const empty=document.createElement('p');empty.textContent='Le fonti disponibili non descrivono ancora statue e fontane di questa piazza.';body.append(empty);}
@@ -7257,46 +7279,150 @@ function openSquareDetailPanel(){
   if(url&&/^https:\/\/(www\.)?(respira\.cordoba\.gob\.ar|prensa\.municipalidadsalta\.gob\.ar|tucumanturismo\.gob\.ar|openstreetmap\.org|buenosaires\.gob\.ar|turismomardelplata\.gob\.ar|syv\.web\.unq\.edu\.ar|target2\.promperu\.gob\.pe|montevideo\.gub\.uy|quito-turismo\.gob\.ec|idpc\.gov\.co|santiagoturismo\.cl)\//.test(url)){const source=document.createElement('a');source.href=url;source.target='_blank';source.rel='noopener';source.textContent='Fonte';row.append(source);}
   body.append(row);
  }
- const back=document.createElement('button');back.textContent='Torna agli obiettivi';back.onclick=()=>openPublicWorks();body.append(back);
+ const back=document.createElement('button');back.type='button';back.textContent='Torna agli obiettivi';back.onclick=()=>openPublicWorks();body.append(back);
+ if(focusHeading)focusCivicTitle(panel);
 }
-function openPublicWorks(selected=null){
- localizedPanelRoute={type:'works',selected};
- const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;$('v4Title').textContent=selected?.name||'Strutture e obiettivi';delete $('v4Title').dataset.i18nSkip;if(selected?.kind==='park'&&selected.block===0&&!selected.name.startsWith('Piazza civica di '))$('v4Title').dataset.i18nSkip='true';body.replaceChildren();
+function openPublicWorks(selected=null,focusHeading=true,phaseStates=new Map()){
+ localizedPanelRoute={type:'works',selected,phaseStates};
+ const panel=revealCivicPanel(focusHeading),body=$('v4Body'),heading=$('v4Title');
+ heading.textContent=selected?.name||'Strutture e obiettivi';
+ delete heading.dataset.i18nSkip;
+ if(selected?.kind==='park'&&selected.block===0&&!selected.name.startsWith('Piazza civica di '))heading.dataset.i18nSkip='true';
+ body.replaceChildren();
  const cityId=currentCity.id;
- const summary=document.createElement('p');summary.textContent=currentCity.name+' · '+count.toLocaleString(window.GameI18n?.locale||'it-IT')+' case · '+PUBLIC_STEPS.filter(s=>publicStepStatus(s).unlocked).length+'/'+PUBLIC_STEPS.length+' obiettivi raggiunti';body.append(summary);
- if(!selected||selected.kind==='park'){
-  const details=document.createElement('button');details.textContent='Statue, fontane e dettagli della piazza';details.onclick=openSquareDetailPanel;body.append(details);
+ const locale=window.GameI18n?.locale||'it-IT';
+ const number=value=>value.toLocaleString(locale);
+ const reached=PUBLIC_STEPS.filter(step=>publicStepStatus(step).unlocked).length;
+ const next=PUBLIC_STEPS.find(step=>!publicStepStatus(step).unlocked);
+ const selectedPhase=PUBLIC_STEPS.find(step=>step.kind===selected?.kind)?.phase;
+ const defaultPhase=selectedPhase||next?.phase||PUBLIC_STEPS.at(-1)?.phase;
+ const zonesByKind=new Map();
+ for(const zone of publicZones()){
+  if(!zonesByKind.has(zone.kind))zonesByKind.set(zone.kind,[]);
+  zonesByKind.get(zone.kind).push(zone);
  }
- const search=document.createElement('input');search.type='search';search.placeholder='Cerca una struttura…';search.setAttribute('aria-label','Cerca strutture pubbliche');body.append(search);
- const list=document.createElement('div');body.append(list);
- const render=()=>{
-  list.replaceChildren();let phase='';const zones=publicZones(),query=cityPanelSearchText(search.value);
-  for(const step of PUBLIC_STEPS){
-   const available=zones.filter(z=>z.kind===step.kind);
-   const names=[step.name,...available.map(zone=>zone.name)];
-   if(query&&!names.some(name=>cityPanelSearchText(name,window.GameI18n?.t(name)||name).includes(query)))continue;
-   if(step.phase!==phase){phase=step.phase;const h=document.createElement('h3');h.textContent=phase;list.append(h);}
-   const state=publicStepStatus(step),row=document.createElement('div');row.className='civicObjective '+(state.unlocked?'achieved':'pending');
-   if(selected?.kind===step.kind){row.classList.add('current');row.setAttribute('aria-current','true');}
-   const title=document.createElement('strong');title.textContent=(state.unlocked?'✓ ':'🔒 ')+step.name;
-   const detail=document.createElement('span');detail.textContent=step.at.toLocaleString(window.GameI18n?.locale||'it-IT')+' case · '+(state.unlocked?'Raggiunto':state.remaining.toLocaleString(window.GameI18n?.locale||'it-IT')+' case mancanti');
-   const progress=document.createElement('progress');progress.max=Math.max(1,step.at);progress.value=step.at?Math.min(count,step.at):1;progress.setAttribute('aria-label',step.name);
-   row.append(title,detail,progress);
-   for(const zone of available){const button=document.createElement('button');button.textContent='📍 Trova '+zone.name;
+ const stages=new Map();
+ for(const step of PUBLIC_STEPS){
+  if(!stages.has(step.phase))stages.set(step.phase,[]);
+  stages.get(step.phase).push(step);
+ }
+ const overview=document.createElement('section');
+ overview.className='civic-overview';
+ const summary=document.createElement('p');
+ summary.textContent=currentCity.name+' · '+number(count)+' case · '+number(reached)+'/'+number(PUBLIC_STEPS.length)+' obiettivi raggiunti';
+ const progress=document.createElement('progress');
+ progress.max=PUBLIC_STEPS.length;
+ progress.value=reached;
+ progress.setAttribute('aria-label','Strutture e obiettivi');
+ overview.append(summary,progress);
+ if(next){
+  const preview=document.createElement('div');
+  preview.className='civic-next';
+  const label=document.createElement('small');
+  label.textContent='PROSSIMA OPERA';
+  const name=document.createElement('strong');
+  name.textContent=next.name;
+  const remaining=document.createElement('span');
+  remaining.textContent=number(publicStepStatus(next).remaining)+' case mancanti';
+  preview.append(label,name,remaining);
+  overview.append(preview);
+ }
+ body.append(overview);
+ const shortcuts=document.createElement('div');
+ shortcuts.className='civic-quick-actions';
+ const plazaDetails=document.createElement('button');
+ plazaDetails.type='button';
+ plazaDetails.textContent='Statue, fontane e dettagli della piazza';
+ plazaDetails.onclick=()=>openSquareDetailPanel();
+ const publicDirectory=document.createElement('button');
+ publicDirectory.type='button';
+ publicDirectory.textContent='Strutture pubbliche';
+ publicDirectory.onclick=()=>openCityDirectory('public');
+ shortcuts.append(publicDirectory,plazaDetails);
+ body.append(shortcuts);
+ const search=document.createElement('input');
+ search.className='civic-works-search';
+ search.type='search';
+ search.placeholder='Cerca una struttura…';
+ search.setAttribute('aria-label','Cerca strutture pubbliche');
+ search.setAttribute('aria-controls','civicWorksList');
+ const list=document.createElement('div');
+ list.id='civicWorksList';
+ list.className='civic-phases';
+ body.append(search,list);
+
+ const makeRow=step=>{
+  const state=publicStepStatus(step),available=zonesByKind.get(step.kind)||[];
+  const row=document.createElement('div');
+  row.className='civicObjective '+(state.unlocked?'achieved':'pending');
+  if(selected?.kind===step.kind){
+   row.classList.add('current');
+   row.setAttribute('aria-current','true');
+  }
+  const name=document.createElement('strong');
+  const plaza=step.kind==='park'&&available.find(zone=>zone.block===0);
+  name.textContent=plaza?.name||step.name;
+  if(plaza&&!plaza.name.startsWith('Piazza civica di '))name.dataset.i18nSkip='true';
+  const status=document.createElement('span');
+  status.textContent=state.unlocked?'Raggiunto':number(step.at)+' case · '+number(state.remaining)+' case mancanti';
+  row.append(name,status);
+  if(available.length){
+   const actions=document.createElement('div');
+   actions.className='civic-objective-actions';
+   for(const zone of available){
+    const button=document.createElement('button');
+    button.type='button';
+    button.textContent='📍 Trova '+zone.name;
     button.onclick=async()=>{
      if(!active&&!await enter())return;
      if(currentCity.id!==cityId||panel.hidden||!button.isConnected)return;
-     const b=facilityBounds(zone.block);flyToWorld({x:b.x,y:4,z:b.z},{distance:120,elevation:1.0});panel.hidden=true;$('status').textContent=zone.name;
-    };row.append(button);}
-   list.append(row);
+     const bounds=facilityBounds(zone.block);
+     closeCivicPanel();
+     flyToWorld({x:bounds.x,y:4,z:bounds.z},{distance:120,elevation:1.0});
+     $('status').textContent=zone.name;
+    };
+    actions.append(button);
+   }
+   row.append(actions);
+  }
+  return row;
+ };
+ const render=()=>{
+  list.replaceChildren();
+  const query=cityPanelSearchText(search.value);
+  for(const [phase,steps] of stages){
+   const matching=query?steps.filter(step=>{
+    const names=[step.name,phase,...(zonesByKind.get(step.kind)||[]).map(zone=>zone.name)];
+    return names.some(name=>cityPanelSearchText(name,window.GameI18n?.t(name)||name).includes(query));
+   }):steps;
+   if(!matching.length)continue;
+   const group=document.createElement('details');
+   group.className='civic-phase';
+   group.open=!!query||(phaseStates.get(phase)??phase===defaultPhase);
+   if(!query)group.addEventListener('toggle',()=>{
+    if(group.isConnected)phaseStates.set(phase,group.open);
+   });
+   const toggle=document.createElement('summary');
+   const phaseName=document.createElement('span');
+   phaseName.textContent=phase;
+   const tally=document.createElement('span');
+   tally.className='civic-phase-count';
+   tally.textContent=number(steps.filter(step=>publicStepStatus(step).unlocked).length)+'/'+number(steps.length);
+   toggle.append(phaseName,tally);
+   const rows=document.createElement('div');
+   rows.className='civic-phase-rows';
+   for(const step of matching)rows.append(makeRow(step));
+   group.append(toggle,rows);
+   list.append(group);
   }
   if(!list.children.length){const empty=document.createElement('p');empty.setAttribute('role','status');empty.textContent='Nessuna struttura trovata.';list.append(empty);}
  };
  search.oninput=render;render();
+ if(focusHeading)focusCivicTitle(panel);
 }
-function openCityDirectory(defaultType='all'){
+function openCityDirectory(defaultType='all',focusHeading=true){
  localizedPanelRoute={type:'directory',defaultType};
- const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;$('v4Title').textContent='Trova nella città';delete $('v4Title').dataset.i18nSkip;body.replaceChildren();
+ const panel=revealCivicPanel(focusHeading),body=$('v4Body');$('v4Title').textContent='Trova nella città';delete $('v4Title').dataset.i18nSkip;body.replaceChildren();
  const cityId=currentCity.id;
  const search=document.createElement('input');search.type='search';search.placeholder='Nome, nickname o numero…';search.setAttribute('aria-label','Cerca edifici');
  const type=document.createElement('select');for(const [value,label] of [['all','Tutti gli edifici'],['public','Strutture pubbliche'],['shop','Attività'],['home','Case']]){const opt=document.createElement('option');opt.value=value;opt.textContent=label;type.append(opt);}type.value=defaultType;
@@ -7330,6 +7456,7 @@ function openCityDirectory(defaultType='all'){
   more.hidden=matching.length<=limit;
  };
  search.oninput=type.onchange=()=>{limit=60;render();};more.onclick=()=>{limit+=60;render();};render();
+ if(focusHeading)focusCivicTitle(panel);
 }
 
 function leaderboardEntries(residents,limit=10){
@@ -7360,8 +7487,8 @@ function mountPublicResidentSearch(body,panel,kind){
 }
 function openV4(tab,focusHeading=true){
  localizedPanelRoute={type:'menu',tab};
- if(tab==='works'){openPublicWorks();return;}
- if(tab==='directory'){openCityDirectory();return;}
+ if(tab==='works'){openPublicWorks(null,focusHeading);return;}
+ if(tab==='directory'){openCityDirectory('all',focusHeading);return;}
  const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;
  const titles={shop:'Attività',home:'La mia casa',avatar:'Il mio personaggio',world:'Mondo',ranking:'Classifica',works:'Opere'};
  $('v4Title').textContent=titles[tab];delete $('v4Title').dataset.i18nSkip;
@@ -7438,7 +7565,19 @@ function openV4(tab,focusHeading=true){
  if($('v4Motion'))$('v4Motion').onchange=()=>{v4.motion=$('v4Motion').checked;saveV4()};
 }
 document.querySelectorAll('[data-v4]').forEach(el=>el.addEventListener('click',()=>openV4(el.dataset.v4)));
-$('v4Close').onclick=()=>$('v4Panel').hidden=true;
+const civicPanelIsOpen=()=>!$('v4Panel').hidden&&['works','square','directory'].includes(localizedPanelRoute?.type);
+$('v4Panel').setAttribute('role','region');
+$('v4Panel').setAttribute('aria-labelledby','v4Title');
+$('v4Close').onclick=()=>{
+ if(civicPanelIsOpen())closeCivicPanel();
+ else $('v4Panel').hidden=true;
+};
+$('v4Panel').addEventListener('keydown',event=>{
+ if(event.key!=='Escape'||!civicPanelIsOpen())return;
+ event.preventDefault();
+ event.stopPropagation();
+ closeCivicPanel();
+});
 // No forced 3D entrance. The geographic map remains the initial view.
 
 // Permanent grid audit: run once when loading, and expose results for debugging.
@@ -7621,7 +7760,7 @@ window.GameI18n?.onChange(async()=>{
  updateCitySelection();renderMilestones();$('counter').textContent=count.toLocaleString(GameI18n.locale);$('v4Population').textContent=count.toLocaleString(GameI18n.locale);
  if(active)refreshLocalizedSceneText();
  if(cardOpen&&localizedOwnerCard){showOwnerCard(localizedOwnerCard.h,localizedOwnerCard.kind,localizedOwnerCard.selected);restoreLocalizedForm($('details'),cardFields);}
- if(panelOpen&&localizedPanelRoute){const route=localizedPanelRoute;if(route.type==='square')openSquareDetailPanel();else if(route.type==='works')openPublicWorks(route.selected);else if(route.type==='directory')openCityDirectory(route.defaultType);else if(route.type==='neighbors')showNeighborCities();else openV4(route.tab,false);restoreLocalizedForm($('v4Body'),panelFields);}
+ if(panelOpen&&localizedPanelRoute){const route=localizedPanelRoute;if(route.type==='square')openSquareDetailPanel(false);else if(route.type==='works')openPublicWorks(route.selected,false,route.phaseStates);else if(route.type==='directory')openCityDirectory(route.defaultType,false);else if(route.type==='neighbors')showNeighborCities();else openV4(route.tab,false);restoreLocalizedForm($('v4Body'),panelFields);}
 });
 window.GameI18n?.registerAudit(()=>{const textures=new Set();group?.traverse(object=>{for(const material of Array.isArray(object.material)?object.material:[object.material])if(material?.map?.userData?.i18nBillboard)textures.add(material.map);});return [...textures].map(texture=>({source:texture.userData.i18nBillboard.lines,rendered:texture.userData.i18nBillboard.rendered,locale:texture.userData.i18nBillboard.locale,width:texture.image.width,height:texture.image.height}));});
 

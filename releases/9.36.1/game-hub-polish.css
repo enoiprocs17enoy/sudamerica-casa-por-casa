@@ -19,7 +19,7 @@ body.game-hub {
 }
 
 .hub-shell [hidden], body.game-hub .v4Nav button[hidden],
-body.game-hub #v4Panel[hidden], body.game-hub .hub-legacy-field {
+body.game-hub #v4Panel[hidden], body.game-hub .layout > aside[hidden], body.game-hub .hub-legacy-field {
   display: none !important;
 }
 
@@ -116,6 +116,7 @@ body.game-hub .v4Panel, body.game-hub #card {
   overscroll-behavior: contain;
 }
 body.game-hub .v4Panel { padding: 22px !important; }
+body.game-hub #v4Title { padding-inline-end: 44px; overflow-wrap: anywhere; }
 body.game-hub :is(.v4Close, .hub-close, .hub-drawer-close) {
   min-width: 44px;
   min-height: 44px;
@@ -133,9 +134,12 @@ body.game-hub .layout > aside {
   transform: translateX(110%);
 }
 [dir="rtl"] body.game-hub.hub-drawer-open .layout > aside { transform: translateX(0); }
+body.game-hub.hub-drawer-open .layout > aside:not([hidden]) { display: block !important; }
 .hub-drawer-close { top: 14px; right: auto; inset-inline-end: 14px; }
 .hub-drawer-title { font-size: 22px; margin: 0 0 24px !important; padding-inline-end: 48px; }
 .hub-language-label, .hub-city-label { display: block; font-weight: 750; }
+.hub-only-settings :is(#worldDirectory, #citySelect, .hub-city-label, .hub-show-selected-city),
+.hub-city-picker :is(.hub-language-slot, .hub-drawer-privacy) { display: none !important; }
 .hub-drawer-links { display: flex; align-items: stretch; flex-direction: column; gap: 9px; margin-block: 16px 24px; }
 .hub-drawer-links > :is(button, a) {
   padding: 11px 13px;
@@ -162,6 +166,53 @@ body.game-hub .hud { max-width: min(32vw, 440px); }
 .city-rank-list { margin: 12px 0 0; padding: 0; list-style: none; }
 .city-rank-list .v4Rank { gap: 8px; align-items: center; }
 .city-rank-list .v4Rank > b { flex: none; white-space: nowrap; }
+body.game-hub .v4Panel .city-resident-search {
+  display: grid;
+  gap: 9px;
+}
+.city-resident-search > :is(input, button), .civic-works-search { min-height: 44px; }
+.civic-overview {
+  display: grid;
+  gap: 8px;
+  background: #eef3ed;
+  border-radius: 12px;
+  padding: 12px 13px;
+  margin-block: 10px 14px;
+}
+.civic-overview > * { margin: 0; }
+.civic-overview progress { inline-size: 100%; min-height: 6px; accent-color: #277e6b; }
+.civic-next { background: #fff2c9; padding: 10px; border-radius: 9px; }
+.civic-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(min(135px,100%),1fr));
+  gap: 8px;
+  margin-block: 12px;
+}
+body.game-hub .v4Panel .civic-quick-actions > button { min-height: 44px; text-align: start; }
+.civic-phases { display: grid; gap: 8px; margin-block: 12px; }
+.civic-phase { border: 1px solid var(--hub-stroke); border-radius: 12px; }
+.civic-phase summary {
+  list-style: none;
+  min-height: 44px;
+  padding: 9px 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 720;
+}
+.civic-phase summary::-webkit-details-marker { display: none; }
+.civic-phase summary::after { content: "⌄"; font-size: 18px; line-height: 1; flex: none; }
+.civic-phase[open] summary::after { transform: rotate(180deg); }
+.civic-phase-count { margin-inline-start: auto; color: #4d6960; flex: none; font-weight: 600; }
+.civic-phase-rows { padding: 0 8px 8px; }
+.civic-phase-rows .civicObjective { margin-block: 6px 0; }
+.civic-objective-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.civic-phase summary:focus-visible {
+  outline: 2px solid #187e69;
+  outline-offset: -2px;
+  border-radius: 11px;
+}
 body.game-hub .v4Panel .city-rank-resident {
   background: transparent;
   color: inherit;
@@ -191,7 +242,7 @@ body.game-hub .v4Panel .city-rank-resident {
 .city-load-retry button { min-height: 44px; background: #ffd35f; color: #213c38; border-radius: 9px; }
 
 @media (max-width: 720px) {
-  body.game-hub { --hub-edge: 11px; --hub-bottom: max(14px, env(safe-area-inset-bottom)); }
+  body.game-hub { --hub-edge: 11px; --hub-bottom: max(14px, env(safe-area-inset-bottom)); --hub-dock-space: 86px; }
   .hub-brand, .hub-tools { top: max(var(--hub-edge), env(safe-area-inset-top)); }
   .hub-brand { min-height: 44px; }
   .hub-brand-mark { width: 34px; height: 34px; }
@@ -202,7 +253,7 @@ body.game-hub .v4Panel .city-rank-resident {
   .hub-city-strip { top: calc(max(var(--hub-edge), env(safe-area-inset-top)) + 112px); }
   .hub-city-pill { min-height: 38px; }
   .hub-next { min-height: 32px; }
-  .hub-launch { bottom: calc(var(--hub-bottom) + 72px); }
+  .hub-launch { bottom: calc(var(--hub-bottom) + var(--hub-dock-space)); }
   .hub-launch button { padding-inline: 14px; }
   body.game-hub .v4Nav {
     width: calc(100% - 2 * var(--hub-edge)) !important;
@@ -217,11 +268,12 @@ body.game-hub .v4Panel .city-rank-resident {
     top: auto !important;
     inset-inline: var(--hub-edge) !important;
     width: auto !important;
-    bottom: calc(var(--hub-bottom) + 68px) !important;
+    bottom: calc(var(--hub-bottom) + var(--hub-dock-space)) !important;
     max-height: min(69dvh, calc(100dvh - var(--hub-bottom) - 114px));
     border-radius: 20px !important;
   }
   body.game-hub .v4Panel { padding: 17px !important; }
+  body.game-hub:has(#v4Panel:not([hidden]), #card[style*="display: block"]) .hub-launch { display: none; }
   body.game-hub .hub-privacy-link { display: none; }
   body.game-hub .hud { max-width: 48vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }

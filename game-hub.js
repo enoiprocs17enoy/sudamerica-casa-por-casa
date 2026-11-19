@@ -8,15 +8,11 @@
  'Trova la tua casa':['Find your home','Encuentra tu casa','Trouve ta maison','Encontre sua casa','Finde dein Haus','اعثر على منزلك','自分の家を探そう','寻找你的家','Temukan rumahmu'],
  '@nomeutente, città o paese':['@username, city or country','@usuario, ciudad o país','@pseudo, ville ou pays','@usuário, cidade ou país','@Benutzername, Stadt oder Land','@اسم المستخدم، مدينة أو بلد','@ユーザー名、都市、国','@用户名、城市或国家','@pengguna, kota, atau negara'],
  'Impostazioni':['Settings','Ajustes','Paramètres','Configurações','Einstellungen','الإعدادات','設定','设置','Pengaturan'],
- 'Apri una città':['Open a city','Abre una ciudad','Ouvre une ville','Abra uma cidade','Stadt öffnen','افتح مدينة','街を開く','打开城市','Buka kota'],
+ 'Navigazione del gioco':['Game navigation','Navegación del juego','Navigation du jeu','Navegação do jogo','Spielnavigation','التنقل في اللعبة','ゲームのナビゲーション','游戏导航','Navigasi gim'],
  'Condividi':['Share','Compartir','Partager','Compartilhar','Teilen','مشاركة','共有','分享','Bagikan'],
- 'Esplora e impostazioni':['Explore and settings','Explorar y ajustes','Explorer et réglages','Explorar e configurações','Entdecken und Einstellungen','الاستكشاف والإعدادات','探索と設定','探索与设置','Jelajahi dan pengaturan'],
  'La città in un colpo d’occhio':['Your city at a glance','Tu ciudad de un vistazo','Ta ville en un coup d’œil','Sua cidade em um olhar','Deine Stadt auf einen Blick','مدينتك في لمحة','街の様子をひと目で','城市一览','Sekilas kotamu'],
- 'Invita gli amici':['Invite friends','Invita a tus amigos','Invite tes amis','Convide seus amigos','Freunde einladen','ادعُ أصدقاءك','友達を招待','邀请好友','Undang teman'],
  'Link copiato!':['Link copied!','¡Enlace copiado!','Lien copié !','Link copiado!','Link kopiert!','تم نسخ الرابط!','リンクをコピーしました！','链接已复制！','Tautan disalin!'],
- 'Una casa alla volta.':['One home at a time.','Una casa a la vez.','Une maison à la fois.','Uma casa de cada vez.','Ein Haus nach dem anderen.','منزلًا بعد منزل.','一軒ずつ、街を育てよう。','一栋一栋，建起城市。','Satu rumah demi satu rumah.'],
  'Città in anteprima: dati di gioco dimostrativi.':['Preview city: demonstration game data.','Ciudad de prueba: datos de juego demostrativos.','Ville en aperçu : données de démonstration.','Cidade em prévia: dados demonstrativos.','Vorschaustadt: Spieldaten zur Demonstration.','مدينة تجريبية: بيانات اللعبة توضيحية.','プレビューの街：ゲームデータはデモ用です。','城市预览：游戏数据为演示数据。','Pratinjau kota: data permainan demonstrasi.'],
- 'Nessun risultato. Cambia nome o paese dal menu.':['No results. Try another name or country in the menu.','Sin resultados. Cambia el nombre o el país en el menú.','Aucun résultat. Change de nom ou de pays dans le menu.','Sem resultados. Mude o nome ou o país no menu.','Keine Ergebnisse. Ändere Name oder Land im Menü.','لا نتائج. غيّر الاسم أو البلد من القائمة.','結果がありません。名前や国をメニューで変更してください。','没有结果。请在菜单中更改名称或国家。','Tidak ada hasil. Ganti nama atau negara di menu.'],
  'Condividi questa città':['Share this city','Comparte esta ciudad','Partage cette ville','Compartilhe esta cidade','Diese Stadt teilen','شارك هذه المدينة','この街をシェア','分享这座城市','Bagikan kota ini']
  };
  function tr(text){const i=codes.indexOf(window.GameI18n?.locale||'it');return translations[text]?(i<0?text:translations[text][i]):window.GameI18n?.t(text)||text;}
@@ -36,16 +32,16 @@
  const backdrop=el('button','hub-drawer-backdrop');backdrop.hidden=true;backdrop.type='button';backdrop.tabIndex=-1;backdrop.onclick=closeDrawer;document.body.append(backdrop);
  const isLaboratory=location.pathname.endsWith('/laboratorio.html');
  const closeDrawerButton=button('✕',closeDrawer,'hub-drawer-close'),languageSlot=el('div','hub-language-slot'),drawerTitle=label(el('h2','hub-drawer-title'),'Impostazioni'),languageLabel=label(el('label','hub-language-label'),'Lingua');
- aside.id='hubDrawer';drawerTitle.id='hubDrawerTitle';menu.setAttribute('aria-controls',aside.id);menu.setAttribute('aria-expanded','false');languageLabel.htmlFor='languagePicker';languageSlot.append(languageLabel);
+ aside.id||='hubDrawer';drawerTitle.id='hubDrawerTitle';menu.setAttribute('aria-controls',aside.id);menu.setAttribute('aria-expanded','false');languageLabel.htmlFor='languagePicker';languageSlot.append(languageLabel);
  const drawerLinks=el('div','hub-drawer-links'),exploreLink=button('',showExplore);drawerLinks.append(exploreLink,privacyAnchor('hub-drawer-privacy'));
- aside.prepend(closeDrawerButton,drawerTitle,languageSlot,drawerLinks);aside.inert=true;
- let citySelectLabel,showSelectedCity;
+ aside.prepend(closeDrawerButton,drawerTitle,languageSlot,drawerLinks);aside.inert=true;aside.hidden=true;
+ let citySelectLabel,showSelectedCity,chooseCityMode=false;
  if(!isLaboratory){
   const publicSelectors=new Set(['worldDirectory','citySelect']);
   for(const child of aside.children){if([closeDrawerButton,drawerTitle,languageSlot,drawerLinks].includes(child)||publicSelectors.has(child.id)||child.htmlFor==='citySelect')continue;child.classList.add('hub-legacy-field');}
   const citySelect=$('citySelect');
   if(citySelect){
-   citySelectLabel=label(el('label','hub-city-label'),'Scegli una città');citySelectLabel.htmlFor=citySelect.id;
+   citySelectLabel=aside.querySelector('label[for="citySelect"]')||el('label');citySelectLabel.classList.add('hub-city-label');label(citySelectLabel,'Scegli una città');citySelectLabel.htmlFor=citySelect.id;
    showSelectedCity=button('Vai alla città selezionata',()=>{if(!citySelect.value)return;closeDrawer();selectCity(citySelect.value,true);},'hub-show-selected-city');
    citySelect.before(citySelectLabel);citySelect.after(showSelectedCity);
    citySelect.addEventListener('change',()=>closeDrawer());
@@ -57,11 +53,69 @@
  dialog.addEventListener('close',()=>{if(!dialog.open){currentDialog=null;if(returnFocus?.isConnected&&!aside.contains(returnFocus)&&!stage.inert)returnFocus.focus();}});dialog.addEventListener('click',e=>{if(e.target!==dialog)return;const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeDialog();});
  function openDialog(kind,heading){closeDrawer();closeResults();if(!dialog.open)returnFocus=document.activeElement;dialog.replaceChildren();const close=button('✕',closeDialog,'hub-close');close.setAttribute('aria-label',tr('Chiudi'));dialog.append(close,el('h2','',heading));dialog.setAttribute('aria-label',heading);if(!dialog.open)dialog.showModal();currentDialog=kind;}
  let drawerFocus=null,previousStageInert=false;
- function openDrawer(focusCity=false){closeDialog();closeResults();attachSettings();if(!document.body.classList.contains('hub-drawer-open')){drawerFocus=document.activeElement;previousStageInert=stage.inert;}document.body.classList.add('hub-drawer-open');stage.inert=true;aside.inert=false;aside.setAttribute('role','dialog');aside.setAttribute('aria-modal','true');aside.setAttribute('aria-labelledby',drawerTitle.id);backdrop.hidden=false;menu.setAttribute('aria-expanded','true');(focusCity===true?$('citySelect'):closeDrawerButton)?.focus();}
- function closeDrawer(){if(!document.body.classList.contains('hub-drawer-open'))return;document.body.classList.remove('hub-drawer-open');aside.inert=true;stage.inert=previousStageInert;aside.removeAttribute('role');aside.removeAttribute('aria-modal');backdrop.hidden=true;menu.setAttribute('aria-expanded','false');if(!stage.inert)(stage.contains(drawerFocus)?drawerFocus:menu).focus();requestAnimationFrame(()=>map.invalidateSize());}
- function showWelcome(){openDialog('home',ShowcaseUI.t('home_title'));dialog.append(el('p','',ShowcaseUI.t('welcome')),el('p','showcase-home-note',ShowcaseUI.t('preview')+' · '+ShowcaseUI.t('no_accounts')));const actions=el('div','showcase-home-actions');actions.append(button(ShowcaseUI.t('find'),()=>{showFind();},'showcase-primary'),button(ShowcaseUI.t('explore'),showExplore,'showcase-secondary'));const more=el('div','showcase-home-more');more.append(button(ShowcaseUI.t('request'),()=>{closeDialog();ShowcaseUI.openRequest();}),button(ShowcaseUI.t('information'),()=>{closeDialog();ShowcaseUI.openInfo();}));dialog.append(actions,more);}
+ function openDrawer(focusCity=false){
+  closeDialog();closeResults();attachSettings();
+  if(!document.body.classList.contains('hub-drawer-open')){drawerFocus=document.activeElement;previousStageInert=stage.inert;}
+  chooseCityMode=!isLaboratory&&focusCity===true;
+  aside.classList.toggle('hub-city-picker',chooseCityMode);
+  aside.classList.toggle('hub-only-settings',!isLaboratory&&!chooseCityMode);
+  label(drawerTitle,chooseCityMode?'Scegli una città':'Impostazioni');
+  document.body.classList.add('hub-drawer-open');stage.inert=true;aside.inert=false;aside.hidden=false;
+  aside.setAttribute('role','dialog');aside.setAttribute('aria-modal','true');aside.setAttribute('aria-labelledby',drawerTitle.id);
+  backdrop.hidden=false;menu.setAttribute('aria-expanded','true');
+  (chooseCityMode?$('citySelect'):closeDrawerButton)?.focus();
+ }
+ function closeDrawer(){
+  if(!document.body.classList.contains('hub-drawer-open'))return;
+  document.body.classList.remove('hub-drawer-open');aside.inert=true;aside.hidden=true;stage.inert=previousStageInert;
+  aside.removeAttribute('role');aside.removeAttribute('aria-modal');backdrop.hidden=true;menu.setAttribute('aria-expanded','false');
+  if(!stage.inert)(stage.contains(drawerFocus)?drawerFocus:menu).focus();
+  requestAnimationFrame(()=>map.invalidateSize());
+ }
+ function showWelcome(){
+  openDialog('home',tr('Come funziona?'));
+  dialog.append(el('p','',ShowcaseUI.t('welcome')),el('p','showcase-home-note',tr('Città in anteprima: dati di gioco dimostrativi.')));
+  const actions=el('div','showcase-home-actions'),more=el('div','showcase-home-more');
+  actions.append(button(ShowcaseUI.t('find'),showFind,'showcase-primary'),button(ShowcaseUI.t('explore'),showExplore,'showcase-secondary'));
+  more.append(button(ShowcaseUI.t(window.CommunityContact?.instagram?'request':'pending'),()=>{closeDialog();ShowcaseUI.openRequest();}));
+  dialog.append(actions,more);
+ }
  function showFind(){returnFocus=input;closeDialog();input.focus();input.select();}
- function showExplore(){openDialog('explore',ShowcaseUI.t('explore'));dialog.append(el('p','',SitePrivacy.ui('explore_help')));const field=el('input','start-country-filter');field.type='search';field.placeholder=SitePrivacy.ui('country_search');field.setAttribute('aria-label',SitePrivacy.ui('country_search'));const list=el('div','start-country-list');list.setAttribute('aria-label',SitePrivacy.ui('country_search'));function render(){const q=WorldSearch.normalize(field.value),matches=q?new Set(WorldSearch.searchCountries(field.value,300).map(c=>c.code)):null,countries=[...WorldAtlas.countries.values()].filter(c=>!matches||matches.has(c.code)).sort((a,b)=>GameI18n.country(a.code,a.name).localeCompare(GameI18n.country(b.code,b.name),GameI18n.locale));list.replaceChildren();for(const c of countries){const b=button(GameI18n.country(c.code,c.name),async()=>{b.disabled=true;try{await WorldSearch.showCountry(c.code);returnFocus=cityButton;closeDialog();openDrawer();}catch{b.disabled=false;notice.textContent=WorldSearch.t('error');}});list.append(b);}if(!countries.length)list.append(el('p','',WorldSearch.t('empty')));}const notice=el('p','showcase-status');notice.setAttribute('role','status');field.oninput=render;dialog.append(field,list,notice);render();field.focus();}
+ function showExplore(){
+  openDialog('explore',ShowcaseUI.t('explore'));
+  dialog.append(el('p','',SitePrivacy.ui('explore_help')));
+  const field=el('input','start-country-filter');
+  field.type='search';field.placeholder=SitePrivacy.ui('country_search');field.setAttribute('aria-label',field.placeholder);
+  const list=el('div','start-country-list'),notice=el('p','showcase-status');
+  list.setAttribute('aria-label',field.placeholder);notice.setAttribute('role','status');
+  const locale=GameI18n.locale;
+  const countries=[...WorldAtlas.countries.values()]
+   .map(c=>({code:c.code,name:GameI18n.country(c.code,c.name)}))
+   .sort((a,b)=>a.name.localeCompare(b.name,locale));
+  function render(){
+   const matches=field.value.trim()?new Set(WorldSearch.searchCountries(field.value,300).map(c=>c.code)):null;
+   const visible=matches?countries.filter(c=>matches.has(c.code)):countries;
+   list.replaceChildren();
+   for(const country of visible){
+    const choice=button(country.name,async()=>{
+     if(list.getAttribute('aria-busy')==='true')return;
+     list.setAttribute('aria-busy','true');notice.textContent=WorldSearch.t('loading');
+     try{
+      await WorldSearch.showCountry(country.code);
+      if(!dialog.open||currentDialog!=='explore'||!field.isConnected)return;
+      returnFocus=enterButton;closeDialog();openDrawer(true);
+     }
+     catch{notice.textContent=WorldSearch.t('error');}
+     finally{list.removeAttribute('aria-busy');}
+    });
+    choice.dir='auto';list.append(choice);
+   }
+   if(!visible.length)list.append(el('p','',WorldSearch.t('empty')));
+  }
+  field.oninput=render;
+  field.addEventListener('keydown',event=>{if(event.key==='Enter'&&list.childElementCount===1)list.querySelector('button')?.click();});
+  dialog.append(field,list,notice);render();field.focus();
+ }
  function goHome(){closeDrawer();closeDialog();closeResults();input.value='';$('v4Panel').hidden=true;$('card').style.display='none';if(active)back();WorldSearch.clearCountry();manualCityNavigation=true;suppressMapEntry=true;try{map.setView([18,0],2);}finally{manualCityNavigation=false;suppressMapEntry=false;}const url=new URL(location.href);url.searchParams.delete('city');url.searchParams.delete('country');history.replaceState(null,'',url);setActiveTab('world');sync();}
  function hasCityContext(){return active||(!WorldSearch.getSelectedCountry()&&map.getZoom()>=8&&map.getBounds().contains([currentCity.lat,currentCity.lng]));}
  function activateMainAction(){if(!hasCityContext()){if(WorldSearch.getSelectedCountry())openDrawer(true);else showExplore();return;}$('v4Panel').hidden=true;closeResults();$(active?'back':'enter').click();}
@@ -87,7 +141,7 @@
    const items=[
     ...people.map(h=>['🏡','@'+h.user,h.cityName,()=>WorldSearch.openResident(h)]),
     ...countries.map(c=>['🌍',GameI18n.country(c.code,c.name),WorldSearch.t('country'),()=>WorldSearch.showCountry(c.code)]),
-    ...cities.map(c=>['📍',c.name,GameI18n.country(c.countryCode,WorldAtlas.countries.get(c.countryCode)?.name||c.countryCode),()=>WorldSearch.openCity(c)])
+    ...cities.map(c=>['📍',c.matchedName||c.name,GameI18n.country(c.countryCode,WorldAtlas.countries.get(c.countryCode)?.name||c.countryCode),()=>WorldSearch.openCity(c)])
    ];
    results.replaceChildren();results.removeAttribute('aria-busy');
    searchStatus.textContent='';
@@ -104,7 +158,27 @@
  }
  input.addEventListener('input',()=>{searchRequest++;clearTimeout(timer);timer=setTimeout(()=>void renderSearch(),160);});input.addEventListener('keydown',e=>{if(e.key==='ArrowDown'&&!results.hidden&&results.querySelector('button')){e.preventDefault();results.querySelector('button').focus();}if(e.key==='Escape')closeResults();});
  results.addEventListener('keydown',e=>{const buttons=[...results.querySelectorAll('button')],index=buttons.indexOf(document.activeElement);if(e.key==='Escape'){e.stopPropagation();closeResults();input.focus();}if(e.key==='ArrowDown'&&buttons.length){e.preventDefault();buttons[(index+1)%buttons.length]?.focus();}if(e.key==='ArrowUp'){e.preventDefault();if(index===0)input.focus();else buttons[index-1]?.focus();}});
- form.addEventListener('submit',async e=>{e.preventDefault();clearTimeout(timer);const raw=input.value.trim(),q=raw.replace(/^@/,'');if(!q){input.focus();return;}const resident=WorldSearch.searchResidents(q).find(h=>h.user.toLowerCase()===q.toLowerCase());if(resident){void runSearchAction(()=>WorldSearch.openResident(resident));return;}if(!raw.startsWith('@')){const country=WorldSearch.searchCountries(q).find(c=>WorldSearch.countryExact(c,q));if(country){void runSearchAction(()=>WorldSearch.showCountry(country.code));return;}const request=++searchRequest;showSearchMessage('loading');try{const city=(await WorldSearch.searchCities(q)).find(c=>[c.name,c.asciiName].some(n=>WorldSearch.normalize(n)===WorldSearch.normalize(q)));if(request!==searchRequest||input.value.trim()!==raw)return;if(city){void runSearchAction(()=>WorldSearch.openCity(city));return;}}catch{if(request===searchRequest)showSearchMessage('error');return;}}void renderSearch();});
+ form.addEventListener('submit',async event=>{
+  event.preventDefault();clearTimeout(timer);
+  const raw=input.value.trim(),query=raw.replace(/^@/,'');
+  if(!query){input.focus();return;}
+  const resident=WorldSearch.searchResidents(query).find(h=>h.user.toLowerCase()===query.toLowerCase());
+  if(resident){void runSearchAction(()=>WorldSearch.openResident(resident));return;}
+  if(!raw.startsWith('@')){
+   const country=WorldSearch.searchCountries(query).find(c=>WorldSearch.countryExact(c,query));
+   if(country){void runSearchAction(()=>WorldSearch.showCountry(country.code));return;}
+   const request=++searchRequest;showSearchMessage('loading');
+   try{
+    const city=(await WorldSearch.searchCities(query)).find(c=>WorldSearch.cityExact(c,query));
+    if(request!==searchRequest||input.value.trim()!==raw)return;
+    if(city){void runSearchAction(()=>WorldSearch.openCity(city));return;}
+   }catch{
+    if(request===searchRequest)showSearchMessage('error');
+    return;
+   }
+  }
+  void renderSearch();
+ });
  document.addEventListener('pointerdown',e=>{if(!searchArea.contains(e.target))closeResults();});document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeResults();closeDrawer();}if(e.key==='Tab'&&document.body.classList.contains('hub-drawer-open')){const nodes=[...aside.querySelectorAll('button,input,select,a[href]')].filter(n=>!n.disabled&&n.getClientRects().length),first=nodes[0],last=nodes.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
  const nav=document.querySelector('.v4Nav'),tabs=[...nav.querySelectorAll('[data-v4]')];nav.setAttribute('role','navigation');
  function setActiveTab(tab){for(const node of tabs){const selected=node.dataset.v4===tab;node.classList.toggle('hub-selected',selected);node.setAttribute('aria-pressed',String(selected));}}
@@ -120,7 +194,28 @@
  let copiedTimer;
  async function shareCity(){const url=new URL('./',location.href);url.searchParams.set('city',currentCity.id);url.searchParams.set('country',currentCity.countryCode||'AR');url.searchParams.set('lang',window.GameI18n?.locale||'it');if(navigator.share){try{await navigator.share({title:currentCity.name+' · MundoCity',url:url.href});return;}catch(error){if(error.name==='AbortError')return;}}try{await navigator.clipboard.writeText(url.href);clearTimeout(copiedTimer);shareButton.textContent=tr('Link copiato!');searchStatus.textContent=tr('Link copiato!');copiedTimer=setTimeout(()=>{shareButton.textContent=tr('Condividi');searchStatus.textContent='';},2400);}catch{openDialog('share',tr('Condividi questa città'));const field=el('input');field.readOnly=true;field.value=url.href;field.setAttribute('aria-label',tr('Condividi questa città'));dialog.append(field);field.focus();field.select();}}
  function sync(){const locale=GameI18n.locale,format=n=>n.toLocaleString(locale),cityContext=hasCityContext();strip.hidden=!cityContext;shareButton.hidden=!cityContext;cityName.textContent=currentCity.name;cityName.dir='auto';cityCount.textContent=format(homes.length)+' '+tr('Case');const next=PUBLIC_STEPS.find(s=>s.at>count);nextText.textContent=next?tr(next.name)+' · '+format(count)+'/'+format(next.at):tr('Strutture e obiettivi');enterButton.textContent=active?tr('Torna alla mappa'):cityContext?tr('Entra nel 3D'):WorldSearch.getSelectedCountry()?tr('Scegli una città'):ShowcaseUI.t('explore');attachSettings();}
- function refresh(){for(const n of [...shell.querySelectorAll('[data-hub-text]'),drawerTitle,languageLabel,citySelectLabel,showSelectedCity])if(n&&n!==cityButton&&n!==nextButton&&n!==help&&n!==menu)n.textContent=tr(n.dataset.hubText);input.placeholder=tr('@nomeutente, città o paese');input.setAttribute('aria-label',input.placeholder);results.setAttribute('aria-label',tr('Cerca'));help.setAttribute('aria-label',tr('Come funziona?'));help.title=tr('Come funziona?');menu.setAttribute('aria-label',tr('Impostazioni'));menu.title=tr('Impostazioni');closeDrawerButton.setAttribute('aria-label',tr('Chiudi'));backdrop.setAttribute('aria-label',tr('Chiudi'));exploreLink.textContent=ShowcaseUI.t('explore');nav.setAttribute('aria-label',tr('Mondo'));sync();brand.setAttribute('aria-label',ShowcaseUI.t('home_label'));brand.title=ShowcaseUI.t('home_label');if(currentDialog==='home')showWelcome();else if(currentDialog==='explore')showExplore();else if(currentDialog==='city')showCity();if(input.value.trim()&&!results.hidden)void renderSearch();}
+ function refresh(){
+  for(const node of [...shell.querySelectorAll('[data-hub-text]'),drawerTitle,languageLabel,citySelectLabel,showSelectedCity]){
+   if(node&&node!==cityButton&&node!==nextButton&&node!==help&&node!==menu)node.textContent=tr(node.dataset.hubText);
+  }
+  input.placeholder=tr('@nomeutente, città o paese');
+  input.setAttribute('aria-label',input.placeholder);
+  results.setAttribute('aria-label',tr('Cerca'));
+  for(const [button,key] of [[help,'Come funziona?'],[menu,'Impostazioni']]){
+   button.title=tr(key);button.setAttribute('aria-label',button.title);
+  }
+  closeDrawerButton.setAttribute('aria-label',tr('Chiudi'));
+  backdrop.setAttribute('aria-label',tr('Chiudi'));
+  exploreLink.textContent=ShowcaseUI.t('explore');
+  nav.setAttribute('aria-label',tr('Navigazione del gioco'));
+  brand.title=ShowcaseUI.t('home_label');
+  brand.setAttribute('aria-label',brand.title);
+  sync();
+  if(currentDialog==='home')showWelcome();
+  else if(currentDialog==='explore')showExplore();
+  else if(currentDialog==='city')showCity();
+  if(input.value.trim()&&!results.hidden)void renderSearch();
+ }
  const observer=new MutationObserver(sync);for(const id of ['counter','currentCityName'])observer.observe($(id),{childList:true,subtree:true,characterData:true});new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilter:['class']});window.GameI18n?.onChange(refresh);
  map.on('moveend zoomend',sync);document.body.classList.add('game-hub');refresh();requestAnimationFrame(()=>map.invalidateSize());
  const params=new URL(location.href).searchParams,cityId=params.get('city'),country=params.get('country');if(!isLaboratory&&!cityId&&!country)requestAnimationFrame(goHome);if(cityId&&country&&WorldAtlas.countries.has(country))void WorldAtlas.loadCountry(country).then(()=>{if(WorldAtlas.byId.has(cityId))selectCity(cityId,true);}).catch(()=>{});else if(country&&WorldAtlas.countries.has(country))void WorldSearch.showCountry(country).catch(()=>{});

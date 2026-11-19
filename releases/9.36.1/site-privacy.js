@@ -15,4 +15,47 @@ function appendParagraphText(paragraph, text) {
   paragraph.append(text.slice(0, contactIndex), link, text.slice(contactIndex + contact.length));
 }
 function render(parent){const section=document.createElement('section');section.className='privacy-content';const status=document.createElement('p');status.className='privacy-status';status.textContent=ui('pending');section.append(status);const date=document.createElement('p');date.textContent='2026-11-19 · MundoCity';section.append(date);const paragraphs=body[locale()]||body.en;['controller','purpose','technical','local','retention','rights'].forEach((key,i)=>{const heading=document.createElement('h3'),p=document.createElement('p');heading.textContent=ui(key);appendParagraphText(p,paragraphs[i]);section.append(heading,p);});for(const [name,url] of [['GitHub','https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement'],['Supabase','https://supabase.com/privacy'],['OpenFreeMap','https://openfreemap.org/'],['UNPKG','https://unpkg.com/'],['Cloudflare','https://www.cloudflare.com/privacypolicy/'],['Garante','https://www.garanteprivacy.it/Regolamentoue/diritti-degli-interessati']]){const a=document.createElement('a');a.textContent=name;a.href=url;a.target='_blank';a.rel='noopener noreferrer';section.append(a,document.createTextNode(' · '));}parent.append(section);}
-window.SitePrivacy=Object.freeze({ui,render,locales});const page=document.getElementById('privacyDocument');if(page){const picker=document.getElementById('privacyLanguage');locales.forEach((code,i)=>picker.add(new Option(['Italiano','English','Español','Français','Português','Deutsch','العربية','日本語','简体中文','Bahasa Indonesia'][i],code)));const requested=new URL(location.href).searchParams.get('lang');chosen=locales.includes(requested)?requested:'it';picker.value=chosen;function refresh(){document.documentElement.lang=chosen;document.documentElement.dir=chosen==='ar'?'rtl':'ltr';document.getElementById('privacyTitle').textContent=ui('title');document.getElementById('privacyBack').textContent=ui('back');page.replaceChildren();render(page);}picker.onchange=()=>{chosen=picker.value;refresh();};refresh();}})();
+window.SitePrivacy=Object.freeze({ui,render,locales});
+const page=document.getElementById('privacyDocument');
+if(page){
+  const picker=document.getElementById('privacyLanguage');
+  const pickerLabel=document.getElementById('privacyLanguageLabel');
+  const back=document.getElementById('privacyBack');
+  const backLabel=document.getElementById('privacyBackLabel');
+  const title=document.getElementById('privacyTitle');
+  const languageNames=['Italiano','English','Español','Français','Português','Deutsch','العربية','日本語','简体中文','Bahasa Indonesia'];
+  const pickerLabels=['Lingua','Language','Idioma','Langue','Idioma','Sprache','اللغة','言語','语言','Bahasa'];
+  locales.forEach((code,index)=>{
+    const option=new Option(languageNames[index],code);
+    option.lang=code;
+    option.dir=code==='ar'?'rtl':'ltr';
+    picker.add(option);
+  });
+  const requested=new URL(location.href).searchParams.get('lang');
+  chosen=locales.includes(requested)?requested:'it';
+  picker.value=chosen;
+  function refresh(){
+    document.documentElement.lang=chosen;
+    document.documentElement.dir=chosen==='ar'?'rtl':'ltr';
+    title.textContent=ui('title');
+    document.title=ui('title')+' · MundoCity';
+    backLabel.textContent=ui('back');
+    const home=new URL('./',location.href);
+    home.searchParams.set('lang',chosen);
+    back.href=home.href;
+    pickerLabel.textContent=pickerLabels[locales.indexOf(chosen)];
+    page.replaceChildren();
+    render(page);
+  }
+  picker.onchange=()=>{
+    if(!locales.includes(picker.value))return;
+    chosen=picker.value;
+    const address=new URL(location.href);
+    address.searchParams.set('lang',chosen);
+    history.replaceState(history.state,'',address.href);
+    refresh();
+  };
+  refresh();
+  document.getElementById('privacyLanguageControl').hidden=false;
+}
+})();
