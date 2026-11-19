@@ -52,3 +52,6 @@ body.game-hub button:focus-visible,body.game-hub a:focus-visible{outline:3px sol
 .world-country-label{background:#fffdf3;color:#173b32;border:2px solid #a36a08;border-radius:20px;padding:7px 14px;font:700 14px system-ui;box-shadow:0 3px 12px #24352633}.hub-results[aria-busy="true"]{opacity:.9}.hub-results button:focus-visible{outline:3px solid #d08c00;outline-offset:-3px}
 
 body.game-hub.country-focus:not(.city-view) .hub-city-strip{display:none!important}
+
+/* Search suggestions must stay above the city summary controls. */
+.hub-search-area{z-index:6}
