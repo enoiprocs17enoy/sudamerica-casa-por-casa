@@ -2205,19 +2205,17 @@ function addTree(x,z,seed,scale=1,flowering=false) {
  group.add(canopy);
 }
 
-function civicFlowerbed(x,z,w,d,seed){
-  addBox(w,.18,d,x,.18,z,0x4e9a63);
+function civicFlowerbed(x,z,w,d,seed,elevation=0){
+  addBox(w,.18,d,x,.18+elevation,z,0x4e9a63);
   const palette=[0xe989a6,0xf4d86b,0x9d80d2,0xfff4e1,0xf1856c];
   for(let j=0;j<7;j++){
     const xx=x+(rnd(seed*71+j)-.5)*(w-.6),zz=z+(rnd(seed*41+j+10)-.5)*(d-.5);
     const blossom=new THREE.Mesh(new THREE.IcosahedronGeometry(.24,0),new THREE.MeshLambertMaterial({color:palette[(seed+j)%palette.length]}));
-    blossom.position.set(xx,.48,zz);group.add(blossom);
+    blossom.position.set(xx,.48+elevation,zz);group.add(blossom);
   }
 }
 function civicBench(x,z){
-  addBox(2.5,.22,.68,x,.65,z,0x9d6b47);
-  addBox(2.5,.75,.2,x,1.05,z-.3,0x9d6b47);
-  for(const dx of [-.9,.9])addBox(.16,.52,.18,x+dx,.32,z,0x566b67);
+  urbanBench((color,x,y,z,w,h,d)=>addBox(w,h,d,x,y,z,color),x,z,.26,-1);
 }
 function makeHouse(h) {
   const height = [2.4,3,3.8,5.6,7.3,2.8,4.4][h.type];
@@ -2327,7 +2325,8 @@ function drawCivicBuilding(zone,b){
  const w=b.width,d=b.depth,batches=new Map(),pavingTop=.12;
  const geometries={box:new THREE.BoxGeometry(1,1,1),glass:new THREE.BoxGeometry(1,1,1),
   cylinder:new THREE.CylinderGeometry(1,1,1,20),dome:new THREE.SphereGeometry(1,20,12,0,Math.PI*2,0,Math.PI/2),
-  wheel:new THREE.CylinderGeometry(1,1,1,10)};
+  wheel:new THREE.CylinderGeometry(1,1,1,10),
+  fieldRing:new THREE.RingGeometry(.975,1,48).rotateX(-Math.PI/2)};
  geometries.wheel.rotateZ(Math.PI/2);
  const add=(geometry,color,fx,y,fz,sx,sy,sz,rotation=0,pitch=0)=>{
   if(![fx,y,fz,sx,sy,sz].every(Number.isFinite)||Math.min(sx,sy,sz)<=0)throw Error('Geometria pubblica '+kind);
@@ -2455,9 +2454,30 @@ function drawCivicBuilding(zone,b){
    box(line,0,.35,fz+side*.24,.62,.024,.002);
   }
   box(line,0,.35,fz,.62,.024,.002);
-  if(type==='football')for(const side of [-1,1]){
-   box(0xe6e5d9,0,2.13,fz+side*.237,.20,.10,.003);
-   for(const post of [-1,1])box(0xe6e5d9,post*.095,1.21,fz+side*.237,.004,1.82,.003);
+  if(type==='football'){
+   const circle=Math.min(w,d)*.102;
+   add('fieldRing',line,0,.352,fz,circle,1,circle);
+   round(line,0,.341,fz,.12,.025);
+   for(const side of [-1,1]){
+    const touchLine=fz+side*.237,goalBack=fz+side*.263;
+    const goal=0xe6e5d9,net=0xb7c2b6;
+    for(const [width,depth] of [[.378,.117],[.229,.049]]){
+     const outer=fz+side*(.24-depth);
+     for(const edge of [-1,1])box(line,edge*width/2,.344,fz+side*(.24-depth/2),.004,.024,depth);
+     box(line,0,.344,outer,width-.004,.024,.002);
+    }
+    round(line,0,.341,fz+side*.143,.12,.023);
+    box(goal,0,2.13,touchLine,.20,.10,.003);
+    const rise=1.75,run=(goalBack-touchLine)*d;
+    for(const post of [-1,1]){
+     box(goal,post*.095,1.21,touchLine,.004,1.82,.003);
+     add('box',goal,post*.095,.35+rise/2,(touchLine+goalBack)/2,.058,Math.hypot(rise,run),.058,0,-Math.atan2(run,rise));
+    }
+    for(let strand=1;strand<=6;strand++){
+     const t=strand/7;
+     add('box',net,0,.35+t*rise,goalBack+(touchLine-goalBack)*t,.19*w,.029,.027);
+    }
+   }
   }
  };
  const stands=(fz=-.06,large=false)=>{
@@ -2483,7 +2503,7 @@ function drawCivicBuilding(zone,b){
   building(0,lobbyZ,.38,lobbyDepth,1,white,blue,.14);
   canopy(0,3.53,lobbyFront+.026,.30,.085,blue);
   frontDoor(0,lobbyFront,.14);
-  medicalEmblem(-.119,2.22,lobbyFront,1.44);
+  medicalEmblem(0,4.12,lobbyFront+.0685,1.30);
   if(hospital)medicalEmblem(0,10.66,-.03,2.34);
   box(0x798b93,0,.16,.34,.77,.08,.21);
   for(const side of [-1,1])ambulance(side*.22,.34);
@@ -2773,20 +2793,18 @@ function drawCivicBuilding(zone,b){
  }
 
  // Detailed seating and litter bins stay outside the central accessible path.
+ const benchPiece=(color,x,y,z,width,height,depth)=>add('box',color,(x-b.x)/w,y,(z-b.z)/d,width,height,depth);
  for(const side of [-1,1]){
-  const fx=side*.33,fz=.405;
-  for(let slat=-2;slat<=2;slat++)box(0xa87648,fx,.75,fz+slat*.0025,.14,.10,.0018);
-  for(const leg of [-1,1])box(0x354c48,fx+leg*.052,.43,fz,.004,.58,.014);
-  for(const slat of [0,1])box(0xb78550,fx,1.05+slat*.20,fz-.011,.14,.13,.002);
-  box(0x3f6d61,side*.425,.72,.425,.026,1.0,.016);
-  box(0x263d3a,side*.425,1.25,.425,.028,.12,.018);
+  urbanBench(benchPiece,b.x+side*.33*w,b.z+.405*d,pavingTop,-1);
+  box(0x3f6d61,side*.425,.62,.425,.026,1.0,.016);
+  box(0x263d3a,side*.425,1.15,.425,.028,.12,.018);
  }
  // A landscaped public forecourt is part of every service.
  for(const side of [-1,1]){
   const px=side*.43,pz=.40;
   box(0xd9c7a8,px,.35,pz,.07,.48,.035);
   add('dome',0x5c8d4c,px,.67,pz,w*.038,.65,d*.019);
-  box(0x344c49,px,2.2,.32,.004,4.0,.002);
+  box(0x344c49,px,2.16,.32,.004,4.08,.002);
   box(0xffdc8a,px,4.25,.32,.018,.27,.011);
  }
  const transform=new THREE.Object3D(),color=new THREE.Color();
@@ -2841,6 +2859,22 @@ function drawSpecial(zone){
   if(drawCivicBuilding(zone,b))return;
 
   addBox(w-4,.16,d-4,x,.18,z,0xe5d4b8);
+  const mosaicW=w-8,mosaicD=d-8;
+  for(const side of [-1,1]){
+    addBox(.22,.043,mosaicD,x+side*mosaicW/2,.271,z,0xa49b89);
+    addBox(mosaicW-.22,.043,.22,x,.271,z+side*mosaicD/2,0xa49b89);
+    for(const corner of [-1,1]){
+      const bedX=x+side*(w/2-5.2),bedZ=z+corner*d*.30;
+      addBox(3.05,.31,3.6,bedX,.406,bedZ,0xb8a486);
+      civicFlowerbed(bedX,bedZ,2.65,3.11,zone.block*11+side*3+corner,.281);
+    }
+  }
+  for(const side of [-1,1]){
+    const length=d*.305;
+    addBox(6.4,.04,length,x,.275,z+side*(4.35+length/2),0xd5c6ab);
+    for(const edge of [-1,1])
+      addBox(.13,.034,length,x+edge*3.28,.273,z+side*(4.35+length/2),0xada392);
+  }
   addBox(8.4,.42,8.4,x,.47,z,0xc5b9a6);
   addBox(7.0,.48,7.0,x,.92,z,0xd8ccb5);
   addBox(4.4,.44,4.4,x,1.38,z,0xe5d8c3);
