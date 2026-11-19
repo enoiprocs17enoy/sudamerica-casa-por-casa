@@ -6819,6 +6819,11 @@ function assignResidentDetails(chosen){
  for(let j=6;j<meshes.length;j++)meshes[j].count=chosen.length*(specs[j].pair?2:1);
  for(let slot=0;slot<chosen.length;slot++){const a=chosen[slot].a;a.detailIndex=slot;if(detailOwners[slot]===a.home.id)continue;detailOwners[slot]=a.home.id;for(let j=6;j<meshes.length;j++){const copies=specs[j].pair?2:1,color=new THREE.Color(a.residentColors[specs[j].color]);for(let k=0;k<copies;k++)meshes[j].setColorAt(slot*copies+k,color);meshes[j].instanceColor.needsUpdate=true;}}
 }
+function commitResidentMatrices(chosen){
+ if(!residentBatches||!chosen.length)return;
+ let first=Infinity,last=-1;for(const {a}of chosen){first=Math.min(first,a.i);last=Math.max(last,a.i);}
+ const {meshes,specs}=residentBatches;for(let j=0;j<meshes.length;j++){const copies=specs[j].pair?2:1;meshes[j].instanceMatrix.updateRange.offset=(j<6?first:0)*copies*16;meshes[j].instanceMatrix.updateRange.count=(j<6?last-first+1:chosen.length)*copies*16;meshes[j].instanceMatrix.needsUpdate=true;}
+}
 // A shared sidewalk graph replaces private-lawn perimeter loops.
 let residentNavigation=null;
 function pedestrianWidth(axis,index){return axis==='x'?(index%4===0?11.5:index%7===2?8.7:6.8):(index%5===0?11.5:index%6===3?8.7:6.8);}
@@ -7183,7 +7188,7 @@ function animateLife(t){if(!active||!v4.motion)return;
    const label=avatarLabels.get(a.home.id);
    if(label){label.position.set(a.g.position.x,a.g.position.y+4,a.g.position.z);sizeAvatarLabel(label);}
   }
-  if(residentBatches)for(const mesh of residentBatches.meshes)mesh.instanceMatrix.needsUpdate=true;
+  commitResidentMatrices(chosenPeople);
   if(window.v49Focus){
    const {group:marker,person}=window.v49Focus;
    marker.position.set(person.g.position.x,0,person.g.position.z);
