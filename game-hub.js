@@ -117,7 +117,11 @@
   dialog.append(field,list,notice);render();field.focus();
  }
  function goHome(){closeDrawer();closeDialog();closeResults();input.value='';$('v4Panel').hidden=true;$('card').style.display='none';if(active)back();WorldSearch.clearCountry();manualCityNavigation=true;suppressMapEntry=true;try{map.setView([18,0],2);}finally{manualCityNavigation=false;suppressMapEntry=false;}const url=new URL(location.href);url.searchParams.delete('city');url.searchParams.delete('country');history.replaceState(null,'',url);setActiveTab('world');sync();}
- function hasCityContext(){return active||(!WorldSearch.getSelectedCountry()&&map.getZoom()>=8&&map.getBounds().contains([currentCity.lat,currentCity.lng]));}
+ function hasCityContext(){
+  if(active)return true;
+  if(WorldSearch.getSelectedCountry())return false;
+  return manualCityNavigation||(map.getZoom()>=8&&map.getBounds().contains([currentCity.lat,currentCity.lng]));
+ }
  function activateMainAction(){if(!hasCityContext()){if(WorldSearch.getSelectedCountry())openDrawer(true);else showExplore();return;}$('v4Panel').hidden=true;closeResults();$(active?'back':'enter').click();}
  function showCity(){openDialog('city',currentCity.name);dialog.append(label(el('p'),'La città in un colpo d’occhio'));const stats=el('div','hub-dashboard-stats');for(const [value,text]of [[homes.length,'Case'],[shopPurchases.length,'Attività'],[PUBLIC_STEPS.filter(s=>count>=s.at).length,'Opere']]){const box=el('div');box.append(el('strong','',value.toLocaleString(window.GameI18n?.locale||'it')),label(el('small'),text));stats.append(box);}dialog.append(stats);
   const next=PUBLIC_STEPS.find(s=>s.at>count),progress=el('div','hub-progress');progress.append(el('strong','',tr(next?.name||'Strutture e obiettivi')));if(next){progress.append(el('p','',count.toLocaleString()+' / '+next.at.toLocaleString()+' '+tr('Case')));const bar=el('progress');bar.max=next.at;bar.value=count;bar.setAttribute('aria-label',tr(next.name));progress.append(bar);}dialog.append(progress);

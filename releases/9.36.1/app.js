@@ -7332,7 +7332,8 @@ function openPublicWorks(selected=null,focusHeading=true,phaseStates=new Map()){
  shortcuts.className='civic-quick-actions';
  const plazaDetails=document.createElement('button');
  plazaDetails.type='button';
- plazaDetails.textContent='Statue, fontane e dettagli della piazza';
+ plazaDetails.textContent=citySquareProfile(currentCity).name;
+ if(!plazaDetails.textContent.startsWith('Piazza civica di '))plazaDetails.dataset.i18nSkip='true';
  plazaDetails.onclick=()=>openSquareDetailPanel();
  const publicDirectory=document.createElement('button');
  publicDirectory.type='button';

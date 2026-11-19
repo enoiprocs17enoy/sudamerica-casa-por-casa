@@ -181,7 +181,9 @@ body.game-hub .v4Panel .city-resident-search {
 }
 .civic-overview > * { margin: 0; }
 .civic-overview progress { inline-size: 100%; min-height: 6px; accent-color: #277e6b; }
-.civic-next { background: #fff2c9; padding: 10px; border-radius: 9px; }
+.civic-next { display: grid; gap: 3px; background: #fff2c9; padding: 10px; border-radius: 9px; }
+.civic-next > small { font-weight: 700; color: #574820; }
+.civic-next > span { font-size: .875em; }
 .civic-quick-actions {
   display: grid;
   grid-template-columns: repeat(auto-fit,minmax(min(135px,100%),1fr));
