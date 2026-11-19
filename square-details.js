@@ -39,7 +39,6 @@ function prepare(profile,fit,b,city){
 function render(plan,group,b){
  if(!plan?.items.length)return;
  const T=THREE,UP=new T.Vector3(0,1,0);
- const baseY=plan.profile?.openStoneSquare ? .43 : .59;
  const parts=[],bronze=0x526b62,stone=0xd6cbb3,marble=0xe4e0d2,gold=0xb1a06d,water=0x67c4dc;
  let owner;
  const add=(kind,material,color,x,y,z,sx,sy,sz,rotation=null)=>{if(Math.min(sx,sy,sz)<=0)return;parts.push({kind,material,color,x,y,z,sx,sy,sz,rotation,owner});};
@@ -51,7 +50,7 @@ function render(plan,group,b){
  const steps=(y,width=5,depth=width)=>{for(let i=0;i<3;i++)box(stone,0,y+.13+i*.22,0,width-i*.4,.24,depth-i*.4);};
  const plaque=(y,width=1.7,z=1.5)=>{box(bronze,0,y,z,width,.75,.09,'metal');box(gold,0,y+.35,z+.06,width-.12,.04,.025,'metal');for(const side of [-1,1])sphere(gold,side*(width/2-.12),y,z+.08,.05,.05,.025);};
  const human=(x,y,z,scale=1,pose='civil',color=bronze)=>{
-  const at=(px,py,pz)=>[x+px*scale,y+py*scale,z+pz*scale],material=color===marble?'stone':'metal';
+  const at=(px,py,pz)=>[x+px*scale,y+py*scale,z+pz*scale],material=color===marble?'stone':pose==='civil'?'patina':'metal';
   const ball=(px,py,pz,rx,ry,rz)=>sphere(color,...at(px,py,pz),rx*scale,ry*scale,rz*scale,material);
   const segment=(a,c,r)=>limb(at(...a),at(...c),r*scale,color,material);
   ball(0,2.30,0,.24,.30,.23);ball(0,2.28,.23,.07,.10,.10);ball(-.24,2.28,0,.045,.085,.07);ball(.24,2.28,0,.045,.085,.07);
@@ -203,6 +202,66 @@ function render(plan,group,b){
   limb([-.37,.75,-1.18],[-.60,.63,-.94],.077,shade,'stone');
   limb([-.60,.63,-.94],[-.59,.57,-.68],.074,shade,'stone');
  }
+ function sanMartin(){
+  const cliffWidth=5.86,cliffDepth=5.42,cliffHeight=4.84,rockFloor=.34,rockTop=rockFloor+cliffHeight;
+  const limestone=0xb5a287,carving=0xc7b89e,detail=0xa39178;
+  cylinder(0xc7b8a0,0,.115,0,3.45,.23);
+  cylinder(0xd5c7ac,0,.29,0,3.24,.15);
+  add('cliff','stone',limestone,0,rockFloor+cliffHeight/2,0,cliffWidth,cliffHeight,cliffDepth);
+  human(0,rockTop,0,1.55,'civil',0x647b6f);
+
+  function stoneFace(angle,plane){
+   const cos=Math.cos(angle),sin=Math.sin(angle),turn=new T.Quaternion().setFromAxisAngle(UP,angle);
+   const at=(x,y,depth)=>[x*cos+(plane+depth)*sin,y,-x*sin+(plane+depth)*cos];
+   const inlay=(x,y,width,height,color=limestone)=>add('box','stone',color,...at(x,y,.018),width,height,.146,turn);
+   const carvingBall=(x,y,w,h)=>add('sphere','stone',carving,...at(x,y,.125),w,h,.077,turn);
+   const carvingLine=(x1,y1,x2,y2,width,color=carving)=>limb(at(x1,y1,.102),at(x2,y2,.102),width,color,'stone');
+   const scene=(width=2.70)=>{
+    inlay(0,2.83,width,1.18);
+    for(const side of [-1,1]){
+     inlay(0,2.83+side*.55,width-.10,.054,detail);
+     inlay(side*(width/2-.056),2.83,.052,1.06,detail);
+    }
+   };
+   const figure=(x,base,size,seated=false)=>{
+    carvingBall(x,base+size*.88,size*.115,size*.126);
+    carvingBall(x,base+size*.59,size*.17,size*.21);
+    for(const side of [-1,1]){
+     carvingLine(x+side*size*.13,base+size*.64,x+side*size*.22,base+size*.43,size*.052);
+     carvingLine(x+side*size*.08,base+size*.44,x+side*size*.10+(seated?size*.16:0),base+size*.12,size*.061);
+    }
+   };
+   return {at,turn,inlay,carvingBall,carvingLine,scene,figure};
+  }
+
+  // The three scenes of Perlotti's monument are carved into the stone on separate faces.
+  const meeting=stoneFace(-Math.PI/2,cliffWidth*.44);
+  meeting.scene();meeting.figure(-.49,2.32,.88);meeting.figure(.42,2.32,.85);
+  meeting.carvingLine(-.35,2.78,.26,2.78,.041);
+  meeting.carvingLine(-1.03,2.35,-.96,3.23,.047,detail);
+  meeting.carvingLine(-.99,2.99,-1.17,3.18,.043);
+  meeting.carvingLine(-.97,3.00,-.78,3.19,.041);
+
+  const garden=stoneFace(Math.PI/2,cliffWidth*.44);
+  garden.scene();garden.figure(-.62,2.34,.68,true);garden.figure(-.06,2.32,.92);
+  garden.figure(.47,2.31,.56);garden.figure(.89,2.31,.48);
+  garden.carvingLine(-1.04,2.44,-.46,2.44,.047,detail);
+  garden.carvingLine(.42,2.36,1.07,2.36,.045,detail);
+
+  const rest=stoneFace(Math.PI,cliffDepth*.44);
+  rest.scene();rest.figure(-.85,2.64,.69);rest.figure(.83,2.62,.73);
+  rest.carvingBall(-.58,2.52,.14,.105);rest.carvingBall(-.06,2.48,.45,.13);
+  rest.carvingLine(-.91,2.35,1.00,2.35,.054,detail);
+  rest.carvingLine(.21,2.77,.65,2.97,.035);
+  rest.carvingLine(-.49,3.14,-.02,3.28,.035,detail);
+  rest.carvingLine(-.02,3.28,.32,3.15,.035,detail);
+
+  const front=stoneFace(0,cliffDepth*.44);
+  front.inlay(0,2.79,2.19,.80,detail);
+  add('box','patina',0x61594d,...front.at(0,2.79,.062),2.04,.66,.09,front.turn);
+  for(const [row,width] of [.97,1.42,.83].entries())
+   add('box','patina',0x998872,...front.at(0,2.93-row*.14,.108),width,.024,.018,front.turn);
+ }
  function build(model){
   if(model==='accademia-conegliano'){accademia();return;}
   if(model==='stone-sphinx'){sphinx();return;}
@@ -216,8 +275,8 @@ function render(plan,group,b){
    box(stone,0,3.85,0,3.5,4.3,3.9);box(marble,0,6.14,0,4.1,.32,4.5);plaque(4.3,1.9,2.02);horse(6.32,'pointing');
    for(let i=0;i<15;i++){const angle=i*Math.PI*2/15,x=Math.sin(angle)*3.15,z=Math.cos(angle)*3.15;cylinder(stone,x,1.80,z,.38,.26);human(x,1.93,z,.53,'classical',marble);}
   }else if(model==='freedom-chains'){
-   steps(0,4.6);box(marble,0,1.45,0,2.8,1.6,2.8);box(marble,0,2.38,0,3.15,.24,3.15);
-   human(0,2.52,0,1.38,'freedom',marble);plaque(1.5,1.6,1.45);
+   steps(0,4.6);box(marble,0,1.45,0,2.8,1.6,2.8);box(marble,0,2.365,0,3.15,.24,3.15);
+   human(0,2.485,0,1.38,'freedom',marble);plaque(1.5,1.6,1.41);
   }else if(model==='pyramid'){
    steps(0,6.8);box(marble,0,1.16,0,4.7,1.05,4.7);box(marble,0,2.10,0,3.9,.85,3.9);box(marble,0,2.70,0,4.15,.30,4.15);
    add('pyramid','stone',marble,0,6.50,0,1.75,7.3,1.75);box(marble,0,10.30,0,.75,.33,.75);human(0,10.47,0,.70,'liberty',marble);
@@ -227,28 +286,27 @@ function render(plan,group,b){
    if(model==='equestrian-fountain')basin(4.2);steps(model==='equestrian-fountain'?.45:0,5.3,6.1);box(stone,0,2.05,0,3.9,2.85,4.7);box(0xe4d8c3,0,3.61,0,4.2,.31,5.0);plaque(2.1,2.2,2.39);horse(3.78,owner.feature.riderPose||'reins');
    if(model==='equestrian-fountain')for(const side of [-1,1])jet(side*2.7,.52,0,.85,.60);
   }else if(model==='standing-civil'){
-   steps(0,6.8,6.0);add('cliff','stone',0xb7ab95,0,2.78,0,5.4,4.6,4.9);for(const side of [-1,1])add('cliff','stone',side<0?0xa79a84:0xc3b69c,side*1.95,1.32,side*.28,1.5,1.6,3.7);
-   for(const side of [-1,1]){box(0x8e897d,side*2.25,2.4,0,.16,1.4,2.8);for(let relief=0;relief<4;relief++)sphere(0xaba18d,side*2.36,2.35+relief%2*.30,(relief-1.5)*.45,.09,.26,.18,'stone');}
-   add('cliff','stone',0xc3b69c,0,4.96,0,3.2,.65,2.9);plaque(2.0,2.3,2.47);human(0,5.25,0,1.55,'civil');
-   // Third relief belongs on the rear rock face, not a second generic plaque.
-   box(0x8e897d,0,2.55,-2.44,2.8,1.5,.12);for(let i=0;i<3;i++){sphere(0xaba18d,(i-1)*.60,2.70,-2.53,.18,.31,.09,'stone');limb([(i-1)*.60,2.45,-2.53],[(i-1)*.60+.15,2.08,-2.53],.09,0xaba18d,'stone');}
+   sanMartin();
   }else if(model==='standing-sword'){
-   steps(0,4.0);box(stone,0,1.8,0,2.7,2.15,2.7);box(marble,0,3.0,0,3.0,.27,3.0);plaque(1.9,1.6,1.39);human(0,3.15,0,1.45,'sword');
+   steps(0,4.0);box(stone,0,1.8,0,2.7,2.15,2.7);box(marble,0,3.0,0,3.0,.27,3.0);plaque(1.9,1.6,1.39);human(0,3.135,0,1.45,'sword');
   }else if(model==='liberty-column'||model==='column'||model==='obelisk'){
    steps(0,5.3);box(stone,0,1.5,0,3.5,1.65,3.5);plaque(1.5,1.7,1.79);
    if(model==='obelisk')add('pyramid','stone',marble,0,6.15,0,1.1,7.6,1.1);
-   else{cylinder(marble,0,5.8,0,.74,7.0);for(const y of [2.35,2.65,8.90,9.20])cylinder(stone,0,y,0,1.0,.24);if(model==='liberty-column'){human(0,9.38,0,.9,'liberty');for(const side of [-1,1]){sphere(bronze,side*1.85,1.0,1.8,.45,.45,.85);sphere(bronze,side*1.85,1.40,2.22,.35,.37,.34);}}}
+   else{cylinder(marble,0,5.8,0,.74,7.0);for(const y of [2.35,2.65,8.90,9.20])cylinder(stone,0,y,0,1.0,.24);if(model==='liberty-column'){human(0,9.32,0,.9,'liberty');for(const side of [-1,1]){sphere(bronze,side*1.85,1.0,1.8,.45,.45,.85);sphere(bronze,side*1.85,1.40,2.22,.35,.37,.34);}}}
   }else if(['ornate-fountain','liberty-fountain','fountain'].includes(model)){
    basin(model==='fountain'?2.65:3.8);
    if(model==='fountain'){cylinder(stone,0,.82,0,.44,.75);jet(0,1.23,0,1.25,1.55);}
-   else if(model==='liberty-fountain'){cylinder(marble,0,1.0,0,1.2,1.1);human(0,1.60,0,1.47,'liberty',marble);for(const side of [-1,1])human(side*1.45,.55,0,.55,'civil',marble);for(const side of [-1,1])jet(side*2.4,.49,0,1.1,.72);}
+   else if(model==='liberty-fountain'){
+    cylinder(marble,0,1.0,0,1.2,1.1);human(0,1.55,0,1.47,'liberty',marble);
+    for(const side of [-1,1]){cylinder(stone,side*1.45,.48,0,.39,.14);human(side*1.45,.55,0,.55,'civil',marble);jet(side*2.4,.49,0,1.1,.72);}
+   }
    else{
     cylinder(bronze,0,1.52,0,.68,2.65,'metal');for(const y of [.77,1.1,1.97])ring(gold,0,y,0,.71,.075);
     cylinder(bronze,0,2.77,0,2.15,.16,'metal');ring(gold,0,2.87,0,2.15,.11);cylinder(water,0,2.90,0,2.02,.035,'water');
     cylinder(bronze,0,3.64,0,.38,1.5,'metal');cylinder(bronze,0,4.42,0,1.16,.14,'metal');ring(gold,0,4.52,0,1.16,.08);cylinder(water,0,4.54,0,1.04,.03,'water');cylinder(bronze,0,4.62,0,.24,.18,'metal');human(0,4.70,0,.72,'fame');
     for(let angle=0;angle<4;angle++){const a=angle*Math.PI/2;jet(Math.sin(a)*2.48,.48,Math.cos(a)*2.48,1.4,.73);sphere(bronze,Math.sin(a)*.84,1.57,Math.cos(a)*.84,.35,.49,.26);}
    }
-  }else if(model==='bust'){steps(0,2.7);box(stone,0,1.45,0,1.8,1.7,1.8);sphere(bronze,0,2.95,0,.65,.55,.35);sphere(bronze,0,3.65,0,.30,.36,.30);plaque(1.6,1.1,.94);}
+  }else if(model==='bust'){steps(0,2.7);box(stone,0,1.45,0,1.8,1.7,1.8);cylinder(bronze,0,2.36,0,.38,.14,'metal');sphere(bronze,0,2.95,0,.65,.55,.35);sphere(bronze,0,3.65,0,.30,.36,.30);plaque(1.6,1.1,.94);}
   else if(model==='plaque'){box(stone,0,.63,0,1.8,1.1,.8);plaque(.75,1.5,.44);}
   else if(model==='classical-figure')human(0,0,0,1,'classical',marble);
  }
@@ -262,19 +320,54 @@ function render(plan,group,b){
  // A thin folded cloth sheet replaces the former ellipsoid that looked like a shield.
  const cloth=geos.cape.attributes.position;for(let i=0;i<cloth.count;i++){const u=cloth.getX(i),v=cloth.getY(i),drop=.5-v;cloth.setXYZ(i,u*(.48+drop*.60)+drop*drop*.24,v,Math.sin(u*22+drop*2)*(.025+drop*.045)-drop*drop*.55);}geos.cape.computeVertexNormals();
  geos.pyramid.rotateY(Math.PI/4);geos.torus.rotateX(Math.PI/2);
- // Broken radial ledges give the plinth a rock profile instead of a tapered building.
- const rockPositions=[],rockIndex=[],sides=14,levels=[-.5,-.24,.12,.5];
- for(let j=0;j<levels.length;j++)for(let i=0;i<sides;i++){const a=i*Math.PI*2/sides,r=(.51-j*.055)*(1+Math.sin(i*2.71+j*.9)*.16);rockPositions.push(Math.cos(a)*r,levels[j]+Math.sin(i*3.1)*.025,Math.sin(a)*r);}
- for(let j=0;j<levels.length-1;j++)for(let i=0;i<sides;i++){const a=j*sides+i,b=j*sides+(i+1)%sides,c=a+sides,d=b+sides;rockIndex.push(a,c,b,b,c,d);}
- for(let i=1;i<sides-1;i++){rockIndex.push(0,i+1,i);const top=(levels.length-1)*sides;rockIndex.push(top,top+i,top+i+1);}
- geos.cliff=new T.BufferGeometry();geos.cliff.setAttribute('position',new T.Float32BufferAttribute(rockPositions,3));geos.cliff.setIndex(rockIndex);const indexedRock=geos.cliff;geos.cliff=indexedRock.toNonIndexed();indexedRock.dispose();geos.cliff.computeVertexNormals();
+ if(parts.some(part=>part.kind==='cliff')){
+  // One closed stone volume with flat carving faces and uneven ledges above and below.
+  const profiles=[[-.5,.49,.49,.12,0,0],[-.40,.50,.50,.13,0,0],[-.30,.47,.47,.14,0,0],[-.14,.44,.44,.14,0,0],[.16,.44,.44,.14,0,0],[.27,.43,.40,.14,.01,.012],[.38,.37,.37,.12,.015,.005],[.5,.32,.33,.10,.012,.009]];
+  const vertices=[],indices=[],sides=12;
+  for(const [y,x,z,edge,ox,oz] of profiles){
+   const ring=[[x,-z+edge],[x,-z*.17],[x,z-edge],[x-edge,z],[x*.14,z],[-x+edge,z],[-x,z-edge],[-x,z*.17],[-x,-z+edge],[-x+edge,-z],[-x*.12,-z],[x-edge,-z]];
+   for(const [px,pz] of ring)vertices.push(px+ox,y,pz+oz);
+  }
+  for(let row=0;row<profiles.length-1;row++)for(let i=0;i<sides;i++){
+   const a=row*sides+i,b=row*sides+(i+1)%sides,c=a+sides,d=b+sides;
+   indices.push(a,c,b,b,c,d);
+  }
+  const bottom=vertices.length/3,top=bottom+1,last=(profiles.length-1)*sides;
+  vertices.push(0,profiles[0][0],0,profiles.at(-1)[4],profiles.at(-1)[0],profiles.at(-1)[5]);
+  for(let i=0;i<sides;i++){
+   const next=(i+1)%sides;
+   indices.push(bottom,i,next,top,last+next,last+i);
+  }
+  const indexed=new T.BufferGeometry();indexed.setAttribute('position',new T.Float32BufferAttribute(vertices,3));indexed.setIndex(indices);
+  geos.cliff=indexed.toNonIndexed();indexed.dispose();geos.cliff.computeVertexNormals();
+ }
  const batches=new Map(),dummy=new T.Object3D(),yaw=new T.Quaternion();
  for(const part of parts){const key=part.kind+':'+part.material;if(!batches.has(key))batches.set(key,{kind:part.kind,material:part.material,parts:[]});batches.get(key).parts.push(part);}
  const usedGeometries=new Set([...batches.values()].map(batch=>batch.kind));for(const [kind,geometry]of Object.entries(geos))if(!usedGeometries.has(kind))geometry.dispose();
+ // Source polygons are already rendered. Seat each model on the actual solid surface instead of a universal height.
+ const surfaces=group.children.filter(mesh=>mesh.userData.citySquare&&mesh.userData.citySquare.name===plan.profile?.name&&mesh.material?.color?.getHex()!==0x319bb5);
+ for(const surface of surfaces)surface.updateWorldMatrix(true,false);
+ const down=new T.Vector3(0,-1,0),origin=new T.Vector3(),probe=new T.Raycaster(),partBounds=new T.Box3(),itemBase=new Map();
+ for(const {item,first,end} of localModels){
+  let lowest=Infinity;
+  for(let i=first;i<end;i++){
+   const part=parts[i],geometry=geos[part.kind];
+   if(!geometry.boundingBox)geometry.computeBoundingBox();
+   dummy.position.set(part.x,part.y,part.z);dummy.quaternion.identity();
+   if(part.rotation)dummy.quaternion.copy(part.rotation);
+   dummy.scale.set(part.sx,part.sy,part.sz);dummy.updateMatrix();
+   lowest=Math.min(lowest,partBounds.copy(geometry.boundingBox).applyMatrix4(dummy.matrix).min.y);
+  }
+  if(!Number.isFinite(lowest))continue;
+  origin.set(b.x+item.x,8,b.z+item.z);probe.set(origin,down);
+  const ground=probe.intersectObjects(surfaces,false)[0]?.point.y??.33;
+  itemBase.set(item,ground-lowest*item.scale);
+ }
  for(const batch of batches.values()){
-  const waterMaterial=batch.material==='water';const material=new T.MeshStandardMaterial({side:batch.kind==='cape'?T.DoubleSide:T.FrontSide,color:0xffffff,roughness:waterMaterial?.18:batch.material==='metal'?.43:.83,metalness:waterMaterial?.18:batch.material==='metal'?.58:.02});
+  const waterMaterial=batch.material==='water',patina=batch.material==='patina';
+  const material=new T.MeshStandardMaterial({side:batch.kind==='cape'?T.DoubleSide:T.FrontSide,color:0xffffff,roughness:waterMaterial?.18:patina?.58:batch.material==='metal'?.43:.83,metalness:waterMaterial?.18:patina?.24:batch.material==='metal'?.58:.02});
   const mesh=new T.InstancedMesh(geos[batch.kind],material,batch.parts.length),tint=new T.Color();
-  batch.parts.forEach((p,i)=>{const item=p.owner,ca=Math.cos(item.angle),sa=Math.sin(item.angle);dummy.position.set(b.x+item.x+(p.x*ca-p.z*sa)*item.scale,baseY+p.y*item.scale,b.z+item.z+(p.x*sa+p.z*ca)*item.scale);yaw.setFromAxisAngle(UP,-item.angle);dummy.quaternion.copy(yaw);if(p.rotation)dummy.quaternion.multiply(p.rotation);dummy.scale.set(p.sx*item.scale,p.sy*item.scale,p.sz*item.scale);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);mesh.setColorAt(i,tint.setHex(p.color));});
+  batch.parts.forEach((p,i)=>{const item=p.owner,ca=Math.cos(item.angle),sa=Math.sin(item.angle);dummy.position.set(b.x+item.x+(p.x*ca-p.z*sa)*item.scale,itemBase.get(item)+p.y*item.scale,b.z+item.z+(p.x*sa+p.z*ca)*item.scale);yaw.setFromAxisAngle(UP,-item.angle);dummy.quaternion.copy(yaw);if(p.rotation)dummy.quaternion.multiply(p.rotation);dummy.scale.set(p.sx*item.scale,p.sy*item.scale,p.sz*item.scale);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);mesh.setColorAt(i,tint.setHex(p.color));});
   mesh.computeBoundingSphere();mesh.castShadow=!waterMaterial;mesh.receiveShadow=true;mesh.userData.squareLandmark=true;mesh.userData.sculpturePart=batch.kind;mesh.userData.squareModels=[...new Set(batch.parts.map(p=>p.owner.feature.model))];mesh.userData.squareFeatureIDs=batch.parts.map(p=>p.owner.feature.id);group.add(mesh);
  }
 }
