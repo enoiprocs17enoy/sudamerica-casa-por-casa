@@ -51,10 +51,10 @@ const projected=new THREE.Vector3();let lastLabels=-Infinity;
 function updateLabels(now){
  if(!labelsRoot||!callbacks.camera||now-lastLabels<90)return;lastLabels=now;
  const camera=callbacks.camera,w=callbacks.container.clientWidth,h=callbacks.container.clientHeight,candidates=[];
- const viewDistance=callbacks.getCamera().distance,maxRange=Math.max(5000,viewDistance*10),focal=h/(2*Math.tan(camera.fov*Math.PI/360));
+ const viewDistance=callbacks.getCamera().distance,maxRange=Math.max(5000,viewDistance*10);
  for(const e of entries){if(e.integrated||!e.representative)continue;
   const d=camera.position.distanceToSquared(projected.set(e.x,e.y,e.z));
-  if(d>maxRange*maxRange||focal*Math.min(e.radius,300)/Math.sqrt(d)<10)continue;
+  if(d>maxRange*maxRange)continue;
   projected.set(e.x,e.y+3,e.z).project(camera);if(projected.z< -1||projected.z>1)continue;
   const x=(projected.x*.5+.5)*w,y=(-projected.y*.5+.5)*h,width=Math.min(220,Math.max(60,e.city.name.length*7.4+12));
   if(x<8||x>w-8||y<8||y>h-8)continue;candidates.push({e,x,y,width,d});
