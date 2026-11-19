@@ -1824,8 +1824,8 @@ function installReleaseSky(){
    vec3 horizon=vec3(.69,.82,.89);
    vec3 color=mix(horizon,vec3(.035,.54,.92),smoothstep(-.015,.31,height));
    vec2 cloudPlane=ray.xz/max(height+.10,.09);
-   float patch=noise(cloudPlane*3.),cloudDetail=noise(cloudPlane*7.+vec2(9.7,-3.1));
-   float cloud=.63*patch+.26*cloudDetail+.11*noise(cloudPlane*15.+vec2(-2.4,11.8));
+   float cloudBase=noise(cloudPlane*3.),cloudDetail=noise(cloudPlane*7.+vec2(9.7,-3.1));
+   float cloud=.63*cloudBase+.26*cloudDetail+.11*noise(cloudPlane*15.+vec2(-2.4,11.8));
    color=mix(color,mix(vec3(.69,.79,.87),vec3(1.,.99,.95),smoothstep(.56,.77,cloud)),
              smoothstep(.55,.70,cloud)*smoothstep(.025,.14,height)*.95);
    if(ridgeStrength>.01){
