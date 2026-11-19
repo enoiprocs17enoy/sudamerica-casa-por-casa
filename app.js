@@ -715,6 +715,16 @@ const scoreOverrides=new Map();
 // Demo-only subscription state per city and owner. No payments or backend.
 const designOverrides=new Map();
 const colorOverrides=new Map();
+
+// Stable simulated tastes: independent channels, unaffected by catalogue order or growth.
+const simulatedChoices=new WeakMap();
+function simulatedRandom(city,id,kind,channel){let x=2166136261;for(const c of String(city)+'|'+kind+'|'+id+'|'+channel)x=Math.imul(x^c.charCodeAt(0),16777619);x^=x>>>16;x=Math.imul(x,0x7feb352d);x^=x>>>15;x=Math.imul(x,0x846ca68b);x^=x>>>16;return(x>>>0)/4294967296;}
+function simulatedChoice(owner,kind,channel,total){let choices=simulatedChoices.get(owner);if(!choices){choices=new Map();simulatedChoices.set(owner,choices);}const key=kind+':'+channel+':'+total;if(!choices.has(key))choices.set(key,Math.floor(simulatedRandom(owner.cityId||currentCity.id,owner.id,kind,channel)*total));return choices.get(key);}
+function housePaintIndex(h){return colorOverrides.get(scoreOverrideKey(h.cityId,h.id))??simulatedChoice(h,'house','paint',HOUSE_PAINTS.length);}
+function houseLawnColor(h){return [0x84ac82,0x72a56b,0x91ad70,0x65936b][simulatedChoice(h,'house','lawn',4)];}
+const simulatedShopProgressCache=new WeakMap();
+function simulatedShopProgress(shop){if(simulatedShopProgressCache.has(shop))return simulatedShopProgressCache.get(shop);const city=shop.cityId||currentCity.id,r=simulatedRandom(city,shop.id,'shop','evolution'),limits=[.18,.38,.56,.72,.84,.92,.97,1];let tier=limits.findIndex(x=>r<x);if(tier<0)tier=7;const min=HOUSE_TIERS[tier].min,max=HOUSE_TIERS[tier+1]?.min??110000,progress={points:min+Math.floor(simulatedRandom(city,shop.id,'shop','points')*(max-min)),premium:simulatedRandom(city,shop.id,'shop','premium')<.30,paintIndex:simulatedChoice(shop,'shop','paint',HOUSE_PAINTS.length),pavingIndex:simulatedChoice(shop,'shop','paving',3)};simulatedShopProgressCache.set(shop,progress);return progress;}
+
 // 0 points: no plants. At 1 point: pick one species. Gratis = 2,
 // Premium = 4, with fixed slots for each house.
 // Four handcrafted low-poly options for every unlockable decoration.
@@ -731,7 +741,9 @@ const GARDEN_CATALOG=[
 ];
 const gardenChoices=new Map();
 function gardenChoice(h,category){
- return gardenChoices.get(scoreOverrideKey(h.cityId,h.id)+':'+category)||0;
+ const explicit=gardenChoices.get(scoreOverrideKey(h.cityId,h.id)+':'+category);
+ const total=GARDEN_CATALOG.find(item=>item.id===category)?.options.length||4;
+ return explicit??simulatedChoice(h,'house','garden:'+category,total);
 }
 function housePlant(h){return gardenChoice(h,'plant');}
 const GARDEN_PLANTS=GARDEN_CATALOG[0].options.map((name,i)=>({id:String(i),name}));
@@ -753,10 +765,10 @@ function coordinatedHouseColor(wall,other,amount){
  return new THREE.Color(wall).lerp(new THREE.Color(other),amount).getHex();
 }
 function housePaint(h){
- const index=colorOverrides.get(scoreOverrideKey(h.cityId,h.id))??0;
+ const index=housePaintIndex(h);
  return HOUSE_PAINTS[index]||HOUSE_PAINTS[0];
 }
-function isPremiumHouse(h){return designOverrides.get(scoreOverrideKey(h.cityId,h.id))??false;}
+function isPremiumHouse(h){return designOverrides.get(scoreOverrideKey(h.cityId,h.id))??(simulatedChoice(h,'house','premium',100)<35);}
 
 function scoreOverrideKey(city,id){return city+':'+id;}
 let manualCityNavigation=false,suppressMapEntry=false;
@@ -1204,14 +1216,15 @@ function assertInsideParcel(label,x,z,w,d,b){
 const shopPurchases=[];
 const shopProgress=new Map();
 function shopProgressFor(shop){
- return shopProgress.get(scoreOverrideKey(currentCity.id,shop.id))||{points:0,premium:false};
+ const defaults=simulatedShopProgress(shop),manual=shopProgress.get(scoreOverrideKey(shop.cityId||currentCity.id,shop.id));
+ return manual?{...defaults,...manual}:defaults;
 }
 function facadeAngle(plot){return plot.lz===0?Math.PI:0}
 function shopLot(id){
   const {block,slot}=ensurePlots('shop',id);
   const pos=plotPosition(block,slot);
   assertInsideParcel('Negozio '+id,pos.x,pos.z,17,18,pos);
-  return {id,...pos,
+  return {id,cityId:currentCity.id,...pos,
     ownerId:Math.max(1,Math.min(count,1+Math.floor(rnd(id*127+(currentCity.catalogOrdinal??CITY_CATALOG.indexOf(currentCity))*19)*Math.max(1,count)))),
     owner:'',
     business:id%24===14?'Pizzeria':shopStyles[id%shopStyles.length]?.name||'Negozio'};
@@ -2054,7 +2067,7 @@ function makeHouse(h) {
   const height = [2.4,3,3.8,5.6,7.3,2.8,4.4][h.type];
   const width = [2.7,3.5,3,4.1,4.3,3.3,3.7][h.type];
   const depth = [2.7,3.2,3.4,3.6,3.8,3.5,3.2][h.type];
-  if (h.garden) addBox(12.7,.035,11.8,h.x,.015,h.z,0x69bc70);
+  if (h.garden) addBox(12.7,.035,11.8,h.x,.015,h.z,houseLawnColor(h));
   const body = addBox(width,height,depth,h.x,height/2,h.z,walls[h.variant]);
   body.userData.home = h;houseMeshes.push(body);
   let roof;
@@ -3009,11 +3022,12 @@ function drawShops(){
     }
   }
   for(const shop of shopPurchases){
-    const style=shopStyles[shop.id%shopStyles.length];
+    const progress=shopProgressFor(shop);
+    const originalStyle=shopStyles[shop.id%shopStyles.length];
+    const style=progress.paintIndex===undefined?originalStyle:{...originalStyle,walls:HOUSE_PAINTS[progress.paintIndex].wall};
     const seed=shop.id,district=districtStyle(shop.block);
     const shape=shop.id%shopStyles.length;
     const isPizzeria=shape===2&&shop.id%24===14;
-    const progress=shopProgressFor(shop);
     const stage=houseTier(progress.points);
     const growth=[0,.25,.52,.68,.79,.88,.95,1][stage];
     const width=[7.2,14.5,12.2,8.5,8.1,6.4,12.9,7.7,16.2,12.8,11.4,13.1][shape]*(.87+rnd(seed*31+8)*.16)*(isPizzeria?.88:1);
@@ -3033,7 +3047,7 @@ function drawShops(){
     const x=shop.x,z=shop.z;
     // Premium enriches finishes without changing the activity's base colour.
     const wallColor=style.walls;
-    const paving=progress.premium?0xc7ad8b:[0xaba99f,0xb8b5a9,0x9ba9a8][seed%3];
+    const paving=progress.premium?0xc7ad8b:[0xaba99f,0xb8b5a9,0x9ba9a8][progress.pavingIndex??seed%3];
     const front=z+d/2, trim=style.trim, glass=style.glass;
     const diningUpper=(shape===0||shape===2)&&stage>=3;
     const marketHall=shape===11&&stage>=2;
@@ -4990,6 +5004,7 @@ function homeNormalPattern(kind){
 const homeTextures={};
 function homePattern(kind){
  if(homeTextures[kind])return homeTextures[kind];
+ if(kind==='lawn'){const tex=homePattern('grass').clone();tex.repeat.set(3,4);tex.needsUpdate=true;homeTextures[kind]=tex;return tex;}
  const c=document.createElement('canvas');c.width=c.height=512;
  const ctx=c.getContext('2d');
  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,512,512);
@@ -5092,6 +5107,7 @@ function* renderHouseStages(selected){
     const premium=isPremiumHouse(h);
     const {width:footW,depth:footD,offsetZ}=houseFootprint(h,tier);
     h._visualOffsetZ=offsetZ;
+    if(h.garden&&h.points>=1){const parcel=plotBounds(h.blockIndex,h.slot);place('homeGardenLawn',boxGeo,houseLawnColor(h),h,h.x,.018,h.z-offsetZ,parcel.right-parcel.left-.30,.025,parcel.bottom-parcel.top-.30);}
     if(h.garden&&h.points>0&&h.id%3!==1){
       const parcel=plotBounds(h.blockIndex,h.slot);
       const localX=(h.id%2===0?1:-1)*(parcel.right-parcel.left)*.35;
@@ -5324,7 +5340,7 @@ function* renderHouseStages(selected){
     const wall=paint.wall;
     const roof=paint.roof;
     const x=h.x,z=h.z;
-    const lawn=0x84ac82;
+    const lawn=houseLawnColor(h);
     // v5.8.1: low-rise homes are genuinely composed from two masses.
     // The main gabled home has a shorter depth; a side wing forms an L plan.
     // Both masses stay inside the same footprint at every evolution.
@@ -5561,13 +5577,13 @@ function* renderHouseStages(selected){
   const renderBatches=new Map();
   const spatialBatches=selected.length>=2000;
   for(const [key,batch] of batches.entries()){
-    const texture=/(roof|gable|hip|towerTop|cornice)/i.test(key)?'roof':
+    const texture=/homeGardenLawn/i.test(key)?'lawn':/(roof|gable|hip|towerTop|cornice)/i.test(key)?'roof':
       /(wall|body|towerBase|wing|topSetback|penthouse|bay|longWing)/i.test(key)?'wall':'';
     const normalStrength=/(roof|gable|hip)/i.test(key)?.88:.56;
     const roughness=/(window|glass|mullion)/i.test(key)?.26:/roof/i.test(key)?.79:.87;
     const metalness=/(mullion|sconce|handle)/i.test(key)?.48:.02;
     const casts=/(premiumVerandaRoof|premiumDormerTop|premiumChimney|premiumTowerBalconySlab|gardenTree|towerBase|towerRoof|towerMain|towerMid|homeMain|homeWing|homeRoof|homeCore|homeWall|towerWall|towerBody|mainBody|wingBody|mainRoof|gable|hipRoof)/i.test(key);
-    const receives=casts||/(facade|pier|window|door|balcony|pilaster)/i.test(key);
+    const receives=casts||/(homeGardenLawn|facade|pier|window|door|balcony|pilaster)/i.test(key);
     const premiumDetail=/^premiumTowerBalcony(Post|Bottom|SideCap)_/.test(key);
     const profile=[batch.geo.id,texture,normalStrength,roughness,metalness,casts,receives].join(':')+(premiumDetail?':premiumDetail':'');
     for(const entry of batch.entries){
@@ -5591,7 +5607,7 @@ function* renderHouseStages(selected){
     if(!materials.has(batch.profile))materials.set(batch.profile,new THREE.MeshStandardMaterial({
       color:0xffffff,
       map:batch.texture?homePattern(batch.texture):null,
-      normalMap:batch.texture?homeNormalPattern(batch.texture):null,
+      normalMap:batch.texture&&batch.texture!=='lawn'?homeNormalPattern(batch.texture):null,
       normalScale:new THREE.Vector2(batch.normalStrength,batch.normalStrength),
       side:batch.geo===roofGeo?THREE.DoubleSide:THREE.FrontSide,
       roughness:batch.roughness,
@@ -6432,7 +6448,7 @@ function showOwnerCard(h,kind='casa',selected=null){
   const progress=shopProgressFor(selected);
   const level=houseTier(progress.points)+1;
   info.textContent=title+' · '+currentCity.name+' · Livello '+level+'/'+HOUSE_TIERS.length+
-   ' · '+progress.points.toLocaleString(window.GameI18n?.locale||'it-IT')+' punti · '+(progress.premium?'Premium':'Base');
+   ' · '+progress.points.toLocaleString(window.GameI18n?.locale||'it-IT')+' punti · '+(progress.premium?'Premium':'Base')+' · '+HOUSE_PAINTS[progress.paintIndex].name;
  }else info.innerHTML='<b>'+title+' · '+currentCity.name+'</b><p>⭐ '+h.points.toLocaleString(window.GameI18n?.locale||'it-IT')+' punti</p><p>🌿 Giardino: '+(h.points<1?'non sbloccato':GARDEN_CATALOG[0].options[housePlant(h)]+' · '+(isPremiumHouse(h)?4:2)+' piante')+'</p><p>🎨 Colore: '+housePaint(h).name+'</p><p>🏗️ '+tier.name+' · '+tier.levels+' piani</p><p>🎨 Design: '+(isPremiumHouse(h)?'Premium':'Gratis')+'</p><p>🏠 Casa #'+String(h.id).padStart(5,'0')+'</p>';
  details.appendChild(info);
  if(kind==='negozio'&&selected&&window.OwnerAccess?.testMode()){
@@ -6491,7 +6507,7 @@ function showOwnerCard(h,kind='casa',selected=null){
    option.value=String(i);option.textContent=paint.name+' · pareti e tetto';
    colorPicker.appendChild(option);
   });
-  colorPicker.value=String(colorOverrides.get(scoreOverrideKey(h.cityId,h.id))??0);
+  colorPicker.value=String(housePaintIndex(h));
   colorPicker.onchange=()=>applyDemoHouseColor(h.id,Number(colorPicker.value));
   const gardenProgress=document.createElement('div');gardenProgress.className='garden-unlocks';
   const gardenTitle=document.createElement('strong');
