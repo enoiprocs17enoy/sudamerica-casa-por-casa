@@ -1,5 +1,232 @@
-/* Quiet opaque surfaces keep the HUD readable over every 3D background. */
-body.game-hub.city-view .hub-brand{background:#fffdf5f5;border:1px solid #c7d5c3;border-radius:18px;padding:7px 12px 7px 7px;text-shadow:none;box-shadow:0 3px 12px #173b3420}
-body.game-hub.city-view .hub-search-area h1{display:table;margin:0 auto 8px;background:#fffdf5f5;border:1px solid #c7d5c3;border-radius:18px;padding:4px 16px;text-shadow:none;font-size:18px;box-shadow:0 2px 8px #173b3415}
-@media(max-width:720px){body.game-hub.city-view .hub-brand{padding:5px 9px 5px 5px;border-radius:14px;top:10px;left:10px}body.game-hub.city-view .hub-search-area h1{font-size:16px;padding:3px 13px;margin-bottom:8px}}
-@media(max-height:550px) and (min-width:721px){body.game-hub.city-view .hub-search-area h1{display:none}}
+/* Keep exploring and finding a home in reach while the map is the main surface. */
+body.game-hub {
+  --hub-edge: clamp(12px, 2vw, 24px);
+  --hub-bottom: max(18px, env(safe-area-inset-bottom));
+  --hub-stroke: #c6d3cb;
+  --hub-shadow: 0 3px 8px #102f291a, 0 10px 26px #102f2914;
+  --hub-accent: #ffd35f;
+}
+
+.hub-visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.hub-shell [hidden], body.game-hub .v4Nav button[hidden],
+body.game-hub #v4Panel[hidden], body.game-hub .hub-legacy-field {
+  display: none !important;
+}
+
+.hub-brand, .hub-tools { top: var(--hub-edge); }
+.hub-brand, .hub-tools { min-height: 48px; }
+.hub-brand {
+  left: auto;
+  inset-inline-start: var(--hub-edge);
+  background: var(--paper);
+  border: 1px solid var(--hub-stroke);
+  border-radius: 16px;
+  padding: 5px 12px 5px 5px;
+  box-shadow: var(--hub-shadow);
+  text-shadow: none;
+}
+.hub-brand-mark { width: 36px; height: 36px; border: 0; border-radius: 11px; box-shadow: none; }
+.hub-tools { right: auto; inset-inline-end: var(--hub-edge); align-items: center; }
+.hub-round {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--hub-stroke) !important;
+  box-shadow: var(--hub-shadow);
+}
+.hub-search-area {
+  top: var(--hub-edge);
+  z-index: 6;
+  width: min(515px, calc(100% - 410px));
+  max-width: none;
+}
+.hub-search-form {
+  min-height: 48px;
+  gap: 10px;
+  padding: 4px 5px;
+  padding-inline-start: 16px;
+  border: 1px solid var(--hub-stroke);
+  border-radius: 16px;
+  box-shadow: var(--hub-shadow);
+}
+.hub-search-form input { flex: 1; font-size: 16px; font-weight: 600; }
+.hub-search-form button {
+  border: 0 !important;
+  border-radius: 11px;
+  min-height: 40px;
+  padding: 8px 16px;
+}
+.hub-search-icon {
+  position: relative;
+  flex: 0 0 12px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #527065;
+  border-radius: 50%;
+}
+.hub-search-icon::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 2px;
+  top: 9px;
+  left: 8px;
+  background: #527065;
+  transform: rotate(45deg);
+  border-radius: 1px;
+}
+.hub-results { border: 1px solid var(--hub-stroke); border-radius: 16px; box-shadow: var(--hub-shadow); }
+.hub-city-strip { top: calc(var(--hub-edge) + 63px); gap: 6px; }
+.hub-city-pill, .hub-launch button {
+  border: 1px solid var(--hub-stroke) !important;
+  box-shadow: var(--hub-shadow);
+}
+.hub-city-pill { min-height: 42px; }
+.hub-next { min-height: 34px; }
+.hub-launch { bottom: calc(var(--hub-bottom) + 80px); }
+.hub-launch button { min-height: 44px; }
+.hub-launch button:first-child { background: var(--hub-accent) !important; }
+
+body.game-hub .v4Nav {
+  bottom: var(--hub-bottom) !important;
+  border: 1px solid var(--hub-stroke) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--hub-shadow);
+}
+body.game-hub .v4Nav button { border-radius: 13px !important; }
+body.game-hub .v4Nav button.hub-selected { background: #f8e7ae !important; }
+body.game-hub .earthControls > button {
+  border: 1px solid var(--hub-stroke) !important;
+  box-shadow: 0 3px 8px #102f2921;
+}
+body.game-hub .v4Panel, body.game-hub #card {
+  border: 1px solid var(--hub-stroke) !important;
+  top: calc(var(--hub-edge) + 64px) !important;
+  bottom: auto !important;
+  max-height: calc(100dvh - var(--hub-edge) - var(--hub-bottom) - 169px);
+  overscroll-behavior: contain;
+}
+body.game-hub .v4Panel { padding: 22px !important; }
+body.game-hub :is(.v4Close, .hub-close, .hub-drawer-close) {
+  min-width: 44px;
+  min-height: 44px;
+  line-height: 1;
+}
+.hub-dialog h2 { margin-inline: 0 48px; }
+body.game-hub .layout > aside {
+  inset: 0 auto 0 0;
+  padding-block-start: max(24px, env(safe-area-inset-top));
+  padding-block-end: max(26px, env(safe-area-inset-bottom));
+  overscroll-behavior: contain;
+}
+[dir="rtl"] body.game-hub .layout > aside {
+  inset: 0 0 0 auto;
+  transform: translateX(110%);
+}
+[dir="rtl"] body.game-hub.hub-drawer-open .layout > aside { transform: translateX(0); }
+.hub-drawer-close { top: 14px; right: auto; inset-inline-end: 14px; }
+.hub-drawer-title { font-size: 22px; margin: 0 0 24px !important; padding-inline-end: 48px; }
+.hub-language-label, .hub-city-label { display: block; font-weight: 750; }
+.hub-drawer-links { display: flex; align-items: stretch; flex-direction: column; gap: 9px; margin-block: 16px 24px; }
+.hub-drawer-links > :is(button, a) {
+  padding: 11px 13px;
+  min-height: 44px;
+  border: 1px solid var(--hub-stroke);
+  border-radius: 11px;
+  background: #eef3ed;
+  color: var(--ink);
+  text-align: start;
+  font: inherit;
+  font-weight: 700;
+}
+.hub-drawer-links > a { display: grid; align-content: center; text-decoration: none; }
+.hub-show-selected-city {
+  min-height: 44px;
+  margin-block-start: 8px;
+  color: var(--ink);
+  background: var(--hub-accent);
+  border-radius: 11px;
+}
+body.game-hub aside #languageSwitcher { margin-block: 5px 0; }
+body.game-hub .hub-privacy-link { inset-inline-end: var(--hub-edge); inset-inline-start: auto; }
+body.game-hub .hud { max-width: min(32vw, 440px); }
+.city-rank-list { margin: 12px 0 0; padding: 0; list-style: none; }
+.city-rank-list .v4Rank { gap: 8px; align-items: center; }
+.city-rank-list .v4Rank > b { flex: none; white-space: nowrap; }
+body.game-hub .v4Panel .city-rank-resident {
+  background: transparent;
+  color: inherit;
+  border: 0;
+  min-height: 44px;
+  min-width: 0;
+  text-align: start;
+  overflow-wrap: anywhere;
+  padding: 6px;
+}
+.city-load-retry {
+  position: fixed;
+  z-index: 830;
+  bottom: calc(var(--hub-bottom, 18px) + 145px);
+  inset-inline: 14px;
+  max-width: 390px;
+  margin-inline: auto;
+  padding: 13px 14px;
+  border: 1px solid #be9972;
+  border-radius: 14px;
+  background: #fff8e8;
+  color: #413329;
+  box-shadow: 0 3px 12px #102f2933;
+}
+.city-load-retry[hidden] { display: none; }
+.city-load-retry p { margin: 0 0 9px; }
+.city-load-retry button { min-height: 44px; background: #ffd35f; color: #213c38; border-radius: 9px; }
+
+@media (max-width: 720px) {
+  body.game-hub { --hub-edge: 11px; --hub-bottom: max(14px, env(safe-area-inset-bottom)); }
+  .hub-brand, .hub-tools { top: max(var(--hub-edge), env(safe-area-inset-top)); }
+  .hub-brand { min-height: 44px; }
+  .hub-brand-mark { width: 34px; height: 34px; }
+  .hub-tools { min-height: 44px; }
+  .hub-search-area { top: calc(max(var(--hub-edge), env(safe-area-inset-top)) + 53px); width: calc(100% - 2 * var(--hub-edge)); }
+  .hub-search-form { min-height: 49px; }
+  .hub-search-form button { min-height: 41px; padding-inline: 12px; }
+  .hub-city-strip { top: calc(max(var(--hub-edge), env(safe-area-inset-top)) + 112px); }
+  .hub-city-pill { min-height: 38px; }
+  .hub-next { min-height: 32px; }
+  .hub-launch { bottom: calc(var(--hub-bottom) + 72px); }
+  .hub-launch button { padding-inline: 14px; }
+  body.game-hub .v4Nav {
+    width: calc(100% - 2 * var(--hub-edge)) !important;
+    max-width: 470px;
+    justify-content: center;
+  }
+  body.game-hub .v4Nav button { flex: 1 1 0; width: auto; min-height: 49px !important; }
+  body.game-hub .v4Nav button span { font-size: clamp(9px, 2.55vw, 12px) !important; overflow-wrap: anywhere; }
+  body.game-hub .earthControls { right: auto !important; inset-inline-end: 7px; max-height: 38dvh; }
+  body.game-hub .earthControls > button { width: 41px !important; height: 41px !important; }
+  body.game-hub .v4Panel, body.game-hub #card {
+    top: auto !important;
+    inset-inline: var(--hub-edge) !important;
+    width: auto !important;
+    bottom: calc(var(--hub-bottom) + 68px) !important;
+    max-height: min(69dvh, calc(100dvh - var(--hub-bottom) - 114px));
+    border-radius: 20px !important;
+  }
+  body.game-hub .v4Panel { padding: 17px !important; }
+  body.game-hub .hub-privacy-link { display: none; }
+  body.game-hub .hud { max-width: 48vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+@media (max-height: 460px) {
+  .hub-city-strip { display: none; }
+  body.game-hub .v4Panel, body.game-hub #card { max-height: calc(100dvh - 96px); }
+}

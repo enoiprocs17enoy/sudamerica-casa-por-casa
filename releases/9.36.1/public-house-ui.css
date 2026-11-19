@@ -1,0 +1,124 @@
+#details .showcase-request-card {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 14px;
+  overflow-wrap: anywhere;
+}
+
+#details .showcase-request-card p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+#details .showcase-request-card .showcase-manager {
+  margin-top: 0 !important;
+}
+
+#showcaseDialog {
+  box-sizing: border-box;
+  width: min(560px, calc(100% - 24px));
+  max-height: calc(100dvh - 28px);
+  overscroll-behavior: contain;
+  overflow-wrap: anywhere;
+}
+
+#showcaseDialog h2 {
+  margin-inline: 0 54px;
+}
+
+#showcaseDialog .hub-close {
+  right: auto;
+  inset-inline-end: 12px;
+  inset-block-start: 12px;
+  width: 44px;
+  height: 44px;
+}
+
+#showcaseDialog .showcase-reference {
+  margin-block: 18px;
+}
+
+#showcaseDialog .showcase-property {
+  margin-block: 0 8px;
+}
+
+#showcaseDialog .showcase-copy-status {
+  display: block;
+  color: #435c50;
+  font-size: 0.875rem;
+}
+
+#showcaseDialog .showcase-copy-status:not(:empty) {
+  margin-block-start: 6px;
+}
+
+#showcaseDialog .showcase-copy-field {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 4.5rem;
+  margin-block-start: 8px;
+  padding: 8px 10px;
+  border: 1px solid #79968a;
+  border-radius: 10px;
+  background: #fff;
+  color: #18332f;
+  font: inherit;
+}
+
+#details .showcase-request-card .showcase-actions,
+#showcaseDialog .showcase-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-block-start: 5px;
+}
+
+#showcaseDialog .showcase-actions .showcase-secondary {
+  margin: 0;
+}
+
+#details .showcase-request-card button,
+#showcaseDialog .showcase-actions > *,
+#showcaseDialog .showcase-copy-button,
+#showcaseDialog > .showcase-primary,
+#showcaseDialog > .showcase-secondary {
+  box-sizing: border-box;
+  min-height: 44px;
+  max-width: 100%;
+  white-space: normal;
+}
+
+#details .showcase-request-card .showcase-copy-button,
+#showcaseDialog .showcase-copy-button,
+#showcaseDialog .showcase-privacy-page-link {
+  padding: 8px 12px;
+  border: 1px solid #78998a;
+  border-radius: 12px;
+  background: #fffdf5;
+  color: #18332f;
+  font: inherit;
+  font-weight: 650;
+  text-align: start;
+}
+
+#showcaseDialog .showcase-privacy-page-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+#details .showcase-request-card button:focus-visible,
+#showcaseDialog :is(button, a, input, select, textarea):focus-visible {
+  outline: 3px solid #187e69;
+  outline-offset: 2px;
+}
+
+@media (max-width: 400px) {
+  #details .showcase-request-card .showcase-actions > *,
+  #showcaseDialog .showcase-actions > * {
+    flex: 1 1 100%;
+  }
+}
