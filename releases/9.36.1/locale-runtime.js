@@ -54,7 +54,7 @@ function matchLocale(preference,available){
 }
 
 (function(){'use strict';
- const revision='9.8.0-release1',review=document.documentElement.dataset.i18nReview==='true',cache=new Map(),listeners=new Set(),auditors=new Set(),missing=new Set();
+ const revision='9.36.1-mundocity',review=document.documentElement.dataset.i18nReview==='true',cache=new Map(),listeners=new Set(),auditors=new Set(),missing=new Set();
  const catalogueBase=new URL('.',document.currentScript?.src||location.href);
  const preferenceKey=review?'casa-language-review-v1':'casa-language-v1';
  const italian={
@@ -90,7 +90,7 @@ function matchLocale(preference,available){
  }
  function picker(){const controls=document.getElementById('earthControls');if(!controls)return;const container=document.createElement('div');container.id='languageSwitcher';const icon=document.createElement('span');icon.textContent='🌐';icon.setAttribute('aria-hidden','true');select=document.createElement('select');select.id='languagePicker';select.dataset.i18nSkip='true';select.setAttribute('aria-label','Lingua');for(const language of manifest.languages){if(!language.complete&&!review)continue;const option=document.createElement('option');option.value=language.code;option.textContent=language.name+(!language.complete?' · preview':'');option.lang=language.code;select.append(option);}select.onchange=()=>void setLocale(select.value);container.append(icon,select);controls.append(container);}
  const proper=node=>node.parentElement?.closest('#worldCountry,#citySelect,#cityLabel,#currentCityName,#username,.regional-city-labels,[data-i18n-skip]');
- binding=bindTranslation(document.body,()=>translator,{onMissing:(source,node)=>{const text=source.trim(),brand=text.replace(/^[^\p{L}\p{N}]+/u,'');if(review&&!proper(node)&&!translator.recognizes(text)&&!['Sudamérica Casa por Casa','Sudamérica · Casa por Casa','OpenStreetMap contributors','OpenMapTiles','GeoNames','Leaflet','Natural Earth','RESOLVE'].includes(brand)&&missing.size<3000&&/[A-Za-zÀ-ž]/.test(source))missing.add(text);}});
+ binding=bindTranslation(document.body,()=>translator,{onMissing:(source,node)=>{const text=source.trim(),brand=text.replace(/^[^\p{L}\p{N}]+/u,'');if(review&&!proper(node)&&!translator.recognizes(text)&&!['MundoCity','OpenStreetMap contributors','OpenMapTiles','GeoNames','Leaflet','Natural Earth','RESOLVE'].includes(brand)&&missing.size<3000&&/[A-Za-zÀ-ž]/.test(source))missing.add(text);}});
  (async()=>{try{const response=await fetch(new URL('locales/manifest.json?v='+revision,catalogueBase).href);if(!response.ok)throw Error('Manifest not available');manifest=await response.json();picker();let requested=new URL(location.href).searchParams.get('lang');if(!requested)try{requested=localStorage.getItem(preferenceKey);}catch{}const available=manifest.languages.filter(language=>language.complete||review).map(language=>language.code);requested=matchLocale(requested,available);if(!requested){for(const preference of navigator.languages||[navigator.language]){requested=matchLocale(preference,available);if(requested)break;}}if(!requested)requested='it';await setLocale(requested,{remember:false});
   }catch{console.warn('Language manifest unavailable');}
  })();

@@ -20,8 +20,8 @@
  function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;}
  function label(node,text){node.dataset.hubText=text;node.textContent=tr(text);return node;}
  function button(text,action,cls=''){const n=label(el('button',cls),text);n.type='button';n.onclick=action;return n;}
- const shell=el('section','hub-shell');shell.dataset.i18nSkip='true';shell.setAttribute('aria-label','Sudamérica Casa por Casa');
- const brand=el('button','hub-brand'),name=el('span','hub-brand-name','Sudamérica');brand.type='button';brand.onclick=goHome;name.append(el('small','','Casa por Casa'));brand.append(el('span','hub-brand-mark','⌂'),name);shell.append(brand);
+ const shell=el('section','hub-shell');shell.dataset.i18nSkip='true';shell.setAttribute('aria-label','MundoCity');
+ const brand=el('button','hub-brand'),name=el('span','hub-brand-name','MundoCity');brand.type='button';brand.onclick=goHome;brand.append(el('span','hub-brand-mark','⌂'),name);shell.append(brand);
  const searchArea=el('div','hub-search-area'),form=el('form','hub-search-form'),input=el('input');input.type='search';input.autocomplete='off';input.maxLength=80;input.id='hubSearch';input.setAttribute('aria-controls','hubSearchResults');input.setAttribute('aria-expanded','false');
  const search=button('Cerca',()=>{});search.type='submit';form.append(el('span','','@'),input,search);const results=el('div','hub-results');results.id='hubSearchResults';results.hidden=true;searchArea.append(label(el('h1'),'Trova la tua casa'),form,results);shell.append(searchArea);
  const tools=el('div','hub-tools'),help=button('?',showHelp,'hub-round'),menu=button('☰',openDrawer,'hub-round');tools.append(help,menu);shell.append(tools);
