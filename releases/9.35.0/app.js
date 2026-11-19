@@ -6854,7 +6854,7 @@ function residentWalkPoint(a,t){
   const next=a.route[0],edge=residentNavigation.nodes[a.node].links.find(e=>e.to===next);
   if(edge?.crossing&&a.crossed!==next){a.crossed=next;a.pause=.9+residentRandom(a)*1.8;budget=0;}
   const dest=residentNavigation.nodes[next],dx=dest.x-a.g.position.x,dz=dest.z-a.g.position.z,length=Math.hypot(dx,dz);
-  if(budget>0&&length>.001){const travel=Math.min(budget,length),u=travel/length;a.g.position.x+=dx*u;a.g.position.z+=dz*u;a.walkDistance+=travel;moving=true;const yaw=Math.atan2(dx,dz),turn=Math.atan2(Math.sin(yaw-a.g.rotation.y),Math.cos(yaw-a.g.rotation.y));a.g.rotation.y+=Math.max(-dt*4,Math.min(dt*4,turn));}
+  if(budget>0&&length>.001){const yaw=Math.atan2(dx,dz),turn=Math.atan2(Math.sin(yaw-a.g.rotation.y),Math.cos(yaw-a.g.rotation.y));a.g.rotation.y+=Math.max(-dt*4,Math.min(dt*4,turn));if(Math.abs(turn)<.75){const travel=Math.min(budget,length),u=travel/length;a.g.position.x+=dx*u;a.g.position.z+=dz*u;a.walkDistance+=travel;moving=true;}else budget=0;}
   if(length<=budget+.002){a.g.position.set(dest.x,0,dest.z);a.node=next;a.route.shift();if(!a.route.length){a.pause=(a.activity==='public'?5:a.activity==='shop'?7:2)+residentRandom(a)*10;a.crossed=null;}}
  }
  return{x:a.g.position.x,z:a.g.position.z,angle:a.g.rotation.y,moving};
