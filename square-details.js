@@ -1,7 +1,6 @@
 /* Source-driven 3D square details. Models are stylised reconstructions, not scans. */
 (function(){
 'use strict';
-const T=THREE,UP=new T.Vector3(0,1,0);
 const MODEL_SPECS={'floral-calendar':{height:1.2,width:8},'arenales-ensemble':{height:11,width:10},'freedom-chains':{height:7,width:5},pyramid:{height:13,width:7},obelisk:{height:10,width:3},column:{height:10,width:4},'liberty-column':{height:13,width:6},equestrian:{height:8,width:7},'equestrian-fountain':{height:8,width:9},'standing-sword':{height:7,width:4},'standing-civil':{height:10,width:7},'ornate-fountain':{height:7,width:9},'liberty-fountain':{height:7,width:8},fountain:{height:3,width:6},bust:{height:4,width:3},plaque:{height:1.5,width:2},'classical-figure':{height:3,width:2}};
 function classify(name,tags={}){
  if(tags.amenity==='fountain'||tags.class==='fountain'||tags.subclass==='fountain')return 'fountain';
@@ -32,6 +31,7 @@ function prepare(profile,fit,b,city){
 }
 function render(plan,group,b){
  if(!plan?.items.length)return;
+ const T=THREE,UP=new T.Vector3(0,1,0);
  const parts=[],bronze=0x526b62,stone=0xd6cbb3,marble=0xe4e0d2,gold=0xb1a06d,water=0x67c4dc;
  let owner;
  const add=(kind,material,color,x,y,z,sx,sy,sz,rotation=null)=>{if(Math.min(sx,sy,sz)<=0)return;parts.push({kind,material,color,x,y,z,sx,sy,sz,rotation,owner});};

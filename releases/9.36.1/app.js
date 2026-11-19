@@ -1893,13 +1893,17 @@ function flyToWorld(point,opts={}){
 }
 // Static city: only the user's camera moves; no animated objects.
 let roadDetailMeshes=[],lastRoadDetailUpdate=0;
-const roadDetailFrustum=new THREE.Frustum(),roadDetailMatrix=new THREE.Matrix4();
-const roadDetailSphere=new THREE.Sphere(new THREE.Vector3(),125);
+let roadDetailFrustum,roadDetailMatrix,roadDetailSphere;
 function updateRoadDetailLOD(now){
  if(!roadDetailMeshes.length||now-lastRoadDetailUpdate<160)return;
  lastRoadDetailUpdate=now;
  const maxRange=distance>1050?0:distance>480?260:distance>220?340:410;
  if(!maxRange){for(const mesh of roadDetailMeshes)mesh.visible=false;return;}
+ if(!roadDetailFrustum){
+  roadDetailFrustum=new THREE.Frustum();
+  roadDetailMatrix=new THREE.Matrix4();
+  roadDetailSphere=new THREE.Sphere(new THREE.Vector3(),125);
+ }
  roadDetailMatrix.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);
  roadDetailFrustum.setFromProjectionMatrix(roadDetailMatrix);
  const max2=(maxRange+125)**2;
@@ -1913,13 +1917,17 @@ function updateRoadDetailLOD(now){
 // Commercial LOD: each 90m chunk has independently culled decorative
 // meshes. The shop silhouette, roof, windows and entrance stay visible.
 let shopDetailMeshes=[],lastShopDetailUpdate=0;
-const shopDetailFrustum=new THREE.Frustum(),shopDetailMatrix=new THREE.Matrix4();
-const shopDetailSphere=new THREE.Sphere();
+let shopDetailFrustum,shopDetailMatrix,shopDetailSphere;
 function updateShopDetailLOD(now){
  if(!shopDetailMeshes.length||now-lastShopDetailUpdate<180)return;
  lastShopDetailUpdate=now;
  const range=distance>850?0:distance>450?125:distance>220?195:275;
  if(!range){for(const mesh of shopDetailMeshes)mesh.visible=false;return;}
+ if(!shopDetailFrustum){
+  shopDetailFrustum=new THREE.Frustum();
+  shopDetailMatrix=new THREE.Matrix4();
+  shopDetailSphere=new THREE.Sphere();
+ }
  shopDetailMatrix.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);
  shopDetailFrustum.setFromProjectionMatrix(shopDetailMatrix);
  const limit=(range+82)**2;
@@ -2757,9 +2765,12 @@ function drawShops(){
   const readingRafter=new THREE.ExtrudeGeometry(readingRafterShape,{depth:1,bevelEnabled:false});readingRafter.translate(0,0,-.5);
   readingRafter.setIndex(Array.from({length:readingRafter.attributes.position.count},(_,index)=>index));
   const furnitureSoft=new THREE.SphereGeometry(.5,8,6);
+  // Backmost extent of each sculpted mark, relative to its own scale.
+  const businessMarkRearReach=[0,.49,.13,.30,.44,.32,.25,.49,.32,.43,.50,.52];
   const structuralKinds=new Set(['evolutionSignatureHall','evolutionSignatureHallWindow','evolutionSignatureHallSide','evolutionEntranceCanopy','evolutionEntranceColumn','evolutionUpperWindow','evolutionSideWindow','evolutionRoofTerrace','evolutionTerraceRail','evolutionTerraceSideRail','evolutionTerracePavilion','evolutionTerracePavilionPost','evolutionGrandEntrance','evolutionGrandPier','cafeCupSign','cafeHandleSign','pizzaDiscSign','pizzaSauceSign','pizzaToppingSign','tradeMark','tradeRound','tradeDress','tradeSculpt','tradeBar','shopPaving','shopUpperBody','shopUpperGlass','shopUpperCap','body','roof','hotelRoof','cinemaRoof',
       'garageRoof','superRoof','displayGlass','entryDoor','entryDoorGlass',
       'signFascia','signInset','garageGate','cinemaParapet','hotelUpperWindow']);
+  structuralKinds.add('tradeBracket');
   for(const kind of ['libraryGardenRafter','libraryGardenDeck','libraryGardenRoof','libraryGardenGlass','libraryGardenBeam','libraryGardenPost','libraryGardenRidge','gymTrainingPost','gymTrainingBeam','gymTrainingSlat','gymPoolDeck','gymPoolBasin','gymPoolWater','gymTreadmillBase','cinemaPremiereCanopy','cinemaPremiereColumn','cinemaPremiereFascia','cinemaPosterCase','cinemaPosterArtwork','cinemaTicketBooth','cinemaTicketGlass','hotelBalcony','hotelBalconyGlass','hotelBalconyRail','hotelBalconySideRail','hotelPoolBase','hotelPoolWater','hotelRoofGuard','hotelRoofGuardCap','marketServiceDoor','marketGable','marketHallPost','bakeryGable','workshopDaylightRoof','pharmacyWingRoof','fashionTerraceDeck','fashionBalustrade','superClerestory','libraryDome','libraryDrum','gymVault','pizzaGable','diningTerraceDeck','diningBalustrade','diningTerraceAwning'])structuralKinds.add(kind);
   function put(kind,color,shop,x,y,z,w,h,d){
     // Preserve low-cost architecture at all zoom levels. Decorative pieces
@@ -3546,13 +3557,20 @@ function drawShops(){
     }
     const pizzeria=shape===2&&shop.id%24===14;
     if(shape!==0&&!pizzeria){
-      const sculptureScale=shape===6?2.00:shape===8||shape===10?1.70:1.42;
-      const badgeY=signRoof+2.43,badgeZ=front+.32;
+      const baseScale=shape===6?2.00:shape===8||shape===10?1.70:1.42;
+      const sculptureScale=baseScale*(1+stage*.025);
+      const badgeY=signRoof+2.43+stage*.045;
+      // Keep the sculpture itself ahead of roof overhangs and railings.
+      // Its slim support is the only part allowed to attach to the fascia.
+      const badgeZ=front+.36+businessMarkRearReach[shape]*sculptureScale;
       const mark=(dx,dy,width,markHeight,color,kind='tradeMark',dz=0,depth=.38)=>{
         put(kind,color,shop,x+dx*sculptureScale,badgeY+dy*sculptureScale,
           badgeZ+dz*sculptureScale,width*sculptureScale,markHeight*sculptureScale,depth*sculptureScale);
       };
-      put('tradeMark',trim,shop,x,signRoof+1.07,badgeZ,.30,2.15,.28);
+      const bracketY=signRoof+.065,attachmentZ=front-.24;
+      const poleTop=shape===2?badgeY-.60*sculptureScale:badgeY;
+      put('tradeBracket',trim,shop,x,(poleTop+bracketY)/2,badgeZ,.17,poleTop-bracketY,.15);
+      put('tradeBracket',trim,shop,x,bracketY,(attachmentZ+badgeZ)/2,.24,.17,badgeZ-attachmentZ+.15);
       const ivory=shape===1?0xffc45c:0xffe9c3;
       if(shape===1){ // Shopping cart
         const metal=0xffc45c;
@@ -3573,6 +3591,7 @@ function drawShops(){
         mark(-.92,.52,.13,.29,metal,'tradeMark',0,.76);
         mark(-1.06,.66,.18,.13,0x854429,'tradeMark',0,.81);
       }else if(shape===2){ // Standing cutlery
+        mark(0,-.60,.89,.08,trim,'tradeBracket',0,.13);
         mark(-.36,-.10,.13,1.12,ivory,'tradeMark',0,.16);
         mark(.35,-.39,.21,.64,0x814632,'tradeMark',0,.24);
         mark(.35,.28,.28,.86,ivory,'tradeSculpt',0,.19);
@@ -6769,7 +6788,7 @@ v4.balloons=cityStates.get(currentCity.id).balloons;
 renderMilestones();
 
 function saveV4(){try{localStorage.setItem('sudamerica-v4',JSON.stringify(v4))}catch(e){}}
-function v4Mesh(geo,color,parent,x=0,y=0,z=0){const m=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({color}));m.position.set(x,y,z);parent.add(m);return m}
+function v4Mesh(geo,color,parent,x=0,y=0,z=0){const m=new THREE.Mesh(geo,color?.isMaterial?color:new THREE.MeshLambertMaterial({color}));m.position.set(x,y,z);parent.add(m);return m}
 // v4.5: animation assets use deterministic city-wide ownership coordinates.
 // Rebuilding never piles objects on the same house or changes their identity.
 function spreadIndex(i,n,length){
@@ -6805,7 +6824,9 @@ function buildResidentBatches(people){
   return mesh;
  });
  const dummy=new THREE.Object3D();
- residentBatches={meshes,specs,dummy,people,detailOwners:[]};
+ const detailOwners=[];
+ const detailActors=people.slice(0,detailCapacity);
+ residentBatches={meshes,specs,dummy,people,detailOwners,detailActors};
  const skin=['#e4b28e','#b47d5e','#f1c9a2','#d99a78'];
  const shirt=['#e9867c','#75b4cf','#edbf69','#9b8ac5','#75b67b'];
  const hair=[0x5e4238,0x9a704c,0x33343c];
@@ -6815,6 +6836,7 @@ function buildResidentBatches(people){
   a.bodyScale=.94+((id*17)%13)/100;
   const colors={skin:i===0?v4.skin:skin[id%skin.length],shirt:i===0?v4.shirt:shirt[id%shirt.length],hair:hair[id%hair.length],trousers:trousers[id%trousers.length],shoes:shoes[id%shoes.length],eyes:0x222b31};
   a.residentColors=colors;a.detailIndex=i<detailCapacity?i:-1;
+  if(a.detailIndex>=0)detailOwners[a.detailIndex]=id;
   for(let j=0;j<specs.length;j++){if(j>=6&&a.detailIndex<0)continue;const color=new THREE.Color(colors[specs[j].color]);for(let side=0;side<(specs[j].pair?2:1);side++)meshes[j].setColorAt((j<6?i:a.detailIndex)*(specs[j].pair?2:1)+side,color);}
   updateResidentMatrix(i);
  }
@@ -6839,10 +6861,25 @@ function updateResidentMatrix(i){
  }
 }
 function assignResidentDetails(chosen){
- if(!residentBatches)return;const {people,meshes,specs,detailOwners}=residentBatches;
- for(const a of people)a.detailIndex=-1;
+ if(!residentBatches)return;
+ const {meshes,specs,detailOwners,detailActors}=residentBatches;
+ // Only actors that previously owned a slot need to be cleared.
+ for(const actor of detailActors)actor.detailIndex=-1;
+ detailActors.length=0;
  for(let j=6;j<meshes.length;j++)meshes[j].count=chosen.length*(specs[j].pair?2:1);
- for(let slot=0;slot<chosen.length;slot++){const a=chosen[slot].a;a.detailIndex=slot;if(detailOwners[slot]===a.home.id)continue;detailOwners[slot]=a.home.id;for(let j=6;j<meshes.length;j++){const copies=specs[j].pair?2:1,color=new THREE.Color(a.residentColors[specs[j].color]);for(let k=0;k<copies;k++)meshes[j].setColorAt(slot*copies+k,color);meshes[j].instanceColor.needsUpdate=true;}}
+ for(let slot=0;slot<chosen.length;slot++){
+  const actor=chosen[slot].a;
+  actor.detailIndex=slot;
+  detailActors.push(actor);
+  if(detailOwners[slot]===actor.home.id)continue;
+  detailOwners[slot]=actor.home.id;
+  for(let j=6;j<meshes.length;j++){
+   const copies=specs[j].pair?2:1;
+   const color=new THREE.Color(actor.residentColors[specs[j].color]);
+   for(let k=0;k<copies;k++)meshes[j].setColorAt(slot*copies+k,color);
+   meshes[j].instanceColor.needsUpdate=true;
+  }
+ }
 }
 function commitResidentMatrices(chosen){
  if(!residentBatches||!chosen.length)return;
@@ -6932,10 +6969,10 @@ function v45Bird(i,x,z,phase){
  g.position.set(x,24+i%6*3,z);group.add(g);
  return {g,x,z,i,wings,phase,rx,rz};
 }
-let birdBatches=null;
-function buildBirdBatches(birds){
+let birdBatches=null,balloonBatches=null;
+function buildFlightBatches(actors,marker){
  const batches=new Map();
- for(const bird of birds)bird.g.traverse(part=>{
+ for(const actor of actors)actor.g.traverse(part=>{
   if(!part.isMesh)return;
   const key=part.geometry.id+':'+part.material.id;
   if(!batches.has(key))batches.set(key,{geometry:part.geometry,material:part.material,castShadow:part.castShadow,receiveShadow:part.receiveShadow,parts:[]});
@@ -6946,43 +6983,61 @@ function buildBirdBatches(birds){
   const mesh=new THREE.InstancedMesh(batch.geometry,batch.material,batch.parts.length);
   mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);mesh.frustumCulled=false;
   mesh.castShadow=batch.castShadow;mesh.receiveShadow=batch.receiveShadow;
-  mesh.userData.birdInstances=true;group.add(mesh);
-  // Only wing pivots and the bird root animate; each mesh keeps its local pose.
+  mesh.userData[marker]=true;group.add(mesh);
+  // Keep original parts as selection proxies with a fixed local pose.
   for(const part of batch.parts){part.updateMatrix();part.matrixAutoUpdate=false;part.visible=false;}
   meshes.push({mesh,parts:batch.parts});
  }
- birdBatches={birds,meshes,inverse:new THREE.Matrix4(),matrix:new THREE.Matrix4()};
- updateBirdBatches();
+ return {actors,meshes,inverse:new THREE.Matrix4(),matrix:new THREE.Matrix4()};
 }
-function updateBirdBatches(){
- if(!birdBatches)return;
- const {birds,meshes,inverse,matrix}=birdBatches;
+function updateFlightBatches(batches){
+ if(!batches)return;
+ const {actors,meshes,inverse,matrix}=batches;
  group.updateWorldMatrix(true,false);inverse.copy(group.matrixWorld).invert();
- // The city and its ancestors were updated above; update each bird subtree once.
- for(const bird of birds)bird.g.updateWorldMatrix(false,true);
+ // The city and its ancestors were updated above; update each animated root once.
+ for(const actor of actors)actor.g.updateWorldMatrix(false,true);
  for(const {mesh,parts}of meshes){
   for(let i=0;i<parts.length;i++){matrix.multiplyMatrices(inverse,parts[i].matrixWorld);mesh.setMatrixAt(i,matrix);}
   mesh.instanceMatrix.needsUpdate=true;
  }
 }
+function buildBirdBatches(birds){
+ birdBatches=buildFlightBatches(birds,'birdInstances');
+ updateBirdBatches();
+}
+function updateBirdBatches(){updateFlightBatches(birdBatches);}
 
 function v45Balloon(i,home){
  const g=new THREE.Group();
  const palette=[0xf33751,0xffae28,0xffd15b,0x2d8bd4,0xe84fa3];
- const envelope=v4Mesh(new THREE.SphereGeometry(3.3,32,18),palette[i%palette.length],g,0,0,0);
+ const assets=v45Balloon.assets||(v45Balloon.assets={
+  geometry:{
+   envelope:new THREE.SphereGeometry(3.3,32,18),
+   stripe:new THREE.SphereGeometry(3.34,6,18,0,.61,0,Math.PI),
+   burner:new THREE.CylinderGeometry(.8,1.35,1.2,10),
+   basket:new THREE.BoxGeometry(1.8,1.35,1.6),
+   cable:new THREE.CylinderGeometry(.04,.04,2.9,4)
+  },
+  materials:new Map()
+ });
+ function part(shape,color,x=0,y=0,z=0){
+  if(!assets.materials.has(color))assets.materials.set(color,new THREE.MeshLambertMaterial({color}));
+  return v4Mesh(assets.geometry[shape],assets.materials.get(color),g,x,y,z);
+ }
+ const envelope=part('envelope',palette[i%palette.length]);
  envelope.scale.set(1,1.27,1);
  // Vertical colored gores, a crown, burner, basket and suspension cables.
  for(let k=0;k<10;k++){
-  const theta=k*Math.PI/5;
-  const stripe=v4Mesh(new THREE.SphereGeometry(3.34,6,18,theta,.61,0,Math.PI),palette[(i+k+1)%palette.length],g,0,0,0);
+  const stripe=part('stripe',palette[(i+k+1)%palette.length]);
+  stripe.rotation.y=k*Math.PI/5;
   stripe.scale.y=1.275;
  }
- v4Mesh(new THREE.CylinderGeometry(.8,1.35,1.2,10),0xf5dca8,g,0,-4.15,0);
- v4Mesh(new THREE.BoxGeometry(1.8,1.35,1.6),0x957453,g,0,-6.2,0);
+ part('burner',0xf5dca8,0,-4.15,0);
+ part('basket',0x957453,0,-6.2,0);
  for(const xx of [-.72,.72])for(const zz of [-.62,.62]){
-  const cable=v4Mesh(new THREE.CylinderGeometry(.04,.04,2.9,4),0x66503f,g,xx,-4.9,zz);
+  part('cable',0x66503f,xx,-4.9,zz);
  }
- // Distribute balloons over different city blocks, never vertically stack them.
+ // Distribute balloons over different blocks before checking their flight lanes.
  const offsetX=(rnd(i*37+5)-.5)*45;
  const offsetZ=(rnd(i*71+3)-.5)*40;
  const x=i===0?-23:home.x+offsetX,z=i===0?-86:home.z+offsetZ;
@@ -6991,6 +7046,23 @@ function v45Balloon(i,home){
  return {g,i,ownerId:home.id,baseY:g.position.y,x,z};
 }
 const BIRD_BOB=.9, BALLOON_BOB=2, BALLOON_SWAY_X=5, BALLOON_SWAY_Z=4;
+const BIRD_HORIZONTAL_MARGIN=3,BIRD_VERTICAL_MARGIN=3.1,AIR_LANE_GAP=2;
+function balloonFlightLane(balloon,clearance,airspace){
+ const scale=balloon.g.scale.x;
+ const {x,z}=balloon;
+ const rx=BALLOON_SWAY_X+4*scale,rz=BALLOON_SWAY_Z+4*scale;
+ const below=7*scale+BALLOON_BOB,above=4.35*scale+BALLOON_BOB;
+ let altitude=Math.max(balloon.baseY,clearance(x,z,rx,rz)+below+1);
+ // Sort overlapping flight envelopes by their bottom so escaping one cannot enter another.
+ const nearby=airspace.filter(lane=>Math.abs(x-lane.x)<=rx+lane.rx&&Math.abs(z-lane.z)<=rz+lane.rz);
+ nearby.sort((a,b)=>a.bottom-b.bottom);
+ for(const lane of nearby){
+  if(altitude+above+AIR_LANE_GAP<=lane.bottom)break;
+  if(altitude-below<lane.top+AIR_LANE_GAP)altitude=lane.top+AIR_LANE_GAP+below;
+ }
+ airspace.push({x,z,rx,rz,bottom:altitude-below,top:altitude+above});
+ return altitude;
+}
 // Flight paths use a fixed safe altitude for the entire orbit.
 function flightEnvelope(selected){
  let minX=0,maxX=0,minZ=0,maxZ=0;for(const h of selected){minX=Math.min(minX,h.x);maxX=Math.max(maxX,h.x);minZ=Math.min(minZ,h.z);maxZ=Math.max(maxZ,h.z);}
@@ -7073,9 +7145,10 @@ function* flightClearanceStages(group,envelope=null){
 }
 function createV4Life(selected){const steps=createLifeStages(selected);while(!steps.next().done){}}
 function* createLifeStages(selected){
- life.people.length=0;life.birds.length=0;life.balloons.length=0;residentBatches=null;birdBatches=null;
+ life.people.length=0;life.birds.length=0;life.balloons.length=0;residentBatches=null;birdBatches=null;balloonBatches=null;
  // Scene cleanup owns these resources; do not retain a previous city's pool.
  v45Bird.assets=null;
+ v45Balloon.assets=null;
  if(!selected.length)return;
  const clearance=yield* flightClearanceStages(group,flightEnvelope(selected));
  // A sampled owner is visible in every district; the first user's avatar
@@ -7104,22 +7177,29 @@ function* createLifeStages(selected){
   for(let j=0;j<birdsInFlock;j++){
    const i=flock*5+j;
    const bird=v45Bird(i,centerX+(j-2)*5,centerZ+(j%2?4:-4),phase+j*.09);
-   bird.altitude=Math.max(22+bird.i%6*3,clearance(bird.x,bird.z,bird.rx+3,bird.rz+3)+BIRD_BOB+3.1);
+   bird.altitude=Math.max(22+bird.i%6*3,clearance(bird.x,bird.z,bird.rx+BIRD_HORIZONTAL_MARGIN,bird.rz+BIRD_HORIZONTAL_MARGIN)+BIRD_BOB+BIRD_VERTICAL_MARGIN);
    bird.g.position.y=bird.altitude;
    life.birds.push(bird);
   }
  }
  buildBirdBatches(life.birds);
+ const airspace=life.birds.map(bird=>({
+  x:bird.x,z:bird.z,rx:bird.rx+BIRD_HORIZONTAL_MARGIN,rz:bird.rz+BIRD_HORIZONTAL_MARGIN,
+  bottom:bird.altitude-BIRD_BOB-BIRD_VERTICAL_MARGIN,top:bird.altitude+BIRD_BOB+BIRD_VERTICAL_MARGIN
+ }));
  // Use evenly distributed owners, never selected[i] (which stacks them
  // over the first houses of a spiral-growing city).
  const balloonCount=Math.min(20,v4.balloons);
  for(let i=0;i<balloonCount;i++){
   const h=selected[spreadIndex(i,balloonCount,selected.length)];
   const balloon=v45Balloon(i,h);
-  const scale=balloon.g.scale.x;
-  balloon.baseY=Math.max(balloon.baseY,clearance(balloon.x,balloon.z,BALLOON_SWAY_X+4*scale,BALLOON_SWAY_Z+4*scale)+7*scale+BALLOON_BOB+1);
+  balloon.baseY=balloonFlightLane(balloon,clearance,airspace);
   balloon.g.position.y=balloon.baseY;
   life.balloons.push(balloon);
+ }
+ if(life.balloons.length){
+  balloonBatches=buildFlightBatches(life.balloons,'balloonInstances');
+  updateFlightBatches(balloonBatches);
  }
 }
 // Only create name labels near the camera. Faraway residents remain visible
@@ -7235,6 +7315,7 @@ function animateLife(t){if(!active||!v4.motion)return;
   b.g.position.z=b.z+Math.cos(t*.11+b.i)*BALLOON_SWAY_Z;
   b.g.rotation.y=t*.08;
  }
+ updateFlightBatches(balloonBatches);
 }
 function publicStepStatus(step){return {unlocked:count>=step.at,remaining:Math.max(0,step.at-count)};}
 function cityPanelSearchText(...parts){
@@ -7695,16 +7776,18 @@ function recoverCityEntry(error,id){
 function enter(){
  if(cityEntryPromise)return cityEntryPromise;
  $('cityLoadRetryNotice')?.remove();
- const id=currentCity.id,name=currentCity.name;
+ const city=currentCity,{id,name}=city;
  cityEntryPromise=CityLoading.run(async()=>{
   if(currentCity.id!==id)return false;
-  await Promise.all([window.SceneAssets?.load(),window.HouseShowcase?.loadCity(currentCity)]);
   const atlas=window.WorldAtlas;
-  if(atlas&&!atlas.regionReady(currentCity)){
-   try{await atlas.loadRegion(currentCity);WorldRoads.sync(true);}catch(error){console.warn('Catalogo regionale non disponibile',error);}
-  }
+  const assets=window.SceneAssets?.load();
+  const region=atlas&&!atlas.regionReady(city)?atlas.loadRegion(city).then(
+   ()=>true,error=>{console.warn('Catalogo regionale non disponibile',error);return false;}
+  ):false;
+  const [,,updatedRegion]=await Promise.all([assets,window.HouseShowcase?.loadCity(city),region]);
   if(currentCity.id!==id)return false;
-  await window.WorldBiomes?.load(currentCity);
+  if(updatedRegion)WorldRoads.sync(true);
+  await window.WorldBiomes?.load(city);
   if(currentCity.id!==id)return false;
   return enterNow(rebuildResponsive);
  },{phase:'city',priority:30,title:'La tua città prende forma.',place:name,detail:'Prepariamo edifici, strade e paesaggio.'}).then(async result=>{
