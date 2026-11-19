@@ -4,26 +4,75 @@ const normLon=x=>((x+540)%360)-180;
 function delta(a,b){const x=normLon(b.lng-a.lng)*111320*Math.cos((a.lat+b.lat)*Math.PI/360),z=-(b.lat-a.lat)*111320;return{x,z,distance:Math.hypot(x,z),angle:Math.atan2(x,z)};}
 function point(city,x,z){return[city.lat-z/111320,normLon(city.lng+x/(111320*Math.max(.02,Math.cos(city.lat*Math.PI/180))))];}
 const land=(window.WORLD_LAND_DETAIL||window.WORLD_LAND)?.features||[];
-const polygons=[];for(const f of land){const rings=f.geometry.type==='Polygon'?[f.geometry.coordinates]:f.geometry.type==='MultiPolygon'?f.geometry.coordinates:[];for(const p of rings){const xs=p[0].map(p=>p[0]),ys=p[0].map(p=>p[1]);polygons.push({rings:p,minX:Math.min(...xs),maxX:Math.max(...xs),minY:Math.min(...ys),maxY:Math.max(...ys)});}}
+const polygons=[];for(const f of land){const rings=f.geometry.type==='Polygon'?[f.geometry.coordinates]:f.geometry.type==='MultiPolygon'?f.geometry.coordinates:[];for(const p of rings){const xs=p[0].map(p=>p[0]),ys=p[0].map(p=>p[1]);polygons.push({rings:p,minX:Math.min(...xs),maxX:Math.max(...xs),minY:Math.min(...ys),maxY:Math.max(...ys),coastlineDetail:f.properties?.coastlineDetail===true});}}
+const detailedCoasts=polygons.filter(p=>p.coastlineDetail);
 function inRing(lng,lat,ring){let inside=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const a=ring[i],b=ring[j];if((a[1]>lat)!==(b[1]>lat)&&lng<(b[0]-a[0])*(lat-a[1])/(b[1]-a[1])+a[0])inside=!inside;}return inside;}
 function onLand(lat,lng){lng=normLon(lng);return polygons.some(p=>lng>=p.minX&&lng<=p.maxX&&lat>=p.minY&&lat<=p.maxY&&inRing(lng,lat,p.rings[0])&&!p.rings.slice(1).some(r=>inRing(lng,lat,r)));}
-function curve(a,b){const dx=normLon(b.lng-a.lng),dy=b.lat-a.lat,cos=Math.cos((a.lat+b.lat)*Math.PI/360),length=Math.hypot(dx*cos,dy),bend=length*.004,nx=-dy/(length||1)/Math.max(.02,cos)*bend,ny=dx*cos/(length||1)*bend,points=[];for(let i=0;i<=16;i++){const t=i/16,u=1-t,offset=3*u*t;points.push([a.lat+dy*t+ny*offset,a.lng+dx*t+nx*offset]);}points[0]=[a.lat,a.lng];points[points.length-1]=[b.lat,a.lng+dx];return points;}
+function curve(a,b,bendRatio=.004){const dx=normLon(b.lng-a.lng),dy=b.lat-a.lat,cos=Math.cos((a.lat+b.lat)*Math.PI/360),length=Math.hypot(dx*cos,dy),bend=length*bendRatio,nx=-dy/(length||1)/Math.max(.02,cos)*bend,ny=dx*cos/(length||1)*bend,points=[];for(let i=0;i<=16;i++){const t=i/16,u=1-t,offset=3*u*t;points.push([a.lat+dy*t+ny*offset,a.lng+dx*t+nx*offset]);}points[0]=[a.lat,a.lng];points[points.length-1]=[b.lat,a.lng+dx];return points;}
+function coastCandidates(path){
+ if(!detailedCoasts.length)return [];
+ const minX=Math.min(...path.map(p=>p[1])),maxX=Math.max(...path.map(p=>p[1]));
+ const minY=Math.min(...path.map(p=>p[0])),maxY=Math.max(...path.map(p=>p[0]));
+ const candidates=[];
+ for(const coast of detailedCoasts){
+  if(coast.maxY<minY||coast.minY>maxY)continue;
+  const shift=360*Math.round((minX+maxX-coast.minX-coast.maxX)/720);
+  if(coast.maxX+shift>=minX&&coast.minX+shift<=maxX)candidates.push({coast,shift});
+ }
+ return candidates;
+}
+function crossesDetailedWater(a,b,candidates){
+ const [lat,lng]=a,[nextLat,nextLng]=b,dx=nextLng-lng,dy=nextLat-lat;
+ const left=Math.min(lng,nextLng),right=Math.max(lng,nextLng),bottom=Math.min(lat,nextLat),top=Math.max(lat,nextLat);
+ const cuts=[0,1];let nearCoast=false;
+ for(const {coast,shift} of candidates){
+  if(coast.maxX+shift<left||coast.minX+shift>right||coast.maxY<bottom||coast.minY>top)continue;
+  nearCoast=true;
+  for(const ring of coast.rings)for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+   const [x,y]=ring[j],[u,v]=ring[i],sx=u-x,sy=v-y;
+   if(Math.max(x,u)+shift<left||Math.min(x,u)+shift>right||Math.max(y,v)<bottom||Math.min(y,v)>top)continue;
+   const det=dx*sy-dy*sx;
+   if(Math.abs(det)<1e-18)continue;
+   const ox=x+shift-lng,oy=y-lat;
+   const t=(ox*sy-oy*sx)/det,along=(ox*dy-oy*dx)/det;
+   if(t>0&&t<1&&along>=0&&along<=1)cuts.push(t);
+  }
+ }
+ if(!nearCoast)return false;
+ cuts.sort((a,b)=>a-b);
+ // Every interval between shoreline intersections must be on land, even in very narrow inlets.
+ for(let i=1;i<cuts.length;i++){
+  if(cuts[i]-cuts[i-1]<1e-9)continue;
+  const t=(cuts[i]+cuts[i-1])/2;
+  if(!onLand(lat+dy*t,lng+dx*t))return true;
+ }
+ return false;
+}
+function pathStaysOnLand(path,distance,candidates){
+ const samples=Math.max(1,Math.ceil(distance/(path.length-1)/1000));
+ for(let i=1;i<path.length;i++){
+  const a=path[i-1],b=path[i];
+  if(candidates.length&&crossesDetailedWater(a,b,candidates))return false;
+  for(let j=1;j<=samples;j++){
+   if(i===path.length-1&&j===samples)continue;
+   const t=j/samples;
+   if(!onLand(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t))return false;
+  }
+ }
+ return true;
+}
 function safeRoute(a,b){
  if(a.id>b.id)[a,b]=[b,a];
  const distance=delta(a,b).distance;
  if(distance<500||distance>350000)return null;
- const path=curve(a,b);
- if(polygons.length){
-  // Validate between render vertices too. Long links may otherwise jump across narrow water.
-  const samples=Math.max(1,Math.ceil(distance/(path.length-1)/1000));
-  for(let i=1;i<path.length;i++){
-   const [lat,lng]=path[i-1],[nextLat,nextLng]=path[i];
-   for(let j=1;j<=samples;j++){
-    if(i===path.length-1&&j===samples)continue;
-    const t=j/samples;
-    if(!onLand(lat+(nextLat-lat)*t,lng+(nextLng-lng)*t))return null;
-   }
-  }
+ let path=curve(a,b);
+ const candidates=coastCandidates(path);
+ if(candidates.length&&(!onLand(a.lat,a.lng)||!onLand(b.lat,b.lng)))return null;
+ if(polygons.length&&!pathStaysOnLand(path,distance,candidates)){
+  if(!candidates.length||distance>30000)return null;
+  // Give a short link room to go around a harbour before letting the graph pick other streets.
+  path=[-.04,.04,-.10,.10,-.21,.21].map(bend=>curve(a,b,bend)).find(detour=>pathStaysOnLand(detour,distance,coastCandidates(detour)));
+  if(!path)return null;
  }
  return {id:a.id+'|'+b.id,a,b,path,distance};
 }

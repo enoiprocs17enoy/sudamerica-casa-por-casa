@@ -6861,12 +6861,12 @@ function buildResidentBatches(people){
   {name:'torso',geo:new THREE.CylinderGeometry(.37,.43,1.02,8),y:1.12,color:'shirt'},
   {name:'head',geo:new THREE.SphereGeometry(.38,10,8),y:1.91,color:'skin',face:true},
   {name:'hair',geo:new THREE.SphereGeometry(.39,9,6,0,Math.PI*2,0,Math.PI*.49),y:2.00,color:'hair',face:true},
-  {name:'legs',geo:new THREE.CylinderGeometry(.105,.085,.71,7),y:.40,pair:true,lateral:.17,stride:1,color:'trousers'},
-  {name:'arms',geo:new THREE.CapsuleGeometry(.075,.37,2,6),y:1.12,pair:true,lateral:.40,stride:-.8,color:'skin'},
-  {name:'shoes',geo:new THREE.BoxGeometry(.21,.14,.34),y:.10,pair:true,lateral:.17,stride:1,forward:.07,color:'shoes'},
+  {name:'legs',geo:new THREE.CylinderGeometry(.105,.085,.71,7),y:.40,pair:true,lateral:.17,joint:'hip',color:'trousers'},
+  {name:'arms',geo:new THREE.CapsuleGeometry(.075,.43,2,6),y:1.12,pair:true,lateral:.40,joint:'shoulder',color:'skin'},
+  {name:'shoes',geo:new THREE.BoxGeometry(.21,.14,.34),y:.10,pair:true,lateral:.17,joint:'hip',forward:.07,color:'shoes'},
   {name:'neck',geo:new THREE.CylinderGeometry(.12,.14,.19,7),y:1.64,color:'skin'},
-  {name:'sleeves',geo:new THREE.CapsuleGeometry(.11,.17,2,6),y:1.37,pair:true,lateral:.40,stride:-.65,color:'shirt'},
-  {name:'hands',geo:new THREE.SphereGeometry(.09,7,5),y:.83,pair:true,lateral:.40,stride:-.8,color:'skin'},
+  {name:'sleeves',geo:new THREE.CapsuleGeometry(.11,.17,2,6),y:1.37,pair:true,lateral:.40,joint:'shoulder',color:'sleeves'},
+  {name:'hands',geo:new THREE.SphereGeometry(.09,7,5),y:.83,pair:true,lateral:.40,joint:'shoulder',color:'skin'},
   {name:'eyes',geo:new THREE.SphereGeometry(.043,7,5),y:1.96,pair:true,lateral:.135,forward:.34,color:'eyes',face:true},
   {name:'nose',geo:new THREE.SphereGeometry(.077,7,5),y:1.86,forward:.37,color:'skin',face:true},
   {name:'ears',geo:new THREE.SphereGeometry(.085,7,5),y:1.89,pair:true,lateral:.37,color:'skin',face:true}
@@ -6883,14 +6883,16 @@ function buildResidentBatches(people){
  const detailOwners=[];
  const detailActors=people.slice(0,detailCapacity);
  residentBatches={meshes,specs,dummy,people,detailOwners,detailActors};
- const skin=['#e4b28e','#b47d5e','#f1c9a2','#d99a78'];
- const shirt=['#e9867c','#75b4cf','#edbf69','#9b8ac5','#75b67b'];
+ const skin=['#e4b28e','#b47d5e','#f1c9a2','#d99a78','#85513c','#bd805b','#f4d3b2'];
+ const shirt=['#e9867c','#75b4cf','#edbf69','#9b8ac5','#75b67b','#d98049','#4c8294'];
  const hair=[0x5e4238,0x9a704c,0x33343c];
  const trousers=[0x425b75,0x4a454e,0x78624b,0x304c55,0x746c83],shoes=[0x39363b,0x655141,0xf2eadb];
  for(let i=0;i<n;i++){
   const a=people[i],id=a.home?.id??i+1;
   a.bodyScale=.94+((id*17)%13)/100;
-  const colors={skin:i===0?v4.skin:skin[id%skin.length],shirt:i===0?v4.shirt:shirt[id%shirt.length],hair:hair[id%hair.length],trousers:trousers[id%trousers.length],shoes:shoes[id%shoes.length],eyes:0x222b31};
+  const top=i===0?v4.shirt:shirt[id%shirt.length];
+  const sleeves=i!==0&&id%4===0?new THREE.Color(top).lerp(new THREE.Color(0x22313b),.46):top;
+  const colors={skin:i===0?v4.skin:skin[Math.floor(id*11/7)%skin.length],shirt:top,sleeves,hair:hair[id%hair.length],trousers:trousers[id%trousers.length],shoes:shoes[id%shoes.length],eyes:0x222b31};
   a.residentColors=colors;a.detailIndex=i<detailCapacity?i:-1;
   if(a.detailIndex>=0)detailOwners[a.detailIndex]=id;
   for(let j=0;j<specs.length;j++){if(j>=6&&a.detailIndex<0)continue;const color=new THREE.Color(colors[specs[j].color]);for(let side=0;side<(specs[j].pair?2:1);side++)meshes[j].setColorAt((j<6?i:a.detailIndex)*(specs[j].pair?2:1)+side,color);}
@@ -6903,16 +6905,25 @@ function updateResidentMatrix(i){
  const {people,meshes,specs,dummy}=residentBatches;
  const a=people[i];const pos=a.g.position;
  const scale=RESIDENT_SCALE*(a.bodyScale||1);
+ const bodyYaw=a.g.rotation.y,faceYaw=bodyYaw+(a.gaze||0);
+ const bodyCos=Math.cos(bodyYaw),bodySin=Math.sin(bodyYaw),faceCos=Math.cos(faceYaw),faceSin=Math.sin(faceYaw);
  for(let j=0;j<specs.length;j++){
   if(j>=6&&a.detailIndex<0)continue;
-  const spec=specs[j],mesh=meshes[j],copies=spec.pair?2:1,yaw=a.g.rotation.y+(spec.face?(a.gaze||0):0),c=Math.cos(yaw),si=Math.sin(yaw);
+  const spec=specs[j],mesh=meshes[j],copies=spec.pair?2:1;
+  const yaw=spec.face?faceYaw:bodyYaw,c=spec.face?faceCos:bodyCos,si=spec.face?faceSin:bodySin;
   for(let k=0;k<copies;k++){
    const side=k===0?-1:1,xx=spec.pair?side*spec.lateral:0;
-   const gesture=(spec.name==='arms'||spec.name==='hands')&&k===1?(a.gesture||0):0;
-   const swing=(a.gait||0)*side*(spec.stride||0)+gesture,zz=(spec.forward||0)+swing*.18;
-   const lift=spec.name==='shoes'?Math.max(0,swing)*.075:0;
-   dummy.position.set(pos.x+(xx*c+zz*si)*scale,pos.y+(spec.y+lift)*scale,pos.z+(zz*c-xx*si)*scale);
-   dummy.rotation.set(swing*.48,yaw,0,'YXZ');dummy.scale.set(scale,scale*(spec.name==='hair'?(a.i%3===0?1.18:.88):1),scale);dummy.updateMatrix();mesh.setMatrixAt((j<6?i:a.detailIndex)*copies+k,dummy.matrix);
+   let zz=spec.forward||0,y=spec.y,pitch=0;
+   if(spec.joint){
+    const leg=spec.joint==='hip',pivot=leg?.78:1.49;
+    pitch=(a.gait||0)*side*(leg?-.42:.30)-(leg||side<0?0:a.gesture||0);
+    const down=pivot-y,sp=Math.sin(pitch),cp=Math.cos(pitch);
+    y=pivot-down*cp-zz*sp+(leg?Math.max(0,side*(a.stepLift||0))*(spec.name==='shoes'?.05:.02):0);
+    zz=zz*cp-down*sp;
+    if(spec.name==='shoes')pitch*=.40;
+   }
+   dummy.position.set(pos.x+(xx*c+zz*si)*scale,pos.y+y*scale,pos.z+(zz*c-xx*si)*scale);
+   dummy.rotation.set(pitch,yaw,0,'YXZ');dummy.scale.set(scale,scale*(spec.name==='hair'?(a.i%3===0?1.18:.88):1),scale);dummy.updateMatrix();mesh.setMatrixAt((j<6?i:a.detailIndex)*copies+k,dummy.matrix);
   }
  }
 }
@@ -6964,8 +6975,8 @@ function buildResidentNavigation(selected){
   if(below){link(b.south[0],below.north[0],true);link(b.south.at(-1),below.north.at(-1),true);}
  }
  function frontage(block,slot){const c=spiralCell(block),b=blocks.get(c.col+':'+c.row);return b?(slot<LOT_COLS?b.north:b.south)[slot%LOT_COLS+1]:0;}
- for(const shop of shopPurchases){const id=frontage(shop.block,shop.slot);if(nodes[id])nodes[id].kind='shop';}
- for(const zone of publicZones()){const c=spiralCell(zone.block),b=blocks.get(c.col+':'+c.row);if(b)nodes[b.north[4]].kind='public';}
+ for(const shop of shopPurchases){const id=frontage(shop.block,shop.slot);if(nodes[id]){nodes[id].kind='shop';nodes[id].entryYaw=shop.slot<LOT_COLS?0:Math.PI;}}
+ for(const zone of publicZones()){const c=spiralCell(zone.block),b=blocks.get(c.col+':'+c.row);if(b){const entrance=nodes[b.north[4]];entrance.kind='public';entrance.entryYaw=0;}}
  return{nodes,blocks,frontage};
 }
 function residentRandom(a){a.randomState=(Math.imul(a.randomState,1664525)+1013904223)>>>0;return a.randomState/4294967296;}
@@ -6973,7 +6984,7 @@ function planResidentTrip(a){
  const graph=residentNavigation.nodes,start=a.node,parent=new Map([[start,null]]),depth=new Map([[start,0]]),queue=[start],maxDepth=3+Math.floor(residentRandom(a)*7);
  for(let i=0;i<queue.length&&queue.length<160;i++){const at=queue[i];if(depth.get(at)>=maxDepth)continue;for(const edge of graph[at].links)if(!parent.has(edge.to)){parent.set(edge.to,at);depth.set(edge.to,depth.get(at)+1);queue.push(edge.to);}}
  const choices=queue.filter(id=>depth.get(id)>=2&&!a.recent.includes(id));const fallback=queue.filter(id=>id!==start),pool=choices.length?choices:fallback;
- if(!pool.length){a.pause=2;return;}
+ if(!pool.length){a.pause=2;a.pauseKind='rest';return;}
  const destinations=pool.filter(id=>graph[id].kind==='shop'||graph[id].kind==='public'),options=destinations.length&&residentRandom(a)<.55?destinations:pool,target=options[Math.floor(residentRandom(a)*options.length)],route=[];
  for(let n=target;n!==start&&n!==null;n=parent.get(n))route.push(n);a.route=route.reverse();a.goal=target;a.activity=graph[target].kind;a.recent.push(target);if(a.recent.length>5)a.recent.shift();a.crossed=null;
 }
@@ -6981,21 +6992,48 @@ function residentWalkPoint(a,t){
  if(!residentNavigation||!a.route)return{x:a.g.position.x,z:a.g.position.z,angle:a.g.rotation.y,moving:false};
  const dt=a.lastWalkTime===undefined?0:Math.min(.12,Math.max(0,t-a.lastWalkTime));a.lastWalkTime=t;let budget=dt*a.speed,moving=false;
  if(a.pause>0){a.pause=Math.max(0,a.pause-dt);budget=0;}
+ if(a.pause>0&&a.pauseYaw!==undefined){
+  const delta=a.pauseYaw-a.g.rotation.y;
+  const turn=Math.atan2(Math.sin(delta),Math.cos(delta));
+  a.g.rotation.y+=Math.max(-dt*2.8,Math.min(dt*2.8,turn));
+ }
+ if(a.pause<=0){a.pauseKind='';a.pauseYaw=undefined;}
  if(!a.route.length&&a.pause<=0)planResidentTrip(a);
  if(a.route.length){
   const next=a.route[0],edge=residentNavigation.nodes[a.node].links.find(e=>e.to===next);
-  if(edge?.crossing&&a.crossed!==next){a.crossed=next;a.pause=.9+residentRandom(a)*1.8;budget=0;}
   const dest=residentNavigation.nodes[next],dx=dest.x-a.g.position.x,dz=dest.z-a.g.position.z,length=Math.hypot(dx,dz);
+  if(edge?.crossing&&a.crossed!==next){a.crossed=next;a.pause=.9+residentRandom(a)*1.8;a.pauseKind='crossing';a.pauseYaw=Math.atan2(dx,dz);budget=0;}
   if(budget>0&&length>.001){const yaw=Math.atan2(dx,dz),turn=Math.atan2(Math.sin(yaw-a.g.rotation.y),Math.cos(yaw-a.g.rotation.y));a.g.rotation.y+=Math.max(-dt*4,Math.min(dt*4,turn));if(Math.abs(turn)<.75){const travel=Math.min(budget,length),u=travel/length;a.g.position.x+=dx*u;a.g.position.z+=dz*u;a.walkDistance+=travel;moving=true;}else budget=0;}
-  if(length<=budget+.002){a.g.position.x=dest.x;a.g.position.z=dest.z;a.node=next;a.route.shift();if(!a.route.length){a.pause=(a.activity==='public'?5:a.activity==='shop'?7:2)+residentRandom(a)*10;a.crossed=null;}}
+  if(length<=budget+.002){
+   a.g.position.x=dest.x;a.g.position.z=dest.z;a.node=next;a.route.shift();
+   if(!a.route.length){a.pause=(a.activity==='public'?4:a.activity==='shop'?5:1.2)+residentRandom(a)*6;a.crossed=null;a.pauseKind=a.activity;a.pauseYaw=dest.entryYaw;}
+  }
  }
  return{x:a.g.position.x,z:a.g.position.z,angle:a.g.rotation.y,moving};
 }
 function v45Avatar(h,i){
  const g=new THREE.Object3D(),node=residentNavigation.frontage(h.blockIndex,h.slot),at=residentNavigation.nodes[node];
  let seed=2166136261;for(const ch of (h.cityId||'')+':'+h.id)seed=Math.imul(seed^ch.charCodeAt(0),16777619);
- const a={g,i,home:h,bounds:plotBounds(h.blockIndex,h.slot),phase:rnd(i*13+9)*6.28,node,route:[],recent:[],randomState:seed>>>0,walkDistance:0,pause:i===0?0:rnd(i*31+6)*7};
- a.speed=.95+residentRandom(a)*.65;g.position.set(at.x,.115,at.z);g.rotation.y=i%2?Math.PI/2:-Math.PI/2;planResidentTrip(a);a.x=at.x;a.z=at.z;return a;
+ const a={g,i,home:h,bounds:plotBounds(h.blockIndex,h.slot),phase:rnd(i*13+9)*6.28,node,route:[],recent:[],randomState:seed>>>0,walkDistance:0,pause:i===0?0:rnd(i*31+6)*7,walkBlend:0};
+ a.speed=.95+residentRandom(a)*.65;
+ a.stepLength=.51+(a.speed-.95)*.18;
+ g.position.set(at.x,.115,at.z);planResidentTrip(a);
+ const next=residentNavigation.nodes[a.route[0]];
+ g.rotation.y=next?Math.atan2(next.x-at.x,next.z-at.z):0;
+ a.x=at.x;a.z=at.z;return a;
+}
+
+function updateResidentPose(a,t,dt,moving){
+ const ease=1-Math.exp(-dt*11),stride=a.walkDistance*Math.PI/a.stepLength+a.phase;
+ a.walkBlend+=((moving?1:0)-a.walkBlend)*ease;
+ a.gait=Math.sin(stride)*a.walkBlend;
+ a.stepLift=Math.cos(stride)*a.walkBlend;
+ a.g.position.y=.115+Math.abs(a.gait)*.023+(1-a.walkBlend)*Math.sin(t*1.7+a.phase)*.008;
+ const idle=t*1.45+a.phase;
+ const scan=a.pauseKind==='crossing'?Math.sin(idle*1.65)*.58:Math.sin(idle*.64)*.23;
+ a.gaze=((a.gaze||0)*(1-ease))+(moving?0:scan)*ease;
+ const wave=!moving&&a.pauseKind==='public'&&a.i%4===0?Math.max(0,Math.sin(idle))*.50:0;
+ a.gesture=(a.gesture||0)+(wave-(a.gesture||0))*ease;
 }
 
 function v45Bird(i,x,z,phase){
@@ -7322,10 +7360,10 @@ function updateAvatarLabels(t){
 }
 let lastPeopleTick=0;
 function animateLife(t){if(!active||!v4.motion)return;
- const walkPhase=t*7.2;
  // Nearby people animate at 30 Hz; distant ownership records remain lightweight.
  // Everyone else remains visible and selectable in their current position.
  if(t-lastPeopleTick>1/30){
+  const poseDt=Math.min(.12,t-lastPeopleTick);
   lastPeopleTick=t;
   const near=[];
   const cam=camera.position;
@@ -7341,10 +7379,7 @@ function animateLife(t){if(!active||!v4.motion)return;
    a.g.position.x=pt.x;
    a.g.position.z=pt.z;
    a.g.rotation.y=pt.angle;
-   a.g.position.y=.115+(pt.moving?Math.abs(Math.sin(a.walkDistance*4.8))*.035:Math.sin(t*1.6+a.phase)*.008);
-   a.gait=pt.moving?Math.sin(a.walkDistance*4.8+a.phase)*.72:0;
-   a.gaze=pt.moving?0:Math.sin(t*.65+a.phase)*.18;
-   a.gesture=!pt.moving&&a.i%5===0?Math.max(0,Math.sin(t*1.1+a.phase))*.38:0;
+   updateResidentPose(a,t,poseDt,pt.moving);
    updateResidentMatrix(a.i);
    const label=avatarLabels.get(a.home.id);
    if(label){label.position.set(a.g.position.x,a.g.position.y+4,a.g.position.z);sizeAvatarLabel(label);}
