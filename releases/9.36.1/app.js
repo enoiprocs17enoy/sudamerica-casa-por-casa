@@ -1394,13 +1394,15 @@ function drawSurveyedCitySquare(profile,b){
  // Detailed perimeter promenade integrates irregular map footprints into the street block.
  for(const side of [-1,1])for(let i=0;i<7;i++){
   const z=-b.depth*.36+i*b.depth*.12,x=side*(b.width/2-2.1);
-  if(i%2===0)lamp(x,z);else{planter(x,z,i);bench(side*(b.width/2-4.1),z,side*Math.PI/2);}
+  if(profile.openStoneSquare){if(i%3===1)lamp(x,z);}
+  else if(i%2===0)lamp(x,z);
+  else{planter(x,z,i);bench(side*(b.width/2-4.1),z,side*Math.PI/2);}
  }
  // Mapped planting is retained; sparse sources receive complementary planting in the promenade.
  const palmCity=['uy-montevideo','pe-lima','cl-santiago','ec-quito','br-manaus','br-brasilia'].includes(currentCity.id);
  const treePositions=[];
  for(const p of profile.trees||[]){const q=fit.point(p);if(Math.abs(q.x)<b.width/2-2&&Math.abs(q.z)<b.depth/2-3)treePositions.push(q);}
- if(!treePositions.length)for(const side of [-1,1])for(let i=0;i<5;i++)treePositions.push({x:side*(b.width/2-3.5),z:-b.depth*.32+i*b.depth*.16});
+ if(!treePositions.length&&!profile.openStoneSquare)for(const side of [-1,1])for(let i=0;i<5;i++)treePositions.push({x:side*(b.width/2-3.5),z:-b.depth*.32+i*b.depth*.16});
  const maxTrees=Math.min(72,treePositions.length);
  for(let i=0;i<maxTrees;i++){
   const p=treePositions[Math.floor(i*treePositions.length/maxTrees)],x=p.x,z=p.z;
@@ -1415,7 +1417,7 @@ function drawSurveyedCitySquare(profile,b){
  }
  // Extra space around square or compact outlines becomes furnished terraces.
  const gap=(b.depth-fit.depth)/2;
- if(gap>12)for(const side of [-1,1]){
+ if(gap>12&&!profile.openStoneSquare)for(const side of [-1,1]){
   const z=side*(fit.depth/2+gap*.51);
   box(0xdccbb0,0,.40,z,12,.10,6.5,0,false);
   for(const x of [-4.7,4.7])bench(x,z,side<0?0:Math.PI);
@@ -1759,14 +1761,36 @@ function installReleaseSky(){
  }`});
  releaseSky=new THREE.Mesh(new THREE.SphereGeometry(3000,32,20),mat);releaseSky.frustumCulled=false;releaseSky.renderOrder=-1000;scene.add(releaseSky);
 }
-function makeScene(){if(!window.THREE){$('status').textContent='Motore 3D non caricato. Verifica Internet e ricarica.';return false}scene=new THREE.Scene();scene.background=new THREE.Color(0x9bc9e7);scene.fog=new THREE.FogExp2(0xb4d1e2,.000048);installReleaseSky();camera=new THREE.PerspectiveCamera(53,1,2,8000);renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=false;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=0.98;$('threeLayer').appendChild(renderer.domElement);scene.add(new THREE.HemisphereLight(0xc2dbff,0xb5a082,.96));let sun=new THREE.DirectionalLight(0xffe2b8,3.35);sun.position.set(130,240,90);scene.add(sun);if(window.SudamericaRender8)SudamericaRender8.setup(scene,camera,renderer);let ground=new THREE.Mesh(new THREE.PlaneGeometry(100000,100000),new THREE.MeshStandardMaterial({color:0xc8d5ae,roughness:1,map:homePattern('grass')}));ground.rotation.x=-Math.PI/2;ground.position.y=-.12;ground.receiveShadow=true;ground.userData.regionalGround=true;scene.add(ground);group=new THREE.Group();scene.add(group);raycaster=new THREE.Raycaster();let canvas=renderer.domElement;
+function makeScene(){if(!window.THREE){$('status').textContent='Motore 3D non caricato. Verifica Internet e ricarica.';return false}scene=new THREE.Scene();scene.background=new THREE.Color(0x9bc9e7);scene.fog=new THREE.FogExp2(0xb4d1e2,.000048);installReleaseSky();camera=new THREE.PerspectiveCamera(53,1,2,8000);renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=false;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=0.98;$('threeLayer').appendChild(renderer.domElement);scene.add(new THREE.HemisphereLight(0xc2dbff,0xaaa08f,.82));let sun=new THREE.DirectionalLight(0xffecd4,3.45);sun.position.set(130,240,90);scene.add(sun);if(window.SudamericaRender8)SudamericaRender8.setup(scene,camera,renderer);let ground=new THREE.Mesh(new THREE.PlaneGeometry(100000,100000),new THREE.MeshStandardMaterial({color:0xc8d5ae,roughness:1,map:homePattern('grass')}));ground.rotation.x=-Math.PI/2;ground.position.y=-.12;ground.receiveShadow=true;ground.userData.regionalGround=true;scene.add(ground);group=new THREE.Group();scene.add(group);raycaster=new THREE.Raycaster();let canvas=renderer.domElement;
 // Earth-style navigation: left drag pans the ground, right drag or Shift
 // rotates/tilts, wheel zooms toward the cursor, two fingers pan/pinch/rotate.
 canvas.style.touchAction='none';
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 const pointerStart=new Map();
-let navigationFrame=0,multiTouch=false;
-const scheduleNavigation=()=>{if(!navigationFrame)navigationFrame=requestAnimationFrame(()=>{navigationFrame=0;updateCamera();});};
+let navigationFrame=0,multiTouch=false,zoomAnchor=null;
+const scheduleNavigation=()=>{
+ if(navigationFrame)return;
+ navigationFrame=requestAnimationFrame(()=>{
+  navigationFrame=0;
+  const anchor=zoomAnchor;zoomAnchor=null;
+  if(!active)return;
+  updateCamera();
+  if(!anchor)return;
+  const ground=anchor.ground&&screenToGround(anchor.x,anchor.y);
+  if(ground){
+   target.x+=anchor.ground.x-ground.x;
+   target.z+=anchor.ground.z-ground.z;
+  }else if(anchor.x!==anchor.fromX||anchor.y!==anchor.fromY){
+   panPixels(anchor.x-anchor.fromX,anchor.y-anchor.fromY);
+  }else return;
+  updateCamera();
+ });
+};
+function anchorNavigation(fromX,fromY,x,y){
+ if(!zoomAnchor)zoomAnchor={ground:screenToGround(fromX,fromY),fromX,fromY,x,y};
+ zoomAnchor.x=x;zoomAnchor.y=y;
+ scheduleNavigation();
+}
 canvas.addEventListener('pointerdown',e=>{
  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
  pointerStart.set(e.pointerId,{x:e.clientX,y:e.clientY});
@@ -1788,8 +1812,11 @@ canvas.addEventListener('pointermove',e=>{
   const beforeAng=Math.atan2(prev[1].y-prev[0].y,prev[1].x-prev[0].x);
   const afterAng=Math.atan2(pts[1].y-pts[0].y,pts[1].x-pts[0].x);
   azimuth-=Math.atan2(Math.sin(afterAng-beforeAng),Math.cos(afterAng-beforeAng));
-  panPixels((pts[0].x+pts[1].x-prev[0].x-prev[1].x)/2,(pts[0].y+pts[1].y-prev[0].y-prev[1].y)/2);
-  moved=true;scheduleNavigation();return;
+  anchorNavigation(
+   (prev[0].x+prev[1].x)/2,(prev[0].y+prev[1].y)/2,
+   (pts[0].x+pts[1].x)/2,(pts[0].y+pts[1].y)/2
+  );
+  moved=true;return;
  }
  const origin=pointerStart.get(e.pointerId);
  if(origin&&Math.hypot(e.clientX-origin.x,e.clientY-origin.y)>4)moved=true;
@@ -1797,22 +1824,25 @@ canvas.addEventListener('pointermove',e=>{
  else{azimuth-=dx*.006;elevation=clamp(elevation+dy*.004,.22,1.55);}
  scheduleNavigation();
 });
-canvas.addEventListener('pointerup',e=>{
+function releaseNavigationPointer(e,allowPick){
+ if(!pointers.has(e.pointerId))return;
  const start=pointerStart.get(e.pointerId);
  pointers.delete(e.pointerId);pointerStart.delete(e.pointerId);
  if(!pointers.size){dragging=false;gesture=null;
-  if(!multiTouch&&start&&Math.hypot(e.clientX-start.x,e.clientY-start.y)<5&&e.button===0)pick(e);
- }else{gesture=pointers.size>1?'pinch':(panMode?'pan':'orbit');for(const [id,p]of pointers)pointerStart.set(id,{...p});}
-});
-canvas.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);pointerStart.delete(e.pointerId);dragging=false;gesture=null;});
+  if(allowPick&&!moved&&!multiTouch&&start&&Math.hypot(e.clientX-start.x,e.clientY-start.y)<5&&e.button===0)pick(e);
+ }else{
+  gesture=pointers.size>1?'pinch':(panMode?'pan':'orbit');
+  for(const [id,p]of pointers)pointerStart.set(id,p);
+ }
+}
+canvas.addEventListener('pointerup',e=>releaseNavigationPointer(e,true));
+canvas.addEventListener('pointercancel',e=>releaseNavigationPointer(e,false));
+canvas.addEventListener('lostpointercapture',e=>releaseNavigationPointer(e,false));
 canvas.addEventListener('wheel',e=>{
  e.preventDefault();
- const before=screenToGround(e.clientX,e.clientY);
  const wheelDelta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?canvas.clientHeight:1);
  zoomBy(Math.exp(-clamp(wheelDelta,-200,200)*.0012));
- updateCamera();
- const after=screenToGround(e.clientX,e.clientY);
- if(before&&after){target.x+=before.x-after.x;target.z+=before.z-after.z;updateCamera();}
+ anchorNavigation(e.clientX,e.clientY,e.clientX,e.clientY);
 },{passive:false});
  resize();
  window.addEventListener('keydown',e=>{
@@ -1837,11 +1867,10 @@ function panPixels(dx,dy){
  // Pixel-to-ground projection using the camera's actual right and up vectors.
  // This stays consistent at every tilt angle.
  const scale=2*distance*Math.tan(camera.fov*Math.PI/360)/Math.max(1,renderer.domElement.clientHeight);
- const right=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0);
- const up=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,1);
+ const axes=camera.matrixWorld.elements;
  const flatY=Math.max(.22,Math.sin(elevation));
- target.x+=(-dx*right.x+dy*up.x/flatY)*scale;
- target.z+=(-dx*right.z+dy*up.z/flatY)*scale;
+ target.x+=(-dx*axes[0]+dy*axes[4]/flatY)*scale;
+ target.z+=(-dx*axes[2]+dy*axes[6]/flatY)*scale;
 }
 function screenToGround(clientX,clientY){
  if(!camera||!renderer)return null;
@@ -5182,7 +5211,7 @@ function* renderHouseStages(selected){
           place('terraceCap',boxGeo,0xf2dec2,h,x+side*footW*.48,height+.93,z,.31,.10,footD);
         }
       }
-      if(tier<=5){
+      if(tier<=5&&!premium){
         const entranceZ=z+footD*.5;
         const entry=x+footW*.045;
         place('apartmentPortal',boxGeo,0xe6cfaa,h,entry,1.09,entranceZ+.09,1.72,2.18,.22);
@@ -5193,15 +5222,28 @@ function* renderHouseStages(selected){
             entry+(stripe-3)*.29,2.27,entranceZ+.41,.29,.14,.86);
         }
       }
-      // Premium design only: rooftop penthouse and enhanced silhouette.
-      if(premium&&tier>=5){
-        place('penthouse',boxGeo,wall,h,x,height+1.45,z-footD*.27,footW*.34,2.4,footD*.26);
-        place('penthouseRoof',boxGeo,trim,h,x,height+2.78,z-footD*.27,footW*.37,.25,footD*.29);
-      }
       if(premium){
-        // Recognizable premium crown on ALL apartment and tower tiers.
         place('premiumRoofTerrace',boxGeo,0xc3d8c4,h,x,height+.48,z,
           footW*.66,.14,footD*.64);
+        const stone=coordinatedHouseColor(wall,0xffefd4,.52);
+        const terraceRear=z-footD*.27;
+        // Keep the street-side pool and grill clear; the sheltered area is behind them.
+        if(tier>=5){
+          place('penthouse',boxGeo,wall,h,x,height+1.57,terraceRear,footW*.34,2.20,footD*.26);
+          place('penthouseRoof',boxGeo,trim,h,x,height+2.78,terraceRear,footW*.37,.25,footD*.29);
+          for(const side of [-1,1]){
+            place('premiumTerraceWindow',boxGeo,0x5992a6,h,x,height+1.66,
+              terraceRear+side*(footD*.13+.07),footW*.28,1.28,.15);
+            place('premiumTerraceWindow',boxGeo,0x5992a6,h,x+side*(footW*.17+.07),height+1.66,
+              terraceRear,.15,1.28,footD*.19);
+          }
+        }else{
+          place('premiumTerraceShade',boxGeo,trim,h,x,height+2.67,terraceRear,footW*.46,.20,3.40);
+          for(const side of [-1,1])for(const face of [-1,1]){
+            place('premiumTerracePier',boxGeo,stone,h,x+side*footW*.205,height+1.58,
+              terraceRear+face*1.32,.20,2.06,.20);
+          }
+        }
         for(const side of [-1,1]){
           place('premiumCrownPier',boxGeo,trim,h,x+side*footW*.37,height+1.06,
             z-footD*.27,.30,1.55,.30);
@@ -5210,26 +5252,30 @@ function* renderHouseStages(selected){
           place('premiumCrownPlant',domeGeo,0x4e9d66,h,
             x+side*footW*.35,height+1.13,z-footD*.37,.88,.68,.88);
         }
-        place('premiumEntranceCanopy',boxGeo,trim,h,x,2.62,
-          z+footD/2+.35,3.8,.24,.72);
-        const stone=coordinatedHouseColor(wall,0xffefd4,.52);
         const baseZ=z+footD/2;
-        place('premiumTowerPortal',boxGeo,stone,h,x,1.25,baseZ+.12,2.18,2.50,.24);
-        place('premiumTowerDoorGlass',boxGeo,0x36728b,h,x,1.08,baseZ+.28,1.66,2.15,.11);
-        place('premiumTowerEntryStep',boxGeo,stone,h,x,.12,baseZ+.52,3.46,.22,.91);
+        place('premiumEntranceCanopy',boxGeo,trim,h,x,2.74,baseZ+.90,4.68,.25,1.94);
+        place('premiumEntranceFascia',boxGeo,stone,h,x,2.62,baseZ+1.82,4.56,.20,.13);
+        place('premiumTowerPortal',boxGeo,stone,h,x,1.30,baseZ+.12,2.42,2.58,.24);
+        place('premiumTowerDoorGlass',boxGeo,0x36728b,h,x,1.23,baseZ+.28,2.04,2.32,.11);
+        place('premiumTowerDoorMullion',boxGeo,trim,h,x,1.20,baseZ+.34,.055,2.25,.05);
+        place('premiumTowerEntryStep',boxGeo,stone,h,x,.12,baseZ+.91,4.65,.22,1.92);
         for(const side of [-1,1]){
-          const pierX=x+side*footW*.445;
-          place('premiumTowerPier',boxGeo,stone,h,pierX,height*.52,baseZ+.11,.24,height*.87,.22);
+          place('premiumEntrancePier',boxGeo,stone,h,x+side*2.10,1.42,baseZ+1.62,.29,2.42,.29);
           place('premiumTowerPortalLamp',boxGeo,0xffd17e,h,x+side*1.48,2.02,baseZ+.31,.24,.34,.17);
-          place('premiumTowerEntryPlanter',boxGeo,trim,h,x+side*2.10,.31,baseZ+.68,.77,.48,.58);
-          place('premiumTowerEntryPlant',domeGeo,0x5f8c43,h,x+side*2.10,.65,baseZ+.68,.65,.43,.51);
+          place('premiumTowerEntryPlanter',boxGeo,trim,h,x+side*2.77,.24,baseZ+.71,.80,.48,.92);
+          place('premiumTowerEntryPlant',domeGeo,0x5f8c43,h,x+side*2.77,.55,baseZ+.71,.72,.48,.82);
         }
         for(const face of [-1,1]){
-          place('premiumTowerBaseBand',boxGeo,stone,h,x,2.92,z+face*(footD/2+.10),footW+.12,.18,.26);
-          place('premiumTowerCrownBand',boxGeo,stone,h,x,height-.16,z+face*(footD/2+.10),footW+.12,.26,.27);
-          const sideX=x+face*(footW/2+.10);
-          place('premiumTowerSideBaseBand',boxGeo,stone,h,sideX,2.92,z,.26,.18,footD+.12);
-          place('premiumTowerSideCrownBand',boxGeo,stone,h,sideX,height-.16,z,.27,.26,footD+.12);
+          const faceZ=z+face*(footD/2+.14),sideX=x+face*(footW/2+.14);
+          const pierHeight=height-3.08,pierY=(height+2.84)/2;
+          for(const side of [-1,1]){
+            place('premiumTowerPier',boxGeo,stone,h,x+side*footW*.466,pierY,faceZ,.51,pierHeight,.36);
+            place('premiumTowerPier',boxGeo,stone,h,sideX,pierY,z+side*footD*.461,.36,pierHeight,.51);
+          }
+          place('premiumTowerPierBand',boxGeo,stone,h,x,2.92,faceZ,footW+.28,.22,.32);
+          place('premiumTowerPierBand',boxGeo,stone,h,x,height-.16,faceZ,footW+.28,.28,.32);
+          place('premiumTowerPierBand',boxGeo,stone,h,sideX,2.92,z,.32,.22,footD+.28);
+          place('premiumTowerPierBand',boxGeo,stone,h,sideX,height-.16,z,.32,.28,footD+.28);
         }
 
       }
@@ -5332,7 +5378,7 @@ function* renderHouseStages(selected){
             footW+.12,.12,footD+.12);
         }
       }
-      place('towerDoor',boxGeo,0x66564d,h,x,1.05,z+footD/2+.12,1.6,2.1,.16);
+      if(!premium)place('towerDoor',boxGeo,0x66564d,h,x,1.05,z+footD/2+.12,1.6,2.1,.16);
       if(premium){
         // Usable balconies articulate both elevations, through the full tower height.
         const balconyStone=coordinatedHouseColor(wall,0xffefd4,.32);
@@ -5378,7 +5424,7 @@ function* renderHouseStages(selected){
     const coreZ=depth*.12; // front wall stays at +depth/2
     const wingW=width*.31,wingD=depth*.57;
     const wingX=-width*.345,wingZ=-depth*.18;
-    const wingH=height*(premium?.90:.78);
+    const wingH=height*.78;
     place('homeMainBody',boxGeo,wall,h,x,height/2,z+coreZ,coreW,height,coreD);
     place('homeMainPlinth',boxGeo,plinth,h,x,.20,z+coreZ,coreW+.12,.40,coreD+.12);
     place('homeMainRoof',roofGeo,roof,h,x,height-.03,z+coreZ,
@@ -5407,8 +5453,8 @@ function* renderHouseStages(selected){
     // the dark square end caps seen in screenshots. The roof mesh itself
     // provides a continuous clean edge.
     // A sheltered entrance with a distinct front gable and door.
-    place('entryStep',boxGeo,plinth,h,x,.12,z+depth/2+.48,2.4,.24,.76);
     if(!premium){
+      place('entryStep',boxGeo,plinth,h,x,.12,z+depth/2+.48,2.4,.24,.76);
       place('entryAwning',roofGeo,roof,h,x,2.48,z+depth/2+.32,1.42,.48,.43);
       for(const side of [-1,1])
         place('entryPost',boxGeo,stone,h,x+side*1.06,1.22,z+depth/2+.55,.13,2.28,.13);
@@ -5444,7 +5490,7 @@ function* renderHouseStages(selected){
           }
         }
       }
-      place('premiumEntryPaving',boxGeo,stone,h,x,.085,frontage+1.35,1.68,.10,1.18);
+      place('premiumEntryPaving',boxGeo,stone,h,x,.085,frontage+2.50,1.78,.10,.96);
       const rear=z+coreZ-coreD/2;
       for(const side of [-1,1]){
         const rearX=x+side*coreW*.455;
@@ -5456,9 +5502,17 @@ function* renderHouseStages(selected){
       // intersecting the house, with windows embedded in its geometry.
       // Premium distinction comes from the veranda, pilasters and dormer.
       const verandaWidth=coreW*.86;
-      place('premiumVerandaFloor',boxGeo,plinth,h,x,.13,z+depth/2+.85,verandaWidth,.22,1.80);
-      for(const side of [-1,1])place('premiumVerandaPost',boxGeo,stone,h,x+side*verandaWidth*.44,1.28,z+depth/2+1.50,.18,2.56,.18);
-      place('premiumVerandaRoof',roofGeo,roof,h,x,2.56,z+depth/2+.85,coreW*.41,.48,1.00);
+      place('premiumVerandaFloor',boxGeo,stone,h,x,.13,frontage+1.10,verandaWidth,.22,2.26);
+      place('premiumVerandaBeam',boxGeo,capital,h,x,2.53,frontage+2.13,verandaWidth,.27,.22);
+      place('premiumVerandaRoof',roofGeo,roof,h,x,2.58,frontage+1.09,coreW*.44,.47,1.24);
+      for(const side of [-1,1]){
+        const postX=x+side*verandaWidth*.445;
+        place('premiumVerandaPost',boxGeo,stone,h,postX,1.38,frontage+2.12,.23,2.32,.23);
+        place('premiumVerandaCapital',boxGeo,capital,h,postX,2.40,frontage+2.12,.36,.19,.36);
+        place('premiumVerandaPlinth',boxGeo,plinth,h,postX,.32,frontage+2.12,.34,.20,.32);
+        place('premiumVerandaRail',boxGeo,bronze,h,postX,.91,frontage+1.20,.12,.10,1.75);
+        place('premiumVerandaGlass',boxGeo,0x75a1a2,h,postX,.565,frontage+1.20,.066,.65,1.70);
+      }
       place('premiumChimney',boxGeo,0xa47765,h,x-width*.18,height+.85,
         z-depth*.12,.50,1.60,.50);
       // Do not add the former floating balcony/door assembly: it had no
@@ -5487,8 +5541,10 @@ function* renderHouseStages(selected){
     place('archDoorHead',boxGeo,stone,h,x,2.15,z+depth/2+.18,1.53,.17,.22);
     for(const side of [-1,1]){
       place('archDoorJamb',boxGeo,stone,h,x+side*.68,1.10,z+depth/2+.17,.15,2.18,.20);
-      place('archEntranceSconce',boxGeo,metal,h,x+side*1.03,1.83,z+depth/2+.24,.17,.31,.18);
-      place('archEntranceGlow',boxGeo,0xffe3a7,h,x+side*1.03,1.87,z+depth/2+.34,.12,.18,.10);
+      if(!premium){
+        place('archEntranceSconce',boxGeo,metal,h,x+side*1.03,1.83,z+depth/2+.24,.17,.31,.18);
+        place('archEntranceGlow',boxGeo,0xffe3a7,h,x+side*1.03,1.87,z+depth/2+.34,.12,.18,.10);
+      }
     }
     place('archDoorHandle',boxGeo,0xe6c88e,h,x+.39,1.08,z+depth/2+.22,.065,.12,.07);
     // Recessed entrance panels: the door remains the user's existing door.
@@ -5607,8 +5663,8 @@ function* renderHouseStages(selected){
     const normalStrength=/(roof|gable|hip)/i.test(key)?.88:.56;
     const roughness=/(window|glass|mullion)/i.test(key)?.26:/roof/i.test(key)?.79:.87;
     const metalness=/(mullion|sconce|handle)/i.test(key)?.48:.02;
-    const casts=/(premiumVerandaRoof|premiumDormerTop|premiumChimney|premiumTowerBalconySlab|gardenTree|towerBase|towerRoof|towerMain|towerMid|homeMain|homeWing|homeRoof|homeCore|homeWall|towerWall|towerBody|mainBody|wingBody|mainRoof|gable|hipRoof)/i.test(key);
-    const receives=casts||/(homeGardenLawn|facade|pier|window|door|balcony|pilaster)/i.test(key);
+    const casts=/(premiumVerandaRoof|premiumEntranceCanopy|premiumTerraceShade|premiumDormerTop|premiumChimney|premiumTowerBalconySlab|gardenTree|towerBase|towerRoof|towerMain|towerMid|homeMain|homeWing|homeRoof|homeCore|homeWall|towerWall|towerBody|mainBody|wingBody|mainRoof|gable|hipRoof)/i.test(key);
+    const receives=casts||/(homeGardenLawn|veranda|facade|pier|window|door|balcony|pilaster)/i.test(key);
     const premiumDetail=/^premiumTowerBalcony(Post|Bottom|SideCap)_/.test(key);
     const profile=[batch.geo.id,texture,normalStrength,roughness,metalness,casts,receives].join(':')+(premiumDetail?':premiumDetail':'');
     for(const entry of batch.entries){
@@ -7357,7 +7413,7 @@ function openSquareDetailPanel(focusHeading=true){
   if(feature.description){const description=document.createElement('p');description.textContent=feature.description;row.append(description);}
   if(feature.evidence){const evidence=document.createElement('small');evidence.textContent='Posizione: '+(feature.evidence.position==='mapped-point'?'cartografia':feature.evidence.position)+' · orientamento e dettagli fini ancora da verificare';row.append(evidence);}
   const url=feature.reference||feature.source;
-  if(url&&/^https:\/\/(www\.)?(respira\.cordoba\.gob\.ar|prensa\.municipalidadsalta\.gob\.ar|tucumanturismo\.gob\.ar|openstreetmap\.org|buenosaires\.gob\.ar|turismomardelplata\.gob\.ar|syv\.web\.unq\.edu\.ar|target2\.promperu\.gob\.pe|montevideo\.gub\.uy|quito-turismo\.gob\.ec|idpc\.gov\.co|santiagoturismo\.cl)\//.test(url)){const source=document.createElement('a');source.href=url;source.target='_blank';source.rel='noopener';source.textContent='Fonte';row.append(source);}
+  if(url&&/^https:\/\/(www\.)?(respira\.cordoba\.gob\.ar|prensa\.municipalidadsalta\.gob\.ar|tucumanturismo\.gob\.ar|openstreetmap\.org|buenosaires\.gob\.ar|turismomardelplata\.gob\.ar|syv\.web\.unq\.edu\.ar|target2\.promperu\.gob\.pe|montevideo\.gub\.uy|quito-turismo\.gob\.ec|idpc\.gov\.co|santiagoturismo\.cl|visitconegliano\.it|teatroaccademia\.it)\//.test(url)){const source=document.createElement('a');source.href=url;source.target='_blank';source.rel='noopener';source.textContent='Fonte';row.append(source);}
   body.append(row);
  }
  const back=document.createElement('button');back.type='button';back.textContent='Torna agli obiettivi';back.onclick=()=>openPublicWorks();body.append(back);

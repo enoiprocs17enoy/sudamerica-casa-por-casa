@@ -2,6 +2,8 @@
 (function(){
 'use strict';
 const MODEL_SPECS={'floral-calendar':{height:1.2,width:8},'arenales-ensemble':{height:11,width:10},'freedom-chains':{height:7,width:5},pyramid:{height:13,width:7},obelisk:{height:10,width:3},column:{height:10,width:4},'liberty-column':{height:13,width:6},equestrian:{height:8,width:7},'equestrian-fountain':{height:8,width:9},'standing-sword':{height:7,width:4},'standing-civil':{height:10,width:7},'ornate-fountain':{height:7,width:9},'liberty-fountain':{height:7,width:8},fountain:{height:3,width:6},bust:{height:4,width:3},plaque:{height:1.5,width:2},'classical-figure':{height:3,width:2}};
+MODEL_SPECS['accademia-conegliano']={height:15,width:32,depth:18,parcelWidth:.80};
+MODEL_SPECS['stone-sphinx']={height:3.15,width:3.6};
 function classify(name,tags={}){
  if(tags.amenity==='fountain'||tags.class==='fountain'||tags.subclass==='fountain')return 'fountain';
  if(tags.statue==='equestrian'||/ecuestre|equestrian|equestre|a caballo/i.test(name))return 'equestrian';
@@ -18,20 +20,26 @@ function prepare(profile,fit,b,city){
  for(const feature of [...all].sort((a,b)=>(b.status==='reference-model')-(a.status==='reference-model'))){
   if(feature.partOf||!MODEL_SPECS[feature.model]||!Number.isFinite(feature.x)||!Number.isFinite(feature.z))continue;
   const spec=MODEL_SPECS[feature.model],p=fit.point(feature),wanted=feature.displayHeight||5;
-  let factor=Math.min(wanted/spec.height,6.4/spec.width);
+  const angle=fit.angle+(Number(feature.bearing)||0),widthLimit=spec.parcelWidth?b.width*spec.parcelWidth:6.4;
+  let factor=Math.min(wanted/spec.height,widthLimit/spec.width);
   if(feature.model==='fountain'&&feature.status!=='reference-model')factor=Math.min(factor,.45);
-  const clearance=Math.min(b.width/2-Math.abs(p.x)-.8,b.depth/2-Math.abs(p.z)-.8);
-  factor=Math.min(factor,clearance/(spec.width*.57));if(factor<.09)continue;
+  const clearanceX=b.width/2-Math.abs(p.x)-.8,clearanceZ=b.depth/2-Math.abs(p.z)-.8;
+  if(spec.depth){
+   const c=Math.abs(Math.cos(angle)),s=Math.abs(Math.sin(angle));
+   factor=Math.min(factor,2*clearanceX/(c*spec.width+s*spec.depth),2*clearanceZ/(s*spec.width+c*spec.depth));
+  }else factor=Math.min(factor,Math.min(clearanceX,clearanceZ)/(spec.width*.57));
+  if(factor<.09)continue;
   const radius=spec.width*factor*.74;
   // Prefer a sourced landmark over duplicate point representations of the same object.
   if(items.some(item=>Math.hypot(item.x-p.x,item.z-p.z)<Math.min(radius,item.radius)*.45))continue;
-  const item={feature,x:p.x,z:p.z,scale:factor,angle:fit.angle+(Number(feature.bearing)||0),radius};items.push(item);reservations.push({x:p.x,z:p.z,radius:radius+.30});
+  const item={feature,x:p.x,z:p.z,scale:factor,angle,radius};items.push(item);reservations.push({x:p.x,z:p.z,radius:radius+.30});
  }
  return{profile,city,items,reservations,clear(x,z,radius=0){return !reservations.some(p=>Math.hypot(x-p.x,z-p.z)<p.radius+radius);}};
 }
 function render(plan,group,b){
  if(!plan?.items.length)return;
  const T=THREE,UP=new T.Vector3(0,1,0);
+ const baseY=plan.profile?.openStoneSquare ? .43 : .59;
  const parts=[],bronze=0x526b62,stone=0xd6cbb3,marble=0xe4e0d2,gold=0xb1a06d,water=0x67c4dc;
  let owner;
  const add=(kind,material,color,x,y,z,sx,sy,sz,rotation=null)=>{if(Math.min(sx,sy,sz)<=0)return;parts.push({kind,material,color,x,y,z,sx,sy,sz,rotation,owner});};
@@ -109,7 +117,95 @@ function render(plan,group,b){
   cylinder(water,x,y+height/2,z,.05,height,'water');
   for(let stream=0;stream<5;stream++){const a=stream*Math.PI*2/5;let previous=[x,y+.04,z];for(let step=1;step<=7;step++){const t=step/7,p=[x+Math.sin(a)*radius*t,y+4*height*.60*t*(1-t),z+Math.cos(a)*radius*t];limb(previous,p,.024,water,'water');previous=p;}}
  };
+ function accademia(){
+  const plaster=0xe7ddc8,trim=0xf0e7d7,joint=0xafa797,recess=0x494845,door=0x625548;
+  const pediment=(x,y,z,width,height,depth)=>{
+   add('pediment','stone',trim,x,y,z,width,height,depth);
+   box(marble,x,y-height/2,z+.06,width+.38,.22,depth+.14);
+   for(const side of [-1,1])limb([x+side*width/2,y-height/2,z+depth/2],[x,y+height/2,z+depth/2],.10,marble,'stone');
+  };
+  box(plaster,0,5.68,-2.1,13.3,11.36,8.6);
+  for(const side of [-1,1]){
+   const x=side*10.65;
+   box(plaster,x,4.48,-2.3,9.3,8.96,8.2);
+   for(const h of [.42,2.22,5.55,8.86])box(trim,x,h,1.68,9.45,.18,.42);
+   pediment(x,9.60,1.41,9.30,1.46,.72);
+   for(const offset of [-2.6,0,2.6]){
+    const xx=x+offset;
+    box(trim,xx,4.32,1.87,1.51,2.43,.15);
+    box(recess,xx,4.33,1.96,1.15,1.94,.04);
+    box(joint,xx,3.37,2.0,1.55,.18,.32);
+    box(trim,xx,2.93,1.9,1.41,.18,.18);
+    box(trim,xx,4.32,1.99,.055,1.89,.05);
+    box(trim,xx,4.59,1.99,1.12,.055,.05);
+   }
+   box(trim,x,1.30,1.86,2.15,2.55,.18);
+   box(door,x,1.20,1.97,1.70,2.30,.05);
+  }
+  for(let i=0;i<8;i++){
+   const front=8.9-i*.64,back=2.10,h=.23*(i+1),width=13.7-i*.075;
+   box(stone,0,h/2,(front+back)/2,width,h,front-back);
+   box(trim,0,h-.035,front-.07,width+.05,.08,.20);
+  }
+  box(stone,0,1.79,3.83,13.0,.22,3.45);
+  for(const x of [-4.85,-1.62,1.62,4.85]){
+   box(trim,x,1.97,4.68,1.02,.25,1.01);
+   cylinder(stone,x,3.97,4.68,.34,3.90);
+   cylinder(marble,x,2.18,4.68,.46,.21);
+   cylinder(marble,x,5.82,4.68,.43,.24);
+   box(trim,x,6.00,4.68,.96,.19,.92);
+  }
+  for(const x of [-3.76,0,3.76]){
+   box(trim,x,3.50,2.29,2.34,3.29,.18);
+   box(recess,x,3.47,2.40,1.89,2.90,.06);
+   box(door,x,3.20,2.45,1.62,2.29,.10);
+   box(stone,x,3.22,2.52,.06,2.24,.036);
+   for(const side of [-1,1])sphere(gold,x+side*.15,3.18,2.54,.038,.038,.022,'stone');
+  }
+  box(trim,0,6.38,4.04,12.7,.91,2.30);
+  box(joint,0,6.74,5.21,12.95,.10,.22);
+  pediment(0,7.42,5.0,12.63,1.46,.52);
+  box(trim,0,7.12,2.48,13.2,.32,.59);
+  for(const x of [-3.55,0,3.55]){
+   box(trim,x,8.98,2.28,2.09,2.68,.17);
+   box(recess,x,8.98,2.39,1.72,2.31,.05);
+   box(joint,x,7.91,2.60,2.22,.20,.55);
+   human(x,8.00,2.66,.64,'classical',marble);
+  }
+  pediment(0,12.55,2.04,13.45,2.6,.83);
+  const lettering={A:['010','101','111','101','101'],C:['011','100','100','100','011'],D:['110','101','101','101','110'],E:['111','100','110','100','111'],M:['10001','11011','10101','10001','10001'],I:['111','010','010','010','111']};
+  const letters=[...'ACCADEMIA'],unit=.124;
+  let start=-letters.reduce((sum,ch)=>sum+lettering[ch][0].length+1,0)*unit/2;
+  for(const ch of letters){
+   for(const [row,line] of lettering[ch].entries())for(let col=0;col<line.length;col++)if(line[col]==='1')box(recess,start+col*unit,6.60-row*unit,5.202,unit+.003,unit+.003,.044);
+   start+=(lettering[ch][0].length+1)*unit;
+  }
+ }
+ function sphinx(){
+  const pale=0xc5bca9,face=0xd0c8b7,shade=0xb4a994;
+  box(stone,0,.18,0,1.78,.32,3.49);
+  box(pale,0,.40,0,1.58,.14,3.27);
+  sphere(pale,0,.93,-.38,.55,.48,1.05,'stone');
+  sphere(pale,0,1.19,.48,.49,.64,.60,'stone');
+  for(const side of [-1,1]){
+   sphere(shade,side*.33,.76,-.88,.31,.33,.58,'stone');
+   sphere(pale,side*.31,.65,.86,.22,.19,.71,'stone');
+   sphere(face,side*.31,.56,1.36,.245,.12,.29,'stone');
+   for(let toe=-1;toe<=1;toe++)sphere(pale,side*.31+toe*.085,.55,1.57,.057,.065,.08,'stone');
+   limb([side*.27,2.39,.35],[side*.36,1.87,.46],.10,shade,'stone');
+  }
+  limb([0,1.44,.54],[0,2.10,.54],.28,pale,'stone');
+  sphere(shade,0,2.36,.43,.38,.46,.32,'stone');
+  sphere(face,0,2.36,.61,.27,.35,.225,'stone');
+  sphere(face,0,2.34,.83,.074,.09,.073,'stone');
+  for(const side of [-1,1])sphere(shade,side*.12,2.44,.801,.064,.026,.019,'stone');
+  sphere(shade,0,2.10,.74,.15,.050,.02,'stone');
+  limb([-.37,.75,-1.18],[-.60,.63,-.94],.077,shade,'stone');
+  limb([-.60,.63,-.94],[-.59,.57,-.68],.074,shade,'stone');
+ }
  function build(model){
+  if(model==='accademia-conegliano'){accademia();return;}
+  if(model==='stone-sphinx'){sphinx();return;}
   if(model==='floral-calendar'){
    box(stone,0,.12,0,8,.24,4);box(0x426d38,0,.29,0,7.65,.14,3.65);
    const date=new Date(),digits=String(date.getFullYear()),segments=[[0,.6,0,.34,.075],[.22,.44,0,.075,.27],[.22,.15,0,.075,.27],[0,0,0,.34,.075],[-.22,.15,0,.075,.27],[-.22,.44,0,.075,.27],[0,.30,0,.34,.075]],codes=[63,6,91,79,102,109,125,7,127,111];
@@ -159,6 +255,10 @@ function render(plan,group,b){
  const localModels=[];
  for(const item of plan.items){owner=item;const first=parts.length;build(item.feature.model);localModels.push({item,first,end:parts.length});}
  const geos={box:new T.BoxGeometry(1,1,1),sphere:new T.SphereGeometry(1,12,8),cylinder:new T.CylinderGeometry(1,1,1,12),cone:new T.ConeGeometry(1,1,12),torus:new T.TorusGeometry(1,.045,6,20),pyramid:new T.CylinderGeometry(.12,1,1,4),robe:new T.CylinderGeometry(.55,1,1,10),cape:new T.PlaneGeometry(1,1,10,12)};
+ if(parts.some(part=>part.kind==='pediment')){
+  const shape=new T.Shape();shape.moveTo(-.5,-.5);shape.lineTo(.5,-.5);shape.lineTo(0,.5);shape.closePath();
+  geos.pediment=new T.ExtrudeGeometry(shape,{depth:1,bevelEnabled:false}).translate(0,0,-.5);
+ }
  // A thin folded cloth sheet replaces the former ellipsoid that looked like a shield.
  const cloth=geos.cape.attributes.position;for(let i=0;i<cloth.count;i++){const u=cloth.getX(i),v=cloth.getY(i),drop=.5-v;cloth.setXYZ(i,u*(.48+drop*.60)+drop*drop*.24,v,Math.sin(u*22+drop*2)*(.025+drop*.045)-drop*drop*.55);}geos.cape.computeVertexNormals();
  geos.pyramid.rotateY(Math.PI/4);geos.torus.rotateX(Math.PI/2);
@@ -174,7 +274,7 @@ function render(plan,group,b){
  for(const batch of batches.values()){
   const waterMaterial=batch.material==='water';const material=new T.MeshStandardMaterial({side:batch.kind==='cape'?T.DoubleSide:T.FrontSide,color:0xffffff,roughness:waterMaterial?.18:batch.material==='metal'?.43:.83,metalness:waterMaterial?.18:batch.material==='metal'?.58:.02});
   const mesh=new T.InstancedMesh(geos[batch.kind],material,batch.parts.length),tint=new T.Color();
-  batch.parts.forEach((p,i)=>{const item=p.owner,ca=Math.cos(item.angle),sa=Math.sin(item.angle);dummy.position.set(b.x+item.x+(p.x*ca-p.z*sa)*item.scale,.59+p.y*item.scale,b.z+item.z+(p.x*sa+p.z*ca)*item.scale);yaw.setFromAxisAngle(UP,-item.angle);dummy.quaternion.copy(yaw);if(p.rotation)dummy.quaternion.multiply(p.rotation);dummy.scale.set(p.sx*item.scale,p.sy*item.scale,p.sz*item.scale);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);mesh.setColorAt(i,tint.setHex(p.color));});
+  batch.parts.forEach((p,i)=>{const item=p.owner,ca=Math.cos(item.angle),sa=Math.sin(item.angle);dummy.position.set(b.x+item.x+(p.x*ca-p.z*sa)*item.scale,baseY+p.y*item.scale,b.z+item.z+(p.x*sa+p.z*ca)*item.scale);yaw.setFromAxisAngle(UP,-item.angle);dummy.quaternion.copy(yaw);if(p.rotation)dummy.quaternion.multiply(p.rotation);dummy.scale.set(p.sx*item.scale,p.sy*item.scale,p.sz*item.scale);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);mesh.setColorAt(i,tint.setHex(p.color));});
   mesh.computeBoundingSphere();mesh.castShadow=!waterMaterial;mesh.receiveShadow=true;mesh.userData.squareLandmark=true;mesh.userData.sculpturePart=batch.kind;mesh.userData.squareModels=[...new Set(batch.parts.map(p=>p.owner.feature.model))];mesh.userData.squareFeatureIDs=batch.parts.map(p=>p.owner.feature.id);group.add(mesh);
  }
 }
