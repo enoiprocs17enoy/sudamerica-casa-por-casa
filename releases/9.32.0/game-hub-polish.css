@@ -1,0 +1,5 @@
+/* Quiet opaque surfaces keep the HUD readable over every 3D background. */
+body.game-hub.city-view .hub-brand{background:#fffdf5f5;border:1px solid #c7d5c3;border-radius:18px;padding:7px 12px 7px 7px;text-shadow:none;box-shadow:0 3px 12px #173b3420}
+body.game-hub.city-view .hub-search-area h1{display:table;margin:0 auto 8px;background:#fffdf5f5;border:1px solid #c7d5c3;border-radius:18px;padding:4px 16px;text-shadow:none;font-size:18px;box-shadow:0 2px 8px #173b3415}
+@media(max-width:720px){body.game-hub.city-view .hub-brand{padding:5px 9px 5px 5px;border-radius:14px;top:10px;left:10px}body.game-hub.city-view .hub-search-area h1{font-size:16px;padding:3px 13px;margin-bottom:8px}}
+@media(max-height:550px) and (min-width:721px){body.game-hub.city-view .hub-search-area h1{display:none}}
