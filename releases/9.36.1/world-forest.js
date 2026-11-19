@@ -29,11 +29,13 @@ function groveTexture(){
  if(!groveCanvas){
   groveCanvas=document.createElement('canvas');
   groveCanvas.width=512;
-  groveCanvas.height=96;
+  // Power-of-two dimensions keep trilinear minification available on WebGL 1.
+  groveCanvas.height=128;
   const context=groveCanvas.getContext('2d');
+  const yScale=groveCanvas.height/96;
   for(let i=0;i<12;i++){
-   const x=20+i*42+(random(i+30)-.5)*16,base=91-random(i+9)*9;
-   const h=22+random(i+7)**2*60,w=8+random(i+18)*9;
+   const x=20+i*42+(random(i+30)-.5)*16,base=(91-random(i+9)*9)*yScale;
+   const h=(22+random(i+7)**2*60)*yScale,w=8+random(i+18)*9;
    context.fillStyle='#66583d';
    context.fillRect(x-1,base-h*.53,3,h*.53);
    foliage2D(context,x,base-h*.59,w,h*.39,canopyColors[i%canopyColors.length]);
@@ -101,10 +103,12 @@ function* buildSteps({group,region,plan,height,city,bounds}){
  const options={alphaTest:.012,transparent:true,depthWrite:false,side:THREE.DoubleSide,forceSinglePass:true,fog:true};
  const material=new THREE.MeshBasicMaterial({...options,map:groveTexture()});
  material.onBeforeCompile=shader=>{
+  shader.vertexShader=shader.vertexShader.replace('#include <uv_vertex>',
+   '#include <uv_vertex>\nif(instanceMatrix[0].x<0.)vMapUv.x=1.-vMapUv.x;');
   shader.vertexShader=shader.vertexShader.replace('#include <project_vertex>',
    'vec4 mvPosition=modelViewMatrix*instanceMatrix*vec4(0.,0.,0.,1.); mvPosition.xy+=position.xy*vec2(length(instanceMatrix[0].xyz),length(instanceMatrix[1].xyz)); gl_Position=projectionMatrix*mvPosition;');
  };
- material.customProgramCacheKey=()=> 'far-woodland-groves-v1';
+ material.customProgramCacheKey=()=> 'far-woodland-groves-v2';
  const mesh=new THREE.InstancedMesh(new THREE.PlaneGeometry(1,1),material,points.length);
  const topMaterial=new THREE.MeshBasicMaterial({...options,map:canopyTexture()});
  const top=new THREE.InstancedMesh(new THREE.PlaneGeometry(1,1).rotateX(-Math.PI/2),topMaterial,points.length);
@@ -113,7 +117,7 @@ function* buildSteps({group,region,plan,height,city,bounds}){
   if(i>0&&i%2048===0)yield;
   const p=points[i];
   dummy.position.set(p.x,p.y+p.h*.46,p.z);
-  dummy.rotation.y=0;
+  dummy.rotation.y=p.color>.5?Math.PI:0;
   dummy.scale.set(p.w,p.h,1);
   dummy.updateMatrix();
   color.setHSL(.23,.12,.78+p.color*.15);

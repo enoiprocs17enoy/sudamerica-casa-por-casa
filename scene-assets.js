@@ -9,7 +9,7 @@
   ['world-biomes.js','WorldBiomes'],
   ['world-geography.js','WorldGeography'],
   ['world-terrain.js','WorldTerrain'],
-  ['world-forest.js','WorldForest']
+  ['world-forest.js','WorldForest','9.36.1-detail1']
  ];
  let scenePromise;
 
@@ -31,14 +31,14 @@
   return request;
  }
 
- function releaseScript(file,globalName){
-  return script('releases/9.36.1/'+file+'?v='+version,globalName);
+ function releaseScript(file,globalName,assetVersion=version){
+  return script('releases/9.36.1/'+file+'?v='+assetVersion,globalName);
  }
 
  function load(){
   if(scenePromise)return scenePromise;
   const three=script(engineUrl,'THREE');
-  const geography=sceneModules.map(([file,globalName])=>releaseScript(file,globalName));
+  const geography=sceneModules.map(module=>releaseScript(...module));
   const engine=three.then(()=>script('render-engine.js?v=9.23.0','SudamericaRender8'));
   scenePromise=Promise.all([engine,...geography])
    .then(()=>releaseScript('world-neighbors.js','WorldNeighbors'))
