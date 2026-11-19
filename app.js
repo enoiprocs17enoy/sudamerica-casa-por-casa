@@ -6771,15 +6771,16 @@ function buildResidentBatches(people){
   {name:'nose',geo:new THREE.SphereGeometry(.077,7,5),y:1.86,forward:.37,color:'skin',face:true},
   {name:'ears',geo:new THREE.SphereGeometry(.085,7,5),y:1.89,pair:true,lateral:.37,color:'skin',face:true}
  ];
- const meshes=specs.map(spec=>{
-  const mesh=new THREE.InstancedMesh(spec.geo,new THREE.MeshLambertMaterial({color:0xffffff}),n*(spec.pair?2:1));
+ const detailCapacity=Math.min(n,120);
+ const meshes=specs.map((spec,index)=>{
+  const mesh=new THREE.InstancedMesh(spec.geo,new THREE.MeshLambertMaterial({color:0xffffff}),(index<6?n:detailCapacity)*(spec.pair?2:1));
   mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   mesh.frustumCulled=false;mesh.castShadow=true;mesh.receiveShadow=true;
   group.add(mesh);
   return mesh;
  });
  const dummy=new THREE.Object3D();
- residentBatches={meshes,specs,dummy,people};
+ residentBatches={meshes,specs,dummy,people,detailOwners:[]};
  const skin=['#e4b28e','#b47d5e','#f1c9a2','#d99a78'];
  const shirt=['#e9867c','#75b4cf','#edbf69','#9b8ac5','#75b67b'];
  const hair=[0x5e4238,0x9a704c,0x33343c];
@@ -6788,7 +6789,8 @@ function buildResidentBatches(people){
   const a=people[i],id=a.home?.id??i+1;
   a.bodyScale=.94+((id*17)%13)/100;
   const colors={skin:i===0?v4.skin:skin[id%skin.length],shirt:i===0?v4.shirt:shirt[id%shirt.length],hair:hair[id%hair.length],trousers:trousers[id%trousers.length],shoes:shoes[id%shoes.length],eyes:0x222b31};
-  for(let j=0;j<specs.length;j++){const color=new THREE.Color(colors[specs[j].color]);for(let side=0;side<(specs[j].pair?2:1);side++)meshes[j].setColorAt(i*(specs[j].pair?2:1)+side,color);}
+  a.residentColors=colors;a.detailIndex=i<detailCapacity?i:-1;
+  for(let j=0;j<specs.length;j++){if(j>=6&&a.detailIndex<0)continue;const color=new THREE.Color(colors[specs[j].color]);for(let side=0;side<(specs[j].pair?2:1);side++)meshes[j].setColorAt((j<6?i:a.detailIndex)*(specs[j].pair?2:1)+side,color);}
   updateResidentMatrix(i);
  }
  for(const mesh of meshes){mesh.instanceMatrix.needsUpdate=true;mesh.instanceColor.needsUpdate=true;}
@@ -6799,6 +6801,7 @@ function updateResidentMatrix(i){
  const a=people[i];const pos=a.g.position;
  const scale=RESIDENT_SCALE*(a.bodyScale||1);
  for(let j=0;j<specs.length;j++){
+  if(j>=6&&a.detailIndex<0)continue;
   const spec=specs[j],mesh=meshes[j],copies=spec.pair?2:1,yaw=a.g.rotation.y+(spec.face?(a.gaze||0):0),c=Math.cos(yaw),si=Math.sin(yaw);
   for(let k=0;k<copies;k++){
    const side=k===0?-1:1,xx=spec.pair?side*spec.lateral:0;
@@ -6806,9 +6809,15 @@ function updateResidentMatrix(i){
    const swing=(a.gait||0)*side*(spec.stride||0)+gesture,zz=(spec.forward||0)+swing*.18;
    const lift=spec.name==='shoes'?Math.max(0,swing)*.075:0;
    dummy.position.set(pos.x+(xx*c+zz*si)*scale,pos.y+(spec.y+lift)*scale,pos.z+(zz*c-xx*si)*scale);
-   dummy.rotation.set(swing*.48,yaw,0,'YXZ');dummy.scale.set(scale,scale*(spec.name==='hair'?(a.i%3===0?1.18:.88):1),scale);dummy.updateMatrix();mesh.setMatrixAt(i*copies+k,dummy.matrix);
+   dummy.rotation.set(swing*.48,yaw,0,'YXZ');dummy.scale.set(scale,scale*(spec.name==='hair'?(a.i%3===0?1.18:.88):1),scale);dummy.updateMatrix();mesh.setMatrixAt((j<6?i:a.detailIndex)*copies+k,dummy.matrix);
   }
  }
+}
+function assignResidentDetails(chosen){
+ if(!residentBatches)return;const {people,meshes,specs,detailOwners}=residentBatches;
+ for(const a of people)a.detailIndex=-1;
+ for(let j=6;j<meshes.length;j++)meshes[j].count=chosen.length*(specs[j].pair?2:1);
+ for(let slot=0;slot<chosen.length;slot++){const a=chosen[slot].a;a.detailIndex=slot;if(detailOwners[slot]===a.home.id)continue;detailOwners[slot]=a.home.id;for(let j=6;j<meshes.length;j++){const copies=specs[j].pair?2:1,color=new THREE.Color(a.residentColors[specs[j].color]);for(let k=0;k<copies;k++)meshes[j].setColorAt(slot*copies+k,color);meshes[j].instanceColor.needsUpdate=true;}}
 }
 // A shared sidewalk graph replaces private-lawn perimeter loops.
 let residentNavigation=null;
@@ -7160,7 +7169,8 @@ function animateLife(t){if(!active||!v4.motion)return;
    if(d2<230*230)near.push({a,d2});
   }
   near.sort((a,b)=>a.d2-b.d2);
-  for(const {a} of near.slice(0,120)){
+  const chosenPeople=near.slice(0,120);assignResidentDetails(chosenPeople);
+  for(const {a} of chosenPeople){
    const pt=residentWalkPoint(a,t);
    a.g.position.x=pt.x;
    a.g.position.z=pt.z;
