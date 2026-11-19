@@ -1,0 +1,698 @@
+{
+  "locale": "ja",
+  "name": "日本語",
+  "reviewStatus": "verified",
+  "messages": {
+    "Esplora il mondo": "世界を探索",
+    "Scegli una città": "都市を選択",
+    "Cerca utente Instagram": "Instagramユーザーを検索",
+    "Cerca": "検索",
+    "Nome utente": "ユーザー名",
+    "@nomeutente": "@ユーザー名",
+    "case nella città": "市内の住宅",
+    "La città cresce": "成長する都市",
+    "Ingrandisci la mappa per scoprire le città e avvicinarti ai loro quartieri.": "地図を拡大して都市を見つけ、街並みを探索しましょう。",
+    "Un mondo virtuale di città da esplorare, una casa alla volta.": "一軒ずつ広がる、都市の仮想世界を探索しましょう。",
+    "Un luogo, tante storie": "ひとつの場所に、たくさんの物語",
+    "Benvenuto, esploratore.": "探索の世界へようこそ。",
+    "Carichiamo il mondo e le sue città.": "世界と都市を読み込んでいます。",
+    "Una casa alla volta, il mondo prende vita.": "一軒ずつ、世界に命が吹き込まれます。",
+    "La tua città prende forma.": "あなたの街をつくっています。",
+    "Prepariamo edifici, strade e paesaggio.": "建物、道路、風景を準備しています。",
+    "La città si rinnova.": "都市を更新しています。",
+    "Aggiorniamo edifici, dettagli e abitanti.": "建物、細部、住民を更新しています。",
+    "Una città sempre più viva.": "さらに活気あふれる街へ。",
+    "Prepariamo le case e i servizi per i suoi abitanti.": "住民のための住宅と公共施設を準備しています。",
+    "Il mondo continua, intorno a te.": "あなたの周りに世界が広がります。",
+    "Prepariamo le città vicine, le strade e il paesaggio.": "周辺の都市、道路、風景を準備しています。",
+    "Esploriamo nuovi luoghi.": "新しい場所を探索しています。",
+    "Carichiamo le località della regione.": "地域の場所を読み込んでいます。",
+    "Prepariamo le località e la mappa della regione.": "地域の場所と地図を準備しています。",
+    "Caricamento in corso": "読み込み中",
+    "Non è stato possibile completare il caricamento. Puoi riprovare.": "読み込みを完了できませんでした。もう一度お試しください。",
+    "Motore 3D non caricato. Verifica Internet e ricarica.": "3Dエンジンを読み込めませんでした。接続を確認して再読み込みしてください。",
+    "Continente": "大陸",
+    "Paese o territorio": "国・地域",
+    "Cerca una località": "場所を検索",
+    "Nome città o regione": "都市名・地域名",
+    "Tutti i continenti": "すべての大陸",
+    "Antartide": "南極",
+    "Europa": "ヨーロッパ",
+    "America del Nord e centrale": "北・中央アメリカ",
+    "America del Sud": "南アメリカ",
+    "🌐 Vedi tutto il mondo": "🌐 世界全体を見る",
+    "Seleziona una città…": "都市を選択…",
+    "Caricamento delle località…": "場所を読み込み中…",
+    "Nessuna località trovata in questo paese": "この国の場所は見つかりませんでした",
+    "Catalogo non caricato. Controlla la connessione e riseleziona il paese.": "一覧を読み込めませんでした。接続を確認して国を選び直してください。",
+    "Vai alla città selezionata": "選択した都市へ移動",
+    "Entra nel 3D": "3D表示を開く",
+    "Torna alla mappa": "地図に戻る",
+    "Controlli 3D": "3D操作",
+    "↻ Ruota": "↻ 回転",
+    "✥ Sposta": "✥ 移動",
+    "⌂ Centro": "⌂ 中央へ",
+    "⛶ Vista ampia": "⛶ ワイド表示",
+    "☰ Comandi": "☰ 操作",
+    "Orienta a nord": "北向きにする",
+    "Alterna vista dall’alto e inclinata": "真上と斜めの視点を切り替え",
+    "Avvicina": "拡大",
+    "Allontana": "縮小",
+    "Ruota e inclina la visuale": "視点を回転・傾斜",
+    "Sposta la visuale": "視点を移動",
+    "🏙 Città vicine": "🏙 周辺の都市",
+    "Città vicine": "周辺の都市",
+    "Avvicinati alle città collegate": "道路でつながる都市に近づく",
+    "Nessuna città collegata visibile in questa zona. Puoi cercare altre località nella mappa.": "この範囲に表示できる接続都市はありません。地図でほかの場所を検索できます。",
+    "Mappa geografica · le città sono posizionate con coordinate reali": "地理地図 · 都市は実際の座標に配置されています",
+    "Un mondo. Milioni di storie. Una casa per ognuno.": "ひとつの世界。無数の物語。みんなの家。",
+    "🌎 Città selezionata:": "🌎 選択中の都市：",
+    "Tienda": "ショップ",
+    "Attività": "お店",
+    "La mia casa": "マイホーム",
+    "Personaggio": "キャラクター",
+    "Il mio personaggio": "マイキャラクター",
+    "Mondo": "世界",
+    "Ranking": "ランキング",
+    "Trova": "探す",
+    "Obras": "公共施設",
+    "Opere": "公共施設",
+    "Menu mondo": "ワールドメニュー",
+    "Chiudi": "閉じる",
+    "Casa": "住宅",
+    "Negozio": "店舗",
+    "Mongolfiera": "熱気球",
+    "Scopri le attività della città e le loro evoluzioni.": "街のお店と、その進化を見てみましょう。",
+    "🏪 Esplora le attività": "🏪 お店を探す",
+    "Cerca il tuo nome utente per trovare la casa, il personaggio e le proprietà collegate.": "ユーザー名を検索すると、自分の家、キャラクター、関連する所有物を見つけられます。",
+    "Trova nella città": "市内を検索",
+    "🌎 Entra nel 3D": "🌎 3D表示を開く",
+    "🧭 Panoramica": "🧭 全体表示",
+    "Animazioni ambientali": "環境アニメーション",
+    "Strutture e obiettivi": "施設と目標",
+    "Ricostruzione 3D stilizzata: la planimetria e gli elementi documentati sono affiancati da arredi di integrazione.": "デフォルメした3D再現です。資料に基づく配置や要素に、補足の装飾を加えています。",
+    "Le fonti disponibili non descrivono ancora statue e fontane di questa piazza.": "この広場の像や噴水については、まだ資料がそろっていません。",
+    "Presenza mappata · forma 3D da completare": "地図上で確認済み · 3D形状は未完成",
+    "Riferimento documentato · modello 3D stilizzato": "資料に基づく再現 · デフォルメした3Dモデル",
+    "Tipologia mappata · modello 3D da verificare nei dettagli": "地図で種類を確認済み · 3Dモデルの細部は要確認",
+    "Fonte": "出典",
+    "Torna agli obiettivi": "目標一覧に戻る",
+    "Parco di quartiere": "地区公園",
+    "Acquedotto e serbatoio": "水道・貯水施設",
+    "Ambulatorio e pronto soccorso": "診療所・救急外来",
+    "Stazione di polizia": "警察署",
+    "Caserma dei pompieri": "消防署",
+    "Primi servizi": "基礎サービス",
+    "Asilo e area giochi": "保育園・遊び場",
+    "Scuola primaria": "小学校",
+    "Centro raccolta e riciclo": "資源回収・リサイクル施設",
+    "Campo da calcio": "サッカー場",
+    "Biblioteca pubblica": "公共図書館",
+    "Ospedale generale": "総合病院",
+    "Municipio": "市役所",
+    "Autostazione": "バスターミナル",
+    "Centrale elettrica di quartiere": "地区発電所",
+    "Giardini e area giochi": "庭園・遊び場",
+    "Centro commerciale": "ショッピングモール",
+    "Campo da baseball": "野球場",
+    "Centro sportivo": "スポーツセンター",
+    "Museo civico": "市立博物館",
+    "Teatro e auditorium": "劇場・ホール",
+    "Piscina comunale": "市営プール",
+    "Stadio cittadino": "市立スタジアム",
+    "Università e campus": "大学・キャンパス",
+    "Stazione ferroviaria": "鉄道駅",
+    "Palazzo di giustizia": "裁判所",
+    "Depuratore e servizi ambientali": "下水処理・環境施設",
+    "Piazza monumentale": "記念広場",
+    "Eliporto di soccorso": "救急ヘリポート",
+    "Orto botanico e serre": "植物園・温室",
+    "Servizi di quartiere": "地区サービス",
+    "Città in crescita": "成長中の都市",
+    "Grande città": "大都市",
+    "Strutture pubbliche": "公共施設",
+    "Tutti gli edifici": "すべての建物",
+    "Case": "住宅",
+    "Cerca edifici": "建物を検索",
+    "Nome, nickname o numero…": "名前・ユーザー名・番号…",
+    "Mostra altri risultati": "さらに表示",
+    "📍 Raggiungi e apri": "📍 移動して開く",
+    "Nessuna struttura trovata.": "施設が見つかりませんでした。",
+    "Raggiunto": "達成済み",
+    "Caffetteria": "カフェ",
+    "Supermercato": "スーパーマーケット",
+    "Ristorante": "レストラン",
+    "Libreria": "書店",
+    "Farmacia": "薬局",
+    "Negozio di moda": "衣料品店",
+    "Officina": "整備工場",
+    "Panetteria": "パン屋",
+    "Palestra": "ジム",
+    "Mercato": "市場",
+    "PIAZZA CIVICA": "市民広場",
+    "PIAZZA PRINCIPALE": "中央広場",
+    "SERVIZI PUBBLICI": "公共サービス",
+    "Monolocale": "ワンルーム",
+    "Casa piccola": "小さな家",
+    "Villetta": "戸建て住宅",
+    "Palazzina": "小規模集合住宅",
+    "Condominio": "集合住宅",
+    "Torre residenziale": "タワーマンション",
+    "Grattacielo": "超高層ビル",
+    "Grattacielo monumentale": "巨大超高層ビル",
+    "Crema": "クリーム",
+    "Bianco": "ホワイト",
+    "Rosa": "ピンク",
+    "Azzurro": "ライトブルー",
+    "Verde salvia": "セージグリーン",
+    "Ocra": "オーカー",
+    "Grigio": "グレー",
+    "Gratis": "無料",
+    "Base": "標準",
+    "Accesso proprietario": "オーナーログイン",
+    "Accedi per aprire gli strumenti di simulazione.": "ログインするとシミュレーションツールを開けます。",
+    "Ricevi link di accesso": "ログインリンクを受け取る",
+    "Apri l’email ricevuta e premi il link di accesso. Il link è personale e utilizzabile una sola volta.": "届いたメールを開き、ログインリンクを押してください。リンクは本人専用で、一度だけ使用できます。",
+    "Apri simulazione": "シミュレーションを開く",
+    "Torna alla vista pubblica": "公開表示に戻る",
+    "Apri gli strumenti proprietario": "オーナーツールを開く",
+    "Esci dal tuo account": "ログアウト",
+    "Vista pubblica ripristinata.": "公開表示に戻りました。",
+    "Accedi nuovamente per continuare.": "続行するには再度ログインしてください。",
+    "Strumenti riservati non disponibili.": "専用ツールを利用できません。",
+    "Il sito sta ancora terminando il caricamento.": "サイトの読み込みがまだ完了していません。",
+    "Sei uscito. Il sito è tornato alla vista pubblica.": "ログアウトしました。サイトは公開表示に戻りました。",
+    "Accesso chiuso su questo dispositivo. Connessione al servizio non disponibile.": "この端末のログインを終了しました。サービスに接続できません。",
+    "Troppe richieste. Attendi un minuto e riprova.": "リクエストが多すぎます。1分待ってから再度お試しください。",
+    "Accesso non disponibile. Controlla i dati e riprova.": "ログインできません。入力内容を確認して再度お試しください。",
+    "Verifichiamo il tuo accesso.": "ログインを確認しています。",
+    "Tra poco tornerai alla tua città.": "まもなく街に戻ります。",
+    "Il link non è valido oppure è già stato utilizzato. Richiedi un nuovo accesso.": "リンクが無効か、すでに使用されています。新しいログインリンクをリクエストしてください。",
+    "Questo account non è autorizzato ad aprire la simulazione.": "このアカウントにはシミュレーションを開く権限がありません。",
+    "Torna al sito": "サイトに戻る",
+    "🧪 Simulazione e test": "🧪 シミュレーション・テスト",
+    "Le modifiche di prova restano in questa sessione. Torna alla vista pubblica per ripristinare la città.": "テストの変更はこのセッション内のみ有効です。公開表示に戻ると街が元に戻ります。",
+    "👥 Abitanti simulati:": "👥 シミュレーション住民数：",
+    "Numero di case simulate": "シミュレーション住宅数",
+    "Numero esatto di case": "住宅数を指定",
+    "Applica": "適用",
+    "Sposta il cursore per scegliere. Rilascia per generare la città; oppure inserisci il numero esatto e premi Applica.": "スライダーで数を選び、離すと街を生成します。正確な数を入力して「適用」を押すこともできます。",
+    "🏗️ Evoluzione casa (demo)": "🏗️ 住宅の進化（デモ）",
+    "Clicca qualsiasi casa nel 3D per scegliere quale far evolvere: il lotto rimane fisso.": "3D表示の家を選んで進化させられます。敷地の位置は変わりません。",
+    "Attività di prova": "テスト用店舗",
+    "+1 negozio": "店舗を1軒追加",
+    "+100 negozi": "店舗を100軒追加",
+    "Azzera negozi": "テスト用店舗をリセット",
+    "Lingua": "言語",
+    "Prepariamo la tua lingua.": "言語を準備しています。",
+    "Aggiorniamo testi e cartelli della città.": "街のテキストと看板を更新しています。",
+    "Lingua non disponibile. Controlla la connessione e riprova.": "この言語を読み込めませんでした。接続を確認して再度お試しください。",
+    "Classifica": "ランキング",
+    "abitanti": "人の住民",
+    "Negozi": "店舗",
+    "Email": "メールアドレス",
+    "Premium": "プレミアム",
+    "Hotel": "ホテル",
+    "Cinema": "映画館",
+    "Africa": "アフリカ",
+    "Asia": "アジア",
+    "Oceania": "オセアニア",
+    "Terracotta": "テラコッタ",
+    "Zoom in": "拡大",
+    "Zoom out": "縮小",
+    "A JavaScript library for interactive maps": "インタラクティブ地図のライブラリ",
+    "Località:": "場所：",
+    "· Terre: Natural Earth": "· 陸地：Natural Earth",
+    "· Terreno:": "· 地形：",
+    "Seleziona una città del mondo: ogni città ha case evolute, negozi e mongolfiere. Avvicinati per scoprire giardini, attività e piazze. Puoi ruotare, spostarti liberamente e selezionare le case.": "世界の都市を選んで住宅、お店、熱気球を探索しましょう。近づくと庭やお店、広場が見えてきます。視点を回転・移動し、家を選択できます。",
+    "Trascina per spostarti. Usa Ruota per inclinare la visuale. Su telefono allarga due dita per avvicinarti e chiudile per allontanarti. Tocca una casa, un’attività o una persona per aprire la sua scheda.": "ドラッグで移動し、「回転」で視点を傾けます。スマートフォンでは2本の指を広げて拡大、閉じて縮小します。家、お店、人物をタップすると詳細が開きます。",
+    "Statue, fontane e dettagli della piazza": "広場の像・噴水・細部",
+    "Cerca una struttura…": "施設を検索…",
+    "Cerca strutture pubbliche": "公共施設を検索",
+    "IL TUO NEGOZIO": "あなたのお店を",
+    "PUÒ ESSERE QUI": "ここに開こう",
+    "PROSSIMA OPERA": "次の公共施設",
+    "LA CITTÀ CRESCE": "成長する都市",
+    "Scopri il traguardo": "次の目標を見る",
+    "Scopri le attività": "お店を見る",
+    "PIAZZA DI QUARTIERE": "地区の広場",
+    "Cespuglio": "低木",
+    "Sfera fiorita": "花咲く丸い低木",
+    "Arbusto a foglie": "葉の茂る低木",
+    "Siepe compatta": "コンパクトな生け垣",
+    "Cespuglio a tre chiome": "三つの樹冠の低木",
+    "Vialetto": "庭の小道",
+    "Pietra chiara": "明るい石",
+    "Pietra scura": "暗い石",
+    "Cotto": "テラコッタタイル",
+    "Lastre separate": "飛び石",
+    "Aiuola": "花壇",
+    "Fiori misti": "ミックスフラワー",
+    "Rose rosse": "赤いバラ",
+    "Margherite": "デイジー",
+    "Lavanda": "ラベンダー",
+    "Lampioncino": "庭園灯",
+    "Classico": "クラシック",
+    "Globo": "球形",
+    "Lanterna quadrata": "四角いランタン",
+    "Paletto moderno": "モダンなポール灯",
+    "Barbecue Premium": "プレミアムBBQ",
+    "Muratura con cappa": "フード付きレンガグリル",
+    "Griglia con coperchio": "ふた付きグリル",
+    "Forno a legna": "薪窯",
+    "Cucina BBQ moderna": "モダンなBBQキッチン",
+    "Cassetta postale": "郵便受け",
+    "Rossa": "レッド",
+    "Nera": "ブラック",
+    "Casetta": "家形",
+    "Acciaio": "スチール",
+    "Recinzione": "フェンス",
+    "Legno": "木製",
+    "Ferro": "鉄製",
+    "Siepe": "生け垣",
+    "Muretto": "低い塀",
+    "Piscina Premium": "プレミアムプール",
+    "Piscina classica": "クラシックプール",
+    "Piscina ovale": "楕円形プール",
+    "Piscina sportiva": "競泳プール",
+    "Piscina rotonda": "円形プール",
+    "🌿 Giardino: non sbloccato": "🌿 庭：未解放",
+    "Scegli una città del mondo. Il puntatore della città rimane della stessa dimensione.": "都市を選んで世界を探索しましょう。",
+    "📍 Conegliano e dintorni · Veneto": "📍 Coneglianoと周辺 · Veneto",
+    "Cerca città nel mondo": "世界の都市を検索",
+    "N ↑": "北 ↑",
+    "Evoluzione attività": "店舗の進化",
+    "Design Premium (demo)": "プレミアムデザイン（デモ）",
+    "Applica evoluzione": "進化を適用",
+    "🏗️ Evoluzione di questa casa (demo)": "🏗️ この家の進化（デモ）",
+    "Scegli i punti e il design: cambia solo questa casa, senza spostare il lotto.": "ポイントとデザインを選ぶと、この家だけが変わります。敷地は移動しません。",
+    "Punti esatti per questa casa": "この家のポイントを指定",
+    "Applica punti": "ポイントを適用",
+    "🎨 Design per questa evoluzione": "🎨 この進化段階のデザイン",
+    "Gratis · Casa standard": "無料 · 標準住宅",
+    "Abbonamento · Casa con balconi, camino e dettagli": "サブスクリプション · バルコニー、煙突、装飾付き住宅",
+    "🎨 Colore della casa": "🎨 住宅の色",
+    "🌿 Personalizza le decorazioni · 4 modelli per sblocco": "🌿 装飾をカスタマイズ · 解放ごとに4モデル",
+    "Casa senza piante a 0 punti.": "0ポイントでは植物はありません。",
+    "4 piante con Premium": "プレミアムでは植物4本",
+    "2 piante con Gratis": "無料では植物2本",
+    "posizioni automatiche.": "自動配置。",
+    "Simulazione dell’abbonamento: non viene effettuato alcun pagamento.": "サブスクリプションのシミュレーションです。支払いは発生しません。",
+    "Acquisti dimostrativi: nessun pagamento reale.": "デモ購入です。実際の支払いはありません。",
+    "🏪 Aggiungi negozio": "🏪 店舗を追加",
+    "🎈 Aggiungi mongolfiera": "🎈 熱気球を追加",
+    "📍 Vai alla mia casa": "📍 マイホームへ移動",
+    "La personalizzazione della facciata sarà ampliata nelle prossime versioni.": "外観のカスタマイズは今後のバージョンで拡充予定です。",
+    "Colore della pelle": "肌の色",
+    "Vestiti": "服装",
+    "📍 Trova il mio personaggio": "📍 マイキャラクターを探す",
+    "Personaggio non generato": "キャラクターが生成されていません",
+    "Pizzeria": "ピザ店",
+    "PIZZERIA": "ピザ店",
+    "Opera mappata": "地図で確認された作品",
+    "Fontana mappata": "地図で確認された噴水",
+    "Prepariamo la città e i suoi dintorni.": "都市と周辺地域を準備しています。",
+    "Design Premium (demo abbonamento)": "プレミアムデザイン（サブスクデモ）",
+    "Design Gratis": "無料デザイン",
+    "San Martín anziano in abiti civili con mantello al vento, sopra base rocciosa con tre rilievi. Il monumento equestre appartiene al Parque San Martín, non a questa piazza.": "風になびくマントと私服姿の晩年のSan Martín像。3つの浮き彫りがある岩の台座に立っています。騎馬像はこの広場ではなくParque San Martínにあります。",
+    "Giardino-calendario cartografato: aiuola floreale con anno corrente. Disegno delle fioriture interpretato, non un rilievo fotografico.": "地図で確認された花のカレンダーです。花壇に今年の年号を表現しています。花の配置は解釈によるもので、写真測量ではありません。",
+    "San Martín equestre, bronzo su basamento in granito con rilievi.": "浮き彫りのある花崗岩の台座に立つ、青銅のSan Martín騎馬像。",
+    "Arenales a cavallo con quindici figure allegoriche alla base.": "台座の周りに15体の寓意像があるArenales騎馬像。",
+    "Libertà di Lola Mora, marmo di Carrara, panneggio e catene spezzate; nessuno scudo o cavallo.": "Lola Mora作の「自由」。カララ大理石で、衣のひだと断ち切られた鎖を表現しています。盾や馬はありません。",
+    "Posizione: cartografia · orientamento e dettagli fini ancora da verificare": "位置：地図資料に基づく · 向きと細部は未確認",
+    "Accesso proprietario · Casa por Casa": "オーナーログイン · Casa por Casa",
+    "PARCO DI QUARTIERE": "地区公園",
+    "ACQUEDOTTO E SERBATOIO": "水道・貯水施設",
+    "AMBULATORIO E PRONTO SOCCORSO": "診療所・救急外来",
+    "STAZIONE DI POLIZIA": "警察署",
+    "CASERMA DEI POMPIERI": "消防署",
+    "ASILO E AREA GIOCHI": "保育園・遊び場",
+    "SCUOLA PRIMARIA": "小学校",
+    "CENTRO RACCOLTA E RICICLO": "資源回収・リサイクル施設",
+    "CAMPO DA CALCIO": "サッカー場",
+    "BIBLIOTECA PUBBLICA": "公共図書館",
+    "OSPEDALE GENERALE": "総合病院",
+    "MUNICIPIO": "市役所",
+    "AUTOSTAZIONE": "バスターミナル",
+    "CENTRALE ELETTRICA DI QUARTIERE": "地区発電所",
+    "GIARDINI E AREA GIOCHI": "庭園・遊び場",
+    "CENTRO COMMERCIALE": "ショッピングモール",
+    "CAMPO DA BASEBALL": "野球場",
+    "CENTRO SPORTIVO": "スポーツセンター",
+    "MUSEO CIVICO": "市立博物館",
+    "TEATRO E AUDITORIUM": "劇場・ホール",
+    "PISCINA COMUNALE": "市営プール",
+    "STADIO CITTADINO": "市立スタジアム",
+    "UNIVERSITÀ E CAMPUS": "大学・キャンパス",
+    "STAZIONE FERROVIARIA": "鉄道駅",
+    "PALAZZO DI GIUSTIZIA": "裁判所",
+    "DEPURATORE E SERVIZI AMBIENTALI": "下水処理・環境施設",
+    "PIAZZA MONUMENTALE": "記念広場",
+    "ELIPORTO DI SOCCORSO": "救急ヘリポート",
+    "ORTO BOTANICO E SERRE": "植物園・温室",
+    "CAFFETTERIA": "カフェ",
+    "SUPERMERCATO": "スーパーマーケット",
+    "RISTORANTE": "レストラン",
+    "LIBRERIA": "書店",
+    "FARMACIA": "薬局",
+    "NEGOZIO DI MODA": "衣料品店",
+    "OFFICINA": "整備工場",
+    "PANETTERIA": "パン屋",
+    "CINEMA": "映画館",
+    "PALESTRA": "ジム",
+    "HOTEL": "ホテル",
+    "MERCATO": "市場",
+    "Alcuni elementi della città non sono stati caricati. Puoi riprovare.": "街の一部の要素を読み込めませんでした。もう一度お試しください。"
+  },
+  "templates": [
+    {
+      "source": "{count} risultati",
+      "target": "{count}件の結果"
+    },
+    {
+      "source": "{city} · {count} case · {shops} attività",
+      "target": "{city} · 住宅{count}軒 · 店舗{shops}軒"
+    },
+    {
+      "source": "Casa · {city}",
+      "target": "住宅 · {city}"
+    },
+    {
+      "source": "🌿 Giardino: {plant} · {count} piante",
+      "target": "🌿 庭：{plant} · 植物{count}本",
+      "translateSlots": [
+        "plant"
+      ]
+    },
+    {
+      "source": "🎨 Colore: {color}",
+      "target": "🎨 色：{color}",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "🏗️ {tier} · {floors} piani",
+      "target": "🏗️ {tier} · {floors}階建て",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "🎨 Design: {design}",
+      "target": "🎨 デザイン：{design}",
+      "translateSlots": [
+        "design"
+      ]
+    },
+    {
+      "source": "⭐ {points} punti",
+      "target": "⭐ {points}ポイント"
+    },
+    {
+      "source": "{count} case mancanti",
+      "target": "あと住宅{count}軒"
+    },
+    {
+      "source": "{version} · Edizione mondiale",
+      "target": "{version} · ワールドエディション"
+    },
+    {
+      "source": "Prossima fermata: {city}.",
+      "target": "次の目的地：{city}。"
+    },
+    {
+      "source": "{city} · {count} case · {shops} negozi · {facilities} strutture pubbliche",
+      "target": "{city} · 住宅{count}軒 · 店舗{shops}軒 · 公共施設{facilities}件"
+    },
+    {
+      "source": "{city} · città raggiunta · {count} case",
+      "target": "{city} · 到着 · 住宅{count}軒"
+    },
+    {
+      "source": "{city} · {count} case · scegli Entra nel 3D",
+      "target": "{city} · 住宅{count}軒 · 「3D表示を開く」を選択"
+    },
+    {
+      "source": "{count} risultati mostrati · scrivi per restringere la ricerca",
+      "target": "{count}件を表示中 · 入力して絞り込み"
+    },
+    {
+      "source": "{count} risultati mostrati",
+      "target": "{count}件を表示中"
+    },
+    {
+      "source": "Utente non presente in {city}",
+      "target": "{city}にユーザーが見つかりません"
+    },
+    {
+      "source": "Esplora {city} con la telecamera libera.",
+      "target": "自由なカメラで{city}を探索しましょう。"
+    },
+    {
+      "source": "🏠 Casa #{id} · @{user}",
+      "target": "🏠 住宅 #{id} · @{user}"
+    },
+    {
+      "source": "🏠 Casa #{id}",
+      "target": "🏠 住宅 #{id}"
+    },
+    {
+      "source": "Casa #{id}",
+      "target": "住宅 #{id}"
+    },
+    {
+      "source": "{points} punti",
+      "target": "{points}ポイント"
+    },
+    {
+      "source": "{count} case",
+      "target": "住宅{count}軒"
+    },
+    {
+      "source": "{count} negozi · lotti misti",
+      "target": "店舗{count}軒 · 複合区画"
+    },
+    {
+      "source": "{count} mongolfiere",
+      "target": "熱気球{count}機"
+    },
+    {
+      "source": "Livello {level}/{total}",
+      "target": "レベル{level}/{total}"
+    },
+    {
+      "source": "Proprietà raggiungibili ({count})",
+      "target": "関連する所有物（{count}件）"
+    },
+    {
+      "source": "Raggiungi {city}",
+      "target": "{city}へ移動"
+    },
+    {
+      "source": "{city} · {count} abitanti virtuali",
+      "target": "{city} · 仮想住民{count}人"
+    },
+    {
+      "source": "{business} · {city} · Livello {level}/{total} · {points} punti · {design}",
+      "target": "{business} · {city} · レベル{level}/{total} · {points}ポイント · {design}",
+      "translateSlots": [
+        "business",
+        "design"
+      ]
+    },
+    {
+      "source": "{business} #{id} · @{user}",
+      "target": "{business} #{id} · @{user}",
+      "translateSlots": [
+        "business"
+      ]
+    },
+    {
+      "source": "🏪 {business} #{id}",
+      "target": "🏪 {business} #{id}",
+      "translateSlots": [
+        "business"
+      ]
+    },
+    {
+      "source": "{tier} ({floors} piani)",
+      "target": "{tier}（{floors}階建て）",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{tier} ({floors} piano)",
+      "target": "{tier}（{floors}階建て）",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{count} CASE",
+      "target": "住宅{count}軒"
+    },
+    {
+      "source": "{city} · {count} case · {reached}/{total} obiettivi raggiunti",
+      "target": "{city} · 住宅{count}軒 · 目標{reached}/{total}達成"
+    },
+    {
+      "source": "🏙 {city} · {distance} km",
+      "target": "🏙 {city} · {distance} km"
+    },
+    {
+      "source": "📍 Trova {facility}",
+      "target": "📍 {facility}を探す",
+      "translateSlots": [
+        "facility"
+      ]
+    },
+    {
+      "source": "Personaggio · {city}",
+      "target": "キャラクター · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Mongolfiera · {city}",
+      "target": "熱気球 · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Negozio · {city}",
+      "target": "店舗 · {city}",
+      "translateSlots": []
+    },
+    {
+      "source": "Livello {level} · {points} punti",
+      "target": "レベル{level} · {points}ポイント",
+      "translateSlots": []
+    },
+    {
+      "source": "{points} punti · {tier} ({floors} piani)",
+      "target": "{points}ポイント · {tier}（{floors}階建て）",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{color} · pareti e tetto",
+      "target": "{color} · 壁と屋根",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "🎈 Mongolfiera #{id}",
+      "target": "🎈 熱気球 #{id}",
+      "translateSlots": []
+    },
+    {
+      "source": "Casa demo di @{user}",
+      "target": "@{user}のデモ住宅",
+      "translateSlots": []
+    },
+    {
+      "source": "@{user} · personaggio selezionato (freccia gialla)",
+      "target": "@{user} · 選択中のキャラクター（黄色の矢印）",
+      "translateSlots": []
+    },
+    {
+      "source": "Nella demo la prima casa appartiene a @{user}. Non è ancora presente un sistema di accesso personale.",
+      "target": "デモの最初の家は@{user}のものです。住民向けの個人ログインはまだありません。",
+      "translateSlots": []
+    },
+    {
+      "source": "Un personaggio gratuito per ogni casa. In questa demo puoi individuare il personaggio di @{user}.",
+      "target": "各住宅に無料キャラクターが1人付きます。このデモでは@{user}のキャラクターを探せます。",
+      "translateSlots": []
+    },
+    {
+      "source": "Cespuglio: {variant}",
+      "target": "低木：{variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Vialetto: {variant}",
+      "target": "庭の小道：{variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Aiuola: {variant}",
+      "target": "花壇：{variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Lampioncino: {variant}",
+      "target": "庭園灯：{variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Barbecue Premium: {variant}",
+      "target": "プレミアムBBQ：{variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Cassetta postale: {variant}",
+      "target": "郵便受け：{variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Recinzione: {variant}",
+      "target": "フェンス：{variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Piscina Premium: {variant}",
+      "target": "プレミアムプール：{variant}",
+      "translateSlots": [
+        "variant"
+      ]
+    },
+    {
+      "source": "Casa #{id} · colore {color}",
+      "target": "住宅 #{id} · 色：{color}",
+      "translateSlots": [
+        "color"
+      ]
+    },
+    {
+      "source": "Demo @{user} · Casa #{id} · {points} punti · {tier}",
+      "target": "デモ @{user} · 住宅 #{id} · {points}ポイント · {tier}",
+      "translateSlots": [
+        "tier"
+      ]
+    },
+    {
+      "source": "{count} località nel catalogo · {countries} paesi e territori · simulazione · {residents} in {city} · {points} punti città · {homes} case 3D caricate",
+      "target": "登録場所{count}件 · {countries}の国・地域 · シミュレーション · {city}の住民{residents}人 · 都市ポイント{points} · 3D住宅{homes}軒読み込み済み",
+      "translateSlots": []
+    },
+    {
+      "source": "Piazza civica di {city}",
+      "target": "{city}の市民広場",
+      "translateSlots": []
+    }
+  ],
+  "verification": {
+    "messages": 360,
+    "templates": 61,
+    "browserEvidence": "Cartello_giapponese_Tokyo_v9.4.0.jpg",
+    "privateOptions": "all eight tiers; source normalization and translation regression checked",
+    "scope": "Current game UI; further languages remain in development"
+  }
+}
