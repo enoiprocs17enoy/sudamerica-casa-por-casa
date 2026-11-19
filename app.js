@@ -822,6 +822,7 @@ function updateCitySelection(){
 function selectCity(id,fly=false){
  const next=window.WorldAtlas?.byId.get(id)||CITY_CATALOG.find(c=>c.id===id);
  if(!next||next.geoVerified===false)return;
+ window.WorldSearch?.clearCountry();
  if(active)back();
  currentCity=next;
  if(!cityStates.has(next.id))cityStates.set(next.id,{count:next.pop,shops:Math.max(1,Math.round(next.pop/28)),balloons:Math.min(8,Math.max(1,Math.floor(next.pop/380)))});
@@ -832,6 +833,7 @@ function selectCity(id,fly=false){
  v4.balloons=state.balloons;
  count=state.count;
  homes=createHomes(count);
+ window.WorldSearch?.rememberResidents(currentCity,homes);
  $('counter').textContent=count.toLocaleString(window.GameI18n?.locale||'it-IT');
  $('v4Population').textContent=count.toLocaleString(window.GameI18n?.locale||'it-IT');
  syncPopulationControls();
@@ -6556,7 +6558,7 @@ function showCard(h){showOwnerCard(h,'casa')}
 function enterNow(build=rebuildNow){if(!active&&window.WorldRoads){WorldRoads.sync();const p=WorldRoads.cityPlan(currentCity,worldCityCells(),WorldAtlas);azimuth=0;elevation=1.12;distance=Math.min(3500,Math.max(360,(Math.max(p.bounds.maxX-p.bounds.minX,p.bounds.maxZ-p.bounds.minZ))*.85));}if(!threeReady&&!makeScene())return false;active=true;document.body.classList.add("city-view");if(window.matchMedia('(max-width:720px), (max-height:480px)').matches){document.body.classList.add('wide-city');const toggle=$('cityPanelToggle');if(toggle){toggle.textContent='☰ Comandi';toggle.setAttribute('aria-expanded','false');}}$('threeLayer').classList.add('active');$('threeLayer').style.opacity=1;map.dragging.disable();map.scrollWheelZoom.disable();const built=build();const finish=()=>{updateCamera();resize();void ensureCitySquare(currentCity);void ensureRegionalCatalog(currentCity);return true;};return built?.then?built.then(finish):finish();}
 function back(){clearAvatarLabels();active=false;document.body.classList.remove("city-view");$('threeLayer').style.opacity=0;$('threeLayer').classList.remove('active');$('card').style.display='none';map.dragging.enable();map.scrollWheelZoom.enable();$('status').textContent='Mappa geografica · le città sono posizionate con coordinate reali'}
 function onZoom(){
- if(active||suppressMapEntry||cityEntryPromise)return;
+ if(active||suppressMapEntry||cityEntryPromise||window.WorldSearch?.getSelectedCountry())return;
  const nearest=cityAtMapCenter();
  const near=nearest&&nearest.distance<50000;
  const z=map.getZoom();
