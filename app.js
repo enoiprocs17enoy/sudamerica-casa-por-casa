@@ -6855,7 +6855,7 @@ function residentWalkPoint(a,t){
   if(edge?.crossing&&a.crossed!==next){a.crossed=next;a.pause=.9+residentRandom(a)*1.8;budget=0;}
   const dest=residentNavigation.nodes[next],dx=dest.x-a.g.position.x,dz=dest.z-a.g.position.z,length=Math.hypot(dx,dz);
   if(budget>0&&length>.001){const yaw=Math.atan2(dx,dz),turn=Math.atan2(Math.sin(yaw-a.g.rotation.y),Math.cos(yaw-a.g.rotation.y));a.g.rotation.y+=Math.max(-dt*4,Math.min(dt*4,turn));if(Math.abs(turn)<.75){const travel=Math.min(budget,length),u=travel/length;a.g.position.x+=dx*u;a.g.position.z+=dz*u;a.walkDistance+=travel;moving=true;}else budget=0;}
-  if(length<=budget+.002){a.g.position.set(dest.x,0,dest.z);a.node=next;a.route.shift();if(!a.route.length){a.pause=(a.activity==='public'?5:a.activity==='shop'?7:2)+residentRandom(a)*10;a.crossed=null;}}
+  if(length<=budget+.002){a.g.position.x=dest.x;a.g.position.z=dest.z;a.node=next;a.route.shift();if(!a.route.length){a.pause=(a.activity==='public'?5:a.activity==='shop'?7:2)+residentRandom(a)*10;a.crossed=null;}}
  }
  return{x:a.g.position.x,z:a.g.position.z,angle:a.g.rotation.y,moving};
 }
@@ -6863,7 +6863,7 @@ function v45Avatar(h,i){
  const g=new THREE.Object3D(),node=residentNavigation.frontage(h.blockIndex,h.slot),at=residentNavigation.nodes[node];
  let seed=2166136261;for(const ch of (h.cityId||'')+':'+h.id)seed=Math.imul(seed^ch.charCodeAt(0),16777619);
  const a={g,i,home:h,bounds:plotBounds(h.blockIndex,h.slot),phase:rnd(i*13+9)*6.28,node,route:[],recent:[],randomState:seed>>>0,walkDistance:0,pause:i===0?0:rnd(i*31+6)*7};
- a.speed=.95+residentRandom(a)*.65;g.position.set(at.x,0,at.z);g.rotation.y=i%2?Math.PI/2:-Math.PI/2;planResidentTrip(a);a.x=at.x;a.z=at.z;return a;
+ a.speed=.95+residentRandom(a)*.65;g.position.set(at.x,.115,at.z);g.rotation.y=i%2?Math.PI/2:-Math.PI/2;planResidentTrip(a);a.x=at.x;a.z=at.z;return a;
 }
 
 function v45Bird(i,x,z,phase){
@@ -7165,7 +7165,7 @@ function animateLife(t){if(!active||!v4.motion)return;
    a.g.position.x=pt.x;
    a.g.position.z=pt.z;
    a.g.rotation.y=pt.angle;
-   a.g.position.y=pt.moving?Math.abs(Math.sin(a.walkDistance*4.8))*.035:Math.sin(t*1.6+a.phase)*.008;
+   a.g.position.y=.115+(pt.moving?Math.abs(Math.sin(a.walkDistance*4.8))*.035:Math.sin(t*1.6+a.phase)*.008);
    a.gait=pt.moving?Math.sin(a.walkDistance*4.8+a.phase)*.72:0;
    a.gaze=pt.moving?0:Math.sin(t*.65+a.phase)*.18;
    a.gesture=!pt.moving&&a.i%5===0?Math.max(0,Math.sin(t*1.1+a.phase))*.38:0;
