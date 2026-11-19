@@ -6518,6 +6518,7 @@ function ownedProperties(h){
 }
 function showOwnerCard(h,kind='casa',selected=null){
  if(!h)return;localizedOwnerCard={h,kind,selected};
+ if(kind!=='persona')clearResidentFocus();
  const props=ownedProperties(h);
  const name=kind==='persona'?'🧑':kind==='negozio'?'🏪':kind==='mongolfiera'?'🎈':'🏠';
  $('username').textContent=name+' @'+h.user;
@@ -6537,6 +6538,8 @@ function showOwnerCard(h,kind='casa',selected=null){
   addFact('⭐ '+format(progress.points)+' punti');
   addFact('🎨 Design: '+(progress.premium?'Premium':'Base'));
   addFact('🎨 Colore: '+HOUSE_PAINTS[progress.paintIndex].name);
+ }else if(kind==='persona'){
+  addFact('⭐ '+format(h.points)+' punti');
  }else{
   const tier=HOUSE_TIERS[houseTier(h.points)];
   const premium=isPremiumHouse(h);
@@ -6666,10 +6669,30 @@ function showOwnerCard(h,kind='casa',selected=null){
 }
 function showShopCard(shop){showOwnerCard(ownerForShop(shop),'negozio',shop)}
 function showBalloonCard(balloon){showOwnerCard(homes.find(h=>h.id===balloon.ownerId)||homes[0],'mongolfiera',balloon)}
-function showPersonCard(a){showOwnerCard(a.home,'persona')}
+function clearResidentFocus(){
+ const marker=window.v49Focus?.group;
+ if(!marker)return;
+ marker.removeFromParent();
+ for(const part of marker.children){part.geometry.dispose();part.material.dispose();}
+ window.v49Focus=null;
+}
+function showPersonCard(person){
+ if(window.v49Focus?.person!==person){
+  clearResidentFocus();
+  const marker=new THREE.Group();
+  const material=()=>new THREE.MeshBasicMaterial({color:0xffd84e,side:THREE.DoubleSide,depthTest:false,depthWrite:false});
+  const ring=new THREE.Mesh(new THREE.RingGeometry(1.25,1.62,28),material());
+  ring.rotation.x=-Math.PI/2;ring.position.y=.16;ring.renderOrder=6;
+  const arrow=new THREE.Mesh(new THREE.ConeGeometry(.45,.82,8),material());
+  arrow.rotation.z=Math.PI;arrow.position.y=3.55;arrow.renderOrder=6;
+  marker.position.copy(person.g.position);marker.add(ring,arrow);
+  group.add(marker);window.v49Focus={group:marker,person};
+ }
+ showOwnerCard(person.home,'persona');
+}
 function showCard(h){showOwnerCard(h,'casa')}
 function enterNow(build=rebuildNow){if(!active&&window.WorldRoads){WorldRoads.sync();const p=WorldRoads.cityPlan(currentCity,worldCityCells(),WorldAtlas);azimuth=0;elevation=1.12;distance=Math.min(3500,Math.max(360,(Math.max(p.bounds.maxX-p.bounds.minX,p.bounds.maxZ-p.bounds.minZ))*.85));}if(!threeReady&&!makeScene())throw Error('3D engine unavailable');active=true;document.body.classList.add("city-view");if(window.matchMedia('(max-width:720px), (max-height:480px)').matches){document.body.classList.add('wide-city');const toggle=$('cityPanelToggle');if(toggle){toggle.textContent='☰ Comandi';toggle.setAttribute('aria-expanded','false');}}$('threeLayer').classList.add('active');$('threeLayer').style.opacity=1;map.dragging.disable();map.scrollWheelZoom.disable();const built=build();const finish=()=>{updateCamera();resize();drawCityFrame();void ensureCitySquare(currentCity);void ensureRegionalCatalog(currentCity);return true;};return built?.then?built.then(finish):finish();}
-function back(){clearAvatarLabels();active=false;document.body.classList.remove("city-view");$('threeLayer').style.opacity=0;$('threeLayer').classList.remove('active');$('card').style.display='none';$('cityErrorNotice')?.remove();map.dragging.enable();map.scrollWheelZoom.enable();$('status').textContent='Mappa geografica · le città sono posizionate con coordinate reali'}
+function back(){clearAvatarLabels();clearResidentFocus();active=false;document.body.classList.remove("city-view");$('threeLayer').style.opacity=0;$('threeLayer').classList.remove('active');$('card').style.display='none';$('cityErrorNotice')?.remove();map.dragging.enable();map.scrollWheelZoom.enable();$('status').textContent='Mappa geografica · le città sono posizionate con coordinate reali'}
 function onZoom(){
  if(active||suppressMapEntry||cityEntryPromise||window.WorldSearch?.getSelectedCountry())return;
  const nearest=cityAtMapCenter();
@@ -6769,7 +6792,7 @@ $('go').onclick=()=>map.flyTo([currentCity.lat,currentCity.lng],12,{duration:1.1
 $('enter').onclick=()=>{map.setView([currentCity.lat,currentCity.lng],12);enter()};
 $('back').onclick=()=>{back();map.setView([currentCity.lat,currentCity.lng],9)};
 $('close').setAttribute('aria-label','Chiudi');
-$('close').onclick=()=>{$('card').style.display='none'};
+$('close').onclick=()=>{$('card').style.display='none';localizedOwnerCard=null;clearResidentFocus();};
 async function findResident(query,kind='casa',report=message=>{$('status').textContent=message;}){
  const q=query.trim().replace(/^@+/,'').trim().toLowerCase();
  const comment=simulatedComments.find(entry=>entry.user===q);
@@ -7387,7 +7410,7 @@ function animateLife(t){if(!active||!v4.motion)return;
   commitResidentMatrices(chosenPeople);
   if(window.v49Focus){
    const {group:marker,person}=window.v49Focus;
-   marker.position.set(person.g.position.x,0,person.g.position.z);
+   marker.position.copy(person.g.position);
   }
  }
  for(const b of life.birds){
@@ -7707,17 +7730,9 @@ function openV4(tab,focusHeading=true){
   const h=homes[0];if(!h)return;
   const a=avatar?life.people.find(person=>person.home?.id===h.id):null;
   if(avatar&&!a){$('status').textContent='Personaggio non generato';return;}
-  if(window.v49Focus){group.remove(window.v49Focus);window.v49Focus=null;}
   if(avatar){
    // Always select the real avatar object, not the home or a guessed offset.
    const anchor=a.g.position;
-   const focusGroup=new THREE.Group();
-   const ring=new THREE.Mesh(new THREE.RingGeometry(1.65,2.15,32),new THREE.MeshBasicMaterial({color:0xffd84e,side:THREE.DoubleSide,depthTest:false}));
-   ring.rotation.x=-Math.PI/2;ring.position.y=.2;focusGroup.add(ring);
-   const arrow=new THREE.Mesh(new THREE.ConeGeometry(.85,1.5,6),new THREE.MeshBasicMaterial({color:0xffd84e,depthTest:false}));
-   arrow.rotation.z=Math.PI;arrow.position.y=5.8;focusGroup.add(arrow);
-   group.add(focusGroup);window.v49Focus={group:focusGroup,person:a};
-   focusGroup.position.set(anchor.x,0,anchor.z);
    // Stable view above the avatar; the marker and selected avatar are centered.
    flyToWorld({x:anchor.x,y:1.7,z:anchor.z},{distance:46,elevation:1.42,azimuth:.68});
    showPersonCard(a);
