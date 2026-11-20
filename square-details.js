@@ -23,6 +23,7 @@ Object.assign(MODEL_SPECS,{
  'franklin-fountain':{height:2.5,width:6.8,depth:6.8,parcelWidth:.51},
  'freedom-arches':{height:4.8,width:9.9,depth:6.8,parcelWidth:.64},
  'liberty-carousel':{height:5.2,width:7.8,depth:7.8,parcelWidth:.25},
+ 'se-anchieta':{height:9.37,width:2.6,depth:2.05},
  'marco-zero':{height:1.15,width:5.7,depth:5.7,parcelWidth:.3},
  'dam-memorial':{height:12,width:6.9,depth:6.9,parcelWidth:.4},
  'senate-monument':{height:8.9,width:6.8,depth:6.8,parcelWidth:.42},
@@ -40,12 +41,14 @@ Object.assign(MODEL_SPECS,{
  'bratislava-maximilian-fountain':{height:10.5,width:10.4,depth:8.6},
  'bratislava-city-guard':{height:2.68,width:.91,depth:1.42},
  'bratislava-napoleonic-soldier':{height:1.53,width:1.80,depth:1.18},
+ 'andorra-casa-de-la-vall':{height:14.5,width:20.6,depth:17.2,parcelWidth:.7},
  'cuenca-calderon-monument':{height:6.5,width:3.9,depth:3.9},
  'cuenca-calderon-glorieta':{height:4.8,width:7.2,depth:7.2},
  'budapest-millennium-column':{height:40.5,width:17,depth:17,parcelWidth:.5},
  'budapest-millennium-colonnade-north':{height:8.2,width:38,depth:14,parcelWidth:.85},
  'budapest-millennium-colonnade-east':{height:8.2,width:16,depth:38,parcelWidth:.85},
  'budapest-heroes-memorial-stone':{height:.85,width:10,depth:6,parcelWidth:.5},
+ 'hong-kong-thomas-jackson':{height:6.2,width:3.65,depth:3.8},
  'kingston-manley-statue':{height:5,width:3,depth:3},
  'kingston-bustamante-statue':{height:5,width:3,depth:3},
  'waharoa':{height:7,width:10.132,depth:.62,parcelWidth:.38},
@@ -770,6 +773,14 @@ function render(plan,group,b){
    box(0xb5ad9b,0,.11,0,10,.22,6.0);
    box(0xaaa18f,0,.50,0,8.3,.56,4.0);
    box(0xc5bca7,0,.80,0,8.55,.11,4.18);
+  }else if(model==='hong-kong-thomas-jackson'){
+   const limestone=0xb8ad9b,bronzePatina=0x47584d;
+   box(limestone,0,.20,0,3.65,.40,3.8);
+   box(limestone,0,.56,0,3.25,.34,3.4);
+   box(limestone,0,1.92,0,2.20,2.40,2.34);
+   box(limestone,0,3.23,0,2.75,.24,2.95);
+   plaque(2.06,1.30,1.20);
+   human(0,3.36,0,1.10,'civil',bronzePatina);
   }else if(model==='kingston-manley-statue'||model==='kingston-bustamante-statue'){
    const limestone=0xd7d3c5,darkBronze=0x494c3d,manley=model==='kingston-manley-statue';
    cylinder(limestone,0,.12,0,1.5,.24);
@@ -778,6 +789,26 @@ function render(plan,group,b){
    box(limestone,0,2.59,0,1.77,.18,1.77);
    plaque(1.69,1.10,.78);
    human(0,2.69,0,.88,manley?'civil':'orator',darkBronze);
+  }else if(model==='andorra-casa-de-la-vall'){
+   const granite=0x827a6d,trim=0xa79982,slate=0x454c52,shutter=0x514435;
+   box(granite,0,4.90,0,19.4,9.8,15.9);
+   box(trim,0,9.82,0,19.6,.25,16.1);
+   add('hip-roof','stone',slate,0,9.96,0,20.6,4.12,17.2);
+   for(const y of [4.45,7.43])for(const x of [-6.5,0,6.5]){
+    box(trim,x,y,8.02,1.76,1.78,.21);
+    box(shutter,x,y,8.16,1.22,1.35,.08,'wood');
+    box(granite,x,y,8.22,.08,1.35,.03);
+   }
+   for(const y of [4.45,7.43])for(const z of [-5.14,0,5.14]){
+    box(trim,-9.73,y,z,.20,1.51,1.48);
+    box(shutter,-9.86,y,z,.08,1.10,1.03,'wood');
+   }
+   box(trim,-1.07,1.13,8.04,2.33,2.25,.23);
+   box(shutter,-1.07,1.10,8.19,1.62,2.20,.12,'wood');
+   sphere(shutter,-1.07,2.12,8.20,.81,.52,.08,'wood');
+   cylinder(granite,8.83,7.92,7.42,1.06,4.3);
+   cylinder(trim,8.83,10.11,7.42,1.14,.20);
+   add('cone','stone',slate,8.83,11.22,7.42,1.18,2.19,1.18);
   }else if(model==='cuenca-calderon-monument'){
    const limestone=0xb2a696,darkBronze=0x4c5245;
    box(limestone,0,.20,0,3.90,.40,3.90);
@@ -1379,7 +1410,7 @@ function render(plan,group,b){
     }
    }
    for(const x of [-6.62,-3.26,3.26,6.62])box(cream,x,9.48,9.77,.43,8.45,.26);
-   add('tartu-hip-roof','stone',roof,0,14.27,0,35.95,5.90,19.62);
+   add('hip-roof','stone',roof,0,14.27,0,35.95,5.90,19.62);
    for(let course=0;course<7;course++)box(cream,0,14.24+course*.40,9.33,15.7-course*2.12,.43,.69);
    sphere(0xd6bb9b,0,15.88,9.72,.78,.70,.09,'stone');
    box(cream,0,20.38,0,4.25,2.15,4.25);
@@ -1915,6 +1946,45 @@ function render(plan,group,b){
     box(granite,x,.89,0,1.03,.58,1.21);human(x,1.18,0,.85,'sword');
    }
    plaque(1.51,2.01,1.079);
+  }else if(model==='se-anchieta'){
+   const granite=0x96958f,trim=0xaaa7a0,metal=0x505954,dark=0x424c46;
+   box(trim,0,.17,0,1.96,.34,2.05);
+   box(granite,0,2.28,0,1.80,3.88,1.89);
+   box(trim,0,4.36,0,1.92,.28,2.02);
+   box(0x777771,0,2.87,.96,1.39,.74,.027);
+   for(const side of [-1,1]){
+    box(metal,side*.915,1.97,0,.035,1.34,1.30,'patina');
+    // Reliefs read as incised bronze panels at plaza scale.
+    for(const [y,z,h] of [[1.78,-.34,.42],[1.91,.04,.68],[1.81,.34,.48]]){
+     sphere(0x657067,side*.938,y,z,.022,h*.56,.10,'patina');
+     sphere(0x657067,side*.941,y+h*.52,z,.024,.079,.077,'patina');
+    }
+   }
+   const fig=(x,y,z,rx,ry,rz,c=metal)=>sphere(c,x,y,z,rx,ry,rz,'patina');
+   const join=(a,b,r,c=metal)=>limb(a,b,r,c,'patina');
+   add('robe','patina',metal,.09,5.61,-.15,.79,2.22,.42);
+   join([-.14,4.66,.28],[-.31,5.91,.06],.27);
+   join([.48,4.67,-.03],[.27,5.90,-.08],.28);
+   fig(-.19,4.63,.33,.21,.12,.26,dark);
+   fig(.43,4.64,.12,.24,.14,.28,dark);
+   for(const [x,z] of [[-.53,.06],[-.21,.32],[.12,.39],[.52,.26],[.66,-.28]]){
+    join([x,4.68,z],[x*.56+.06,6.17,z*.34-.06],.105,dark);
+   }
+   fig(.03,6.73,-.01,.53,.75,.37);
+   fig(.43,6.80,-.22,.40,.57,.28);
+   join([.02,7.18,.03],[-.09,7.48,.08],.17);
+   fig(-.11,7.63,.14,.26,.31,.25);
+   fig(-.11,7.71,.03,.28,.26,.23,dark);
+   fig(-.14,7.55,.34,.092,.10,.097);
+   join([-.36,7.11,.04],[-.70,7.53,.16],.22);
+   join([-.70,7.53,.16],[-.93,8.31,.21],.13);
+   fig(-.93,8.34,.21,.145,.15,.115);
+   join([-.95,8.19,.23],[-1.17,9.35,.26],.044,dark);
+   join([-1.26,8.86,.25],[-.83,8.94,.26],.043,dark);
+   join([.37,7.04,.05],[.65,6.74,.18],.20);
+   join([.65,6.74,.18],[.51,7.16,.46],.144);
+   add('box','patina',dark,.49,7.20,.47,.37,.51,.18,new T.Quaternion().setFromAxisAngle(new T.Vector3(0,0,1),-.83));
+   fig(.61,7.18,.53,.12,.14,.11);
   }else if(model==='marco-zero'){
    cylinder(stone,0,.061,0,2.72,.122);
    ring(0x8b897f,0,.13,0,2.42,.052,'stone');
@@ -2323,11 +2393,11 @@ function render(plan,group,b){
   geos['herterich-basin']=new T.LatheGeometry(basin.map(([radius,y])=>new T.Vector2(radius,y)),12);
  }
  if(parts.some(part=>part.kind==='octagonal-column'))geos['octagonal-column']=new T.CylinderGeometry(1,1,1,8);
- if(parts.some(part=>part.kind==='tartu-hip-roof')){
+ if(parts.some(part=>part.kind==='hip-roof')){
   const roof=new T.BufferGeometry();
   roof.setAttribute('position',new T.Float32BufferAttribute([-.5,0,-.5,.5,0,-.5,.5,0,.5,-.5,0,.5,-.32,1,0,.32,1,0],3));
   roof.setIndex([0,4,5,0,5,1,1,5,2,2,5,4,2,4,3,3,4,0]);
-  geos['tartu-hip-roof']=roof.toNonIndexed();geos['tartu-hip-roof'].computeVertexNormals();
+  geos['hip-roof']=roof.toNonIndexed();geos['hip-roof'].computeVertexNormals();
  }
  if(parts.some(part=>part.kind==='bandstand-roof')){
   const roof=[[0,0],[.95,0],[1,.08],[.82,.24],[.56,.54],[.28,.83],[0,1]];
