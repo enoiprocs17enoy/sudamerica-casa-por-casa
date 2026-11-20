@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=25',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=26',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -7579,6 +7579,8 @@ function v45Bird(i,x,z,phase){
   mesh.position.set(x,y,z);parent.add(mesh);return mesh;
  }
  const g=new THREE.Group(),feather=i%5===0?0xe3e9ef:0xfff8e9;
+ // The stylized mesh has an unscaled wingspan of about four metres.
+ g.scale.setScalar(.26);
  const body=part('body',feather,g);body.scale.set(.72,.52,1.45);
  part('head',feather,g,0,.14,-.7);
  const beak=part('beak',0xe9b350,g,0,.08,-1.09);beak.rotation.x=Math.PI/2;

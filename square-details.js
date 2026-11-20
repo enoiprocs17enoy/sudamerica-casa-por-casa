@@ -44,6 +44,7 @@ Object.assign(MODEL_SPECS,{
  'bratislava-napoleonic-soldier':{height:1.53,width:1.80,depth:1.18},
  'jicin-coronation-well':{height:7,width:7.2,depth:3.9,parcelWidth:.5},
  'andorra-casa-de-la-vall':{height:14.5,width:20.6,depth:17.2,parcelWidth:.7},
+ 'ordino-comunidor':{height:4.86,width:4.35,depth:4.8},
  'cuenca-calderon-monument':{height:6.5,width:3.9,depth:3.9},
  'cuenca-calderon-glorieta':{height:4.8,width:7.2,depth:7.2},
  'budapest-millennium-column':{height:40.5,width:17,depth:17,parcelWidth:.5},
@@ -51,6 +52,8 @@ Object.assign(MODEL_SPECS,{
  'budapest-millennium-colonnade-east':{height:8.2,width:16,depth:38,parcelWidth:.85},
  'budapest-heroes-memorial-stone':{height:.85,width:10,depth:6,parcelWidth:.5},
  'luanda-agostinho-neto-memorial':{height:120,width:48,depth:46,parcelWidth:.8},
+ 'accra-independence-arch':{height:30,width:51,depth:19,parcelWidth:.8},
+ 'accra-black-star-gate':{height:23,width:25,depth:10,parcelWidth:.8},
  'shanghai-huangpu-light-fountain':{height:5.3,width:32.6,depth:32.6,parcelWidth:.8},
  'hong-kong-thomas-jackson':{height:6.2,width:3.65,depth:3.8},
  'kingston-manley-statue':{height:5,width:3,depth:3},
@@ -794,6 +797,47 @@ function render(plan,group,b){
    }
    box(shadow,0,40.6,7.92,1.1,32.2,.50);
    box(shadow,0,27.6,10.18,1.0,6.3,.38);
+  }else if(model==='accra-independence-arch'){
+   const concrete=0xe0d0b3,trim=0xf0e5d3,shadow=0x9e9585;
+   for(const side of [-1,1]){
+    box(concrete,side*21.5,4.50,0,6.2,9,16.6);
+    box(shadow,side*15.25,2.9,-.5,1.60,5.8,12.4);
+    box(concrete,side*9.55,2.9,-.5,1.65,5.8,12.4);
+   }
+   box(concrete,0,7.98,0,49,2.2,17.3);
+   box(trim,0,9.27,0,50.2,.52,18);
+   box(concrete,0,6.25,8.23,28.6,.48,3.5);
+   for(const side of [-1,1]){
+    box(shadow,0,10.21,side*8.63,46.8,.15,.18);
+    for(let i=-8;i<=8;i++)box(trim,i*2.70,9.80,side*8.63,.14,.95,.17);
+   }
+   // Broad ribs follow the folded, rising silhouette above the tribune.
+   for(const z of [-5.8,5.8]){
+    let from=new T.Vector3(-24,9.53,z);
+    for(let i=1;i<=14;i++){
+     const t=i/14,to=new T.Vector3(-24+48*t,9.53+19.1*Math.sin(Math.PI*t),z);
+     const delta=to.clone().sub(from);
+     const mid=from.clone().lerp(to,.5);
+     const orientation=new T.Quaternion().setFromUnitVectors(UP,delta.clone().normalize());
+     add('box','stone',trim,mid.x,mid.y,mid.z,1.72,delta.length()+.65,2.40,orientation);
+     from=to;
+    }
+   }
+   box(trim,0,28.81,0,2.02,1.15,14.0);
+  }else if(model==='accra-black-star-gate'){
+   const concrete=0xdfdcd1,trim=0xf1ead9,dark=0x282b2a;
+   for(const side of [-1,1]){
+    box(concrete,side*9.15,7.98,0,5.8,15.96,9.75);
+    box(trim,side*9.15,.28,0,7.0,.56,10);
+    for(const z of [-4.93,4.93]){
+     box(trim,side*7.85,8,z,.45,15,.22);
+     box(trim,side*10.45,8,z,.45,15,.22);
+    }
+   }
+   box(concrete,0,17.53,0,24.6,3.06,9.6);
+   box(trim,0,19.72,0,25,1.34,10);
+   box(concrete,0,20.66,0,6.16,.82,4.55);
+   add('flag-star','metal',dark,0,21.82,0,1.28,1.28,.52);
   }else if(model==='shanghai-huangpu-light-fountain'){
    const rim=0xbababa,granite=0x8f9193,nozzle=0x686e73,water=0x78c5d9;
    add('fountain-deck','stone',rim,0,.15,0,15.25,.30,15.25);
@@ -824,6 +868,23 @@ function render(plan,group,b){
    box(limestone,0,2.59,0,1.77,.18,1.77);
    plaque(1.69,1.10,.78);
    human(0,2.69,0,.88,manley?'civil':'orator',darkBronze);
+  }else if(model==='ordino-comunidor'){
+   const masonry=0xa8947b,archStone=0xb3a089,slate=0x535659,iron=0x393b3a;
+   const eastPier=1.66,southPier=1.88;
+   box(archStone,0,.09,0,4.12,.18,4.53);
+   for(const side of [-1,1]){
+    for(const corner of [-1,1]){
+     box(masonry,side*eastPier,.79,corner*southPier,.73,1.38,.73);
+     box(archStone,side*eastPier,1.50,corner*southPier,.78,.16,.78);
+    }
+    add('ordino-stone-arch','stone',masonry,0,2.19,side*southPier,4.04,1.35,.48);
+    const turn=new T.Quaternion().setFromAxisAngle(UP,Math.PI/2);
+    add('ordino-stone-arch','stone',masonry,side*eastPier,2.19,0,4.48,1.35,.48,turn);
+   }
+   box(archStone,0,2.87,0,4.22,.15,4.65);
+   add('ordino-slate-roof','stone',slate,0,2.94,0,4.35,1.33,4.80);
+   box(iron,0,4.55,0,.065,.58,.065,'metal');
+   box(iron,0,4.63,0,.44,.062,.065,'metal');
   }else if(model==='andorra-casa-de-la-vall'){
    const granite=0x827a6d,trim=0xa79982,slate=0x454c52,shutter=0x514435;
    box(granite,0,4.90,0,19.4,9.8,15.9);
@@ -2547,6 +2608,24 @@ function render(plan,group,b){
   roof.setAttribute('position',new T.Float32BufferAttribute([-.5,0,-.5,.5,0,-.5,.5,0,.5,-.5,0,.5,-.32,1,0,.32,1,0],3));
   roof.setIndex([0,4,5,0,5,1,1,5,2,2,5,4,2,4,3,3,4,0]);
   geos['hip-roof']=roof.toNonIndexed();geos['hip-roof'].computeVertexNormals();
+ }
+ if(parts.some(part=>part.kind==='ordino-stone-arch')){
+  const arch=new T.Shape();
+  arch.moveTo(-.5,-.5);
+  arch.lineTo(-.32,-.5);
+  arch.bezierCurveTo(-.32,-.13,-.177,.16,0,.16);
+  arch.bezierCurveTo(.177,.16,.32,-.13,.32,-.5);
+  arch.lineTo(.5,-.5);
+  arch.lineTo(.5,.5);
+  arch.lineTo(-.5,.5);
+  arch.closePath();
+  geos['ordino-stone-arch']=new T.ExtrudeGeometry(arch,{depth:1,bevelEnabled:false,curveSegments:8});
+  geos['ordino-stone-arch'].translate(0,0,-.5);
+  const roof=new T.BufferGeometry();
+  roof.setAttribute('position',new T.Float32BufferAttribute([-.5,0,-.5,.5,0,-.5,.5,0,.5,-.5,0,.5,0,1,0],3));
+  roof.setIndex([0,4,1,1,4,2,2,4,3,3,4,0]);
+  geos['ordino-slate-roof']=roof.toNonIndexed();
+  geos['ordino-slate-roof'].computeVertexNormals();
  }
  if(parts.some(part=>part.kind==='bandstand-roof')){
   const roof=[[0,0],[.95,0],[1,.08],[.82,.24],[.56,.54],[.28,.83],[0,1]];
