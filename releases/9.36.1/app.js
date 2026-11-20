@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=46',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=47',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -1361,6 +1361,15 @@ function fitSquareToParcel(profile,b){
  const scale=Math.min((b.width-10)/Math.max(.1,maxX-minX),(b.depth-14)/Math.max(.1,maxZ-minZ));
  if(!best||scale>best.scale)best={angle,ca,sa,scale,cx:(minX+maxX)/2,cz:(minZ+maxZ)/2,width:(maxX-minX)*scale,depth:(maxZ-minZ)*scale};}
  best.point=p=>({x:(p.x*best.ca-p.z*best.sa-best.cx)*best.scale,z:(p.x*best.sa+p.z*best.ca-best.cz)*best.scale});return best;
+}
+function squareArrivalAzimuth(profile,bounds){
+ if(!profile.reviewed||!profile.arrivalViewModel||!profile.contextSurfaces?.length)return;
+ const front=profile.adjacentLandmarks?.find(feature=>feature.model===profile.arrivalViewModel&&
+  feature.evidence?.orientation==='mapped-frontage'&&Number.isFinite(feature.bearing));
+ if(!front)return;
+ const fit=fitSquareToParcel(profile,bounds);
+ // A façade's local +Z points into the square. Face it from the square at a slight angle.
+ return -(fit.angle+front.bearing)+.20;
 }
 function drawSurveyedCitySquare(profile,b){
  const fit=fitSquareToParcel(profile,b),root=profile.outline,scale=fit.scale;
@@ -8244,7 +8253,8 @@ function openPublicWorks(selected=null,focusHeading=true,phaseStates=new Map()){
      if(currentCity.id!==cityId||panel.hidden||!button.isConnected)return;
      const bounds=facilityBounds(zone.block);
      closeCivicPanel();
-     flyToWorld({x:bounds.x,y:4,z:bounds.z},{distance:120,elevation:1.0});
+     const plazaAzimuth=zone.block===0?squareArrivalAzimuth(citySquareProfile(currentCity),bounds):undefined;
+     flyToWorld({x:bounds.x,y:4,z:bounds.z},{distance:120,elevation:1.0,azimuth:plazaAzimuth});
      $('status').textContent=zone.name;
     };
     actions.append(button);
@@ -8317,7 +8327,8 @@ function openCityDirectory(defaultType='all',focusHeading=true){
     if(currentCity.id!==cityId||panel.hidden||!button.isConnected)return;
     const ref=record.ref,b=record.type==='public'?facilityBounds(ref.block):ref;
     const height=record.type==='home'?HOUSE_TIERS[houseTier(ref.points)].levels*3.15:5;
-    flyToWorld({x:b.x,y:Math.max(3,height*.4),z:b.z},{distance:record.type==='public'?120:Math.max(65,height*1.8),elevation:1});
+    const plazaAzimuth=record.type==='public'&&ref.block===0?squareArrivalAzimuth(citySquareProfile(currentCity),b):undefined;
+    flyToWorld({x:b.x,y:Math.max(3,height*.4),z:b.z},{distance:record.type==='public'?120:Math.max(65,height*1.8),elevation:1,azimuth:plazaAzimuth});
     if(record.type==='public')openPublicWorks(ref);else{panel.hidden=true;if(record.type==='shop')showShopCard(ref);else showCard(ref);}
    };
    row.append(label);

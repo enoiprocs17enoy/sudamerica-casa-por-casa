@@ -9,7 +9,12 @@ MODEL_SPECS['suzhou-jinji-lake-fountain']={height:65,width:140,depth:200,parcelW
 MODEL_SPECS['tehran-azadi-tower']={height:45,width:70,depth:42,parcelWidth:.48};
 MODEL_SPECS['tunis-clock-tower']={height:37.5,width:28,depth:28,parcelWidth:.65};
 MODEL_SPECS['tunis-bourguiba-equestrian']={height:8.95,width:4.8,depth:5.4,parcelWidth:.32};
+MODEL_SPECS['kinshasa-limete-tower']={height:210,width:183,depth:190,parcelWidth:.96};
 MODEL_SPECS['algiers-emir-abdelkader']={height:11.4,width:12.1,depth:13.1,parcelWidth:.62};
+MODEL_SPECS['casablanca-mohammed-v-fountain']={height:6,width:26.5,depth:26.5,parcelWidth:.53};
+MODEL_SPECS['casablanca-palais-justice']={height:19,width:86,depth:24,parcelWidth:.62};
+MODEL_SPECS['rabat-bab-el-had-gate']={height:10.8,width:36.1,depth:23,parcelWidth:.62};
+MODEL_SPECS['rabat-bab-el-had-fountain']={height:2.2,width:10.6,depth:10.6,parcelWidth:.34};
 MODEL_SPECS['fray-bentos-bandstand']={height:6.2,width:7.5,depth:7.5};
 MODEL_SPECS['paraitinga-bandstand']={height:5.6,width:7.5,depth:7.5};
 MODEL_SPECS['accademia-conegliano']={height:15,width:32,depth:18,parcelWidth:.80};
@@ -47,6 +52,7 @@ Object.assign(MODEL_SPECS,{
  'new-orleans-jackson-equestrian':{height:6.15,width:4.6,depth:5.4,parcelWidth:.26,minimumScale:.04},
  'new-orleans-st-louis-cathedral':{height:52.4,width:30.49,depth:59.21,parcelWidth:.48,minimumScale:.04},
  'jeju-sanjicheon-gallery':{height:14.6,width:30.72,depth:15.44,parcelWidth:.45,minimumScale:.04},
+ 'nishinomiya-earthquake-memorial':{height:3,width:14.1,depth:9.7,parcelWidth:.40,minimumScale:.04},
  'dhaka-tower-of-light':{height:45.72,width:12.02,depth:10.51,parcelWidth:.40,minimumScale:.035},
  'hongshan-dong-biwu':{height:5.9,width:4.1,depth:3.5},
  'kindi-mosque-ensemble':{height:25,width:82.64,depth:69.49,parcelWidth:.85},
@@ -153,6 +159,10 @@ Object.assign(MODEL_SPECS,{
  'solsona-ca-aguilar-porch':{height:9.6,width:8.85,depth:4.4},
  'barcelona-generalitat-facade':{height:18.4,width:36.55,depth:6.4,parcelWidth:.92},
  'barcelona-city-hall-facade':{height:16.75,width:46.7,depth:6,parcelWidth:.92},
+ 'valladolid-conde-ansurez':{height:9.3,width:4,depth:4},
+ 'valladolid-casa-consistorial':{height:26,width:40.79,depth:5.8,parcelWidth:.88},
+ 'gijon-plaza-mayor-lantern':{height:6.6,width:2.6,depth:2.6},
+ 'gijon-casa-consistorial':{height:15.6,width:20.51,depth:5.7,parcelWidth:.76},
  'murcia-belluga-cathedral':{height:54,width:42.22,depth:8.4,parcelWidth:.88},
  'murcia-belluga-moneo':{height:15.6,width:15.71,depth:6,parcelWidth:.66},
  'murcia-belluga-palace':{height:14.8,width:49.46,depth:6.4,parcelWidth:.86},
@@ -358,6 +368,18 @@ function render(plan,group,b){
    segment([.48,1.45,.09],[.44,1.04,.15],.083);
    ball(.44,1.02,.15,.084,.105,.09);
    box(color,...at(0,1.03,0),.65*scale,.43*scale,.52*scale,material);
+  }else if(pose==='ansurez-banner'){
+   segment([-.38,1.88,0],[-.61,2.17,.07],.107);
+   segment([-.61,2.17,.07],[-.63,2.65,.17],.082);
+   ball(-.63,2.65,.17,.087,.11,.086);
+   segment([.39,1.86,0],[.58,1.49,.09],.104);
+   segment([.58,1.49,.09],[.41,1.21,.32],.079);
+   box(color,...at(.41,1.18,.34),.31*scale,.54*scale,.086*scale,material);
+   add('cape',material,color,...at(.05,1.24,-.20),.95*scale,1.45*scale,.20*scale);
+   add('robe',material,color,...at(0,.92,0),.53*scale,.83*scale,.44*scale);
+   segment([-.72,.59,.12],[-.60,3.29,.17],.044);
+   box(color,...at(-.92,2.99,.20),.57*scale,.59*scale,.076*scale,material);
+   box(color,...at(-1.13,2.72,.20),.20*scale,.13*scale,.076*scale,material);
   }else if(pose==='orator'){
    segment([-.38,1.88,0],[-.53,1.47,.10],.105);
    segment([-.53,1.47,.10],[-.18,1.83,.28],.085);
@@ -804,6 +826,85 @@ function render(plan,group,b){
    }
    return;
   }
+  if(model==='casablanca-mohammed-v-fountain'){
+   const rim=0xd5cbbb,cascade=0x447f89,whiteJet=0xc9e6e6;
+   ring(rim,0,.10,0,12.78,.15,'stone');
+   cylinder(rim,0,.19,0,8.70,.38);
+   cylinder(cascade,0,.402,0,8.4,.035,'water');
+   cylinder(rim,0,.62,0,4.46,.42);
+   cylinder(cascade,0,.852,0,4.23,.036,'water');
+   for(const [r,count,h] of [[11.10,28,1.91],[7.44,20,3.19],[3.35,12,4.61]]){
+    for(let i=0;i<count;i++){
+     const a=i*2*Math.PI/count,c=Math.cos(a),s=Math.sin(a);
+     const level=r>10?.12:r>5?.43:.88;
+     limb([r*c,level,r*s],[(r-.37)*c,level+h*.72,(r-.37)*s],.055,whiteJet,'water');
+     limb([(r-.37)*c,level+h*.72,(r-.37)*s],[(r-.93)*c,level+h,(r-.93)*s],.038,whiteJet,'water');
+    }
+   }
+   limb([0,.87,0],[0,5.87,0],.15,whiteJet,'water');
+   return;
+  }
+  if(model==='casablanca-palais-justice'){
+   const stucco=0xe4d4b6,trim=0xd2bb93,dark=0x615746,tile=0x516e53,glass=0x5f6862;
+   box(trim,0,.31,0,85,.62,22);
+   for(const side of [-1,1]){
+    box(stucco,side*24.7,6.82,-.85,35.5,12.4,19.5);
+    box(trim,side*24.7,12.84,8.96,35.6,.48,.63);
+    for(const x of [9.7,14.6,19.5,24.4,29.3,34.2,39.1]){
+     add('barcelona-arched-door','stone',dark,side*x,3.22,8.98,2.32,4.92,.15);
+     box(glass,side*x,9.55,9.04,1.43,2.18,.15);
+     box(trim,side*x,8.45,9.23,1.86,.23,.57);
+    }
+   }
+   box(stucco,0,7.74,.21,16,14.22,21.1);
+   box(trim,0,7.95,10.18,13.60,13.55,.78);
+   add('barcelona-arched-door','stone',dark,0,5.55,10.65,7.42,9.0,.18);
+   add('barcelona-arched-door','stone',0x986849,0,4.93,10.77,5.74,7.74,.21);
+   box(tile,0,12.60,10.61,13.78,.66,.26);
+   for(const side of [-1,1])box(tile,side*5.58,6.75,10.66,.71,11.45,.30);
+   add('hip-roof','stone',tile,0,14.92,.25,18.1,3.66,23.1);
+   box(trim,0,18.66,.25,4.25,.36,.22);
+   return;
+  }
+  if(model==='rabat-bab-el-had-fountain'){
+   const rim=0xd5c4ac,riffle=0xc9e5e1;
+   ring(rim,0,.17,0,5.05,.14,'stone');
+   ring(0x729f92,0,.09,0,4.72,.06,'stone');
+   for(let n=0;n<12;n++){
+    const angle=n*Math.PI/6,s=Math.sin(angle),c=Math.cos(angle);
+    limb([3.9*s,.08,3.9*c],[3.66*s,1.26,3.66*c],.038,riffle,'water');
+   }
+   limb([0,.065,0],[0,2.13,0],.055,riffle,'water');
+   return;
+  }
+  if(model==='rabat-bab-el-had-gate'){
+   const ochre=0xb8794e,stonework=0xca9564,shadow=0xa56b47,bevel=0xe0b681;
+   add('rabat-ogive-gate','stone',ochre,0,0,0,1,1,23);
+   for(const side of [-1,1]){
+    box(ochre,side*8.2,4.6,-.34,5.7,9.2,20.4);
+    add('rabat-chamfered-tower','stone',stonework,side*8.3,0,4.1,5.5,9.8,13.6);
+    box(shadow,side*14.55,3.75,-5.83,7.0,7.5,2.4);
+    for(let i=0;i<4;i++){
+     box(stonework,side*(11.45+i*1.75),7.76,-5.83,.70,.52,1.94);
+    }
+    for(const z of [-10.85,10.85]){
+     box(bevel,side*3.30,3.10,z,.11,5.8,.28);
+     for(let n=0;n<6;n++)box(stonework,side*8.29,10.12,z+(z>0?-.62:.7)+.22*n,.68,.60,.56);
+    }
+    for(const x of [6.54,8.24,9.94]){
+     box(stonework,side*x,10.46,10.29,.68,.66,.75);
+    }
+   }
+   for(const front of [-1,1]){
+    const z=front*11.62;
+    const arch=[[-2.06,0],[-2.06,1.55],[-2.29,2.29],[-1.80,3.25],[0,4.14],[1.80,3.25],[2.29,2.29],[2.06,1.55],[2.06,0]];
+    for(let j=1;j<arch.length;j++)limb([arch[j-1][0],arch[j-1][1],z],[arch[j][0],arch[j][1],z],.105,bevel,'stone');
+    box(bevel,0,6.0,z,6.7,.21,.21);
+    for(let x=-3;x<=3;x++)box(stonework,x*1.19,9.69,z-front*.46,.68,.6,.76);
+   }
+   box(shadow,0,5.05,11.64,2.41,.58,.13);
+   return;
+  }
   if(model==='floral-calendar'){
    box(stone,0,.12,0,8,.24,4);box(0x426d38,0,.29,0,7.65,.14,3.65);
    const digits=new Intl.DateTimeFormat('en-GB',{timeZone:'America/Argentina/Buenos_Aires',day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date());
@@ -1171,6 +1272,25 @@ function render(plan,group,b){
    }
    box(dark,-5.1,11.95,-3.52,1.06,3.65,.97);
    box(dark,-5.1,14.10,-3.52,.69,.85,.69,'metal');
+  }else if(model==='nishinomiya-earthquake-memorial'){
+   const granite=0xc6bca7,stone=0xa69b8a,plaque=0x444243,ceramic=0x758689;
+   box(granite,0,.12,.16,10.15,.24,3.12);
+   box(granite,0,1.58,0,4.42,2.84,.60);
+   box(plaque,0,1.70,.31,3.74,1.82,.045);
+   for(const side of [-1,1]){
+    box(granite,side*3.41,1.42,.06,2.38,2.57,.60);
+    box(plaque,side*3.41,1.57,.37,1.80,1.46,.045);
+   }
+   box(stone,0,.25,1.24,2.38,.50,.58);
+   for(let index=0;index<8;index++){
+    const angle=(index-3.5)*Math.PI/10;
+    const x=Math.sin(angle)*7.05,z=Math.cos(angle)*4.75-1.1;
+    cylinder(stone,x,.10,z,.47,.20);
+    cylinder(granite,x,.78,z,.34,1.37);
+    const rotation=new T.Quaternion().setFromAxisAngle(new T.Vector3(0,1,0),angle+Math.PI);
+    add('box','stone',ceramic,x-Math.sin(angle)*.34,.87,z-Math.cos(angle)*.34,.38,.46,.065,rotation);
+    cylinder(stone,x,1.47,z,.35,.095);
+   }
   }else if(model==='dhaka-tower-of-light'){
    const finish=[0x9ac0bc,0xa9cecb,0x83aaa9];
    box(0x949a91,0,.48,0,12.02,.96,10.51);
@@ -3399,6 +3519,146 @@ function render(plan,group,b){
       add('box','stone',leaves[(letter+stroke)%leaves.length],left+(ax+bx)*width/2,base+(ay+by)*height/2,faceOffset,Math.hypot(dx,dy)+.16,.175,.40,turn);
      }
     }
+   }
+  }else if(model==='valladolid-conde-ansurez'){
+   const limestone=0xbeb296,pale=0xd0c4ab,granite=0x8b8175,relief=0x435c51;
+   for(const [w,y,h,c] of [[4.0,.16,.32,granite],[3.65,.44,.24,limestone],[3.33,.67,.22,pale],[3.04,1.17,.78,limestone],[2.62,2.74,2.36,limestone],[2.84,4.05,.26,pale],[2.30,4.63,.92,limestone],[2.52,5.22,.24,pale],[1.88,5.55,.42,limestone],[1.11,5.88,.24,granite]]){
+    box(c,0,y,0,w,h,w);
+   }
+   for(const sign of [-1,1]){
+    const sideAngle=sign*Math.PI/2;
+    const turn=new T.Quaternion().setFromAxisAngle(UP,sideAngle);
+    for(const side of [-1,1]){
+     cylinder(pale,side*.99,2.76,sign*1.29,.117,1.96);
+     cylinder(pale,sign*1.29,2.76,side*.99,.117,1.96);
+     box(pale,side*.99,3.76,sign*1.29,.34,.18,.38);
+     box(pale,sign*1.29,3.76,side*.99,.38,.18,.34);
+    }
+    box(relief,0,2.82,sign*1.332,1.62,1.53,.07,'patina');
+    add('box','patina',relief,sign*1.332,2.82,0,1.62,1.53,.07,turn);
+   }
+   for(let row=0;row<4;row++)box(0x698077,0,3.17-row*.25,1.374,1.16-row*.06,.046,.020,'patina');
+   human(0,6,0,1,'ansurez-banner',0x465e54);
+  }else if(model==='valladolid-casa-consistorial'){
+   const brick=0xa17361,light=0xd5c7ac,shadow=0x504c44,iron=0x494942,roof=0x706c60;
+   box(brick,0,7.0,-.68,40.79,14.0,4.39);
+   for(const [h,w,d,c] of [[.27,40.79,.92,light],[5.10,40.77,.65,light],[9.63,40.77,.36,light],[13.22,40.79,1.01,light],[14.20,40.74,.98,light]])box(c,0,h,1.61,w,.44,d);
+   box(roof,0,14.57,-.48,40.58,.52,4.58);
+   const arch=(x,y,z,w,h)=>{
+    add('barcelona-arched-door','stone',light,x,y,z,w+.57,h+.61,.22);
+    add('barcelona-arched-door','stone',shadow,x,y,z+.15,w,h,.13);
+   };
+   for(let bay=-3;bay<=3;bay++){
+    const x=bay*4.20;
+    arch(x,2.55,1.63,2.81,4.48);
+    arch(x,7.46,1.63,1.97,3.28);
+    box(shadow,x,11.40,1.69,1.42,1.84,.18);
+    box(light,x,10.48,1.81,1.84,.18,.42);
+    if(bay<3)box(light,x+2.10,2.66,1.77,.49,4.23,.64);
+   }
+   box(light,0,5.44,2.15,26.6,.51,1.37);
+   box(iron,0,6.29,2.69,26.5,.12,.13);
+   for(let rail=-13;rail<=13;rail++)box(iron,rail*.99,6.06,2.68,.07,.49,.10);
+   for(const side of [-1,1]){
+    const x=side*17.11;
+    box(light,x,8.18,-.10,6.56,16.36,5.66);
+    for(const h of [3.20,7.49,11.62,15.00])arch(x,h,2.80,1.50,h===3.20?3.20:2.15);
+    for(const offset of [-2.57,2.57])box(light,x+offset,8.64,2.80,.68,15.3,.22);
+    box(light,x,16.32,-.10,6.88,.45,5.77);
+    add('pediment','stone',roof,x,17.45,-.10,6.36,2.08,5.45);
+    box(light,x,18.67,-.10,1.46,.50,1.36);
+    add('cone','stone',light,x,19.50,-.10,.47,1.19,.47);
+   }
+   box(light,0,16.16,-.18,8.30,5.78,5.66);
+   add('pediment','stone',light,0,15.25,2.45,7.46,1.96,.71);
+   const faceClock = new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),Math.PI/2);
+   add('cylinder','stone',shadow,0,17.64,2.72,1.18,.18,1.18,faceClock);
+   add('cylinder','stone',light,0,17.64,2.83,1.03,.08,1.03,faceClock);
+   limb([0,17.64,2.90],[.67,17.64,2.90],.047,iron);
+   limb([0,17.64,2.90],[-.18,18.27,2.90],.043,iron);
+   box(light,0,19.37,-.18,8.68,.50,5.76);
+   for(const side of [-1,1]){
+    box(light,side*1.44,21.20,-.01,.47,3.24,.64);
+    box(light,side*1.44,21.20,-1.11,.47,3.24,.64);
+    add('cone','stone',light,side*4.06,20.06,2.06,.27,1.17,.27);
+   }
+   cylinder(0x9c7d53,0,21.19,-.50,.62,1.09,'metal');
+   limb([0,21.72,-.50],[0,22.68,-.50],.13,iron);
+   box(roof,0,22.91,-.50,3.76,.55,2.79);
+   add('pediment','stone',roof,0,23.78,-.50,3.66,1.21,2.64);
+   limb([0,24.19,-.50],[0,26,-.50],.085,iron);
+   limb([-.45,25.62,-.50],[.45,25.62,-.50],.055,iron);
+  }else if(model==='gijon-plaza-mayor-lantern'){
+   const iron=0x363b36,trim=0x56605a,granite=0x9c938a,glass=0xd4cbb1;
+   cylinder(granite,0,.17,0,1.13,.34);
+   cylinder(granite,0,.41,0,.87,.14);
+   cylinder(iron,0,.58,0,.43,.24,'metal');
+   cylinder(iron,0,1.11,0,.26,.86,'metal');
+   cylinder(trim,0,1.61,0,.31,.14,'metal');
+   cylinder(iron,0,3.63,0,.138,3.96,'metal');
+   cylinder(trim,0,4.88,0,.20,.22,'metal');
+   const lantern=(x,y,z)=>{
+    box(iron,x,y-.36,z,.46,.12,.46,'metal');
+    box(glass,x,y-.01,z,.35,.62,.35,'glass');
+    for(const side of [-1,1])for(const cross of [-1,1]){
+     limb([x+side*.17,y-.31,z+cross*.17],[x+side*.25,y+.34,z+cross*.25],.025,iron);
+    }
+    for(const [h,w] of [[.32,.51],[.39,.47],[.50,.33],[.56,.23]])box(iron,x,y+h,z,w,.10,w,'metal');
+    sphere(trim,x,y+.62,z,.06,.06,.06);
+   };
+   lantern(0,5.94,0);
+   for(const a of [0,Math.PI/2,Math.PI,Math.PI*1.5]){
+    const at=(radius,height)=>[Math.sin(a)*radius,height,Math.cos(a)*radius];
+    const arm=[at(.10,4.97),at(.42,4.81),at(.70,4.82),at(.94,5.01),at(1.04,5.22)];
+    for(let i=1;i<arm.length;i++)limb(arm[i-1],arm[i],.044,iron);
+    lantern(...at(1.04,5.58));
+   }
+  }else if(model==='gijon-casa-consistorial'){
+   const sand=0xc4af92,trim=0xddccaf,shadow=0x524c43,slate=0x605952,glass=0x6b7d80;
+   box(sand,0,5.94,-.56,20.51,11.88,4.44);
+   box(slate,0,12.10,-.44,20.48,.43,4.66);
+   box(trim,0,.26,1.65,20.49,.45,.75);
+   const arch=(x,y,w,h,z)=>{
+    add('barcelona-arched-door','stone',trim,x,y,z,w+.68,h+.54,.27);
+    add('barcelona-arched-door','stone',shadow,x,y,z+.18,w,h,.14);
+   };
+   for(const x of [-3.55,0,3.55])arch(x,2.30,2.51,4.24,1.65);
+   for(const x of [-7.85,7.85]){
+    box(trim,x,2.61,1.69,2.10,2.19,.25);
+    box(shadow,x,2.59,1.85,1.61,1.77,.17);
+    for(const a of [-.47,0,.47])box(trim,x+a,2.59,1.96,.05,1.74,.07);
+   }
+   for(const [y,w,d] of [[4.76,20.51,.63],[5.06,20.51,.55],[8.39,20.51,.36],[11.34,20.51,.53],[11.76,20.51,.84]])box(trim,0,y,1.68,w,.26,d);
+   for(const y of [6.68,9.79])for(const x of [-7.85,-3.55,0,3.55,7.85]){
+    const width=y>8?1.36:1.74;
+    box(trim,x,y,1.63,width+.27,2.20,.24);
+    box(shadow,x,y,1.81,width,1.88,.13);
+    box(glass,x,y,1.89,width-.18,1.64,.08,'glass');
+    box(shadow,x,y,1.95,.055,1.76,.062);
+    box(trim,x,y-1.07,1.82,width+.41,.18,.64);
+   }
+   for(const x of [-5.43,-1.78,1.78,5.43]){
+    box(trim,x,2.43,1.85,.53,4.20,.55);
+    box(trim,x,4.36,1.92,.72,.16,.69);
+   }
+   box(trim,0,5.15,2.05,10.62,.29,1.50);
+   box(trim,0,5.93,2.75,10.61,.15,.18);
+   for(let i=-8;i<=8;i++)cylinder(trim,i*.61,5.58,2.74,.056,.57);
+   for(const x of [-9.65,-5.81,5.81,9.65])box(trim,x,9.93,1.72,.31,3.34,.35);
+   box(trim,0,12.08,1.82,8.10,.55,1.62);
+   add('pediment','stone',trim,0,13.15,1.73,7.97,2.06,1.82);
+   const dialTurn=new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),Math.PI/2);
+   add('cylinder','stone',shadow,0,12.95,2.66,.74,.16,.74,dialTurn);
+   add('cylinder','stone',trim,0,12.95,2.75,.65,.09,.65,dialTurn);
+   limb([0,12.95,2.80],[.37,13.12,2.80],.036,shadow);
+   limb([0,12.95,2.80],[-.055,13.41,2.80],.028,shadow);
+   for(const x of [-9.34,-4.12,0,4.12,9.34]){
+    box(trim,x,x===0?14.20:12.01,1.90,.54,.35,.62);
+    const y=x===0?14.37:12.18;
+    cylinder(trim,x,y+.15,1.90,.145,.30);
+    sphere(trim,x,y+.39,1.90,.265,.29,.254,'stone');
+    cylinder(trim,x,y+.65,1.90,.174,.11);
+    sphere(trim,x,y+.77,1.90,.125,.125,.124,'stone');
    }
   }else if(model==='murcia-belluga-cathedral'){
    const limestone=0xd0bd9f,trim=0xe3d2af,shadow=0x746b5a,door=0x494239,roof=0xa49171;
@@ -5688,6 +5948,47 @@ function render(plan,group,b){
   }else if(model==='se-dialogo'){
    box(0xa09d92,0,.115,0,5.30,.23,2.05);
    add('se-dialogo-steel','metal',0xb52527,0,.23,0,1,1,1);
+  }else if(model==='kinshasa-limete-tower'){
+   const concrete=0xc8bca4,podium=0xb0a694,baseTrim=0xe0d6c2,recess=0x515854,bronzeTint=0xad9260;
+   cylinder(podium,0,1.62,0,37.7,3.24);
+   cylinder(concrete,0,4.22,0,35.3,2.00);
+   cylinder(baseTrim,0,5.32,0,35.65,.34);
+   // The wings use the four ends and shoulders of the mapped podium.
+   for(const [fromX,fromZ,toX,toZ,width] of [
+    [-89.91,-13.40,-36.32,-6.55,15.08],[10.12,-93.78,3.27,-39.00,14.41],
+    [89.02,6.85,35.73,.30,14.90],[-10.42,86.63,-5.95,32.45,16.09]
+   ]){
+    const start=new T.Vector3(fromX,.46,fromZ),end=new T.Vector3(toX,4.96,toZ);
+    const span=end.clone().sub(start),mid=start.clone().lerp(end,.5);
+    // Pitch around the ramp's horizontal cross-axis so the wide deck never rolls.
+    const rotation=new T.Quaternion().setFromAxisAngle(UP,Math.atan2(span.x,span.z));
+    const pitch=-Math.atan2(span.y,Math.hypot(span.x,span.z));
+    rotation.multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),pitch));
+    add('box','stone',concrete,mid.x,mid.y,mid.z,width,.86,span.length(),rotation);
+    for(const portion of [.37,.73]){
+     const support=start.clone().lerp(end,portion),height=support.y;
+     cylinder(podium,support.x,height*.5,support.z,width*.19,height);
+    }
+   }
+   // Four reinforced-concrete shafts remain visibly separated above the podium.
+   for(const x of [-5.45,5.45])for(const z of [-5.45,5.45]){
+    cylinder(concrete,x,94.4,z,4.45,178.2);
+    cylinder(podium,x,93.5,z+3.83,.62,171);
+    cylinder(baseTrim,x,18.4,z,5.55,26.6);
+   }
+   for(const y of [58,111,154])box(podium,0,y,0,12.0,3.4,12.0);
+   cylinder(podium,0,171,0,16.7,5.4);
+   cylinder(recess,0,174.6,0,15.8,2.6,'metal');
+   cylinder(baseTrim,0,176.8,0,17.45,1.3);
+   for(const x of [-8.65,8.65])for(const z of [-8.65,8.65]){
+    cylinder(concrete,x,183.36,z,7.10,13.45);
+    cylinder(recess,x,185.58,z,7.18,1.75,'metal');
+    cylinder(baseTrim,x,190.43,z,7.28,.90);
+    cylinder(bronzeTint,x,191.24,z,6.30,.72);
+   }
+   cylinder(podium,0,193.7,0,7.8,12.9);
+   cylinder(baseTrim,0,201.15,0,6.13,2.5);
+   cylinder(recess,0,206.20,0,.56,7.60,'metal');
   }else if(model==='harare-unity-fountain'){
    const paving=0xc2b39f,rim=0xbeb6aa,basinBlue=0x5ca4b9;
    add('harare-basin','stone',paving,0,.15,0,10.45,.30,10.45);
@@ -7002,6 +7303,17 @@ function render(plan,group,b){
   const lathe=section=>new T.LatheGeometry(section.map(([r,y])=>new T.Vector2(r,y)),40);
   geos['gdansk-lower-basin']=lathe([[2.40,0],[2.67,0],[2.70,.15],[2.67,.37],[2.53,.42],[2.40,.35],[2.39,.11],[2.40,0]]);
   geos['gdansk-upper-bowl']=lathe([[.43,0],[.62,.10],[1.35,.30],[1.51,.42],[1.52,.53],[1.36,.54],[1.27,.40],[.52,.12],[.43,0]]);
+ }
+ if(parts.some(part=>part.kind==='rabat-ogive-gate')){
+  const doorway=new T.Shape();
+  doorway.moveTo(-5.7,0);doorway.lineTo(-1.59,0);doorway.lineTo(-1.59,1.55);
+  doorway.bezierCurveTo(-2.43,2.63,-1.39,3.13,0,3.69);
+  doorway.bezierCurveTo(1.39,3.13,2.43,2.63,1.59,1.55);
+  doorway.lineTo(1.59,0);doorway.lineTo(5.7,0);doorway.lineTo(5.7,9.4);doorway.lineTo(-5.7,9.4);doorway.closePath();
+  geos['rabat-ogive-gate']=new T.ExtrudeGeometry(doorway,{depth:1,curveSegments:14,bevelEnabled:false}).translate(0,0,-.5);
+  const edge=[[-.5,-.5],[.5,-.5],[.5,.32],[.29,.5],[-.29,.5],[-.5,.32]]
+   .map(([x,z])=>new T.Vector2(x,-z));
+  geos['rabat-chamfered-tower']=new T.ExtrudeGeometry(new T.Shape(edge),{depth:1,bevelEnabled:false}).rotateX(-Math.PI/2);
  }
  if(parts.some(part=>part.kind==='masonry-arch')){
   const arch=new T.Shape();
