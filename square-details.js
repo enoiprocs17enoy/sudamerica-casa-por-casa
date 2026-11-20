@@ -1,9 +1,12 @@
 /* Source-driven 3D square details. Models are stylised reconstructions, not scans. */
 (function(){
 'use strict';
-const MODEL_SPECS={'gravina-benedict-statue':{height:6.2,width:3.4,depth:3.4},'ceglie-clock-tower':{height:12,width:5,depth:4.7},'assisi-three-lions-fountain':{height:3.75,width:7.5,depth:7.5},'verrazzano-memorial':{height:7.2,width:4.3,depth:4.3},herterichsbrunnen:{height:5.1,width:7.7,depth:7.7,parcelWidth:.5},'iquique-naval-monument':{height:13.3,width:8.2,depth:8.2},'floral-calendar':{height:1.2,width:8},'arenales-ensemble':{height:11,width:10},'freedom-chains':{height:7,width:5},pyramid:{height:13,width:7},obelisk:{height:10,width:3},column:{height:10,width:4},'liberty-column':{height:13,width:6},equestrian:{height:8,width:7},'equestrian-fountain':{height:8,width:9},'standing-sword':{height:7,width:4},'standing-civil':{height:10,width:7},'ornate-fountain':{height:7,width:9},'liberty-fountain':{height:7,width:8},fountain:{height:3,width:6},bust:{height:4,width:3},plaque:{height:1.5,width:2},'classical-figure':{height:3,width:2}};
+const MODEL_SPECS={'alcazar-cervantes-riders':{height:6.5,width:6.6,depth:5.1},'gravina-benedict-statue':{height:6.2,width:3.4,depth:3.4},'ceglie-clock-tower':{height:12,width:5,depth:4.7},'assisi-three-lions-fountain':{height:3.75,width:7.5,depth:7.5},'verrazzano-memorial':{height:7.2,width:4.3,depth:4.3},herterichsbrunnen:{height:5.1,width:7.7,depth:7.7,parcelWidth:.5},'iquique-naval-monument':{height:13.3,width:8.2,depth:8.2},'floral-calendar':{height:1.2,width:8},'arenales-ensemble':{height:11,width:10},'freedom-chains':{height:7,width:5},pyramid:{height:13,width:7},obelisk:{height:10,width:3},column:{height:10,width:4},'liberty-column':{height:13,width:6},equestrian:{height:8,width:7},'equestrian-fountain':{height:8,width:9},'standing-sword':{height:7,width:4},'standing-civil':{height:10,width:7},'ornate-fountain':{height:7,width:9},'liberty-fountain':{height:7,width:8},fountain:{height:3,width:6},bust:{height:4,width:3},plaque:{height:1.5,width:2},'classical-figure':{height:3,width:2}};
+MODEL_SPECS['fray-bentos-bandstand']={height:6.2,width:7.5,depth:7.5};
+MODEL_SPECS['paraitinga-bandstand']={height:5.6,width:7.5,depth:7.5};
 MODEL_SPECS['accademia-conegliano']={height:15,width:32,depth:18,parcelWidth:.80};
 MODEL_SPECS['stone-sphinx']={height:3.15,width:3.6};
+MODEL_SPECS['trogir-clock-tower']={height:13.3,width:5.2,depth:3.8};
 MODEL_SPECS['condamine-market-hall']={height:9.4,width:21.4,depth:60,parcelWidth:.56};
 MODEL_SPECS['hvar-pjaca-well']={height:1.05,width:2.6,depth:4.4};
 MODEL_SPECS['hallstatt-trinity-column']={height:6.1,width:3.4};
@@ -33,6 +36,7 @@ Object.assign(MODEL_SPECS,{
  'liberty-paifang':{height:6,width:16,depth:2.15,parcelWidth:.70},
  'san-gimignano-cistern':{height:1.65,width:4.5,depth:4.5},
  'nankinmachi-azumaya':{height:6.6,width:4.92,depth:4.92,parcelWidth:.45},
+ 'tabaco-plaza-gazebo':{height:4.8,width:6.4,depth:6.4,parcelWidth:.34},
  'waharoa':{height:7,width:10.132,depth:.62,parcelWidth:.38},
  'delhi-baradari':{height:4.8,width:8.4,depth:8.4,parcelWidth:.32},
  'delhi-entry-arcade':{height:3.6,width:12.4,depth:.9,parcelWidth:.42},
@@ -41,6 +45,8 @@ Object.assign(MODEL_SPECS,{
  'goiania-tres-racas':{height:7,width:3.1,depth:4.7},
  'tartini-monument':{height:6,width:2.75,depth:2.75},
  'monaco-malizia':{height:4.25,width:2.2,depth:2.2},
+ 'kamppi-chapel':{height:11.5,width:19.6,depth:13.4,parcelWidth:.50},
+ 'kamppi-entrepreneurs-monument':{height:6,width:3.9,depth:3.9},
  'teror-pilar-fountain':{height:2.36,width:3.8,depth:3.8},
  'teror-wall-fountain':{height:2.77,width:2.25,depth:1.65},
  'arucas-sureda-monument':{height:4.9,width:4.1,depth:4.1},
@@ -654,6 +660,18 @@ function render(plan,group,b){
    const travertine=0xb6a78f;
    add('cistern-stonework','stone',travertine,0,0,0,1,1,1);
    cylinder(0x4d463c,0,.59,0,.97,.10);
+  }else if(model==='tabaco-plaza-gazebo'){
+   const pale=0xe2d0b9,greenRoof=0x2f6858,redTrim=0x963e34;
+   cylinder(pale,0,.13,0,2.93,.26);
+   cylinder(redTrim,0,3.13,0,3.20,.27);
+   add('cone','stone',greenRoof,0,3.87,0,3.13,1.32,3.13);
+   cylinder(greenRoof,0,4.60,0,.18,.39);
+   for(let i=0;i<6;i++){
+    const angle=i*Math.PI/3,x=Math.cos(angle)*2.28,z=Math.sin(angle)*2.28;
+    cylinder(pale,x,1.66,z,.17,2.80);
+    cylinder(pale,x,.39,z,.27,.24);
+    cylinder(pale,x,2.92,z,.23,.17);
+   }
   }else if(model==='nankinmachi-azumaya'){
    const vermilion=0x9c3630,darkRed=0x702f29,brass=0xc49a4a,granite=0x9d9290;
    add('hex','stone',granite,0,.13,0,1.82,.26,1.82);
@@ -983,6 +1001,28 @@ function render(plan,group,b){
    }
    for(const [y,radius] of [[3.65,1.72],[4.03,1.54],[4.38,1.10],[4.59,.53]])ring(iron,0,y,0,radius,.023);
    sphere(iron,0,4.73,0,.08,.14,.08,'metal');
+  }else if(model==='kamppi-chapel'){
+   const spruce=0xbd7840;
+   add('kamppi-chapel-shell','stone',spruce,0,0,0,9.8,11.5,6.7);
+   for(const [y,ratio] of [[.58,.61],[2.30,.70],[4.83,.83],[7.82,.94],[10.24,1],[11.49,.99]]){
+    add('kamppi-chapel-seam','stone',0x9e6036,0,y,0,9.8*ratio,1,6.7*ratio);
+   }
+  }else if(model==='kamppi-entrepreneurs-monument'){
+   const aluminium=0xb8b392;
+   box(0x474844,0,.66,0,.70,1.30,.70);
+   const frames=[[-.92,.87,0,1.46,.22],[.40,.78,.87,1.38,-.4],[.72,1.57,-.62,1.55,.43],
+    [-.36,2.05,.22,1.92,.56],[-.89,2.64,-.46,1.48,-.32],[.82,2.66,.49,1.56,.24],
+    [0,3.16,-.22,2.02,-.43],[-.78,3.75,.37,1.21,.41],[.73,3.81,-.46,1.40,.17],
+    [0,4.26,.55,1.50,.59],[.46,4.79,-.32,1.39,-.32],[-.54,4.97,-.28,1.24,.19],[.05,5.44,.16,1.12,.44]];
+   for(const [x,y,z,size,bearing] of frames){
+    const sine=Math.sin(bearing),cosine=Math.cos(bearing),half=size/2;
+    const corner=(u,v,w)=>[x+(u*cosine+w*sine)*half,y+v*half,z+(-u*sine+w*cosine)*half];
+    for(const a of [-1,1])for(const c of [-1,1]){
+     limb(corner(-1,a,c),corner(1,a,c),.027,aluminium,'metal');
+     limb(corner(a,-1,c),corner(a,1,c),.027,aluminium,'metal');
+     limb(corner(a,c,-1),corner(a,c,1),.027,aluminium,'metal');
+    }
+   }
   }else if(model==='verrazzano-memorial'){
    const travertine=0xb9ae96;
    steps(0,4.3);
@@ -991,6 +1031,41 @@ function render(plan,group,b){
    box(marble,0,3.21,0,2.54,.24,2.45);
    plaque(2.15,1.38,1.1);
    human(0,3.33,0,1.45,'civil',0x38534a);
+  }else if(model==='alcazar-cervantes-riders'){
+   const limestone=0xb7a991;
+   box(limestone,-1.64,.27,.30,2.38,.54,4.24);
+   box(limestone,1.57,.27,-.30,2.12,.54,3.63);
+   for(const [x,z,size,knight] of [[-1.64,.30,1,true],[1.57,-.30,.79,false]]){
+    const first=parts.length;
+    horse();
+    if(knight){
+     limb([.45,.65,.40],[.45,6.10,.60],.043,bronze);
+     add('cone','metal',bronze,.45,6.19,.60,.087,.31,.087);
+     sphere(bronze,-.70,3.15,.27,.16,.65,.44);
+    }else{
+     for(const side of [-1,1])limb([side*.19,3.13,1.28],[side*.26,3.75,1.20],.085);
+    }
+    for(const part of parts.slice(first)){
+     part.x=x+part.x*size;part.y=.54+part.y*size;part.z=z+part.z*size;
+     part.sx*=size;part.sy*=size;part.sz*=size;
+    }
+   }
+  }else if(model==='fray-bentos-bandstand'||model==='paraitinga-bandstand'){
+   const paraitinga=model==='paraitinga-bandstand';
+   const post=paraitinga?0x3c608e:0xe5debd,accent=paraitinga?0xd78339:0xc5b68f;
+   const platform=paraitinga?0x8f8781:0xb4a791,roof=paraitinga?0x9e573b:0xd2bd91;
+   add('bandstand-deck','stone',platform,0,.29,0,3.45,.58,3.45);
+   add('bandstand-deck','stone',platform,0,.63,0,3.04,.14,3.04);
+   for(let i=0;i<8;i++){
+    const angle=i*Math.PI/4,next=angle+Math.PI/4;
+    const x=Math.sin(angle)*2.74,z=Math.cos(angle)*2.74;
+    cylinder(post,x,2.31,z,.105,3.22,'metal');
+    cylinder(accent,x,1.04,z,.16,.48,'metal');
+    cylinder(accent,x,3.77,z,.17,.23,'metal');
+    limb([x,3.63,z],[Math.sin(next)*2.74,3.63,Math.cos(next)*2.74],.073,accent);
+   }
+   add('bandstand-roof','stone',roof,0,3.87,0,3.38,paraitinga?1.25:1.92,3.38);
+   sphere(accent,0,paraitinga?5.24:5.94,0,.14,.20,.14,'metal');
   }else if(model==='gravina-benedict-statue'){
    const limestone=0xc1ae93,patina=0x50544a;
    box(limestone,0,.22,0,3.34,.44,3.34);
@@ -999,6 +1074,26 @@ function render(plan,group,b){
    plaque(1.35,1.44,1.15);
    human(0,2.15,0,1.50,'classical',patina);
    sphere(patina,0,5.92,0,.31,.37,.31,'metal');
+  }else if(model==='trogir-clock-tower'){
+   const limestone=0xdccdb5,moulding=0xede0c9,tile=0xa55a43,dial=0x779caa,brass=0xd3b06e;
+   box(limestone,0,4.64,0,4.70,9.28,3.35);
+   box(moulding,0,9.24,0,5.1,.45,3.69);
+   box(limestone,0,9.80,0,4.42,.72,3.29);
+   add('trogir-clock-dome','stone',tile,0,10.15,0,1,1,1);
+   cylinder(brass,0,12.65,0,.081,.72,'metal');
+   box(brass,0,12.85,0,.42,.065,.065,'metal');
+   const vertical=new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),Math.PI/2);
+   add('cylinder','stone',moulding,0,7.60,-1.69,1.53,.12,1.53,vertical);
+   add('cylinder','metal',dial,0,7.60,-1.76,1.37,.08,1.37,vertical);
+   limb([0,7.60,-1.82],[.70,7.87,-1.82],.052,brass);
+   limb([0,7.60,-1.82],[-.22,8.54,-1.82],.040,brass);
+   for(let i=0;i<12;i++){
+    const a=i*Math.PI/6;
+    sphere(brass,Math.sin(a)*1.13,7.60+Math.cos(a)*1.13,-1.82,.045,.062,.028);
+   }
+   box(0x625148,0,1.35,-1.69,1.31,2.7,.070,'metal');
+   box(moulding,0,3.06,-1.71,1.77,.22,.18);
+   add('cylinder','stone',0x8d8071,0,4.76,-1.69,.31,.08,.31,vertical);
   }else if(model==='ceglie-clock-tower'){
    const limestone=0xd9cbb2,trim=0xeee0c5,face=0xf4e8ce,iron=0x383632;
    box(trim,0,.20,0,5,.40,4.7);
@@ -1345,6 +1440,10 @@ function render(plan,group,b){
  if(parts.some(part=>part.kind==='obelisk-shaft'))geos['obelisk-shaft']=new T.CylinderGeometry(.62*Math.SQRT1_2,Math.SQRT1_2,1,4).rotateY(Math.PI/4);
  if(parts.some(part=>part.kind==='obelisk-cap'))geos['obelisk-cap']=new T.ConeGeometry(Math.SQRT1_2,1,4).rotateY(Math.PI/4);
  if(parts.some(part=>part.kind==='monas-base'))geos['monas-base']=new T.CylinderGeometry(1,.76,1,4).rotateY(Math.PI/4);
+ if(parts.some(part=>part.kind==='trogir-clock-dome')){
+  const profile=[[2.06,0],[1.95,.29],[1.70,.67],[1.34,1.10],[.92,1.58],[.50,1.96],[.15,2.23],[0,2.27]];
+  geos['trogir-clock-dome']=new T.LatheGeometry(profile.map(([r,y])=>new T.Vector2(r,y)),16).scale(1,1,.80);
+ }
  if(parts.some(part=>part.kind==='park-arch')){
   const opening=new T.Shape();
   opening.moveTo(-.5,0);opening.lineTo(-.38,0);opening.lineTo(-.38,.62);
@@ -1381,10 +1480,20 @@ function render(plan,group,b){
    [3.41,.87],[3.01,.87],[3.01,.43],[0,.43]];
   geos['assisi-fountain-basin']=new T.LatheGeometry(basin.map(([radius,y])=>new T.Vector2(radius,y)),9);
  }
+ if(parts.some(part=>part.kind==='kamppi-chapel-shell')){
+  const section=[[0,0],[.62,0],[.61,.05],[.70,.20],[.83,.42],[.94,.68],[1,.89],[.99,1],[0,1]];
+  geos['kamppi-chapel-shell']=new T.LatheGeometry(section.map(([radius,y])=>new T.Vector2(radius,y)),32);
+  geos['kamppi-chapel-seam']=new T.TorusGeometry(1,.006,4,40).rotateX(Math.PI/2);
+ }
  if(parts.some(part=>part.kind==='herterich-basin')){
   const basin=[[0,0],[3.85,0],[3.85,.18],[3.68,.25],[3.59,.99],[3.73,1.05],
    [3.73,1.23],[3.26,1.23],[3.26,.44],[0,.44]];
   geos['herterich-basin']=new T.LatheGeometry(basin.map(([radius,y])=>new T.Vector2(radius,y)),12);
+ }
+ if(parts.some(part=>part.kind==='bandstand-roof')){
+  const roof=[[0,0],[.95,0],[1,.08],[.82,.24],[.56,.54],[.28,.83],[0,1]];
+  geos['bandstand-roof']=new T.LatheGeometry(roof.map(([radius,y])=>new T.Vector2(radius,y)),8);
+  geos['bandstand-deck']=new T.CylinderGeometry(1,1,1,8);
  }
  if(parts.some(part=>part.kind==='cistern-stonework')){
   const profile=[[0,0],[2.25,0],[2.25,.14],[1.98,.14],[1.98,.28],[1.70,.28],[1.70,.44],
