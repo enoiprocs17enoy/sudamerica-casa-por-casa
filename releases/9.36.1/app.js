@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=6',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=7',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -1442,7 +1442,7 @@ function drawSurveyedCitySquare(profile,b){
    paint.clip('evenodd');paint.lineCap='round';paint.lineJoin='round';
    for(const edge of [true,false])for(const route of validRoutes){
     const width=routeWidth(route);
-    const stone=/asphalt/i.test(route.surface||'')?'#a09f92':/concrete/i.test(route.surface||'')?'#d0c8b6':'#dbc8a6';
+    const stone=/asphalt/i.test(route.surface||'')?'#a09f92':/concrete/i.test(route.surface||'')?'#d0c8b6':route.surface==='sandstone'?'#ad6954':'#dbc8a6';
     paint.strokeStyle=edge?'#b9a78e':stone;paint.lineWidth=width+(edge?.15:0);
     paint.beginPath();trace(route.points);paint.stroke();
    }
@@ -7955,7 +7955,8 @@ function openSquareDetailPanel(focusHeading=true){
  localizedPanelRoute={type:'square'};
  const panel=revealCivicPanel(focusHeading),body=$('v4Body'),profile=citySquareProfile(currentCity);$('v4Title').textContent=profile.name;if(profile.name.startsWith('Piazza civica di '))delete $('v4Title').dataset.i18nSkip;else $('v4Title').dataset.i18nSkip='true';body.replaceChildren();
  const intro=document.createElement('p');
- intro.textContent=profile.reviewed?'Piazza verificata singolarmente. La ricostruzione segue la cartografia e i riferimenti disponibili.':
+ intro.textContent=profile.layoutEvidence==='schematic-from-design'?'Perimetro da OpenStreetMap. Disposizione interna schematica basata sul progetto, con posizioni indicative.':
+  profile.reviewed?'Piazza verificata singolarmente. La ricostruzione segue la cartografia e i riferimenti disponibili.':
   profile.realGeometry?'Planimetria da OpenStreetMap. La scelta della piazza e gli elementi 3D possono richiedere una verifica.':
   'Piazza civica generata per questa città.';
  body.append(intro);
@@ -7971,7 +7972,7 @@ function openSquareDetailPanel(focusHeading=true){
  const references=document.createElement('div');references.className='civic-objective-actions';
  sourceLink(references,profile.source,profile.geometryAttribution?'Planimetria ufficiale':'Planimetria OpenStreetMap');
  if(profile.geometryAttribution)sourceLink(references,profile.geometryTerms,profile.geometryAttribution);
- if(profile.reference!==profile.source)sourceLink(references,profile.reference,'Riferimento ufficiale');
+ if(profile.reference!==profile.source)sourceLink(references,profile.reference,profile.layoutEvidence==='schematic-from-design'?'Relazione del progettista':'Riferimento ufficiale');
  if(references.childElementCount)body.append(references);
  const adjacent=profile.contextSurfaces?.length?profile.adjacentLandmarks||[]:[];
  const features=[...(profile.landmarks||[]),...adjacent];
@@ -7985,6 +7986,7 @@ function openSquareDetailPanel(focusHeading=true){
    const evidence=document.createElement('small');
    if(feature.evidence.position==='mapped-footprint')evidence.textContent='Posizione ricavata dal perimetro dell’opera.';
    else if(feature.evidence.position==='mapped-point')evidence.textContent='Posizione ricavata dal punto cartografico.';
+   else if(feature.evidence.position==='schematic-from-design')evidence.textContent='Posizione indicativa basata sulla sequenza descritta nel progetto.';
    else evidence.textContent='Posizione ricavata dalla documentazione della piazza.';
    row.append(evidence);
   }
