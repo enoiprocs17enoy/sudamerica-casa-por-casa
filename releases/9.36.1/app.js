@@ -1345,9 +1345,8 @@ function addCitySquareNameSign(profile,b){
  const w=b.width,d=b.depth;
  const signWidth=Math.min(w*.23,9.5),signHeight=signWidth/4,signZ=b.z+d*.466,signX=b.x-w*.26;
  const signBottom=1.60,signY=signBottom+signHeight/2;
- const source=profile.realGeometry?profile.geometrySource||'OpenStreetMap':'';
- const signLines=profile.workInProgress?[currentCity.name.toUpperCase(),'PIAZZA REALE','IN LAVORAZIONE']:
-  [currentCity.name.toUpperCase(),profile.documented?profile.name:'PIAZZA CIVICA',source];
+ const signLines=profile.workInProgress?['PIAZZA COMUNALE','IN LAVORAZIONE']:
+  [profile.name,'IN LAVORAZIONE'];
  const material=new THREE.MeshBasicMaterial({map:billboardTexture(signLines,'#234f63',{wide:true}),side:THREE.FrontSide,toneMapped:false});
  const geo=new THREE.PlaneGeometry(signWidth,signHeight);
  for(const rear of [false,true]){
