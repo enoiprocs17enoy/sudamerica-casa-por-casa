@@ -1079,13 +1079,17 @@ const PUBLIC_BLOCK_INTERVAL=7;
 function facilityBlock(i){return i*PUBLIC_BLOCK_INTERVAL}
 function facilitySlots(block){
   if(block%PUBLIC_BLOCK_INTERVAL!==0)return [];
+  // The central plaza owns its complete city block. Keeping private lots in
+  // block zero made real squares look like small gardens beside houses and
+  // shops, even though the road grid already treats this as the civic core.
+  if(block===0)return Array.from({length:LOT_COLS*LOT_ROWS},(_,slot)=>slot);
   const right=(Math.floor(block/PUBLIC_BLOCK_INTERVAL)%2)===1;
   const first=right?LOT_COLS-2:0;
   return [first,first+1,LOT_COLS+first,LOT_COLS+first+1];
 }
 function facilityBounds(block){
   const slots=facilitySlots(block);
-  if(slots.length!==4)throw Error('Invalid civic parcel');
+  if(slots.length!==4&&!(block===0&&slots.length===LOT_COLS*LOT_ROWS))throw Error('Invalid civic parcel');
   const parcels=slots.map(slot=>plotBounds(block,slot));
   const bb=blockBounds(block);
   const left=Math.max(bb.left,Math.min(...parcels.map(p=>p.left)));
@@ -1358,6 +1362,9 @@ function fitSquareToParcel(profile,b){
  let best;
  for(const angle of angles){const ca=Math.cos(angle),sa=Math.sin(angle),points=root.map(p=>({x:p.x*ca-p.z*sa,z:p.x*sa+p.z*ca}));
  const minX=Math.min(...points.map(p=>p.x)),maxX=Math.max(...points.map(p=>p.x)),minZ=Math.min(...points.map(p=>p.z)),maxZ=Math.max(...points.map(p=>p.z));
+ // Keep a narrow pedestrian apron inside the road-facing block. The plan is
+ // enlarged uniformly, never stretched independently on one axis, so mapped
+ // distances and the proportions of monuments remain truthful.
  const scale=Math.min((b.width-10)/Math.max(.1,maxX-minX),(b.depth-14)/Math.max(.1,maxZ-minZ));
  if(!best||scale>best.scale)best={angle,ca,sa,scale,cx:(minX+maxX)/2,cz:(minZ+maxZ)/2,width:(maxX-minX)*scale,depth:(maxZ-minZ)*scale};}
  best.point=p=>({x:(p.x*best.ca-p.z*best.sa-best.cx)*best.scale,z:(p.x*best.sa+p.z*best.ca-best.cz)*best.scale});return best;
@@ -1584,7 +1591,10 @@ function drawSurveyedCitySquare(profile,b){
  const maxTrees=compactMappedTrees?treePositions.length:Math.min(72,treePositions.length),mappedTrees=[];
  for(let i=0;i<maxTrees;i++){
   const p=treePositions[Math.floor(i*treePositions.length/maxTrees)],x=p.x,z=p.z;
-  const treeScale=p.mapped?Math.min(1,scale):1;
+  // Map fitting changes distances, not the physical size of urban furniture.
+  // Match the trees used by the rest of the city instead of shrinking crowns
+  // and trunks when a large real-world square is fitted into the game block.
+  const treeScale=1;
   const ground=p.mapped?mappedGround(x,z):plazaTop;
   if(ground===null||!clearDetail(x,z,1.65*treeScale))continue;
   const size=(.79+rnd(x*43+z*31+17)*.46)*treeScale;

@@ -358,13 +358,16 @@ function prepare(profile,fit,b,city){
   // Use the square's projection when the model has source-based proportions.
   if(feature.scaleWithLayout)factor=Math.min(factor,fit.scale);
   if(feature.model==='fountain'&&feature.status!=='reference-model')factor=Math.min(factor,.45);
-  if(!layoutProjection){
-   const clearanceX=b.width/2-Math.abs(p.x)-.8,clearanceZ=b.depth/2-Math.abs(p.z)-.8;
-   if(spec.depth){
-    const c=Math.abs(Math.cos(angle)),s=Math.abs(Math.sin(angle));
-    factor=Math.min(factor,2*clearanceX/(c*spec.width+s*spec.depth),2*clearanceZ/(s*spec.width+c*spec.depth));
-   }else factor=Math.min(factor,Math.min(clearanceX,clearanceZ)/(spec.width*.57));
-  }
+  // Adjacent exact-footprint models must still remain inside the civic block.
+  // A larger plaza fit can otherwise push a station or grandstand across the
+  // road even though its anchor is mapped correctly. Scale uniformly here,
+  // preserving shape and orientation while respecting both block edges.
+  const clearanceX=b.width/2-Math.abs(p.x)-.8,clearanceZ=b.depth/2-Math.abs(p.z)-.8;
+  if(spec.depth){
+   const c=Math.abs(Math.cos(angle)),s=Math.abs(Math.sin(angle));
+   const boundFactor=Math.min(2*clearanceX/(c*spec.width+s*spec.depth),2*clearanceZ/(s*spec.width+c*spec.depth));
+   factor=Math.min(factor,boundFactor*(layoutProjection?.88:1));
+  }else factor=Math.min(factor,Math.min(clearanceX,clearanceZ)/(spec.width*.57));
   // A large mapped site needs a small scale even for a clearly visible landmark.
   const visibleReference=feature.scaleWithLayout&&feature.status==='reference-model'&&
    factor*spec.height>=2.5&&factor*spec.width>=1.2;
