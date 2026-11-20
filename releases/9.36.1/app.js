@@ -2220,16 +2220,7 @@ canvas.addEventListener('pointermove',e=>{
  if(pointers.size>=2){
   const ids=[...pointers.keys()].slice(0,2),pts=ids.map(id=>pointers.get(id));
   const prev=ids.map(id=>id===e.pointerId?old:pointers.get(id));
-  const length=a=>Math.hypot(a[1].x-a[0].x,a[1].y-a[0].y);
-  const before=length(prev),after=length(pts);
-  if(before>12&&after>12)zoomBy(after/before);
-  const beforeAng=Math.atan2(prev[1].y-prev[0].y,prev[1].x-prev[0].x);
-  const afterAng=Math.atan2(pts[1].y-pts[0].y,pts[1].x-pts[0].x);
-  azimuth-=Math.atan2(Math.sin(afterAng-beforeAng),Math.cos(afterAng-beforeAng));
-  anchorNavigation(
-   (prev[0].x+prev[1].x)/2,(prev[0].y+prev[1].y)/2,
-   (pts[0].x+pts[1].x)/2,(pts[0].y+pts[1].y)/2
-  );
+  applyTwoFingerNavigation(prev,pts);
   moved=true;return;
  }
  const origin=pointerStart.get(e.pointerId);
@@ -2277,6 +2268,25 @@ canvas.addEventListener('wheel',e=>{
 window.addEventListener('resize',resize);threeReady=true;animate();return true}
 function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
 function zoomBy(factor){distance=clamp(distance/Math.max(.01,factor),12,24000);}
+function applyTwoFingerNavigation(previous,current){
+ const length=points=>Math.hypot(points[1].x-points[0].x,points[1].y-points[0].y);
+ const before=length(previous),after=length(current);
+ if(before>12&&after>12)zoomBy(after/before);
+ const beforeAngle=Math.atan2(previous[1].y-previous[0].y,previous[1].x-previous[0].x);
+ const afterAngle=Math.atan2(current[1].y-current[0].y,current[1].x-current[0].x);
+ const angleDelta=Math.atan2(Math.sin(afterAngle-beforeAngle),Math.cos(afterAngle-beforeAngle));
+ // Match the fingers: a clockwise twist turns the view clockwise instead of mirroring it.
+ azimuth+=angleDelta;
+ const beforeMid={x:(previous[0].x+previous[1].x)/2,y:(previous[0].y+previous[1].y)/2};
+ const afterMid={x:(current[0].x+current[1].x)/2,y:(current[0].y+current[1].y)/2};
+ const midX=afterMid.x-beforeMid.x,midY=afterMid.y-beforeMid.y;
+ // Two-finger vertical movement controls pitch; lateral movement keeps panning the city.
+ elevation=clamp(elevation-midY*.004,.22,1.55);
+ if(midX)panPixels(midX,0);
+ if(typeof scheduleNavigation==='function')scheduleNavigation();
+ else updateCamera();
+ return {scale:before>12&&after>12?after/before:1,angleDelta,midX,midY};
+}
 function panPixels(dx,dy){
  // Pixel-to-ground projection using the camera's actual right and up vectors.
  // This stays consistent at every tilt angle.
