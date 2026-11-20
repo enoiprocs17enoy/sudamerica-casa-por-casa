@@ -13,8 +13,11 @@ MODEL_SPECS['hallstatt-trinity-column']={height:6.1,width:3.4};
 MODEL_SPECS['palmanova-stendardo']={height:11.5,width:8.4};
 MODEL_SPECS['arequipa-tuturutu']={height:5.5,width:10};
 MODEL_SPECS['warsaw-old-town-mermaid']={height:3.43,width:2.65,depth:2.45};
+MODEL_SPECS['pimpri-ambedkar-pavilion']={height:7.4,width:5.2,depth:5.2};
 Object.assign(MODEL_SPECS,{
  'washington-arch':{height:9.2,width:7.7,depth:2.9,parcelWidth:.38},
+ 'vientiane-patuxay-gate':{height:42,width:24,depth:24,parcelWidth:.50},
+ 'vientiane-patuxay-fountain':{height:3.25,width:34,depth:34,parcelWidth:.55},
  'washington-fountain':{height:2.25,width:7.4,depth:7.4,parcelWidth:.52},
  'washington-garibaldi':{height:6.3,width:3.05,depth:3.05},
  'holley-monument':{height:3.8,width:3.15,depth:1.2},
@@ -103,6 +106,7 @@ Object.assign(MODEL_SPECS,{
  'kasarmitori-the-eye':{height:.055,width:1.8,depth:1.8},
  'teror-pilar-fountain':{height:2.36,width:3.8,depth:3.8},
  'teror-wall-fountain':{height:2.77,width:2.25,depth:1.65},
+ 'tremp-cross-fountain':{height:4.48,width:2.84,depth:2.84},
  'arucas-sureda-monument':{height:4.9,width:4.1,depth:4.1},
  'king-sejong-seated':{height:7.0,width:5.5,depth:5.3,parcelWidth:.45},
  'joseon-armillary':{height:1.48,width:.82,depth:.82},
@@ -480,6 +484,39 @@ function render(plan,group,b){
     }
    }
    for(let i=0;i<42;i++){const a=i*Math.PI*2/42;sphere(i%2?0xe8c572:0xd694b1,Math.cos(a)*3.45,.47,Math.sin(a)*1.45,.12,.10,.12,'stone');}
+  }else if(model==='vientiane-patuxay-gate'){
+   const main=0xb8b2a5,cap=0xd2c2a5,relief=0x9d917e;
+   for(const side of [-1,1]){
+    add('triumphal-arch','stone',main,0,0,side*9.38,23.2,21.2,4.42);
+    add('triumphal-arch','stone',main,side*9.38,0,0,23.2,21.2,4.42,
+     new T.Quaternion().setFromAxisAngle(UP,Math.PI/2));
+    for(const corner of [-1,1])box(cap,side*9,1.04,corner*9,5.8,2.08,5.8);
+   }
+   box(main,0,24,0,21,7.1,21);
+   for(const [height,size,depth] of [[20.65,24,.85],[21.72,23.2,1.45],[24.1,22.7,.65],[25.5,21.9,2.08],[27.0,22.9,.68]])
+    box(cap,0,height,0,size,depth,size);
+   for(const side of [-1,1])for(const i of [-4,-3,-2,-1,0,1,2,3,4]){
+    box(relief,i*2.30,25.54,side*10.96,.17,1.05,.15);
+    box(relief,side*10.96,25.54,i*2.30,.15,1.05,.17);
+   }
+   const tower=(x,z,width,height)=>{
+    for(const [i,scale] of [1,.76,.53,.32].entries()){
+     box(main,x,27.9+i*height*.17,z,width*scale,height*.19,width*scale);
+     box(cap,x,27.9+i*height*.17+height*.10,z,width*scale*1.22,.38,width*scale*1.22);
+    }
+    add('pyramid','stone',cap,x,28.0+height*.74,z,width*.27,height*.42,width*.27);
+   };
+   tower(0,0,7.4,15);
+   for(const x of [-6.6,6.6])for(const z of [-6.6,6.6])tower(x,z,3.5,8.3);
+  }else if(model==='vientiane-patuxay-fountain'){
+   cylinder(stone,0,.32,0,17,.64);
+   cylinder(water,0,.665,0,16.15,.04,'water');
+   ring(marble,0,.66,0,16.35,.18,'stone');
+   for(let i=0;i<12;i++){
+    const angle=i*Math.PI/6;
+    jet(Math.sin(angle)*11.5,.69,Math.cos(angle)*11.5,1.55,1.1);
+   }
+   jet(0,.69,0,2.5,1.3);
   }else if(model==='washington-arch'){
    const light=0xe5dfd3,shade=0xbcb8ac;
    add('triumphal-arch','stone',light,0,0,0,7.1,8.76,2.18);
@@ -979,6 +1016,40 @@ function render(plan,group,b){
    box(limestone,0,3.23,0,2.75,.24,2.95);
    plaque(2.06,1.30,1.20);
    human(0,3.36,0,1.10,'civil',bronzePatina);
+  }else if(model==='pimpri-ambedkar-pavilion'){
+   const plaster=0xeee9de,trim=0xd7d3c9,plinth=0x3f4145,figure=0xb18a48,blue=0x2d5b9f;
+   add('octagonal-column','stone',trim,0,.14,0,2.60,.28,2.60);
+   add('octagonal-column','stone',plaster,0,.33,0,2.49,.12,2.49);
+   for(let i=0;i<8;i++){
+    const angle=(i+.5)*Math.PI/4,x=2.14*Math.sin(angle),z=2.14*Math.cos(angle);
+    box(trim,x,.61,z,.39,.43,.39);
+    box(plaster,x,2.73,z,.24,3.93,.24);
+    box(trim,x,4.67,z,.36,.22,.36);
+   }
+   for(const side of [-1,1]){
+    const x=side*1.98;
+    for(const y of [.44,1.02])box(trim,x,y,0,.055,.065,1.63);
+    for(let i=0;i<4;i++){
+     const z=-.80+i*.40;
+     limb([x,.44,z],[x,1.02,z+.40],.022,trim,'stone');
+     limb([x,1.02,z],[x,.44,z+.40],.022,trim,'stone');
+    }
+   }
+   box(plinth,0,.51,0,1.77,.24,1.67);
+   box(plinth,0,1.05,0,1.35,.84,1.25);
+   box(plinth,0,1.52,0,1.52,.14,1.41);
+   human(0,1.59,0,.99,'proclaiming',figure);
+   add('octagonal-column','stone',trim,0,4.87,0,2.57,.24,2.57);
+   add('octagonal-column','stone',plaster,0,5.06,0,2.45,.18,2.45);
+   add('pimpri-pavilion-dome','stone',plaster,0,5.14,0,2.24,1.26,2.24);
+   cylinder(trim,0,6.45,0,.20,.15);
+   box(blue,0,6.61,0,.07,.31,.07,'metal');
+   const upright=new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),Math.PI/2);
+   add('torus','metal',blue,0,6.94,0,.40,.40,.40,upright);
+   for(let i=0;i<24;i++){
+    const angle=i*Math.PI/12;
+    limb([0,6.94,0],[.39*Math.cos(angle),6.94+.39*Math.sin(angle),0],.008,blue);
+   }
   }else if(model==='kingston-manley-statue'||model==='kingston-bustamante-statue'){
    const limestone=0xd7d3c5,darkBronze=0x494c3d,manley=model==='kingston-manley-statue';
    cylinder(limestone,0,.12,0,1.5,.24);
@@ -2058,6 +2129,38 @@ function render(plan,group,b){
     const angle=petal*Math.PI*2/5;
     sphere(gold,Math.sin(angle)*.028,.887,-.745+Math.cos(angle)*.028,.022,.013,.022);
    }
+  }else if(model==='tremp-cross-fountain'){
+   const limestone=0xb7a48b,trim=0xc6b59b,relief=0xa08d72,spout=0x625b48;
+   // The 1922 stone base carries a pair of drinking taps below the Gothic shaft.
+   cylinder(limestone,0,.075,0,1.42,.15);
+   cylinder(trim,0,.22,0,1.32,.14);
+   cylinder(limestone,0,.395,0,.92,.35);
+   cylinder(trim,0,.64,0,.81,.16);
+   add('hexagonal-stone','stone',limestone,0,1.015,0,.52,.62,.52);
+   add('hexagonal-stone','stone',trim,0,1.36,0,.39,.13,.39);
+   add('hexagonal-stone','stone',limestone,0,2.31,0,.226,1.81,.226);
+   for(const side of [-1,1]){
+    box(relief,side*.26,.86,.434,.21,.24,.045);
+    limb([side*.26,.92,.453],[side*.26,.92,.61],.028,spout,'metal');
+    limb([side*.26,.92,.61],[side*.26,.85,.61],.026,spout,'metal');
+    box(relief,side*.26,.51,.70,.24,.026,.16);
+   }
+   add('hexagonal-stone','stone',trim,0,3.26,0,.31,.15,.31);
+   add('hexagonal-stone','stone',relief,0,3.48,0,.35,.30,.35);
+   add('hexagonal-stone','stone',trim,0,3.66,0,.38,.14,.38);
+   box(limestone,0,3.859,0,.235,.282,.205);
+   box(trim,0,4.186,0,.212,.588,.158);
+   box(trim,-.225,4.128,0,.33,.155,.157);
+   box(trim,.151,4.128,0,.105,.143,.15);
+   sphere(limestone,-.39,4.13,0,.09,.119,.090,'stone');
+   sphere(limestone,0,4.413,0,.096,.066,.088,'stone');
+   // Only the principal relief masses are reconstructed.
+   sphere(relief,0,4.259,.088,.050,.052,.024,'stone');
+   sphere(relief,0,4.104,.093,.065,.123,.029,'stone');
+   limb([-.179,4.147,.091],[0,4.158,.09],.027,relief,'stone');
+   sphere(relief,0,4.25,-.087,.05,.063,.027,'stone');
+   sphere(relief,0,4.095,-.089,.075,.128,.032,'stone');
+   sphere(limestone,.062,4.166,-.116,.053,.070,.025,'stone');
   }else if(model==='jicin-amphitrite-fountain'){
    const sandstone=0xb69e80, trim=0xc4b096, shadedStone=0xa18e76, figure=0xcab49a, waterTint=0x659da3;
    // A near-square basin has clipped corners, two surrounding steps and a profiled coping.
@@ -2942,6 +3045,7 @@ function render(plan,group,b){
  }
  if(parts.some(part=>part.kind==='hex'))geos.hex=new T.CylinderGeometry(1,1,1,6);
  if(parts.some(part=>part.kind==='pentagonal-pedestal'))geos['pentagonal-pedestal']=new T.CylinderGeometry(1,1,1,5);
+ if(parts.some(part=>part.kind==='hexagonal-stone'))geos['hexagonal-stone']=new T.CylinderGeometry(1,1,1,6);
  if(parts.some(part=>part.kind==='bratislava-bicorne')){
   const outline=new T.Shape();
   outline.moveTo(-.5,-.05);
@@ -3071,6 +3175,7 @@ function render(plan,group,b){
   geos['herterich-basin']=new T.LatheGeometry(basin.map(([radius,y])=>new T.Vector2(radius,y)),12);
  }
  if(parts.some(part=>part.kind==='octagonal-column'))geos['octagonal-column']=new T.CylinderGeometry(1,1,1,8);
+ if(parts.some(part=>part.kind==='pimpri-pavilion-dome'))geos['pimpri-pavilion-dome']=new T.SphereGeometry(1,24,8,0,2*Math.PI,0,Math.PI/2);
  if(parts.some(part=>part.kind==='hip-roof')){
   const roof=new T.BufferGeometry();
   roof.setAttribute('position',new T.Float32BufferAttribute([-.5,0,-.5,.5,0,-.5,.5,0,.5,-.5,0,.5,-.32,1,0,.32,1,0],3));

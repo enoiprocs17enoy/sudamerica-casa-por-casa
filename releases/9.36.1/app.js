@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=29',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=30',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -1526,57 +1526,11 @@ function drawSurveyedCitySquare(profile,b){
   }
   return ground;
  };
- const mappedSeats=[];
  const seats=(profile.benches||[]).filter(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.z));
- if(profile.realGeometry&&seats.length){
-  // Keep mapped centers in place. Furniture and distances must use the same scale.
-  const positions=seats.map(seat=>({...fit.point(seat),bearing:seat.bearing}));
-  const segments=validRoutes.flatMap(route=>{
-   const points=route.points.map(fit.point),radius=(routeWidth(route)+.15)/2;
-   return points.slice(1).map((b,i)=>({a:points[i],b,radius}));
-  });
-  for(const seat of positions){
-   const {x,z}=seat;
-   let nearest=null,distance=Infinity;
-   for(const p of positions){
-    if(p===seat)continue;
-    const d=Math.hypot(x-p.x,z-p.z);
-    if(d>0&&d<distance){nearest=p;distance=d;}
-   }
-   const size=Math.min(1,scale,distance/(2.18*benchRadius));
-   // Unrecorded bearings follow nearby rows of mapped seats.
-   const angle=Number.isFinite(seat.bearing)?seat.bearing-fit.angle:
-    nearest&&distance<=5*scale?Math.atan2(z-nearest.z,nearest.x-x):-fit.angle;
-   const ca=Math.cos(angle),sa=Math.sin(angle);
-   const onRoute=segments.some(({a,b,radius})=>{
-    // Clip each centerline against the bench footprint padded by the painted path radius.
-    const ax=(a.x-x)*ca-(a.z-z)*sa,az=(a.x-x)*sa+(a.z-z)*ca;
-    const dx=(b.x-a.x)*ca-(b.z-a.z)*sa,dz=(b.x-a.x)*sa+(b.z-a.z)*ca;
-    let start=0,end=1;
-    for(const [origin,delta,extent] of [[ax,dx,1.06*size+radius],[az,dz,.34*size+radius]]){
-     if(Math.abs(delta)<1e-9){if(Math.abs(origin)>extent)return false;continue;}
-     const first=(-extent-origin)/delta,last=(extent-origin)/delta;
-     start=Math.max(start,Math.min(first,last));
-     end=Math.min(end,Math.max(first,last));
-     if(start>end)return false;
-    }
-    return true;
-   });
-   if(onRoute)continue;
-   const ground=mappedGround(x,z);
-   // Seat height clears the raised edge while each leg meets its own surface.
-   const feet=[-1,1].map(side=>mappedGround(x+side*.78*ca*size,z-side*.78*sa*size));
-   if(ground!==null&&feet.every(foot=>foot!==null)&&bench(x,z,angle,size,Math.max(ground,...feet),1.45*size,feet)){
-    mappedSeats.push({...placedBenches.at(-1),size,angle});
-   }
-  }
- }else{
-  for(const seat of seats){
-   const {x,z}=fit.point(seat);
-   bench(x,z,fit.angle+(Number(seat.bearing)||0));
-  }
+ if(!profile.realGeometry)for(const seat of seats){
+  const {x,z}=fit.point(seat);
+  bench(x,z,fit.angle+(Number(seat.bearing)||0));
  }
- group.userData.squareMappedSeats=mappedSeats;
  const lamp=(x,z)=>{
   if(!clearDetail(x,z,.35))return;
   put('round',0x314b48,x,(4.38+plazaTop)/2,z,.13,4.38-plazaTop,.13);
@@ -1618,10 +1572,11 @@ function drawSurveyedCitySquare(profile,b){
   const ground=p.mapped?mappedGround(x,z):plazaTop;
   if(ground===null||!clearDetail(x,z,1.65*treeScale))continue;
   const size=(.79+rnd(x*43+z*31+17)*.46)*treeScale;
-  if(p.mapped)mappedTrees.push({x,z,size});
+  const isPalm=palmCity&&p.leafType!=='broadleaved'&&p.leafType!=='needleleaved';
+  if(p.mapped)mappedTrees.push({x,z,size,radius:(isPalm?.11:.125)*size});
   const crownY=height=>ground+(height-plazaTop)*size;
   const tree=(type,color,dx,height,dz,w,h,d,angle=0)=>put(type,color,x+dx*size,crownY(height),z+dz*size,w*size,h*size,d*size,angle);
-  if(palmCity&&p.leafType!=='broadleaved'&&p.leafType!=='needleleaved'){
+  if(isPalm){
    tree('round',0x88704e,0,(5.15+plazaTop)/2,0,.22,5.15-plazaTop,.22);
    for(let leaf=0;leaf<9;leaf++){
     const a=leaf*Math.PI*2/9;
@@ -1639,6 +1594,58 @@ function drawSurveyedCitySquare(profile,b){
   }
  }
  group.userData.squareMappedTrees=mappedTrees;
+ const mappedSeats=[];
+ if(profile.realGeometry&&seats.length){
+  // Keep mapped centers in place. Furniture and distances must use the same scale.
+  const positions=seats.map(seat=>({...fit.point(seat),bearing:seat.bearing}));
+  const segments=validRoutes.flatMap(route=>{
+   const points=route.points.map(fit.point),radius=(routeWidth(route)+.15)/2;
+   return points.slice(1).map((b,i)=>({a:points[i],b,radius}));
+  });
+  for(const seat of positions){
+   const {x,z}=seat;
+   let nearest=null,distance=Infinity;
+   for(const p of positions){
+    if(p===seat)continue;
+    const d=Math.hypot(x-p.x,z-p.z);
+    if(d>0&&d<distance){nearest=p;distance=d;}
+   }
+   const size=Math.min(1,scale,distance/(2.18*benchRadius));
+   // Unrecorded bearings follow nearby rows of mapped seats.
+   const angle=Number.isFinite(seat.bearing)?seat.bearing-fit.angle:
+    nearest&&distance<=5*scale?Math.atan2(z-nearest.z,nearest.x-x):-fit.angle;
+   const ca=Math.cos(angle),sa=Math.sin(angle);
+   const onRoute=segments.some(({a,b,radius})=>{
+    // Clip each centerline against the bench footprint padded by the painted path radius.
+    const ax=(a.x-x)*ca-(a.z-z)*sa,az=(a.x-x)*sa+(a.z-z)*ca;
+    const dx=(b.x-a.x)*ca-(b.z-a.z)*sa,dz=(b.x-a.x)*sa+(b.z-a.z)*ca;
+    let start=0,end=1;
+    for(const [origin,delta,extent] of [[ax,dx,1.06*size+radius],[az,dz,.34*size+radius]]){
+     if(Math.abs(delta)<1e-9){if(Math.abs(origin)>extent)return false;continue;}
+     const first=(-extent-origin)/delta,last=(extent-origin)/delta;
+     start=Math.max(start,Math.min(first,last));
+     end=Math.min(end,Math.max(first,last));
+     if(start>end)return false;
+    }
+    return true;
+   });
+   if(onRoute)continue;
+   // Preserve mapped trees. Skip a bench if its footprint intersects a rendered trunk.
+   if(mappedTrees.some(tree=>{
+    const dx=tree.x-x,dz=tree.z-z;
+    const along=Math.max(0,Math.abs(dx*ca-dz*sa)-1.06*size);
+    const across=Math.max(0,Math.abs(dx*sa+dz*ca)-.34*size);
+    return along*along+across*across<tree.radius*tree.radius;
+   }))continue;
+   const ground=mappedGround(x,z);
+   // Seat height clears the raised edge while each leg meets its own surface.
+   const feet=[-1,1].map(side=>mappedGround(x+side*.78*ca*size,z-side*.78*sa*size));
+   if(ground!==null&&feet.every(foot=>foot!==null)&&bench(x,z,angle,size,Math.max(ground,...feet),1.45*size,feet)){
+    mappedSeats.push({...placedBenches.at(-1),size,angle});
+   }
+  }
+ }
+ group.userData.squareMappedSeats=mappedSeats;
  // Furnish terraces in the free space around generated outlines.
  const gap=(b.depth-fit.depth)/2;
  if(gap>12&&!profile.realGeometry&&!profile.openStoneSquare)for(const side of [-1,1]){
