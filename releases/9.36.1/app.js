@@ -1318,6 +1318,7 @@ function citySquareProfile(city){
  const cached=citySquareRecords()[city.id]?.square;
  const fromMap=scope?.PlazaMapResolver?.eligibleCandidate?.(cached)&&
   /^https:\/\/www\.openstreetmap\.org\/(?:node|way|relation)\/\d+$/.test(cached.source);
+ let provisionalCandidate=null;
  for(const data of [reviewed,bundled,imported,fromMap?cached:null]){
   const outline=data?.outline;
   if(typeof data?.name!=='string'||!data.name.trim()||!Array.isArray(outline)||outline.length<4||outline.length>1200)continue;
@@ -1325,19 +1326,29 @@ function citySquareProfile(city){
   const area=Math.abs(outline.reduce((sum,p,i)=>{const q=outline[(i+1)%outline.length];return sum+p.x*q.z-q.x*p.z;},0))/2;
   if(area<1)continue;
   const profile={layout:'mapped',stone:0xc9bda7,green:0x638d4c,palm:false,...data,documented:true,realGeometry:true};
-  return data!==reviewed&&scope?.SquareDetails?scope.SquareDetails.enrich(profile,city):profile;
+  const enriched=data!==reviewed&&scope?.SquareDetails?scope.SquareDetails.enrich(profile,city):profile;
+  // Only source-reviewed and deliberately bundled plans are presented as the
+  // real square. Raw map candidates stay available for the geography review,
+  // while players receive a complete provisional square instead of a sparse
+  // or misleading outline.
+  if(data===reviewed||data===bundled)return enriched;
+  provisionalCandidate=enriched;
+  break;
  }
  const seed=Array.from(String(city.id||city.name)).reduce((n,c)=>(Math.imul(n,31)+c.codePointAt(0))>>>0,17);
  return {name:'Piazza civica di '+city.name,layout:['garden','promenade','groves','terraces'][seed%4],
   stone:[0xd0c1a7,0xc9c5b7,0xd9c8ae,0xd6c7bc][(seed>>>5)%4],green:[0x698c50,0x618a56,0x739650][(seed>>>8)%3],
-  palm:Math.abs(city.lat)<23,seed,documented:false,realGeometry:false,localDesign:true};
+  palm:Math.abs(city.lat)<23,seed,designVariant:(seed>>>10)%24,documented:false,realGeometry:false,localDesign:true,
+  workInProgress:true,candidateName:provisionalCandidate?.name||null,candidateSource:provisionalCandidate?.source||null};
 }
 function addCitySquareNameSign(profile,b){
  const w=b.width,d=b.depth;
  const signWidth=Math.min(w*.23,9.5),signHeight=signWidth/4,signZ=b.z+d*.466,signX=b.x-w*.26;
  const signBottom=1.60,signY=signBottom+signHeight/2;
  const source=profile.realGeometry?profile.geometrySource||'OpenStreetMap':'';
- const material=new THREE.MeshBasicMaterial({map:billboardTexture([currentCity.name.toUpperCase(),profile.documented?profile.name:'PIAZZA CIVICA',source],'#234f63',{wide:true}),side:THREE.FrontSide,toneMapped:false});
+ const signLines=profile.workInProgress?[currentCity.name.toUpperCase(),'PIAZZA REALE','IN LAVORAZIONE']:
+  [currentCity.name.toUpperCase(),profile.documented?profile.name:'PIAZZA CIVICA',source];
+ const material=new THREE.MeshBasicMaterial({map:billboardTexture(signLines,'#234f63',{wide:true}),side:THREE.FrontSide,toneMapped:false});
  const geo=new THREE.PlaneGeometry(signWidth,signHeight);
  for(const rear of [false,true]){
   const label=new THREE.Mesh(geo,material);label.position.set(signX,signY,signZ+(rear?-.102:.102));label.rotation.y=rear?Math.PI:0;
@@ -1686,7 +1697,7 @@ function drawSurveyedCitySquare(profile,b){
   }
  }
  if(profile.localDesign&&profile.fountain){
-  const fountain=fit.point(profile.fountain),radius=Math.min(3.2,profile.fountain.radius*scale);
+  const fountain=fit.point(profile.fountain),radius=Math.min(profile.workInProgress?5.4:3.2,profile.fountain.radius*scale);
   if(radius>1.25&&clearDetail(fountain.x,fountain.z,radius)){
    const {x,z}=fountain;
    put('round',0xd9cebb,x,.63,z,radius*2,.42,radius*2);
@@ -1727,6 +1738,7 @@ function drawCitySquare(zone,b){
  const profile=citySquareProfile(currentCity);
  if(profile.realGeometry)return drawSurveyedCitySquare(profile,b);
  const w=b.width-10,d=b.depth-14;
+ const variant=Number(profile.designVariant)||0;
  const roundedRect=(x,z,width,depth,radius)=>{
   const ring=[],r=Math.min(radius,width*.39,depth*.39),ax=width/2-r,az=depth/2-r;
   for(const [dx,dz,start] of [[1,1,0],[-1,1,Math.PI/2],[-1,-1,Math.PI],[1,-1,Math.PI*1.5]]){
@@ -1739,15 +1751,15 @@ function drawCitySquare(zone,b){
  const circle=(x,z,radius)=>Array.from({length:21},(_,i)=>{
   const a=(i%20)*Math.PI/10;return {x:x+Math.cos(a)*radius,z:z+Math.sin(a)*radius};
  });
- const fountain={x:0,z:0,radius:Math.min(2.85,w*.115)};
- const outline=roundedRect(0,0,w,d,1.9),surfaces=[],trees=[],benches=[];
+ const fountain={x:((variant%3)-1)*Math.min(5,w*.035),z:((Math.floor(variant/3)%3)-1)*Math.min(3,d*.035),radius:Math.min(4.2+(variant%5)*.34,w*.115,d*.16)};
+ const outline=roundedRect(0,0,w,d,1.25+(variant%6)*.31),surfaces=[],trees=[],benches=[];
  const footRoutes=[
   {points:roundedRect(0,0,w-2.8,d-2.8,1.7),widthMeters:1.18},
-  {points:circle(0,0,fountain.radius+1.55),widthMeters:1.45},
-  ...[-1,1].map(side=>({points:[{x:0,z:side*d*.48},{x:0,z:side*(fountain.radius+1.55)}],widthMeters:1.65}))
+  {points:circle(fountain.x,fountain.z,fountain.radius+1.55),widthMeters:1.45},
+  ...[-1,1].map(side=>({points:[{x:fountain.x,z:side*d*.48},{x:fountain.x,z:fountain.z+side*(fountain.radius+1.55)}],widthMeters:1.65}))
  ];
  if(profile.layout!=='promenade'){
-  for(const side of [-1,1])footRoutes.push({points:[{x:side*w*.45,z:0},{x:side*(fountain.radius+1.55),z:0}],widthMeters:1.44});
+  for(const side of [-1,1])footRoutes.push({points:[{x:side*w*.45,z:fountain.z},{x:fountain.x+side*(fountain.radius+1.55),z:fountain.z}],widthMeters:1.44});
  }
  const schemes={
   garden:[[-.255,.326],[.255,.326]],
@@ -1757,7 +1769,7 @@ function drawCitySquare(zone,b){
  };
  for(const side of [-1,1])for(const [offset,length] of schemes[profile.layout]){
   const band=profile.layout==='promenade'?w*.218:profile.layout==='terraces'?w*(side*offset>0?.249:.211):w*.229;
-  const x=side*w*.286,z=d*offset,depth=d*length;
+  const x=side*w*(.274+(variant%4)*.006),z=d*offset+((variant>>2)%3-1)*d*.012,depth=d*length;
   surfaces.push({kind:'lawn',rings:[roundedRect(x,z,band,depth,profile.layout==='groves'?2.3:1.35)]});
   const treeOffsets=depth>40?[-.36,-.12,.12,.36]:depth>14?[-.27,.24]:[0];
   for(const leaf of treeOffsets)trees.push({x:x+side*.45,z:z+depth*leaf});
@@ -1765,6 +1777,15 @@ function drawCitySquare(zone,b){
    for(const end of [-1,1])benches.push({x:side*w*.15,z:end*d*.25,bearing:side*Math.PI/2});
   }else if(Math.abs(z)>d*.17)benches.push({x:side*w*.147,z,bearing:side*Math.PI/2});
  }
+ // Every provisional design is a finished civic garden, not an empty parcel.
+ // The city seed varies the two perimeter groves and seating rhythm while the
+ // furniture retains the same physical scale as the surrounding streets.
+ for(const side of [-1,1])for(let i=0;i<7;i++){
+  const z=-d*.34+i*d*.113;
+  trees.push({x:side*(w*(.405+(variant%3)*.006)),z:z+((variant+i)%3-1)*.7});
+  if((i+variant)%2===0)benches.push({x:side*w*.335,z,bearing:side*Math.PI/2});
+ }
+ for(const side of [-1,1])for(let i=0;i<3;i++)benches.push({x:-w*.16+i*w*.16,z:side*d*.365,bearing:side<0?0:Math.PI});
  return drawSurveyedCitySquare({...profile,outline,surfaces,walkwayDetails:footRoutes,trees,benches,fountain,base:'paving'},b);
 }
 
@@ -8119,7 +8140,8 @@ function openSquareDetailPanel(focusHeading=true){
   !group.userData.squareMappedSeats?.length&&!group.userData.squareMappedTrees?.length;
  const intro=document.createElement('p');
  const chosenWithReference=['curated-central-square','documented-civic-square','named-reference'].includes(profile.selection);
- intro.textContent=profile.layoutEvidence==='cartographic-reconstruction'?'Planimetria ricostruita dalla cartografia e dai documenti disponibili.':
+ intro.textContent=profile.workInProgress?'Piazza provvisoria completa. La planimetria e gli elementi della piazza reale sono in lavorazione.':
+  profile.layoutEvidence==='cartographic-reconstruction'?'Planimetria ricostruita dalla cartografia e dai documenti disponibili.':
   profile.layoutEvidence==='schematic-from-design'?'Perimetro da OpenStreetMap. Disposizione interna schematica basata sul progetto, con posizioni indicative.':
   profile.reviewed?(outlineOnly?'Perimetro verificato nelle fonti. Per ora la scena riproduce il solo contorno della piazza.':
    'Perimetro verificato nelle fonti. Gli elementi ricostruiti seguono la documentazione disponibile.'):
@@ -8144,6 +8166,7 @@ function openSquareDetailPanel(focusHeading=true){
   profile.geometryAttribution?'Planimetria ufficiale':
   /^https:\/\/www\.openstreetmap\.org\//.test(profile.source||'')?'Planimetria OpenStreetMap':'Fonte della planimetria';
  sourceLink(references,profile.source,geometryLabel);
+ sourceLink(references,profile.candidateSource,'Candidato cartografico in revisione');
  if(profile.geometryAttribution)sourceLink(references,profile.geometryTerms,profile.geometryAttribution);
  if(profile.reference!==profile.source)sourceLink(references,profile.reference,profile.layoutEvidence==='schematic-from-design'?'Relazione del progettista':'Fonte della piazza');
  if(references.childElementCount)body.append(references);
