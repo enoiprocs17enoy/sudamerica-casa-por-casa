@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz',{signal:AbortSignal.timeout(3200)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=3',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -6030,15 +6030,17 @@ function* renderHouseStages(selected){
     const casts=/(premiumVerandaRoof|premiumEntranceCanopy|premiumTerraceShade|premiumDormerTop|premiumChimney|premiumTowerBalconySlab|gardenTree|towerBase|towerRoof|towerMain|towerMid|homeMain|homeWing|homeRoof|homeCore|homeWall|towerWall|towerBody|mainBody|wingBody|mainRoof|gable|hipRoof)/i.test(key);
     const receives=casts||/(homeGardenLawn|veranda|facade|pier|window|door|balcony|pilaster)/i.test(key);
     const premiumDetail=/^premiumTowerBalcony(Post|Bottom|SideCap)_/.test(key);
-    const profile=[batch.geo.id,texture,normalStrength,roughness,metalness,casts,receives].join(':')+(premiumDetail?':premiumDetail':'');
+    const facadeDetail=spatialBatches&&/^arch[^_]*(ShutterSlat|WindowCross|WindowVertical)_/.test(key);
+    const distantDetail=premiumDetail||facadeDetail;
+    const profile=[batch.geo.id,texture,normalStrength,roughness,metalness,casts,receives].join(':')+(distantDetail?':distantDetail':'');
     for(const entry of batch.entries){
       // Dense cities cull whole neighborhoods instead of submitting every house.
-      const span=premiumDetail?120:368;
-      const key=spatialBatches||premiumDetail?profile+':'+Math.floor(entry.h.x/span)+':'+Math.floor(entry.h.z/span):profile;
+      const span=distantDetail?120:368;
+      const key=spatialBatches||distantDetail?profile+':'+Math.floor(entry.h.x/span)+':'+Math.floor(entry.h.z/span):profile;
       if(!renderBatches.has(key))renderBatches.set(key,{
-        profile,geo:batch.geo,texture,normalStrength,roughness,metalness,casts,receives,premiumDetail,
-        originX:premiumDetail?(Math.floor(entry.h.x/span)+.5)*span:0,
-        originZ:premiumDetail?(Math.floor(entry.h.z/span)+.5)*span:0,entries:[]
+        profile,geo:batch.geo,texture,normalStrength,roughness,metalness,casts,receives,distantDetail,
+        originX:distantDetail?(Math.floor(entry.h.x/span)+.5)*span:0,
+        originZ:distantDetail?(Math.floor(entry.h.z/span)+.5)*span:0,entries:[]
       });
       // Placements are already complete. Reuse them rather than cloning every
       // window, roof tile and trim piece into a second temporary object graph.
@@ -6077,10 +6079,10 @@ function* renderHouseStages(selected){
       dummy.scale.set(e.w,e.height,e.d);dummy.matrix.compose(dummy.position,rotation,dummy.scale);mesh.setMatrixAt(i,dummy.matrix); mesh.setColorAt(i,tint.setHex(e.color));
     }
     mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();
-    if(batch.premiumDetail){
-      // Rails and posts are subpixel in distant panoramas. Keep the slab,
-      // glass and front cap at every distance, restoring fine metalwork nearby.
-      const lod=new THREE.LOD();lod.name='premium-balcony-detail';
+    if(batch.distantDetail){
+      // Slats, mullions and rails are subpixel at panorama distance. The
+      // walls, window panes, shutters and balcony structure stay visible.
+      const lod=new THREE.LOD();lod.name='fine-house-detail';
       lod.position.set(batch.originX,0,batch.originZ);
       lod.addLevel(mesh,0);lod.addLevel(new THREE.Group(),480,.12);group.add(lod);
     }else group.add(mesh);

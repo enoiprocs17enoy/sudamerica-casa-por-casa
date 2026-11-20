@@ -6,7 +6,37 @@ function point(city,x,z){return[city.lat-z/111320,normLon(city.lng+x/(111320*Mat
 const land=(window.WORLD_LAND_DETAIL||window.WORLD_LAND)?.features||[];
 const polygons=[];for(const f of land){const rings=f.geometry.type==='Polygon'?[f.geometry.coordinates]:f.geometry.type==='MultiPolygon'?f.geometry.coordinates:[];for(const p of rings){const xs=p[0].map(p=>p[0]),ys=p[0].map(p=>p[1]);polygons.push({rings:p,minX:Math.min(...xs),maxX:Math.max(...xs),minY:Math.min(...ys),maxY:Math.max(...ys),coastlineDetail:f.properties?.coastlineDetail===true});}}
 const detailedCoasts=polygons.filter(p=>p.coastlineDetail);
-function inRing(lng,lat,ring){let inside=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const a=ring[i],b=ring[j];if((a[1]>lat)!==(b[1]>lat)&&lng<(b[0]-a[0])*(lat-a[1])/(b[1]-a[1])+a[0])inside=!inside;}return inside;}
+const ringEdges=new WeakMap();
+const latitudeBand=lat=>Math.floor(lat*8);
+function edgesForRing(ring){
+ let index=ringEdges.get(ring);
+ if(index)return index;
+ const edges=[],bands=new Map();
+ for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+  const edge=[ring[j],ring[i]];
+  edges.push(edge);
+  if(ring.length<64)continue;
+  const first=latitudeBand(Math.min(edge[0][1],edge[1][1]));
+  const last=latitudeBand(Math.max(edge[0][1],edge[1][1]));
+  for(let band=first;band<=last;band++){
+   if(!bands.has(band))bands.set(band,[]);
+   bands.get(band).push(edge);
+  }
+ }
+ index={edges,bands};ringEdges.set(ring,index);return index;
+}
+function edgesAtLatitude(ring,bottom,top=bottom){
+ const {edges,bands}=edgesForRing(ring);
+ const band=latitudeBand(bottom);
+ return bands.size&&band===latitudeBand(top)?bands.get(band)||[]:edges;
+}
+function inRing(lng,lat,ring){
+ let inside=false;
+ for(const [b,a] of edgesAtLatitude(ring,lat)){
+  if((a[1]>lat)!==(b[1]>lat)&&lng<(b[0]-a[0])*(lat-a[1])/(b[1]-a[1])+a[0])inside=!inside;
+ }
+ return inside;
+}
 function onLand(lat,lng){lng=normLon(lng);return polygons.some(p=>lng>=p.minX&&lng<=p.maxX&&lat>=p.minY&&lat<=p.maxY&&inRing(lng,lat,p.rings[0])&&!p.rings.slice(1).some(r=>inRing(lng,lat,r)));}
 function curve(a,b,bendRatio=.004){const dx=normLon(b.lng-a.lng),dy=b.lat-a.lat,cos=Math.cos((a.lat+b.lat)*Math.PI/360),length=Math.hypot(dx*cos,dy),bend=length*bendRatio,nx=-dy/(length||1)/Math.max(.02,cos)*bend,ny=dx*cos/(length||1)*bend,points=[];for(let i=0;i<=16;i++){const t=i/16,u=1-t,offset=3*u*t;points.push([a.lat+dy*t+ny*offset,a.lng+dx*t+nx*offset]);}points[0]=[a.lat,a.lng];points[points.length-1]=[b.lat,a.lng+dx];return points;}
 function coastCandidates(path){
@@ -28,8 +58,8 @@ function crossesDetailedWater(a,b,candidates){
  for(const {coast,shift} of candidates){
   if(coast.maxX+shift<left||coast.minX+shift>right||coast.maxY<bottom||coast.minY>top)continue;
   nearCoast=true;
-  for(const ring of coast.rings)for(let i=0,j=ring.length-1;i<ring.length;j=i++){
-   const [x,y]=ring[j],[u,v]=ring[i],sx=u-x,sy=v-y;
+  for(const ring of coast.rings)for(const [[x,y],[u,v]] of edgesAtLatitude(ring,bottom,top)){
+   const sx=u-x,sy=v-y;
    if(Math.max(x,u)+shift<left||Math.min(x,u)+shift>right||Math.max(y,v)<bottom||Math.min(y,v)>top)continue;
    const det=dx*sy-dy*sx;
    if(Math.abs(det)<1e-18)continue;

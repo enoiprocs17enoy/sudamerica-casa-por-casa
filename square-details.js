@@ -7,6 +7,10 @@ MODEL_SPECS['stone-sphinx']={height:3.15,width:3.6};
 Object.assign(MODEL_SPECS,{
  'washington-arch':{height:9.2,width:7.7,depth:2.9,parcelWidth:.38},
  'washington-fountain':{height:2.25,width:7.4,depth:7.4,parcelWidth:.52},
+ 'washington-garibaldi':{height:6.3,width:3.05,depth:3.05},
+ 'holley-monument':{height:3.8,width:3.15,depth:1.2},
+ 'toronto-archer':{height:3.5,width:3.6,depth:2.6},
+ 'boston-embrace':{height:6.1,width:9.76,depth:8.0,parcelWidth:.50},
  'franklin-fountain':{height:2.5,width:6.8,depth:6.8,parcelWidth:.51},
  'freedom-arches':{height:4.8,width:9.9,depth:6.8,parcelWidth:.64},
  'liberty-carousel':{height:5.2,width:7.8,depth:7.8,parcelWidth:.25},
@@ -18,6 +22,10 @@ Object.assign(MODEL_SPECS,{
  'bundesplatz-jets':{height:4.0,width:14,depth:14,parcelWidth:.65},
  'flagpole':{height:8,width:.65},
  'king-sejong-seated':{height:7.0,width:5.5,depth:5.3,parcelWidth:.45},
+ 'joseon-armillary':{height:1.48,width:.82,depth:.82},
+ 'joseon-rain-gauge':{height:1.32,width:.63,depth:.63},
+ 'joseon-sundial':{height:1.14,width:.86,depth:.86},
+ 'three-rivers-fountain':{height:5.5,width:10,depth:10,parcelWidth:.35},
  'rizal-monument':{height:9.6,width:7.4,depth:7.4,parcelWidth:.42},
  'monas':{height:19.0,width:7.1,depth:7.1,parcelWidth:.50},
  'sydney-cenotaph':{height:3.8,width:7.7,depth:3.6,parcelWidth:.35}
@@ -312,6 +320,20 @@ function render(plan,group,b){
   for(const [row,width] of [.97,1.42,.83].entries())
    add('box','patina',0x998872,...front.at(0,2.93-row*.14,.108),width,.024,.018,front.turn);
  }
+ // Short rounded sections follow a spline and keep the sculpture in the shared instance batches.
+ function bronzeCurve(points){
+  const curve=new T.CatmullRomCurve3(points.map(([x,y,z])=>new T.Vector3(x,y,z)));
+  const segments=(points.length-1)*5;
+  let previous=curve.getPoint(0).toArray();
+  for(let i=0;i<=segments;i++){
+   const t=i/segments,position=curve.getPoint(t).toArray();
+   const index=Math.min(points.length-2,Math.floor(t*(points.length-1)));
+   const radius=T.MathUtils.lerp(points[index][3],points[index+1][3],t*(points.length-1)-index);
+   if(i)limb(previous,position,radius,0x735548);
+   sphere(0x735548,...position,radius,radius,radius);
+   previous=position;
+  }
+ }
  function build(model){
   if(model==='accademia-conegliano'){accademia();return;}
   if(model==='stone-sphinx'){sphinx();return;}
@@ -345,6 +367,40 @@ function render(plan,group,b){
     add('box','stone',shade,Math.cos(a)*1.65,4.39+Math.sin(a)*1.66,face*1.1,.18,.29,.10,
      new T.Quaternion().setFromAxisAngle(new T.Vector3(0,0,1),a-Math.PI/2));
    }
+  }else if(model==='washington-garibaldi'){
+   steps(0,3.05);
+   box(0x9d8e85,0,2.04,0,1.66,2.82,1.53);
+   box(0xb6a49a,0,3.47,0,1.92,.22,1.78);
+   box(bronze,0,3.64,0,1.43,.14,1.24,'metal');
+   human(0,3.71,0,.99,'civil',bronze);
+   limb([.55,4.94,.14],[.69,3.85,.26],.035,bronze);
+  }else if(model==='holley-monument'){
+   box(stone,0,.14,0,3.12,.28,1.15);
+   box(stone,0,1.49,0,1.12,2.46,.80);
+   for(const side of [-1,1]){
+    box(stone,side*1.36,1.14,0,.39,1.73,.83);
+    box(stone,side*.88,.82,.04,.65,1.05,.23);
+   }
+   box(stone,0,2.73,0,1.20,.17,.87);
+   sphere(bronze,0,3.04,0,.44,.25,.27);
+   sphere(bronze,0,3.49,.03,.25,.31,.24);
+   sphere(bronze,0,3.47,.25,.08,.09,.08);
+  }else if(model==='toronto-archer'){
+   cylinder(0x8a8b85,0,.14,0,1.28,.28);
+   bronzeCurve([[-1.25,.61,.27,.29],[-.73,1.08,-.20,.47],[-.26,1.77,-.24,.49],
+    [.44,2.62,-.12,.39],[1.22,2.95,.14,.17]]);
+   bronzeCurve([[-.56,.61,-.57,.32],[.15,1.04,-.25,.48],[.92,1.56,.34,.42],
+    [1.20,2.04,.61,.19]]);
+   bronzeCurve([[-.08,1.61,.02,.46],[-.59,1.96,.40,.42],[-1.22,2.37,.64,.16]]);
+  }else if(model==='boston-embrace'){
+   bronzeCurve([[-3.52,.54,-1.75,.51],[-3.17,2.49,-1.73,.68],[-1.94,4.63,-1.29,.66],
+    [.19,5.37,-.43,.62],[2.38,4.47,.39,.42]]);
+   bronzeCurve([[3.53,.54,1.15,.53],[3.18,2.56,1.05,.72],[1.70,4.58,.76,.65],
+    [-.55,5.42,.39,.52],[-2.46,4.35,-.38,.34]]);
+   bronzeCurve([[-3.17,2.62,-1.52,.56],[-2.11,3.17,-.23,.56],[-.43,3.83,1.22,.52],
+    [1.25,4.34,1.58,.39],[2.51,4.12,1.02,.28]]);
+   bronzeCurve([[3.27,2.61,1.03,.55],[2.38,3.23,-.24,.54],[.94,3.92,-1.31,.49],
+    [-1.05,4.38,-1.65,.37],[-2.40,4.03,-1.42,.27]]);
   }else if(model==='washington-fountain'||model==='franklin-fountain'){
    const washington=model==='washington-fountain',radius=washington?3.48:3.12;
    cylinder(stone,0,.14,0,radius+.15,.28);
@@ -440,6 +496,63 @@ function render(plan,group,b){
    box(gilt,0,6.13,-.01,.99,.33,.66,'metal');box(gilt,0,6.30,-.28,.71,.29,.50,'metal');
    limb([0,5.65,.45],[0,5.23,.48],.11,gilt);
    for(const side of [-1,1])box(0xc2a062,side*.34,3.83,1.13,.67,.10,.63,'metal');
+  }else if(model==='joseon-armillary'){
+   const brass=0x9b783b;
+   box(stone,0,.09,0,.78,.18,.78);
+   cylinder(stone,0,.42,0,.23,.48);
+   ring(brass,0,1.06,0,.38,.030);
+   for(const angle of [-Math.PI/4,Math.PI/4]){
+    const rotation=new T.Quaternion().setFromEuler(new T.Euler(Math.PI/2,angle,0,'YXZ'));
+    add('torus','metal',brass,0,1.06,0,.38,.030/.045,.38,rotation);
+   }
+   limb([-.29,.77,0],[.29,1.35,0],.026,brass);
+  }else if(model==='joseon-rain-gauge'){
+   box(stone,0,.09,0,.62,.18,.62);
+   box(stone,0,.44,0,.44,.52,.44);
+   box(marble,0,.73,0,.53,.09,.53);
+   cylinder(bronze,0,1.02,0,.14,.49,'metal');
+   cylinder(0x283536,0,1.266,0,.12,.010,'metal');
+   ring(bronze,0,1.278,0,.139,.026);
+  }else if(model==='joseon-sundial'){
+   box(stone,0,.09,0,.79,.18,.79);
+   cylinder(stone,0,.39,0,.21,.42);
+   cylinder(bronze,0,.62,0,.15,.06,'metal');
+   add('sundial-bowl','metal',bronze,0,.64,0,1,1,1);
+   for(const [height,radius] of [[.75,.24],[.83,.33],[.92,.38]])ring(gold,0,height,0,radius,.014);
+   limb([0,.67,0],[.28,1.06,0],.023,gold);
+  }else if(model==='three-rivers-fountain'){
+   const silver=0xc7ccca,granite=0x817d75;
+   add('triangular-base','stone',granite,0,.33,0,3.30,.66,3.30);
+   cylinder(silver,0,2.27,0,.63,3.92,'metal');
+   add('fountain-crown','metal',silver,0,4.24,0,1.19,.49,1.19);
+   ring(silver,0,4.50,0,1.18,.085);
+   jet(0,4.50,0,.96,.43);
+   for(let i=0;i<3;i++){
+    const angle=i*2*Math.PI/3;
+    const at=(x,y,z)=>[x*Math.cos(angle)+z*Math.sin(angle),y,z*Math.cos(angle)-x*Math.sin(angle)];
+    const pedestalRotation=new T.Quaternion().setFromAxisAngle(UP,angle);
+    add('box','stone',granite,...at(0,.73,2.10),1.69,.48,1.42,pedestalRotation);
+    add('sphere','metal',silver,...at(0,2.02,1.95),.43,.92,.30,pedestalRotation);
+    sphere(silver,...at(0,3.12,1.96),.23,.32,.25);
+    limb(at(0,2.98,1.96),at(0,2.69,1.96),.14,silver);
+    for(const side of [-1,1]){
+     limb(at(side*.23,1.34,2.04),at(side*.31,1.53,2.70),.18,silver);
+     limb(at(side*.31,1.53,2.70),at(side*.26,.96,2.84),.14,silver);
+     limb(at(side*.34,2.58,1.95),at(side*.49,2.07,2.24),.12,silver);
+     limb(at(side*.49,2.07,2.24),at(side*.20,2.04,2.65),.095,silver);
+    }
+    // The three birds share a body, with distinct neck and bill silhouettes.
+    const neckZ=[2.78,2.59,2.75][i],neckY=[2.77,2.91,2.77][i];
+    const headZ=[3.02,2.83,2.98][i],headY=[2.69,2.93,2.83][i];
+    const billZ=[3.53,3.13,3.54][i],billY=[2.51,2.86,2.82][i];
+    add('sphere','metal',silver,...at(0,2.04,2.78),.25,.25,.43,pedestalRotation);
+    limb(at(0,2.12,2.92),at(0,neckY,neckZ),i===1?.085:.065,silver);
+    limb(at(0,neckY,neckZ),at(0,headY,headZ),.064,silver);
+    sphere(silver,...at(0,headY,headZ),.11,.105,.14);
+    limb(at(0,headY,headZ),at(0,billY,billZ),.038,silver);
+    limb(at(0,billY,billZ),at(0,.62,4.55),.033,water,'water');
+    limb(at(0,4.50,.76),at(0,.62,4.36),.035,water,'water');
+   }
   }else if(model==='rizal-monument'){
    const granite=0xa79f91;
    steps(0,7.25);box(granite,0,1.32,0,5.85,1.34,5.48);
@@ -519,6 +632,12 @@ function render(plan,group,b){
  for(const item of plan.items){owner=item;const first=parts.length;build(item.feature.model);localModels.push({item,first,end:parts.length});}
  const geos={box:new T.BoxGeometry(1,1,1),sphere:new T.SphereGeometry(1,12,8),cylinder:new T.CylinderGeometry(1,1,1,12),cone:new T.ConeGeometry(1,1,12),torus:new T.TorusGeometry(1,.045,6,20),pyramid:new T.CylinderGeometry(.12,1,1,4),robe:new T.CylinderGeometry(.55,1,1,10),cape:new T.PlaneGeometry(1,1,10,12)};
  if(parts.some(part=>part.kind==='hex'))geos.hex=new T.CylinderGeometry(1,1,1,6);
+ if(parts.some(part=>part.kind==='sundial-bowl')){
+  const profile=[[0,0],[.13,0],[.27,.08],[.38,.22],[.42,.36],[.38,.36],[.34,.23],[.24,.11],[.11,.05],[0,.05]];
+  geos['sundial-bowl']=new T.LatheGeometry(profile.map(([r,y])=>new T.Vector2(r,y)),20);
+ }
+ if(parts.some(part=>part.kind==='triangular-base'))geos['triangular-base']=new T.CylinderGeometry(1,1,1,3);
+ if(parts.some(part=>part.kind==='fountain-crown'))geos['fountain-crown']=new T.CylinderGeometry(1,.53,1,12);
  if(parts.some(part=>part.kind==='tapered-column'))geos['tapered-column']=new T.CylinderGeometry(.56,1,1,16);
  if(parts.some(part=>part.kind==='monas-base'))geos['monas-base']=new T.CylinderGeometry(1,.76,1,4).rotateY(Math.PI/4);
  if(parts.some(part=>part.kind==='triumphal-arch')){
