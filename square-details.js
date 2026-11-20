@@ -4,6 +4,7 @@
 const MODEL_SPECS={'iquique-naval-monument':{height:13.3,width:8.2,depth:8.2},'floral-calendar':{height:1.2,width:8},'arenales-ensemble':{height:11,width:10},'freedom-chains':{height:7,width:5},pyramid:{height:13,width:7},obelisk:{height:10,width:3},column:{height:10,width:4},'liberty-column':{height:13,width:6},equestrian:{height:8,width:7},'equestrian-fountain':{height:8,width:9},'standing-sword':{height:7,width:4},'standing-civil':{height:10,width:7},'ornate-fountain':{height:7,width:9},'liberty-fountain':{height:7,width:8},fountain:{height:3,width:6},bust:{height:4,width:3},plaque:{height:1.5,width:2},'classical-figure':{height:3,width:2}};
 MODEL_SPECS['accademia-conegliano']={height:15,width:32,depth:18,parcelWidth:.80};
 MODEL_SPECS['stone-sphinx']={height:3.15,width:3.6};
+MODEL_SPECS['hallstatt-trinity-column']={height:6.1,width:3.4};
 MODEL_SPECS['palmanova-stendardo']={height:11.5,width:8.4};
 MODEL_SPECS['arequipa-tuturutu']={height:5.5,width:10};
 Object.assign(MODEL_SPECS,{
@@ -1032,6 +1033,18 @@ function render(plan,group,b){
      box(engraving,dx,y,0,.035,.11,w);
     }
    }
+  }else if(model==='hallstatt-trinity-column'){
+   const limestone=0xcebca5, paleStone=0xe0d3bd;
+   add('triangular-base','stone',limestone,0,.14,0,1.85,.28,1.85);
+   add('triangular-base','stone',paleStone,0,.43,0,1.62,.30,1.62);
+   add('triangular-base','stone',limestone,0,.92,0,1.15,.72,1.15);
+   add('triangular-obelisk','stone',paleStone,0,3.38,0,.83,4.25,.83);
+   for(const angle of [0,2*Math.PI/3,4*Math.PI/3])sphere(limestone,Math.sin(angle)*.92,1.12,Math.cos(angle)*.92,.22,.32,.22,'stone');
+   human(0,1.28,.61,.44,'classical',paleStone);
+   sphere(paleStone,0,3.25,.45,.18,.38,.19,'stone');
+   sphere(paleStone,0,5.47,.16,.37,.25,.27,'stone');
+   human(-.17,5.53,.26,.20,'classical',paleStone);
+   human(.17,5.53,.26,.20,'classical',paleStone);
   }else if(model==='liberty-column'||model==='column'||model==='obelisk'){
    steps(0,5.3);box(stone,0,1.5,0,3.5,1.65,3.5);plaque(1.5,1.7,1.79);
    if(model==='obelisk')add('pyramid','stone',marble,0,6.15,0,1.1,7.6,1.1);
@@ -1097,6 +1110,7 @@ function render(plan,group,b){
   geos['sundial-bowl']=new T.LatheGeometry(profile.map(([r,y])=>new T.Vector2(r,y)),20);
  }
  if(parts.some(part=>part.kind==='triangular-base'))geos['triangular-base']=new T.CylinderGeometry(1,1,1,3);
+ if(parts.some(part=>part.kind==='triangular-obelisk'))geos['triangular-obelisk']=new T.CylinderGeometry(.14,1,1,3).rotateY(Math.PI);
  if(parts.some(part=>part.kind==='fountain-crown'))geos['fountain-crown']=new T.CylinderGeometry(1,.53,1,12);
  if(parts.some(part=>part.kind==='tapered-column'))geos['tapered-column']=new T.CylinderGeometry(.56,1,1,16);
  if(parts.some(part=>part.kind==='obelisk-shaft'))geos['obelisk-shaft']=new T.CylinderGeometry(.62*Math.SQRT1_2,Math.SQRT1_2,1,4).rotateY(Math.PI/4);
