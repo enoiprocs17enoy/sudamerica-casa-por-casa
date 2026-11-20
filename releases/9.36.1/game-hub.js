@@ -145,7 +145,10 @@
    const items=[
     ...people.map(h=>['🏡','@'+h.user,h.cityName,()=>WorldSearch.openResident(h)]),
     ...countries.map(c=>['🌍',GameI18n.country(c.code,c.name),WorldSearch.t('country'),()=>WorldSearch.showCountry(c.code)]),
-    ...cities.map(c=>['📍',c.matchedName||c.name,GameI18n.country(c.countryCode,WorldAtlas.countries.get(c.countryCode)?.name||c.countryCode),()=>WorldSearch.openCity(c)])
+    ...cities.map(c=>{
+     const country=GameI18n.country(c.countryCode,WorldAtlas.countries.get(c.countryCode)?.name||c.countryCode);
+     return ['📍',c.matchedName||c.name,c.region?c.region+' · '+country:country,()=>WorldSearch.openCity(c)];
+    })
    ];
    results.replaceChildren();results.removeAttribute('aria-busy');
    searchStatus.textContent='';

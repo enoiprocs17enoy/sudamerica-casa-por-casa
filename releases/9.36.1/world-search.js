@@ -13,11 +13,16 @@ async function unpack(path){const r=await fetch(DATA+path);if(!r.ok)throw Error(
 // YesMilano also uses the simplified Chinese name 米兰 for Milan.
 // Vitoria-Gasteiz uses the joined name in its municipal tourism directory.
 const extraCityAliases=new Map([[3173435,['米兰']],[3104499,['Vitoria-Gasteiz','Vitoria']]]);
+// GeoNames gives the municipality and Madrid's district the same primary name.
+const placeSearchHints=new Map([
+ [3111108,{region:'Castilla y León',aliases:['Salamanca Castilla y León']}],
+ [6544491,{region:'Madrid',aliases:['Salamanca Madrid'],municipality:'gn-3111108'}],
+]);
 const cityNames=city=>[city.name,city.asciiName,...(city.aliases||[])].filter(Boolean);
-const atlasAliases=id=>[...(atlas.meta.aliases?.[id]||[]),...(extraCityAliases.get(id)||[])];
+const atlasAliases=id=>[...(atlas.meta.aliases?.[id]||[]),...(extraCityAliases.get(id)||[]),...(placeSearchHints.get(id)?.aliases||[])];
 const bootstrapCities=[...new Set(atlas.byId.values())].filter(city=>city.geoVerified!==false&&atlas.countries.has(city.countryCode)).map(city=>{
  const aliases=[...new Set([...(city.aliases||[]),...atlasAliases(city.geonameId)])];
- return {id:city.id,countryCode:city.countryCode,name:city.name,asciiName:city.asciiName,aliases,population:city.realPopulation||city.rankWeight||0};
+ return {id:city.id,countryCode:city.countryCode,name:city.name,asciiName:city.asciiName,aliases,population:city.realPopulation||city.rankWeight||0,hint:placeSearchHints.get(city.geonameId)};
 });
 function cityExact(city,query){const q=norm(query);return !!q&&cityNames(city).some(name=>norm(name)===q);}
 async function searchCities(query,limit=6){
@@ -44,13 +49,17 @@ async function searchCities(query,limit=6){
   const rows=await cache.get(key);
   for(const [id,countryCode,name,asciiName,population,aliases] of rows){
    const place=atlas.byId.get('gn-'+id);
-   add({id:place?.id||'gn-'+id,countryCode,name:place?.name||name,asciiName:place?.asciiName||asciiName,population,aliases:[name,asciiName,...(aliases||[]),...atlasAliases(id)]});
+   add({id:place?.id||'gn-'+id,countryCode,name:place?.name||name,asciiName:place?.asciiName||asciiName,population,hint:placeSearchHints.get(id),aliases:[name,asciiName,...(aliases||[]),...atlasAliases(id)]});
   }
  }catch(error){if(![...matches.values()].some(match=>match.rank<=1))throw error;}
- const ranked=[...matches.values()].sort((a,b)=>a.rank-b.rank||b.city.population-a.city.population||a.city.id.localeCompare(b.city.id));
+ function rankPopulation({city,rank}){
+  const municipality=matches.get(city.hint?.municipality);
+  return municipality?.rank===rank?Math.min(city.population,municipality.city.population-.5):city.population;
+ }
+ const ranked=[...matches.values()].sort((a,b)=>a.rank-b.rank||rankPopulation(b)-rankPopulation(a)||a.city.id.localeCompare(b.city.id));
  const hasExactPrimary=ranked[0]?.rank===0;
  return ranked.slice(0,limit).map(({city,rank,matchedName})=>({
-  id:city.id,countryCode:city.countryCode,name:city.name,asciiName:city.asciiName,aliases:city.aliases,
+  id:city.id,countryCode:city.countryCode,name:city.name,asciiName:city.asciiName,aliases:city.aliases,region:city.hint?.region,
   matchedName:rank===1&&hasExactPrimary?undefined:matchedName,
  }));
 }
