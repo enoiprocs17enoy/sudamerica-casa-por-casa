@@ -11,7 +11,8 @@ function bucket(query){let h=0;for(const ch of [...norm(query)].slice(0,2))h=(h*
 async function unpack(path){const r=await fetch(DATA+path);if(!r.ok)throw Error('Search data '+r.status);const p=await r.json();if(p.encoding!=='gzip-base64')throw Error('Invalid search data');const bytes=Uint8Array.from(atob(p.data),c=>c.charCodeAt(0));return JSON.parse(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text());}
 // The compact world buckets do not carry every GeoNames alias loaded by the atlas.
 // YesMilano also uses the simplified Chinese name 米兰 for Milan.
-const extraCityAliases=new Map([[3173435,['米兰']]]);
+// Vitoria-Gasteiz uses the joined name in its municipal tourism directory.
+const extraCityAliases=new Map([[3173435,['米兰']],[3104499,['Vitoria-Gasteiz','Vitoria']]]);
 const cityNames=city=>[city.name,city.asciiName,...(city.aliases||[])].filter(Boolean);
 const atlasAliases=id=>[...(atlas.meta.aliases?.[id]||[]),...(extraCityAliases.get(id)||[])];
 const bootstrapCities=[...new Set(atlas.byId.values())].filter(city=>city.geoVerified!==false&&atlas.countries.has(city.countryCode)).map(city=>{
