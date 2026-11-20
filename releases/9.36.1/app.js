@@ -6899,6 +6899,21 @@ function ownedProperties(h){
   result.push({type:'mongolfiera',name:'🎈 Mongolfiera #'+(b.i+1),x:b.g.position.x,z:b.g.position.z,ref:b});
  return result;
 }
+function shopLevelDetails(shop){
+ const progress=shopProgressFor(shop),tier=houseTier(progress.points);
+ const format=value=>value.toLocaleString(window.GameI18n?.locale||'it-IT');
+ const level='Livello '+format(tier+1)+'/'+format(HOUSE_TIERS.length);
+ const design=progress.premium?'Premium':'Base';
+ const details=document.createElement('div');
+ details.className='shop-level-details';
+ for(const [text,className] of [[level,'shop-level'],[format(progress.points)+' punti','shop-points'],[design,progress.premium?'shop-design premium':'shop-design']]){
+  const label=document.createElement('span');
+  label.className=className;
+  label.textContent=text;
+  details.append(label);
+ }
+ return {progress,tier,details};
+}
 function showOwnerCard(h,kind='casa',selected=null){
  if(!h)return;localizedOwnerCard={h,kind,selected};
  if(kind!=='persona')clearResidentFocus();
@@ -6915,11 +6930,19 @@ function showOwnerCard(h,kind='casa',selected=null){
  const format=value=>value.toLocaleString(locale);
  const addFact=text=>{const line=document.createElement('p');line.textContent=text;info.append(line);};
  if(kind==='negozio'&&selected){
-  const progress=shopProgressFor(selected);
-  const level=houseTier(progress.points)+1;
-  addFact('Livello '+level+'/'+HOUSE_TIERS.length);
-  addFact('⭐ '+format(progress.points)+' punti');
-  addFact('🎨 Design: '+(progress.premium?'Premium':'Base'));
+  const {progress,tier,details}=shopLevelDetails(selected);
+  info.append(details);
+  const next=HOUSE_TIERS[tier+1];
+  if(next){
+   const current=HOUSE_TIERS[tier].min;
+   const levelProgress=document.createElement('progress');
+   levelProgress.className='shop-level-progress';
+   levelProgress.max=next.min-current;
+   levelProgress.value=progress.points-current;
+   levelProgress.setAttribute('aria-label','Livello '+format(tier+2)+' · '+format(next.min)+' punti');
+   info.append(levelProgress);
+   addFact(levelProgress.getAttribute('aria-label'));
+  }
   addFact('🎨 Colore: '+HOUSE_PAINTS[progress.paintIndex].name);
  }else if(kind==='persona'){
   addFact('⭐ '+format(h.points)+' punti');
@@ -8062,7 +8085,9 @@ function openCityDirectory(defaultType='all',focusHeading=true){
   ...publicZones().map(zone=>({type:'public',name:zone.name,searchText:cityPanelSearchText(zone.name,tr(zone.name)),ref:zone})),
   ...shopPurchases.map(shop=>{
    const name=shop.business+' #'+(shop.id+1)+' · @'+(ownerForShop(shop)?.user||'');
-   return {type:'shop',name,searchText:cityPanelSearchText(name,tr(shop.business)),ref:shop};
+   const progress=shopProgressFor(shop),design=progress.premium?'Premium':'Base';
+   const level='Livello '+(houseTier(progress.points)+1)+'/'+HOUSE_TIERS.length;
+   return {type:'shop',name,searchText:cityPanelSearchText(name,tr(shop.business),design,tr(design),level,tr(level)),ref:shop};
   }),
   ...homes.map(home=>{
    const name='Casa #'+home.id+' · @'+home.user;
@@ -8080,7 +8105,11 @@ function openCityDirectory(defaultType='all',focusHeading=true){
     const height=record.type==='home'?HOUSE_TIERS[houseTier(ref.points)].levels*3.15:5;
     flyToWorld({x:b.x,y:Math.max(3,height*.4),z:b.z},{distance:record.type==='public'?120:Math.max(65,height*1.8),elevation:1});
     if(record.type==='public')openPublicWorks(ref);else{panel.hidden=true;if(record.type==='shop')showShopCard(ref);else showCard(ref);}
-   };row.append(label,button);list.append(row);
+   };
+   row.append(label);
+   if(record.type==='shop')row.append(shopLevelDetails(record.ref).details);
+   row.append(button);
+   list.append(row);
   }
   more.hidden=matching.length<=limit;
  };

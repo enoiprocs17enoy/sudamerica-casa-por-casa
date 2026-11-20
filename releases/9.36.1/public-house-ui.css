@@ -122,3 +122,32 @@
     flex: 1 1 100%;
   }
 }
+
+.shop-level-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 9px;
+  margin: 5px 0;
+}
+body.game-hub .shop-level-details span {
+  color: inherit;
+  font-size: 13px;
+}
+.shop-level { font-weight: 700; }
+body.game-hub .shop-level-details .shop-design {
+  padding: 2px 8px;
+  border: 1px solid currentColor;
+  border-radius: 10px;
+}
+body.game-hub .shop-level-details .shop-design.premium {
+  background: #fce4a1;
+  border-color: #9a6830;
+  color: #583208;
+  font-weight: 700;
+}
+.shop-level-progress {
+  width: 100%;
+  height: 10px;
+  accent-color: #297953;
+}
