@@ -168,6 +168,11 @@
     "Palestra": "Salle de sport",
     "Mercato": "Marché",
     "PIAZZA CIVICA": "PLACE CIVIQUE",
+    "PIAZZA COMUNALE": "PLACE MUNICIPALE",
+    "IN LAVORAZIONE": "TRAVAUX EN COURS",
+    "Piazza provvisoria completa. La planimetria e gli elementi della piazza reale sono in lavorazione.": "Place provisoire complète. Le plan et les éléments de la place réelle sont en cours de réalisation.",
+    "Candidato cartografico in revisione": "Candidat cartographique en cours de révision",
+    "· Terre: Natural Earth, Confini:": "· Terres : Natural Earth, Frontières :",
     "PIAZZA PRINCIPALE": "PLACE PRINCIPALE",
     "SERVIZI PUBBLICI": "SERVICES PUBLICS",
     "Monolocale": "Studio",
@@ -919,7 +924,7 @@
     }
   ],
   "verification": {
-    "messages": 360,
+    "messages": 383,
     "templates": 61,
     "browserEvidence": "Lingue_mobile_francese_Parigi_v9.4.0.jpg",
     "privateOptions": "all eight tiers; source normalization and translation regression checked",

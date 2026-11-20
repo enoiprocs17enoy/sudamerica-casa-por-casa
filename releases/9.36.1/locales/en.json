@@ -168,6 +168,11 @@
     "Palestra": "Gym",
     "Mercato": "Market",
     "PIAZZA CIVICA": "CIVIC SQUARE",
+    "PIAZZA COMUNALE": "MUNICIPAL SQUARE",
+    "IN LAVORAZIONE": "WORK IN PROGRESS",
+    "Piazza provvisoria completa. La planimetria e gli elementi della piazza reale sono in lavorazione.": "Complete provisional square. The layout and features of the real square are being developed.",
+    "Candidato cartografico in revisione": "Mapped candidate under review",
+    "· Terre: Natural Earth, Confini:": "· Land: Natural Earth, Borders:",
     "PIAZZA PRINCIPALE": "MAIN SQUARE",
     "SERVIZI PUBBLICI": "PUBLIC SERVICES",
     "Monolocale": "Studio home",
@@ -919,7 +924,7 @@
     }
   ],
   "verification": {
-    "messages": 360,
+    "messages": 383,
     "templates": 61,
     "browserEvidence": "Cartelli_inglese_v9.4.0.jpg",
     "privateOptions": "all eight tiers; source normalization and translation regression checked",

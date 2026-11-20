@@ -168,6 +168,11 @@
     "Palestra": "Gimnasio",
     "Mercato": "Mercado",
     "PIAZZA CIVICA": "PLAZA CÍVICA",
+    "PIAZZA COMUNALE": "PLAZA MUNICIPAL",
+    "IN LAVORAZIONE": "EN PROCESO",
+    "Piazza provvisoria completa. La planimetria e gli elementi della piazza reale sono in lavorazione.": "Plaza provisional completa. La planta y los elementos de la plaza real están en desarrollo.",
+    "Candidato cartografico in revisione": "Candidato cartográfico en revisión",
+    "· Terre: Natural Earth, Confini:": "· Tierra: Natural Earth, Fronteras:",
     "PIAZZA PRINCIPALE": "PLAZA PRINCIPAL",
     "SERVIZI PUBBLICI": "SERVICIOS PÚBLICOS",
     "Monolocale": "Estudio",
@@ -919,7 +924,7 @@
     }
   ],
   "verification": {
-    "messages": 360,
+    "messages": 383,
     "templates": 61,
     "browserEvidence": "Lingue_mobile_spagnolo_v9.4.0.jpg",
     "privateOptions": "all eight tiers; source normalization and translation regression checked",

@@ -168,6 +168,11 @@
     "Palestra": "ジム",
     "Mercato": "市場",
     "PIAZZA CIVICA": "市民広場",
+    "PIAZZA COMUNALE": "市立広場",
+    "IN LAVORAZIONE": "制作中",
+    "Piazza provvisoria completa. La planimetria e gli elementi della piazza reale sono in lavorazione.": "完成形の仮設広場です。実在する広場の配置と構成要素は現在制作中です。",
+    "Candidato cartografico in revisione": "地図候補を確認中",
+    "· Terre: Natural Earth, Confini:": "· 陸地：Natural Earth、国境：",
     "PIAZZA PRINCIPALE": "中央広場",
     "SERVIZI PUBBLICI": "公共サービス",
     "Monolocale": "ワンルーム",
@@ -707,7 +712,7 @@
     }
   ],
   "verification": {
-    "messages": 360,
+    "messages": 383,
     "templates": 61,
     "browserEvidence": "Cartello_giapponese_Tokyo_v9.4.0.jpg",
     "privateOptions": "all eight tiers; source normalization and translation regression checked",

@@ -168,6 +168,11 @@
     "Palestra": "Academia",
     "Mercato": "Mercado",
     "PIAZZA CIVICA": "PRAÇA CÍVICA",
+    "PIAZZA COMUNALE": "PRAÇA MUNICIPAL",
+    "IN LAVORAZIONE": "EM DESENVOLVIMENTO",
+    "Piazza provvisoria completa. La planimetria e gli elementi della piazza reale sono in lavorazione.": "Praça provisória completa. A planta e os elementos da praça real estão em desenvolvimento.",
+    "Candidato cartografico in revisione": "Candidato cartográfico em revisão",
+    "· Terre: Natural Earth, Confini:": "· Terras: Natural Earth, Fronteiras:",
     "PIAZZA PRINCIPALE": "PRAÇA PRINCIPAL",
     "SERVIZI PUBBLICI": "SERVIÇOS PÚBLICOS",
     "Monolocale": "Quitinete",
@@ -946,7 +951,7 @@
     }
   ],
   "verification": {
-    "messages": 360,
+    "messages": 383,
     "templates": 61,
     "browserEvidence": "Lingue_mobile_brasiliano_SaoPaulo_v9.4.0.jpg",
     "privateOptions": "all eight tiers; source normalization and translation regression checked",

@@ -168,6 +168,11 @@
     "Palestra": "Pusat kebugaran",
     "Mercato": "Pasar",
     "PIAZZA CIVICA": "ALUN-ALUN KOTA",
+    "PIAZZA COMUNALE": "ALUN-ALUN KOTA",
+    "IN LAVORAZIONE": "SEDANG DIKERJAKAN",
+    "Piazza provvisoria completa. La planimetria e gli elementi della piazza reale sono in lavorazione.": "Alun-alun sementara yang lengkap. Denah dan unsur alun-alun yang sebenarnya sedang dikembangkan.",
+    "Candidato cartografico in revisione": "Kandidat pemetaan sedang ditinjau",
+    "· Terre: Natural Earth, Confini:": "· Daratan: Natural Earth, Perbatasan:",
     "PIAZZA PRINCIPALE": "ALUN-ALUN UTAMA",
     "SERVIZI PUBBLICI": "LAYANAN PUBLIK",
     "Monolocale": "Rumah studio",
@@ -707,7 +712,7 @@
     }
   ],
   "verification": {
-    "messages": 360,
+    "messages": 383,
     "templates": 61,
     "browserEvidence": "Indonesiano_obiettivi_contrasto_v9.8.0.jpg",
     "additionalEvidence": "Indonesiano_scheda_attivita_v9.8.0.jpg",

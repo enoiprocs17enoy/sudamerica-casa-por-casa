@@ -2,6 +2,7 @@
 (function(){'use strict';
  if(!window.WorldAtlas||typeof currentCity==='undefined')return;
  const $=id=>document.getElementById(id),aside=document.querySelector('.layout>aside'),stage=document.querySelector('.mapwrap');
+ aside.dataset.i18nSkip='true';
  const codes=['en','es','fr','pt-BR','de','ar','ja','zh-Hans','id'];
  const translations={
  'Come funziona?':['How does it work?','¿Cómo funciona?','Comment ça marche ?','Como funciona?','Wie funktioniert es?','كيف تعمل؟','遊び方','怎么玩？','Bagaimana cara bermain?'],
@@ -187,7 +188,7 @@
   void renderSearch();
  });
  document.addEventListener('pointerdown',e=>{if(!searchArea.contains(e.target))closeResults();});document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeResults();closeDrawer();}if(e.key==='Tab'&&document.body.classList.contains('hub-drawer-open')){const nodes=[...aside.querySelectorAll('button,input,select,a[href]')].filter(n=>!n.disabled&&n.getClientRects().length),first=nodes[0],last=nodes.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
- const nav=document.querySelector('.v4Nav'),tabs=[...nav.querySelectorAll('[data-v4]')];nav.setAttribute('role','navigation');
+ const nav=document.querySelector('.v4Nav'),tabs=[...nav.querySelectorAll('[data-v4]')];nav.dataset.i18nSkip='true';nav.setAttribute('role','navigation');
  function setActiveTab(tab){for(const node of tabs){const selected=node.dataset.v4===tab;node.classList.toggle('hub-selected',selected);node.setAttribute('aria-pressed',String(selected));}}
  for(const tab of ['world','home','shop','works','ranking','avatar','directory']){const node=tabs.find(n=>n.dataset.v4===tab);if(node)nav.append(node);}
  for(const node of tabs){const tab=node.dataset.v4;if(!isLaboratory&&tab==='directory')node.hidden=true;node.addEventListener('click',event=>{

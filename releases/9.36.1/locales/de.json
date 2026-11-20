@@ -168,6 +168,11 @@
     "Palestra": "Fitnessstudio",
     "Mercato": "Markt",
     "PIAZZA CIVICA": "BÜRGERPLATZ",
+    "PIAZZA COMUNALE": "STADTPLATZ",
+    "IN LAVORAZIONE": "IN ARBEIT",
+    "Piazza provvisoria completa. La planimetria e gli elementi della piazza reale sono in lavorazione.": "Vollständig gestalteter provisorischer Platz. Der Lageplan und die Elemente des realen Platzes werden derzeit ausgearbeitet.",
+    "Candidato cartografico in revisione": "Kartografischer Kandidat in Prüfung",
+    "· Terre: Natural Earth, Confini:": "· Landflächen: Natural Earth, Grenzen:",
     "PIAZZA PRINCIPALE": "HAUPTPLATZ",
     "SERVIZI PUBBLICI": "ÖFFENTLICHE DIENSTE",
     "Monolocale": "Einzimmerwohnung",
@@ -919,7 +924,7 @@
     }
   ],
   "verification": {
-    "messages": 360,
+    "messages": 383,
     "templates": 61,
     "browserEvidence": "Cartello_tedesco_Berlino_v9.4.0.jpg",
     "privateOptions": "all eight tiers; source normalization and translation regression checked",

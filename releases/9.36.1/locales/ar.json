@@ -168,6 +168,11 @@
     "Palestra": "نادي لياقة",
     "Mercato": "سوق",
     "PIAZZA CIVICA": "الساحة المدنية",
+    "PIAZZA COMUNALE": "الساحة البلدية",
+    "IN LAVORAZIONE": "قيد الإنشاء",
+    "Piazza provvisoria completa. La planimetria e gli elementi della piazza reale sono in lavorazione.": "ساحة مؤقتة مكتملة. يجري العمل على مخطط الساحة الحقيقية وعناصرها.",
+    "Candidato cartografico in revisione": "مرشح خرائطي قيد المراجعة",
+    "· Terre: Natural Earth, Confini:": "· اليابسة: Natural Earth، الحدود:",
     "PIAZZA PRINCIPALE": "الساحة الرئيسية",
     "SERVIZI PUBBLICI": "الخدمات العامة",
     "Monolocale": "شقة استوديو",
@@ -1045,7 +1050,7 @@
     }
   ],
   "verification": {
-    "messages": 360,
+    "messages": 383,
     "templates": 61,
     "browserEvidence": "Lingue_mobile_arabo_Cairo_v9.4.0.jpg",
     "privateOptions": "all eight tiers; source normalization and translation regression checked",

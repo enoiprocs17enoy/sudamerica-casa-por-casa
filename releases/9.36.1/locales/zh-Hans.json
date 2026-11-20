@@ -168,6 +168,11 @@
     "Palestra": "健身房",
     "Mercato": "集市",
     "PIAZZA CIVICA": "市民广场",
+    "PIAZZA COMUNALE": "市政广场",
+    "IN LAVORAZIONE": "正在建设",
+    "Piazza provvisoria completa. La planimetria e gli elementi della piazza reale sono in lavorazione.": "完整的临时广场。真实广场的布局和各项元素正在制作中。",
+    "Candidato cartografico in revisione": "地图候选方案审核中",
+    "· Terre: Natural Earth, Confini:": "· 陆地：Natural Earth，边界：",
     "PIAZZA PRINCIPALE": "中心广场",
     "SERVIZI PUBBLICI": "公共服务",
     "Monolocale": "单间住宅",
@@ -707,7 +712,7 @@
     }
   ],
   "verification": {
-    "messages": 360,
+    "messages": 383,
     "templates": 61,
     "browserEvidence": "Cartello_cinese_Shanghai_v9.4.0.jpg",
     "privateOptions": "all eight tiers; source normalization and translation regression checked",
