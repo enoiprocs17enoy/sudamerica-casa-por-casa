@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=28',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=29',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -1367,7 +1367,7 @@ function drawSurveyedCitySquare(profile,b){
  const capitol=profile.source==='https://www.openstreetmap.org/way/23055100'&&
   profile.landmarks?.find(landmark=>landmark.id==='way:429078984');
  const detailPlan=typeof window!=='undefined'&&window.SquareDetails?window.SquareDetails.prepare(profile,fit,b,currentCity):null;
- const plazaTop=.33;
+ const plazaTop=.33,pavingTop=.42,lawnTop=.57,stoneInsetTop=.49;
  const clearDetail=(x,z,r=0)=>!detailPlan||detailPlan.clear(x,z,r);
  const project=p=>{const q=fit.point(p);return new THREE.Vector2(q.x,-q.z);};
  const surfaceBatches=new Map(),batches=new Map(),dummy=new THREE.Object3D(),geometries={box:new THREE.BoxGeometry(1,1,1),round:new THREE.CylinderGeometry(.5,.5,1,12),leaf:new THREE.IcosahedronGeometry(1,1),ring:new THREE.TorusGeometry(.35,.045,6,16)};
@@ -1403,16 +1403,16 @@ function drawSurveyedCitySquare(profile,b){
  const paving=profile.continuousPaving?profile.stone:0xd7c9b3;
  const baseKind=['lawn','sand','gravel'].includes(profile.base)?profile.base:'stone';
  const baseColor=baseKind==='lawn'?profile.green||0x76965c:baseKind==='sand'?0xd8b477:baseKind==='gravel'?0xcbbda7:paving;
- polygon([root,...(profile.holes||[])],capitol?0x697070:baseColor,.42,false,true,baseKind);
+ polygon([root,...(profile.holes||[])],capitol?0x697070:baseColor,pavingTop,false,true,baseKind);
  border(root,0xe2d6bf,.26,.15,.43);
  // Context surfaces preserve separately mapped ground outside the plaza outline.
  for(const surface of profile.contextSurfaces||[]){
   const lawn=surface.kind==='lawn',water=surface.kind==='water';
-  polygon(surface.rings,lawn?(profile.green||0x63894c):water?0x319bb5:paving,.42,false,true,lawn?'lawn':water?'water':'stone');
+  polygon(surface.rings,lawn?(profile.green||0x63894c):water?0x319bb5:paving,pavingTop,false,true,lawn?'lawn':water?'water':'stone');
  }
  for(const surface of profile.surfaces||[]){
   const lawn=surface.kind==='lawn',water=surface.kind==='water';
-  polygon(surface.rings,lawn?(profile.green||0x63894c):water?0x319bb5:0xddd0b8,lawn?.57:water?.53:.49,lawn||water,false,lawn?'lawn':water?'water':'stone');
+  polygon(surface.rings,lawn?(profile.green||0x63894c):water?0x319bb5:0xddd0b8,lawn?lawnTop:water?.53:stoneInsetTop,lawn||water,false,lawn?'lawn':water?'water':'stone');
  }
  // Distribute the flower budget around each bed rather than filling only the first edge.
  const lawns=(profile.surfaces||[]).filter(surface=>!profile.realGeometry&&surface.kind==='lawn'&&surface.rings?.[0]?.length>3);
@@ -1491,7 +1491,7 @@ function drawSurveyedCitySquare(profile,b){
  }
 
  const benchRadius=1.12,placedBenches=[];
- const bench=(x,z,angle=0,size=1,ground=.28,reserve=1.45)=>{
+ const bench=(x,z,angle=0,size=1,ground=.28,reserve=1.45,feet)=>{
   const radius=benchRadius*size;
   if(!clearDetail(x,z,reserve)||placedBenches.some(p=>Math.hypot(p.x-x,p.z-z)<p.radius+radius))return false;
   placedBenches.push({x,z,radius});
@@ -1499,15 +1499,21 @@ function drawSurveyedCitySquare(profile,b){
   const part=(color,dx,y,dz,w,h,d)=>box(color,x+(dx*ca+dz*sa)*size,ground+(y-.28)*size,z+(-dx*sa+dz*ca)*size,w*size,h*size,d*size,angle);
   for(let slat=-2;slat<=2;slat++)part(0xad7950,0,.88,slat*.115,2.1,.10,.087);
   for(let slat=0;slat<3;slat++)part(0xb88a57,0,1.14+slat*.14,-.30,2.1,.10,.08);
-  for(const side of [-1,1]){part(0x344d48,side*.78,.59,0,.12,.62,.55);part(0x344d48,side*1.02,1.07,.02,.08,.14,.58);part(0x344d48,side*1.02,.98,-.22,.08,.50,.08);}
+  for(const side of [-1,1]){
+   const foot=feet?.[(side+1)/2]??ground,top=ground+.62*size;
+   box(0x344d48,x+side*.78*ca*size,(foot+top)/2,z-side*.78*sa*size,.12*size,top-foot,.55*size,angle);
+   part(0x344d48,side*1.02,1.07,.02,.08,.14,.58);part(0x344d48,side*1.02,.98,-.22,.08,.50,.08);
+  }
   return true;
  };
  let mappedSurfaces;
  const mappedGround=(x,z)=>{
-  mappedSurfaces??=(profile.surfaces||[]).map(surface=>({
-   kind:surface.kind,rings:(surface.rings||[]).map(ring=>ring.map(fit.point))
-  }));
-  let ground=.42;
+  mappedSurfaces??=[
+   {kind:baseKind,height:pavingTop,rings:[root,...(profile.holes||[])]},
+   ...(profile.contextSurfaces||[]).map(surface=>({...surface,height:pavingTop})),
+   ...(profile.surfaces||[]).map(surface=>({...surface,height:surface.kind==='lawn'?lawnTop:stoneInsetTop}))
+  ].map(surface=>({...surface,rings:(surface.rings||[]).map(ring=>ring.map(fit.point))}));
+  let ground=plazaTop;
   for(const surface of mappedSurfaces){
    let inside=false;
    for(const ring of surface.rings)for(let i=0,j=ring.length-1;i<ring.length;j=i++){
@@ -1516,7 +1522,7 @@ function drawSurveyedCitySquare(profile,b){
    }
    if(!inside)continue;
    if(surface.kind==='water')return null;
-   ground=Math.max(ground,surface.kind==='lawn'?.57:.49);
+   ground=Math.max(ground,surface.height);
   }
   return ground;
  };
@@ -1558,8 +1564,10 @@ function drawSurveyedCitySquare(profile,b){
    });
    if(onRoute)continue;
    const ground=mappedGround(x,z);
-   if(ground!==null&&bench(x,z,angle,size,ground,1.45*size)){
-    mappedSeats.push({...placedBenches.at(-1),size});
+   // Seat height clears the raised edge while each leg meets its own surface.
+   const feet=[-1,1].map(side=>mappedGround(x+side*.78*ca*size,z-side*.78*sa*size));
+   if(ground!==null&&feet.every(foot=>foot!==null)&&bench(x,z,angle,size,Math.max(ground,...feet),1.45*size,feet)){
+    mappedSeats.push({...placedBenches.at(-1),size,angle});
    }
   }
  }else{
