@@ -48,6 +48,7 @@ Object.assign(MODEL_SPECS,{
  'budapest-millennium-colonnade-north':{height:8.2,width:38,depth:14,parcelWidth:.85},
  'budapest-millennium-colonnade-east':{height:8.2,width:16,depth:38,parcelWidth:.85},
  'budapest-heroes-memorial-stone':{height:.85,width:10,depth:6,parcelWidth:.5},
+ 'shanghai-huangpu-light-fountain':{height:5.3,width:32.6,depth:32.6,parcelWidth:.8},
  'hong-kong-thomas-jackson':{height:6.2,width:3.65,depth:3.8},
  'kingston-manley-statue':{height:5,width:3,depth:3},
  'kingston-bustamante-statue':{height:5,width:3,depth:3},
@@ -101,6 +102,7 @@ Object.assign(MODEL_SPECS,{
  'dapitan-mindanao-relief':{height:1.55,width:32,depth:28,parcelWidth:.45},
  'daet-rizal-pylon':{height:6.1,width:3.8,depth:3.8},
  'morong-claudio-statue':{height:4.3,width:2.75,depth:2.75},
+ 'virac-rizal-monument':{height:5.8,width:6.9,depth:5.7},
  'tahrir-obelisk':{height:20.1,width:4.7,depth:4.3},
  'sydney-cenotaph':{height:3.8,width:7.7,depth:3.6,parcelWidth:.35}
 });
@@ -773,6 +775,20 @@ function render(plan,group,b){
    box(0xb5ad9b,0,.11,0,10,.22,6.0);
    box(0xaaa18f,0,.50,0,8.3,.56,4.0);
    box(0xc5bca7,0,.80,0,8.55,.11,4.18);
+  }else if(model==='shanghai-huangpu-light-fountain'){
+   const rim=0xbababa,granite=0x8f9193,nozzle=0x686e73,water=0x78c5d9;
+   add('fountain-deck','stone',rim,0,.15,0,15.25,.30,15.25);
+   add('fountain-deck','stone',granite,0,.33,0,14.5,.08,14.5);
+   ring(rim,0,.40,0,11.2,.075,'stone');
+   ring(rim,0,.41,0,7.2,.065,'stone');
+   for(const [radius,count,height] of [[5.9,10,4.3],[10.2,16,2.5]]){
+    for(let i=0;i<count;i++){
+     const angle=i*Math.PI*2/count,x=radius*Math.cos(angle),z=radius*Math.sin(angle);
+     cylinder(nozzle,x,.45,z,.18,.10,'metal');
+     add('cone','water',water,x,.50+height/2,z,.14,height,.14);
+    }
+   }
+   add('cone','water',water,0,2.9,0,.25,4.8,.25);
   }else if(model==='hong-kong-thomas-jackson'){
    const limestone=0xb8ad9b,bronzePatina=0x47584d;
    box(limestone,0,.20,0,3.65,.40,3.8);
@@ -2060,6 +2076,16 @@ function render(plan,group,b){
     box(0x69523d,0,3.95,side*.939,1.05,.65,.028,'patina');
     box(0x69523d,side*.939,3.95,0,.028,.65,1.05,'patina');
    }
+  }else if(model==='virac-rizal-monument'){
+   const concrete=0xbbb3a4,trim=0xd9cec0,figure=0x69584a;
+   box(concrete,0,.32,0,6.40,.64,5.28);
+   for(let i=0;i<3;i++)box(trim,0,.10+i*.18,2.55-i*.30,3.25,.20,.60);
+   cylinder(concrete,0,.84,-.37,2.01,.40);
+   cylinder(trim,0,1.12,-.38,1.69,.19);
+   box(concrete,0,2.02,-.38,1.62,1.60,1.48);
+   box(trim,0,2.88,-.38,1.82,.21,1.68);
+   box(0x5d5750,0,1.99,.37,.79,.73,.045,'metal');
+   human(0,2.98,-.35,1.07,'standing',figure);
   }else if(model==='morong-claudio-statue'){
    const plinth=0x9e9687,uniform=0x777357;
    box(plinth,0,.18,0,2.75,.36,2.75);
@@ -2277,6 +2303,7 @@ function render(plan,group,b){
   shape.setAttribute('position',new T.Float32BufferAttribute(vertices,3));shape.setIndex(indices);
   shape.computeVertexNormals();geos['iron-man']=shape;
  }
+ if(parts.some(part=>part.kind==='fountain-deck'))geos['fountain-deck']=new T.CylinderGeometry(1,1,1,32);
  if(parts.some(part=>part.kind==='hex'))geos.hex=new T.CylinderGeometry(1,1,1,6);
  if(parts.some(part=>part.kind==='pentagonal-pedestal'))geos['pentagonal-pedestal']=new T.CylinderGeometry(1,1,1,5);
  if(parts.some(part=>part.kind==='bratislava-bicorne')){
