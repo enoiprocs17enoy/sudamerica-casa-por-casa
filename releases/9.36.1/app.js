@@ -1235,13 +1235,13 @@ const worldSquareCatalogRequests=new Map();
 function worldSquareCatalogPart(id){
  let hash=0;
  for(const code of id)hash=(Math.imul(hash,31)+code.charCodeAt(0))|0;
- return (hash>>>0)%8;
+ return (hash>>>0)%16;
 }
 function loadWorldSquareCatalog(city){
- if(window.CITY_SQUARE_DATA?.[city.id]||typeof DecompressionStream!=='function')return;
+ if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-'+part+'.json.gz?v=2026-11-20',{signal:AbortSignal.timeout(3200)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz',{signal:AbortSignal.timeout(3200)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -1279,15 +1279,16 @@ function squareFromMap(city,elements){
  valid.sort((a,b)=>b.score-a.score);return valid[0]||null;
 }
 async function ensureCitySquare(city){
- if(!city||city.geoVerified===false||typeof window==='undefined'||window.CITY_SQUARE_DATA?.[city.id]||!window.PlazaMapResolver)return;
+ if(!city||city.geoVerified===false||typeof window==='undefined')return;
  const records=citySquareRecords(),old=records[city.id];
- if(worldImportedSquares?.[city.id]||old?.version===3&&old.retryAfter>Date.now())return;
+ if(worldImportedSquares[city.id])return;
  const pending=ensureCitySquare.pending||(ensureCitySquare.pending=new Map());if(pending.has(city.id))return pending.get(city.id);
  const job=async()=>{
   try{
    await loadWorldSquareCatalog(city);
    let square=worldImportedSquares?.[city.id];
    if(!square){
+    if(window.CITY_SQUARE_DATA?.[city.id]||!window.PlazaMapResolver||old?.version===3&&old.retryAfter>Date.now())return;
     square=await window.PlazaMapResolver.resolve(city);
     records[city.id]={version:3,square:square||old?.square||null,retryAfter:Date.now()+(square?90:7)*86400000};
    }
@@ -1307,16 +1308,17 @@ function citySquareProfile(city){
  const scope=typeof window==='undefined'?null:window;
  const bundled=scope?.CITY_SQUARE_DATA?.[city.id];
  const imported=typeof worldImportedSquares==='undefined'?null:worldImportedSquares?.[city.id];
+ const reviewed=imported?.reviewed===true?imported:null;
  const cached=citySquareRecords()[city.id]?.square;
  const fromMap=cached&&/^https:\/\/www\.openstreetmap\.org\/(?:node|way|relation)\/\d+$/.test(cached.source);
- for(const data of [bundled,imported,fromMap?cached:null]){
+ for(const data of [reviewed,bundled,imported,fromMap?cached:null]){
   const outline=data?.outline;
   if(typeof data?.name!=='string'||!data.name.trim()||!Array.isArray(outline)||outline.length<4||outline.length>1200)continue;
   if(!outline.every(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.z)))continue;
   const area=Math.abs(outline.reduce((sum,p,i)=>{const q=outline[(i+1)%outline.length];return sum+p.x*q.z-q.x*p.z;},0))/2;
   if(area<1)continue;
   const profile={layout:'mapped',stone:0xc9bda7,green:0x638d4c,palm:false,...data,documented:true,realGeometry:true};
-  return scope?.SquareDetails?scope.SquareDetails.enrich(profile,city):profile;
+  return data!==reviewed&&scope?.SquareDetails?scope.SquareDetails.enrich(profile,city):profile;
  }
  const seed=Array.from(String(city.id||city.name)).reduce((n,c)=>(Math.imul(n,31)+c.codePointAt(0))>>>0,17);
  return {name:'Piazza civica di '+city.name,layout:['garden','promenade','groves','terraces'][seed%4],
@@ -1396,7 +1398,7 @@ function drawSurveyedCitySquare(profile,b){
   polygon(surface.rings,lawn?(profile.green||0x63894c):water?0x319bb5:0xddd0b8,lawn?.57:water?.53:.49,lawn||water,false,lawn?'lawn':water?'water':'stone');
  }
  // Distribute the flower budget around each bed rather than filling only the first edge.
- const lawns=(profile.surfaces||[]).filter(surface=>surface.kind==='lawn'&&surface.rings?.[0]?.length>3);
+ const lawns=(profile.surfaces||[]).filter(surface=>!profile.reviewed&&surface.kind==='lawn'&&surface.rings?.[0]?.length>3);
  let blooms=0;const perBed=Math.max(1,Math.min(24,Math.floor(100/Math.max(1,lawns.length))));
  for(const surface of lawns){
   const ring=surface.rings[0],points=ring.map(fit.point),centre=points.reduce((p,q)=>({x:p.x+q.x/points.length,z:p.z+q.z/points.length}),{x:0,z:0});
@@ -1427,7 +1429,7 @@ function drawSurveyedCitySquare(profile,b){
    paint.clip('evenodd');paint.lineCap='round';paint.lineJoin='round';
    const valid=capitol?[]:routes.filter(route=>route.points?.length>1&&route.points.every(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.z)));
    for(const edge of [true,false])for(const route of valid){
-    const width=Math.max(.66,Math.min(2.35,(Number(route.widthMeters)||3)*scale));
+    const width=Math.max(profile.reviewed?.24:.66,Math.min(2.35,(Number(route.widthMeters)||3)*scale));
     const stone=/asphalt/i.test(route.surface||'')?'#a09f92':/concrete/i.test(route.surface||'')?'#d0c8b6':'#dbc8a6';
     paint.strokeStyle=edge?'#b9a78e':stone;paint.lineWidth=width+(edge?.15:0);
     paint.beginPath();trace(route.points);paint.stroke();
@@ -1506,18 +1508,30 @@ function drawSurveyedCitySquare(profile,b){
  // Mapped planting is retained; sparse sources receive complementary planting in the promenade.
  const palmCity=profile.palm||['uy-montevideo','pe-lima','cl-santiago','ec-quito','br-manaus','br-brasilia'].includes(currentCity.id);
  const treePositions=[];
- for(const p of profile.trees||[]){const q=fit.point(p);if(Math.abs(q.x)<b.width/2-2&&Math.abs(q.z)<b.depth/2-3)treePositions.push(q);}
- if(!treePositions.length&&!profile.openStoneSquare)for(const side of [-1,1])for(let i=0;i<5;i++)treePositions.push({x:side*(b.width/2-3.5),z:-b.depth*.32+i*b.depth*.16});
+ for(const p of profile.trees||[]){
+  const q=fit.point(p);
+  if(Math.abs(q.x)<b.width/2-2&&Math.abs(q.z)<b.depth/2-3)treePositions.push({...q,leafType:p.leafType});
+ }
+ if(!treePositions.length&&!profile.reviewed&&!profile.openStoneSquare)for(const side of [-1,1])for(let i=0;i<5;i++)treePositions.push({x:side*(b.width/2-3.5),z:-b.depth*.32+i*b.depth*.16});
  const maxTrees=Math.min(72,treePositions.length);
  for(let i=0;i<maxTrees;i++){
   const p=treePositions[Math.floor(i*treePositions.length/maxTrees)],x=p.x,z=p.z;
   if(!clearDetail(x,z,1.65))continue;
-  if(palmCity){
-   put('round',0x88704e,x,(5.15+plazaTop)/2,z,.22,5.15-plazaTop,.22);
-   for(let leaf=0;leaf<9;leaf++){const a=leaf*Math.PI*2/9;put('leaf',leaf%2?0x547f43:0x6c9048,x+Math.sin(a)*.64,5.21+Math.sin(a*2)*.12,z+Math.cos(a)*.64,.24,.13,1.2,a);}
+  const size=.79+rnd(x*43+z*31+17)*.46;
+  const crownY=height=>plazaTop+(height-plazaTop)*size;
+  const tree=(type,color,dx,height,dz,w,h,d,angle=0)=>put(type,color,x+dx*size,crownY(height),z+dz*size,w*size,h*size,d*size,angle);
+  if(palmCity&&p.leafType!=='broadleaved'&&p.leafType!=='needleleaved'){
+   tree('round',0x88704e,0,(5.15+plazaTop)/2,0,.22,5.15-plazaTop,.22);
+   for(let leaf=0;leaf<9;leaf++){
+    const a=leaf*Math.PI*2/9;
+    tree('leaf',leaf%2?0x547f43:0x6c9048,Math.sin(a)*.64,5.21+Math.sin(a*2)*.12,Math.cos(a)*.64,.24,.13,1.2,a);
+   }
   }else{
-   put('round',0x75583d,x,(3.525+plazaTop)/2,z,.25,3.525-plazaTop,.25);
-   for(let lobe=0;lobe<6;lobe++){const a=lobe*Math.PI*.8;put('leaf',[0x517b3e,0x67894a,0x789952][lobe%3],x+Math.sin(a)*.56,3.75+(lobe%3)*.36,z+Math.cos(a)*.48,.76,.85,.73,a);}
+   tree('round',0x75583d,0,(3.525+plazaTop)/2,0,.25,3.525-plazaTop,.25);
+   for(let lobe=0;lobe<6;lobe++){
+    const a=lobe*Math.PI*.8;
+    tree('leaf',[0x517b3e,0x67894a,0x789952][(lobe+i)%3],Math.sin(a)*.56,3.75+(lobe%3)*.36,Math.cos(a)*.48,.76,.85,.73,a);
+   }
   }
  }
  // Extra space around square or compact outlines becomes furnished terraces.
@@ -7854,17 +7868,43 @@ function closeCivicPanel(){
 function openSquareDetailPanel(focusHeading=true){
  localizedPanelRoute={type:'square'};
  const panel=revealCivicPanel(focusHeading),body=$('v4Body'),profile=citySquareProfile(currentCity);$('v4Title').textContent=profile.name;if(profile.name.startsWith('Piazza civica di '))delete $('v4Title').dataset.i18nSkip;else $('v4Title').dataset.i18nSkip='true';body.replaceChildren();
- const intro=document.createElement('p');intro.textContent='Ricostruzione 3D stilizzata: la planimetria e gli elementi documentati sono affiancati da arredi di integrazione.';body.append(intro);
+ const intro=document.createElement('p');
+ intro.textContent=profile.reviewed?'Piazza verificata singolarmente. La ricostruzione segue la cartografia e i riferimenti disponibili.':
+  profile.realGeometry?'Planimetria da OpenStreetMap. La scelta della piazza e gli elementi 3D possono richiedere una verifica.':
+  'Piazza civica generata per questa città.';
+ body.append(intro);
+ function sourceLink(parent,address,label){
+  if(typeof address!=='string')return;
+  let url;
+  try{url=new URL(address);}catch{return;}
+  if(url.protocol!=='https:'||url.username||url.password)return;
+  const link=document.createElement('a');
+  link.href=url.href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=label;
+  parent.append(link);
+ }
+ const references=document.createElement('div');references.className='civic-objective-actions';
+ sourceLink(references,profile.source,profile.geometryAttribution?'Planimetria ufficiale':'Planimetria OpenStreetMap');
+ if(profile.geometryAttribution)sourceLink(references,profile.geometryTerms,profile.geometryAttribution);
+ if(profile.reference!==profile.source)sourceLink(references,profile.reference,'Riferimento ufficiale');
+ if(references.childElementCount)body.append(references);
  const features=profile.landmarks||[];
  if(!features.length){const empty=document.createElement('p');empty.textContent='Le fonti disponibili non descrivono ancora statue e fontane di questa piazza.';body.append(empty);}
  for(const feature of features){
   const row=document.createElement('div');row.className='civicObjective '+(feature.status==='needs-model'?'pending':'documented');
   const name=document.createElement('strong');name.textContent=feature.name;if(!['Opera mappata','Fontana mappata'].includes(feature.name))name.dataset.i18nSkip='true';
-  const state=document.createElement('span');state.textContent=feature.status==='needs-model'?'Presenza mappata · forma 3D da completare':feature.status==='reference-model'?'Riferimento documentato · modello 3D stilizzato':'Tipologia mappata · modello 3D da verificare nei dettagli';row.append(name,state);
+  const state=document.createElement('span');state.textContent=feature.model==='mapped-water-surface'||feature.evidence?.shape==='mapped-surface'?'Vasca riprodotta dal perimetro cartografico':feature.status==='needs-model'?'Presenza mappata · forma 3D da completare':feature.status==='reference-model'?'Riferimento documentato · modello 3D stilizzato':'Tipologia mappata · modello 3D da verificare nei dettagli';row.append(name,state);
   if(feature.description){const description=document.createElement('p');description.textContent=feature.description;row.append(description);}
-  if(feature.evidence){const evidence=document.createElement('small');evidence.textContent='Posizione: '+(feature.evidence.position==='mapped-point'?'cartografia':feature.evidence.position)+' · orientamento e dettagli fini ancora da verificare';row.append(evidence);}
-  const url=feature.reference||feature.source;
-  if(url&&/^https:\/\/(www\.)?(respira\.cordoba\.gob\.ar|prensa\.municipalidadsalta\.gob\.ar|tucumanturismo\.gob\.ar|openstreetmap\.org|buenosaires\.gob\.ar|turismomardelplata\.gob\.ar|syv\.web\.unq\.edu\.ar|target2\.promperu\.gob\.pe|montevideo\.gub\.uy|quito-turismo\.gob\.ec|idpc\.gov\.co|santiagoturismo\.cl|visitconegliano\.it|teatroaccademia\.it)\//.test(url)){const source=document.createElement('a');source.href=url;source.target='_blank';source.rel='noopener';source.textContent='Fonte';row.append(source);}
+  if(feature.evidence?.position){
+   const evidence=document.createElement('small');
+   if(feature.evidence.position==='mapped-footprint')evidence.textContent='Posizione ricavata dal perimetro dell’opera.';
+   else if(feature.evidence.position==='mapped-point')evidence.textContent='Posizione ricavata dal punto cartografico.';
+   else evidence.textContent='Posizione ricavata dalla documentazione della piazza.';
+   row.append(evidence);
+  }
+  const links=document.createElement('div');links.className='civic-objective-actions';
+  sourceLink(links,feature.source,'Mappa dell’opera');
+  if(feature.reference!==feature.source)sourceLink(links,feature.reference,'Fonte');
+  if(links.childElementCount)row.append(links);
   body.append(row);
  }
  const back=document.createElement('button');back.type='button';back.textContent='Torna agli obiettivi';back.onclick=()=>openPublicWorks();body.append(back);
@@ -8235,7 +8275,7 @@ cityViewStyle.textContent=`
 document.head.append(cityViewStyle);
 
 // Adjacent towns keep their geographic positions when the local scene origin changes.
-function enterNeighborCity(neighbor,state){if(!active)return;const oldScale=group.userData.roadPlan?.spaceScale||1,offset={x:(state.target.x-neighbor.x)/oldScale,z:(state.target.z-neighbor.z)/oldScale},next=neighbor.city;return CityLoading.run(async()=>{selectCity(next.id,false);WorldRoads.sync(true);await window.WorldBiomes?.load(next);if(!await enterNow(rebuildResponsive))return false;const newScale=group.userData.roadPlan?.spaceScale||1;target.x=offset.x*newScale;target.z=offset.z*newScale;target.y=Math.max(2,state.target.y-neighbor.y);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();$('status').textContent=next.name+' · città raggiunta · '+count.toLocaleString(window.GameI18n?.locale||'it-IT')+' case';return true;},{phase:'travel',priority:30,title:'Prossima fermata: '+next.name+'.',place:next.name,detail:'Prepariamo la città e i suoi dintorni.'}).catch(error=>recoverCityEntry(error,next.id));}
+function enterNeighborCity(neighbor,state){if(!active)return;const oldScale=group.userData.roadPlan?.spaceScale||1,offset={x:(state.target.x-neighbor.x)/oldScale,z:(state.target.z-neighbor.z)/oldScale},next=neighbor.city;return CityLoading.run(async()=>{selectCity(next.id,false);WorldRoads.sync(true);await Promise.all([window.WorldBiomes?.load(next),loadWorldSquareCatalog(next)]);if(!await enterNow(rebuildResponsive))return false;const newScale=group.userData.roadPlan?.spaceScale||1;target.x=offset.x*newScale;target.z=offset.z*newScale;target.y=Math.max(2,state.target.y-neighbor.y);distance=state.distance;azimuth=state.azimuth;elevation=state.elevation;updateCamera();$('status').textContent=next.name+' · città raggiunta · '+count.toLocaleString(window.GameI18n?.locale||'it-IT')+' case';return true;},{phase:'travel',priority:30,title:'Prossima fermata: '+next.name+'.',place:next.name,detail:'Prepariamo la città e i suoi dintorni.'}).catch(error=>recoverCityEntry(error,next.id));}
 function showNeighborCities(){
  localizedPanelRoute={type:'neighbors'};if(!active)return enter().then(ok=>ok?showNeighborCities():null);const panel=$('v4Panel'),body=$('v4Body');panel.hidden=false;$('v4Title').textContent='Città vicine';delete $('v4Title').dataset.i18nSkip;body.replaceChildren();const items=window.WorldNeighbors?.list()||[];
  if(!items.length){const p=document.createElement('p');p.textContent='Nessuna città collegata visibile in questa zona. Puoi cercare altre località nella mappa.';body.append(p);return;}
