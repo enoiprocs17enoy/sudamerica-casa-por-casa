@@ -13,11 +13,22 @@ const pedestrian=/^(?:path|pedestrian|footway|steps|corridor)$/i;
 const publicPolygon=/^(?:park|garden|square|town_square|village_green|recreation_ground|pedestrian)$/i;
 const parkPolygon=/^(?:park|garden|village_green)$/i;
 const privateName=/shopping|\bmall\b|centro comercial|supermarket|parking garage|hotel\b|hotelier|business park/i;
+const nonCivicName=/\b(?:football (?:field|ground|pitch)|soccer (?:field|pitch)|terrain de football|basketball court|campo de (?:futbol|futebol|calcio)|cancha de futbol|parking lot|roundabout|rotatoria)\b/i;
+const nonCivicClass=/^(?:stadium|pitch|sports_(?:centre|center)|parking|roundabout|cemetery|grave_yard|zoo|railway|platform)$/i;
+const minimumCivicScore=490;
 const normalize=name=>String(name||'').normalize('NFKD').replace(/\p{M}/gu,'').toLowerCase();
 const area=ring=>Math.abs(ring.reduce((sum,p,i)=>{const q=ring[(i+1)%ring.length];return sum+p[0]*q[1]-q[0]*p[1];},0)/2);
 const same=(a,b)=>Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1])<.001;
 const westEast=city=>(city.lng+180)/360*GRID;
 const northSouth=city=>(1-Math.asinh(Math.tan(city.lat*Math.PI/180))/Math.PI)/2*GRID;
+function eligibleCandidate(candidate){
+ if(!candidate||nonCivicName.test(normalize(candidate.name))||privateName.test(normalize(candidate.name)))return false;
+ if(candidate.selectionEvidence==='mapped-square'||candidate.selectionEvidence==='named-pedestrian-square')return true;
+ const paths=candidate.walkwayDetails?.length||0,landmarks=candidate.landmarks?.length||0;
+ const surfaces=candidate.surfaces?.length||0;
+ return candidate.selectionScore>=2150&&(paths+landmarks+surfaces>0)||
+  candidate.selectionScore>=minimumCivicScore&&(landmarks>0||paths>=3&&surfaces>0);
+}
 function osm(id){
  const type=['','node','way','relation'][id%10],key=Math.floor(id/10);
  return Number.isSafeInteger(id)&&key>0&&type?{id:type+':'+key,source:'https://www.openstreetmap.org/'+type+'/'+key}:null;
@@ -61,7 +72,7 @@ function clippedWalkway(line,ring,holes){
  }
  flush();return paths;
 }
-function select(city,layers,tile){
+function select(city,layers,tile,accept=()=>true){
  const extent=layers.poi?.extent||Object.values(layers)[0]?.extent||4096;
  const worldX=westEast(city)-tile.x,cx=(worldX-GRID*Math.round(worldX/GRID))*extent,cy=(northSouth(city)-tile.y)*extent;
  const mpu=40075016.686*Math.cos(city.lat*Math.PI/180)/GRID/extent;
@@ -82,12 +93,14 @@ function select(city,layers,tile){
  const nominate=(item,name,pointLabel=false)=>{
   if(typeof name!=='string'||!name.trim()||name.length>160)return;
   const text=normalize(name),{f,layer}=item,properties=f.props||{};
-  if(privateName.test(text))return;
-  const square=squareWords.test(text)||squareWords.test(name)||properties.class==='square'||properties.subclass==='town_square';
+  if(privateName.test(text)||nonCivicName.test(text)||[properties.class,properties.subclass].some(value=>nonCivicClass.test(value||''))||
+    /^(?:no|private)$/i.test(properties.access||''))return;
+  const mappedSquare=[properties.class,properties.subclass,properties.place].some(value=>/^(?:square|town_square)$/i.test(value||''));
+  const square=mappedSquare||squareWords.test(text)||squareWords.test(name);
   const namedPark=parkWords.test(text)||parkWords.test(name);
   const park=parkPolygon.test(properties.class||'')||parkPolygon.test(properties.subclass||'')||namedPark;
   if(!square&&!park)return;
-  const civic=publicPolygon.test(properties.class||'')||publicPolygon.test(properties.subclass||'')
+  const civic=mappedSquare||publicPolygon.test(properties.class||'')||publicPolygon.test(properties.subclass||'')
     ||layer==='park'&&(square||namedPark)&&!/^(?:historic|zoo|cemetery|archaeological_site|ruins|fort)$/i.test(properties.class||'')
     ||layer==='transportation'&&square&&pedestrian.test(properties.class||'');
   const associatedGrass=pointLabel&&square&&layer==='landcover'&&properties.class==='grass';
@@ -100,10 +113,12 @@ function select(city,layers,tile){
   const centre=[(x+X)/2,(y+Y)/2],range=Math.hypot(centre[0]-cx,centre[1]-cy)*mpu;
   const central=centralWords.test(text);
   if(range>(square?2700:1500))return;
-  const selectionScore=(square?2600:900)+(central?650:0)-range;
+  const pedestrianSquare=square&&[properties.class,properties.subclass].includes('pedestrian');
+  const selectionEvidence=mappedSquare?'mapped-square':pedestrianSquare?'named-pedestrian-square':undefined;
+  const selectionScore=(square?2600:900)+(central?650:0)+(mappedSquare?950:pedestrianSquare?450:0)-range;
   const holes=rings.slice(1).filter(r=>r.every(p=>inside(p,ring,true)));
   if(rings.length>1&&holes.length!==rings.length-1)return;
-  const candidate={f,ring,holes,centre,name:name.trim(),square,park,selectionScore};
+  const candidate={f,ring,holes,centre,name:name.trim(),square,park,selectionScore,selectionEvidence};
   if(!candidates.has(f.id)||candidates.get(f.id).selectionScore<selectionScore)candidates.set(f.id,candidate);
  };
  for(const item of polygons)nominate(item,item.f.props?.name);
@@ -112,45 +127,55 @@ function select(city,layers,tile){
   const item=byId.get(f.id);
   if(f.type===1&&item)nominate(item,f.props?.name,true);
  }
- const chosen=[...candidates.values()].sort((a,b)=>b.selectionScore-a.selectionScore||a.f.id-b.f.id)[0];
- if(!chosen)return null;
- const {f,ring,holes,centre,name,square,park,selectionScore}=chosen,link=osm(f.id);
- const convert=path=>path.map(([x,y])=>({x:Math.round((x-centre[0])*mpu*100)/100,z:Math.round((y-centre[1])*mpu*100)/100}));
- const contains=p=>inside(p,ring,true)&&!holes.some(hole=>inside(p,hole));
- const surfaces=[],walkwayDetails=[],landmarks=[],trees=[],benches=[];
  const transport=features('transportation');
- for(const [layer,items] of [['landcover',features('landcover')],['transportation',transport],['water',features('water')]]){
-  for(const feature of items){
-   if(feature.type!==3||feature.id===f.id)continue;
-   if(layer==='landcover'&&feature.props.class!=='grass'||layer==='transportation'&&!pedestrian.test(feature.props.class||''))continue;
-   const bounded=feature.paths.filter(p=>p.length>=4&&p.length<=1200&&p.every(contains));
-   if(bounded.length)surfaces.push({kind:layer==='landcover'?'lawn':layer==='water'?'water':'paving',rings:bounded.map(convert)});
-  }
+ const surfaceLayers=[['landcover',features('landcover')],['transportation',transport],['water',features('water')]];
+ const ranked=[...candidates.values()].sort((a,b)=>b.selectionScore-a.selectionScore||a.f.id-b.f.id);
+ for(const candidate of ranked){
+  if(!candidate.selectionEvidence&&candidate.selectionScore<minimumCivicScore)continue;
+  const profile=describe(candidate);
+  if(eligibleCandidate(profile)&&accept(profile))return profile;
  }
- for(const feature of transport){
-  if(feature.type!==2||!pedestrian.test(feature.props.class||''))continue;
-  for(const line of feature.paths){
-   if(!line?.length)continue;
-   const [x,y,X,Y]=bounds(line),[rx,ry,rX,rY]=bounds(ring);
-   if(X<rx||x>rX||Y<ry||y>rY)continue;
-   for(const run of clippedWalkway(line,ring,holes)){
-    walkwayDetails.push({points:convert(run),surface:feature.props.surface,widthMeters:Number(feature.props.width)||undefined});
+ return null;
+ function describe({f,ring,holes,centre,name,square,park,selectionScore,selectionEvidence}){
+  const link=osm(f.id);
+  const convert=path=>path.map(([x,y])=>({x:Math.round((x-centre[0])*mpu*100)/100,z:Math.round((y-centre[1])*mpu*100)/100}));
+  const contains=p=>inside(p,ring,true)&&!holes.some(hole=>inside(p,hole));
+  const surfaces=[],walkwayDetails=[],landmarks=[],trees=[],benches=[];
+  for(const [layer,items] of surfaceLayers){
+   for(const feature of items){
+    if(feature.type!==3||feature.id===f.id)continue;
+    if(layer==='landcover'&&feature.props.class!=='grass'||layer==='transportation'&&!pedestrian.test(feature.props.class||''))continue;
+    const bounded=feature.paths.filter(p=>p.length>=4&&p.length<=1200&&p.every(contains));
+    if(bounded.length)surfaces.push({kind:layer==='landcover'?'lawn':layer==='water'?'water':'paving',rings:bounded.map(convert)});
    }
   }
+  const [rx,ry,rX,rY]=bounds(ring);
+  for(const feature of transport){
+   if(feature.type!==2||!pedestrian.test(feature.props.class||'')||feature.props.brunnel==='tunnel'||Number(feature.props.layer)<0)continue;
+   for(const line of feature.paths){
+    if(!line?.length)continue;
+    const [x,y,X,Y]=bounds(line);
+    if(X<rx||x>rX||Y<ry||y>rY)continue;
+    for(const run of clippedWalkway(line,ring,holes)){
+     walkwayDetails.push({points:convert(run),surface:feature.props.surface,widthMeters:Number(feature.props.width)||undefined});
+    }
+   }
+  }
+  for(const feature of poi){
+   const point=feature.paths[0]?.[0],props=feature.props;
+   if(feature.type!==1||!point||!contains(point))continue;
+   if(props.class==='tree'||props.subclass==='tree'){trees.push(convert([point])[0]);continue;}
+   if(props.class==='bench'||props.subclass==='bench'){benches.push(convert([point])[0]);continue;}
+   const source=osm(feature.id);
+   if(!source||!['monument','artwork','fountain'].includes(props.class)&&props.subclass!=='fountain')continue;
+   const label=props.name||'Opera mappata',position=convert([point])[0];
+   const model=window.SquareDetails?.classify(label,props)||(props.class==='fountain'||props.subclass==='fountain'?'fountain':'unclassified');
+   landmarks.push({...source,name:label,...position,model,kind:model==='fountain'?'fountain':'artwork',status:model==='unclassified'?'needs-model':'mapped-archetype'});
+  }
+  const grassy=/^(?:grass|lawn)$/i.test(f.props?.surface||'');
+  return {name,base:grassy||park&&!square?'lawn':'paving',outline:convert(ring),holes:holes.map(convert),surfaces,paths:walkwayDetails.map(route=>route.points),walkwayDetails,trees,benches,landmarks,detailSchema:2,
+   source:link.source,documented:true,realGeometry:true,layout:'survey',selection:'central-square-candidate',selectionScore,selectionEvidence,geometrySource:'OpenFreeMap / OpenMapTiles / OpenStreetMap'};
  }
- for(const feature of poi){
-  const point=feature.paths[0]?.[0],props=feature.props;
-  if(feature.type!==1||!point||!contains(point))continue;
-  if(props.class==='tree'||props.subclass==='tree'){trees.push(convert([point])[0]);continue;}
-  if(props.class==='bench'||props.subclass==='bench'){benches.push(convert([point])[0]);continue;}
-  const source=osm(feature.id);
-  if(!source||!['monument','artwork','fountain'].includes(props.class)&&props.subclass!=='fountain')continue;
-  const label=props.name||'Opera mappata',position=convert([point])[0];
-  const model=window.SquareDetails?.classify(label,props)||(props.class==='fountain'||props.subclass==='fountain'?'fountain':'unclassified');
-  landmarks.push({...source,name:label,...position,model,kind:model==='fountain'?'fountain':'artwork',status:model==='unclassified'?'needs-model':'mapped-archetype'});
- }
- return {name,base:park&&!square?'lawn':'paving',outline:convert(ring),holes:holes.map(convert),surfaces,paths:walkwayDetails.map(route=>route.points),walkwayDetails,trees,benches,landmarks,detailSchema:2,
-  source:link.source,documented:true,realGeometry:true,layout:'survey',selection:'central-square-candidate',selectionScore,geometrySource:'OpenFreeMap / OpenMapTiles / OpenStreetMap'};
 }
 let metadata;
 async function resolve(city){
@@ -169,6 +194,6 @@ async function resolve(city){
  const nearby=await Promise.allSettled([read(east,0),read(0,south),read(east,south)]);
  return [main,...nearby.map(result=>result.status==='fulfilled'?result.value:null)].filter(Boolean).sort((a,b)=>b.selectionScore-a.selectionScore)[0]||null;
 }
-window.PlazaMapResolver={resolve,select,decodeTile};
+window.PlazaMapResolver={resolve,select,decodeTile,eligibleCandidate};
 
 })();

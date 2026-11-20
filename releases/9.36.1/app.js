@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=9',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=10',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -1284,16 +1284,18 @@ async function ensureCitySquare(city){
  if(worldImportedSquares[city.id])return;
  const pending=ensureCitySquare.pending||(ensureCitySquare.pending=new Map());if(pending.has(city.id))return pending.get(city.id);
  const job=async()=>{
+  const resolver=window.PlazaMapResolver;
+  const retained=resolver?.eligibleCandidate?.(old?.square)?old.square:null;
   try{
    await loadWorldSquareCatalog(city);
    let square=worldImportedSquares?.[city.id];
    if(!square){
-    if(window.CITY_SQUARE_DATA?.[city.id]||!window.PlazaMapResolver||old?.version===3&&old.retryAfter>Date.now())return;
-    square=await window.PlazaMapResolver.resolve(city);
-    records[city.id]={version:3,square:square||old?.square||null,retryAfter:Date.now()+(square?90:7)*86400000};
+    if(window.CITY_SQUARE_DATA?.[city.id]||!resolver||old?.version===4&&old.retryAfter>Date.now())return;
+    square=await resolver.resolve(city);
+    records[city.id]={version:4,square:square||retained,retryAfter:Date.now()+(square?90:7)*86400000};
    }
    if(square&&square!==old?.square&&currentCity.id===city.id&&active){rebuild();renderMilestones();}
-  }catch{records[city.id]={version:3,square:old?.square||null,retryAfter:Date.now()+86400000};}
+  }catch{records[city.id]={version:4,square:retained,retryAfter:Date.now()+86400000};}
   finally{
    pending.delete(city.id);
    try{
@@ -1310,7 +1312,8 @@ function citySquareProfile(city){
  const imported=typeof worldImportedSquares==='undefined'?null:worldImportedSquares?.[city.id];
  const reviewed=imported?.reviewed===true?imported:null;
  const cached=citySquareRecords()[city.id]?.square;
- const fromMap=cached&&/^https:\/\/www\.openstreetmap\.org\/(?:node|way|relation)\/\d+$/.test(cached.source);
+ const fromMap=scope?.PlazaMapResolver?.eligibleCandidate?.(cached)&&
+  /^https:\/\/www\.openstreetmap\.org\/(?:node|way|relation)\/\d+$/.test(cached.source);
  for(const data of [reviewed,bundled,imported,fromMap?cached:null]){
   const outline=data?.outline;
   if(typeof data?.name!=='string'||!data.name.trim()||!Array.isArray(outline)||outline.length<4||outline.length>1200)continue;
@@ -1401,8 +1404,11 @@ function drawSurveyedCitySquare(profile,b){
  const baseColor=baseKind==='lawn'?profile.green||0x76965c:baseKind==='sand'?0xd8b477:paving;
  polygon([root,...(profile.holes||[])],capitol?0x697070:baseColor,.42,false,true,baseKind);
  border(root,0xe2d6bf,.26,.15,.43);
- // Context paving is mapped separately from the plaza outline.
- for(const surface of profile.contextSurfaces||[])polygon(surface.rings,paving,.42,false,true);
+ // Context surfaces preserve separately mapped ground outside the plaza outline.
+ for(const surface of profile.contextSurfaces||[]){
+  const lawn=surface.kind==='lawn';
+  polygon(surface.rings,lawn?(profile.green||0x63894c):paving,.42,false,true,lawn?'lawn':'stone');
+ }
  for(const surface of profile.surfaces||[]){
   const lawn=surface.kind==='lawn',water=surface.kind==='water';
   polygon(surface.rings,lawn?(profile.green||0x63894c):water?0x319bb5:0xddd0b8,lawn?.57:water?.53:.49,lawn||water,false,lawn?'lawn':water?'water':'stone');
@@ -7955,10 +7961,12 @@ function openSquareDetailPanel(focusHeading=true){
  localizedPanelRoute={type:'square'};
  const panel=revealCivicPanel(focusHeading),body=$('v4Body'),profile=citySquareProfile(currentCity);$('v4Title').textContent=profile.name;if(profile.name.startsWith('Piazza civica di '))delete $('v4Title').dataset.i18nSkip;else $('v4Title').dataset.i18nSkip='true';body.replaceChildren();
  const intro=document.createElement('p');
+ const chosenWithReference=['curated-central-square','named-reference'].includes(profile.selection);
  intro.textContent=profile.layoutEvidence==='schematic-from-design'?'Perimetro da OpenStreetMap. Disposizione interna schematica basata sul progetto, con posizioni indicative.':
   profile.reviewed?'Piazza verificata singolarmente. La ricostruzione segue la cartografia e i riferimenti disponibili.':
-  profile.realGeometry?'Planimetria da OpenStreetMap. La scelta della piazza e gli elementi 3D possono richiedere una verifica.':
-  'Piazza civica generata per questa città.';
+  profile.realGeometry?(chosenWithReference?'Piazza scelta con riferimenti locali. I dettagli della ricostruzione sono da verificare.':
+   'Candidato trovato sulla mappa. La scelta della piazza e i dettagli della scena sono da verificare.'):
+  'Piazza di gioco generata in attesa di una planimetria reale.';
  body.append(intro);
  function sourceLink(parent,address,label){
   if(typeof address!=='string')return;
@@ -7970,9 +7978,11 @@ function openSquareDetailPanel(focusHeading=true){
   parent.append(link);
  }
  const references=document.createElement('div');references.className='civic-objective-actions';
- sourceLink(references,profile.source,profile.geometryAttribution?'Planimetria ufficiale':'Planimetria OpenStreetMap');
+ const geometryLabel=profile.geometryAttribution?'Planimetria ufficiale':
+  /^https:\/\/www\.openstreetmap\.org\//.test(profile.source||'')?'Planimetria OpenStreetMap':'Fonte della planimetria';
+ sourceLink(references,profile.source,geometryLabel);
  if(profile.geometryAttribution)sourceLink(references,profile.geometryTerms,profile.geometryAttribution);
- if(profile.reference!==profile.source)sourceLink(references,profile.reference,profile.layoutEvidence==='schematic-from-design'?'Relazione del progettista':'Riferimento ufficiale');
+ if(profile.reference!==profile.source)sourceLink(references,profile.reference,profile.layoutEvidence==='schematic-from-design'?'Relazione del progettista':'Fonte della piazza');
  if(references.childElementCount)body.append(references);
  const adjacent=profile.contextSurfaces?.length?profile.adjacentLandmarks||[]:[];
  const features=[...(profile.landmarks||[]),...adjacent];
@@ -7984,12 +7994,11 @@ function openSquareDetailPanel(focusHeading=true){
   if(feature.description){const description=document.createElement('p');description.textContent=feature.description;row.append(description);}
   if(feature.evidence?.position){
    const evidence=document.createElement('small');
-   if(feature.evidence.position==='mapped-footprint')evidence.textContent='Posizione ricavata dal perimetro dell’opera.';
+   if(['mapped-footprint','mapped-monument-footprint','mapped-basin-centroid','mapped-plinth','centre-of-mapped-fountain'].includes(feature.evidence.position))evidence.textContent='Posizione ricavata dal perimetro cartografico dell’opera.';
    else if(feature.evidence.position==='mapped-point')evidence.textContent='Posizione ricavata dal punto cartografico.';
    else if(feature.evidence.position==='schematic-from-design')evidence.textContent='Posizione indicativa basata sulla sequenza descritta nel progetto.';
    else if(feature.evidence.position==='reference-estimate')evidence.textContent='Posizione approssimativa in base alle fonti disponibili.';
-   else evidence.textContent='Posizione ricavata dalla documentazione della piazza.';
-   row.append(evidence);
+   if(evidence.textContent)row.append(evidence);
   }
   const links=document.createElement('div');links.className='civic-objective-actions';
   sourceLink(links,feature.source,feature.evidence?.position==='reference-estimate'?'Coordinate indicative':'Mappa dell’opera');
