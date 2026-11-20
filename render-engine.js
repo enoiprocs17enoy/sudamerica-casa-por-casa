@@ -125,6 +125,7 @@
     shadowDirty=false;
    }
   }
+  if(city)window.WorldForest?.updateView?.(city,camera);
   renderer.setRenderTarget(null);
   renderer.render(scene,camera);
   const {calls,triangles}=renderer.info.render;

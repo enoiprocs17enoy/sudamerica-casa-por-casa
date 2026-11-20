@@ -1,8 +1,23 @@
-/* Far woodland uses two instanced impostors per grove. */
+/* Far woodland uses two instanced impostors per grove, culled in regional tiles. */
 (function(){
 'use strict';
 const canopyColors=['#36633a','#486f3d','#587541','#3c663c'];
 let groveCanvas, canopyCanvas;
+const forestLayers=new WeakMap();
+
+function updateView(group,camera){
+ const layers=forestLayers.get(group);
+ if(!layers)return;
+ const angle=Math.abs(camera.getWorldDirection(layers.direction).y);
+ for(const [layer,material,opacity] of [
+  [layers.groves,layers.groveMaterial,1-smoothStep((angle-.3)/.5)],
+  [layers.canopies,layers.canopyMaterial,smoothStep((angle-.15)/.55)],
+ ]){
+  material.opacity=opacity;
+  // Below the material's alpha cutoff this layer cannot contribute a pixel.
+  layer.visible=opacity>=material.alphaTest;
+ }
+}
 
 function random(seed){
  const value=Math.sin(seed*12.9898+78.233)*43758.5453;
@@ -74,7 +89,8 @@ function build(options){
 }
 
 function* buildSteps({group,region,plan,height,city,bounds}){
- const extent=region?.extent||50000,spacing=200,points=[];
+ const extent=region?.extent||50000,spacing=200,tileSize=12000,tiles=new Map();
+ let groveCount=0;
  const originX=city.lng*111320*Math.max(.02,Math.cos(city.lat*Math.PI/180));
  const originNorth=city.lat*111320;
  for(let row=Math.floor((originNorth-extent)/spacing);row<=Math.ceil((originNorth+extent)/spacing);row++){
@@ -96,9 +112,17 @@ function* buildSteps({group,region,plan,height,city,bounds}){
    if(WorldRoads.nearSettlement(x,z,plan,100)||WorldRoads.distanceToRoad(x,z,plan)<80)continue;
    const y=height(x,z),treeLine=1-smoothStep((y-650)/600);
    if(random(seed+17)>treeLine)continue;
-   points.push({x,z,y,w:width,h:13+random(seed+31)*9,color:random(seed+61)});
+   const tileKey=Math.floor(x/tileSize)+':'+Math.floor(z/tileSize);
+   let tile=tiles.get(tileKey);
+   if(!tile){tile=[];tiles.set(tileKey,tile);}
+   tile.push({x,z,y,w:width,h:13+random(seed+31)*9,color:random(seed+61)});
+   groveCount++;
   }
  }
+
+ group.userData.forestHorizon=extent;
+ group.userData.farForestGroves=groveCount;
+ if(!groveCount)return;
 
  const options={alphaTest:.012,transparent:true,depthWrite:false,side:THREE.DoubleSide,forceSinglePass:true,fog:true};
  const material=new THREE.MeshBasicMaterial({...options,map:groveTexture()});
@@ -109,44 +133,40 @@ function* buildSteps({group,region,plan,height,city,bounds}){
    'vec4 mvPosition=modelViewMatrix*instanceMatrix*vec4(0.,0.,0.,1.); mvPosition.xy+=position.xy*vec2(length(instanceMatrix[0].xyz),length(instanceMatrix[1].xyz)); gl_Position=projectionMatrix*mvPosition;');
  };
  material.customProgramCacheKey=()=> 'far-woodland-groves-v2';
- const mesh=new THREE.InstancedMesh(new THREE.PlaneGeometry(1,1),material,points.length);
- const topMaterial=new THREE.MeshBasicMaterial({...options,map:canopyTexture()});
- const top=new THREE.InstancedMesh(new THREE.PlaneGeometry(1,1).rotateX(-Math.PI/2),topMaterial,points.length);
- const dummy=new THREE.Object3D(),color=new THREE.Color(),direction=new THREE.Vector3();
- for(let i=0;i<points.length;i++){
-  if(i>0&&i%2048===0)yield;
-  const p=points[i];
-  dummy.position.set(p.x,p.y+p.h*.46,p.z);
-  dummy.rotation.y=p.color>.5?Math.PI:0;
-  dummy.scale.set(p.w,p.h,1);
-  dummy.updateMatrix();
-  color.setHSL(.23,.12,.78+p.color*.15);
-  mesh.setMatrixAt(i,dummy.matrix);
-  mesh.setColorAt(i,color);
-  dummy.position.set(p.x,p.y+4+p.h*.27,p.z);
-  dummy.rotation.y=p.color*Math.PI*2;
-  dummy.scale.set(p.w,1,p.w);
-  dummy.updateMatrix();
-  top.setMatrixAt(i,dummy.matrix);
-  top.setColorAt(i,color);
+ const groveGeometry=new THREE.PlaneGeometry(1,1);
+ const canopyGeometry=new THREE.PlaneGeometry(1,1).rotateX(-Math.PI/2);
+ const canopyMaterial=new THREE.MeshBasicMaterial({...options,map:canopyTexture()});
+ const groves=new THREE.Group(),canopies=new THREE.Group();
+ const dummy=new THREE.Object3D(),color=new THREE.Color();
+ for(const tile of tiles.values()){
+  const mesh=new THREE.InstancedMesh(groveGeometry,material,tile.length);
+  const top=new THREE.InstancedMesh(canopyGeometry,canopyMaterial,tile.length);
+  for(const [index,p] of tile.entries()){
+   dummy.position.set(p.x,p.y+p.h*.46,p.z);
+   dummy.rotation.y=p.color>.5?Math.PI:0;
+   dummy.scale.set(p.w,p.h,1);
+   dummy.updateMatrix();
+   color.setHSL(.23,.12,.78+p.color*.15);
+   mesh.setMatrixAt(index,dummy.matrix);
+   mesh.setColorAt(index,color);
+   dummy.position.set(p.x,p.y+4+p.h*.27,p.z);
+   dummy.rotation.y=p.color*Math.PI*2;
+   dummy.scale.set(p.w,1,p.w);
+   dummy.updateMatrix();
+   top.setMatrixAt(index,dummy.matrix);
+   top.setColorAt(index,color);
+  }
+  top.computeBoundingSphere();
+  top.userData.farForestCanopies=true;
+  mesh.computeBoundingSphere();
+  mesh.userData.farForest=true;
+  canopies.add(top);groves.add(mesh);
+  yield;
  }
- mesh.onBeforeRender=(_renderer,_scene,camera)=>{
-  camera.getWorldDirection(direction);
-  material.opacity=1-smoothStep((Math.abs(direction.y)-.3)/.5);
- };
- top.onBeforeRender=(_renderer,_scene,camera)=>{
-  camera.getWorldDirection(direction);
-  topMaterial.opacity=smoothStep((Math.abs(direction.y)-.15)/.55);
- };
- top.computeBoundingSphere();
- top.userData.farForestCanopies=true;
- mesh.computeBoundingSphere();
- mesh.userData.farForest=true;
- group.add(top,mesh);
- group.userData.forestHorizon=extent;
- group.userData.farForestGroves=points.length;
- return mesh;
+ group.add(canopies,groves);
+ forestLayers.set(group,{groves,canopies,groveMaterial:material,canopyMaterial,direction:new THREE.Vector3()});
+ return groves;
 }
 
-window.WorldForest={build,buildSteps};
+window.WorldForest={build,buildSteps,updateView};
 })();
