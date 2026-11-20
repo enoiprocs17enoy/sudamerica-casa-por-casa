@@ -26,7 +26,8 @@ async function searchCities(query,limit=6){
  function add(city){
   const names=cityNames(city).map(name=>({name,normalized:norm(name)}));
   const exact=names.find(({normalized})=>normalized===q);
-  const rank=exact?0:single?Infinity:names.some(({normalized})=>normalized.startsWith(q))?1:names.some(({normalized})=>normalized.includes(q))?2:Infinity;
+  const exactPrimary=[city.name,city.asciiName].some(name=>name&&norm(name)===q);
+  const rank=exactPrimary?0:exact?1:single?Infinity:names.some(({normalized})=>normalized.startsWith(q))?2:names.some(({normalized})=>normalized.includes(q))?3:Infinity;
   if(!Number.isFinite(rank))return;
   const previous=matches.get(city.id);
   if(!previous||rank<previous.rank)matches.set(city.id,{city,rank,matchedName:exact?.name});
@@ -44,8 +45,13 @@ async function searchCities(query,limit=6){
    const place=atlas.byId.get('gn-'+id);
    add({id:place?.id||'gn-'+id,countryCode,name:place?.name||name,asciiName:place?.asciiName||asciiName,population,aliases:[name,asciiName,...(aliases||[]),...atlasAliases(id)]});
   }
- }catch(error){if(![...matches.values()].some(match=>match.rank===0))throw error;}
- return [...matches.values()].sort((a,b)=>a.rank-b.rank||b.city.population-a.city.population||a.city.id.localeCompare(b.city.id)).slice(0,limit).map(({city,matchedName})=>({id:city.id,countryCode:city.countryCode,name:city.name,asciiName:city.asciiName,aliases:city.aliases,matchedName}));
+ }catch(error){if(![...matches.values()].some(match=>match.rank<=1))throw error;}
+ const ranked=[...matches.values()].sort((a,b)=>a.rank-b.rank||b.city.population-a.city.population||a.city.id.localeCompare(b.city.id));
+ const hasExactPrimary=ranked[0]?.rank===0;
+ return ranked.slice(0,limit).map(({city,rank,matchedName})=>({
+  id:city.id,countryCode:city.countryCode,name:city.name,asciiName:city.asciiName,aliases:city.aliases,
+  matchedName:rank===1&&hasExactPrimary?undefined:matchedName,
+ }));
 }
 function rememberResidents(city,rows){residentCities.delete(city.id);residentCities.set(city.id,rows.map(h=>({user:h.user,cityId:city.id,cityName:city.name,residentId:h.id})));while(residentCities.size>12)residentCities.delete(residentCities.keys().next().value);}
 function searchResidents(query,limit=4){const q=handle(query);if(!q)return[];const records=new Map();for(const rows of residentCities.values())for(const h of rows)if(handle(h.user).includes(q))records.set(h.cityId+':'+handle(h.user),h);for(const h of simulatedComments){if(!handle(h.user).includes(q))continue;const city=atlas.byId.get(h.cityId);records.set(h.cityId+':'+handle(h.user),{...h,cityName:city?.name||h.cityId});}return [...records.values()].sort((a,b)=>Number(handle(b.user)===q)-Number(handle(a.user)===q)||Number(b.cityId===currentCity.id)-Number(a.cityId===currentCity.id)||a.cityName.localeCompare(b.cityName)).slice(0,limit);}

@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=8',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=9',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -7987,11 +7987,12 @@ function openSquareDetailPanel(focusHeading=true){
    if(feature.evidence.position==='mapped-footprint')evidence.textContent='Posizione ricavata dal perimetro dell’opera.';
    else if(feature.evidence.position==='mapped-point')evidence.textContent='Posizione ricavata dal punto cartografico.';
    else if(feature.evidence.position==='schematic-from-design')evidence.textContent='Posizione indicativa basata sulla sequenza descritta nel progetto.';
+   else if(feature.evidence.position==='reference-estimate')evidence.textContent='Posizione approssimativa in base alle fonti disponibili.';
    else evidence.textContent='Posizione ricavata dalla documentazione della piazza.';
    row.append(evidence);
   }
   const links=document.createElement('div');links.className='civic-objective-actions';
-  sourceLink(links,feature.source,'Mappa dell’opera');
+  sourceLink(links,feature.source,feature.evidence?.position==='reference-estimate'?'Coordinate indicative':'Mappa dell’opera');
   if(feature.reference!==feature.source)sourceLink(links,feature.reference,'Fonte');
   if(links.childElementCount)row.append(links);
   body.append(row);
