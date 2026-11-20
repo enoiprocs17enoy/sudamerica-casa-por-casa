@@ -7,6 +7,7 @@ function geometry(data){let x=0,y=0,i=0,paths=[],path;while(i<data.length){const
 function decodeTile(bytes){const r=new Reader(bytes),layers={};while(r.p<r.end){const k=r.v();if(k>>3!==3){r.skip(k&7);continue;}const lr=new Reader(r.bytes()),keys=[],values=[],features=[];let name='',extent=4096;while(lr.p<lr.end){const t=lr.v(),f=t>>3,w=t&7;if(f===1)name=lr.str();else if(f===2)features.push(lr.bytes());else if(f===3)keys.push(lr.str());else if(f===4)values.push(value(lr.bytes()));else if(f===5)extent=lr.v();else lr.skip(w);}layers[name]={extent,features:features.map(bytes=>{const fr=new Reader(bytes);let id=0,type=0,tags=[],coords=[];while(fr.p<fr.end){const t=fr.v(),f=t>>3,w=t&7;if(f===1)id=fr.v();else if(f===2)tags=packed(fr.bytes());else if(f===3)type=fr.v();else if(f===4)coords=packed(fr.bytes());else fr.skip(w);}const props={};for(let i=0;i<tags.length;i+=2)props[keys[tags[i]]]=values[tags[i+1]];return{id,type,props,paths:geometry(coords)};})};}return layers;}
 const GRID=16384;
 const squareWords=/(?:^|[^\p{L}])(?:plaza|plazoleta|praca|pracinha|largo|square|piazza|piazzale|piazzetta|platz|marktplatz|rathausplatz|stadtplatz|plac|plein|torg|torget|piata|ter|sheshi?|meydani?|quang truong|πλατεια|площадь|площа|հրապարակ|მოედანი|ساحة|ميدان)(?:$|[^\p{L}])|^place\s|广场|廣場|広場|광장|चौक|จัตุรัส/iu;
+const regionalSquareWords=/(?:^|[^\p{L}])(?:namesti|namestie|rynek)(?:$|[^\p{L}])/u;
 const parkWords=/(?:^|[^\p{L}])(?:park|parque|parc|parco|jardin|jardim|garten|ogrod|puisto|volksgarten|парк|حديقة)(?:$|[^\p{L}])|公园|公園|공원/iu;
 const centralWords=/armas|mayor|central|principal|matriz|bolivar|independen|town hall|markt|municipal|市民|中央|централ|الاستقلال/iu;
 const pedestrian=/^(?:path|pedestrian|footway|steps|corridor)$/i;
@@ -96,7 +97,11 @@ function select(city,layers,tile,accept=()=>true){
   if(privateName.test(text)||nonCivicName.test(text)||[properties.class,properties.subclass].some(value=>nonCivicClass.test(value||''))||
     /^(?:no|private)$/i.test(properties.access||''))return;
   const mappedSquare=[properties.class,properties.subclass,properties.place].some(value=>/^(?:square|town_square)$/i.test(value||''));
-  const square=mappedSquare||squareWords.test(text)||squareWords.test(name);
+  // A local civic name can describe a street address as well as a square.
+  const namedPedestrianArea=layer==='transportation'&&regionalSquareWords.test(text)&&
+    [properties.class,properties.subclass].includes('pedestrian')&&
+    properties.area!=='no'&&properties.junction!=='roundabout'&&!/^(?:no|private)$/i.test(properties.foot||'');
+  const square=mappedSquare||squareWords.test(text)||squareWords.test(name)||namedPedestrianArea;
   const namedPark=parkWords.test(text)||parkWords.test(name);
   const park=parkPolygon.test(properties.class||'')||parkPolygon.test(properties.subclass||'')||namedPark;
   if(!square&&!park)return;
