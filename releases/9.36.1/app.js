@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=31',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=32',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -2362,6 +2362,9 @@ function animate(now=0){
   if(!renderer)return;
   requestAnimationFrame(animate);
   if(!active||document.hidden||cityBuildDepth>0)return;
+  // enterNow draws the first frame while the loading overlay still covers the city.
+  // Let the overlay finish its paint and fade without rendering that scene repeatedly.
+  if(document.documentElement.dataset.loadingState==='visible'&&$('cityLoading')?.dataset.phase==='city')return;
   // Keep a stable60FPS ceiling without skipping frames due to timestamp rounding.
   const minInterval=1000/60;
   if(!renderFrameDue(now,minInterval))return;
