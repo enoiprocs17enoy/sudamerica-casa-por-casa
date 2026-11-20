@@ -42,11 +42,15 @@ Object.assign(MODEL_SPECS,{
  'delhi-entry-arcade':{height:3.6,width:12.4,depth:.9,parcelWidth:.42},
  'delhi-open-air-theatre':{height:1.3,width:15,depth:11,parcelWidth:.46},
  'birmingham-iron-man':{height:6,width:2.5,depth:1.94},
+ 'birmingham-the-river':{height:2.8,width:4,depth:2.5},
  'goiania-tres-racas':{height:7,width:3.1,depth:4.7},
  'tartini-monument':{height:6,width:2.75,depth:2.75},
  'monaco-malizia':{height:4.25,width:2.2,depth:2.2},
+ 'karhupuisto-bear':{height:2.55,width:2.4,depth:3.0},
  'kamppi-chapel':{height:11.5,width:19.6,depth:13.4,parcelWidth:.50},
  'kamppi-entrepreneurs-monument':{height:6,width:3.9,depth:3.9},
+ 'kasarmitori-winter-war-memorial':{height:10.6,width:3.65,depth:3.65},
+ 'kasarmitori-the-eye':{height:.055,width:1.8,depth:1.8},
  'teror-pilar-fountain':{height:2.36,width:3.8,depth:3.8},
  'teror-wall-fountain':{height:2.77,width:2.25,depth:1.65},
  'arucas-sureda-monument':{height:4.9,width:4.1,depth:4.1},
@@ -61,6 +65,7 @@ Object.assign(MODEL_SPECS,{
  'boa-vista-garimpeiro':{height:7.5,width:15.7,depth:7.5,parcelWidth:.38},
  'naga-fifteen-martyrs':{height:6.95,width:6.4,depth:6.4},
  'laoag-tobacco-obelisk':{height:6.3,width:3.5,depth:3.5},
+ 'dapitan-mindanao-relief':{height:1.55,width:32,depth:28,parcelWidth:.45},
  'tahrir-obelisk':{height:20.1,width:4.7,depth:4.3},
  'sydney-cenotaph':{height:3.8,width:7.7,depth:3.6,parcelWidth:.35}
 });
@@ -823,6 +828,32 @@ function render(plan,group,b){
      joint(...hand,.08,.10,.07);
     }
    }
+  }else if(model==='birmingham-the-river'){
+   const bronze=0x4a6557;
+   const body=(x,y,z,w,h,d)=>sphere(bronze,x,y,z,w,h,d,'patina');
+   const link=(a,b,r)=>limb(a,b,r,bronze,'patina');
+   body(.14,.77,.03,.74,.66,.61);
+   link([.05,.93,0],[-.71,1.68,-.10],.45);
+   body(-.55,1.47,-.07,.59,.65,.55);
+   body(-.96,1.80,-.12,.43,.42,.46);
+   link([-.94,1.79,-.11],[-1.19,2.20,-.10],.17);
+   body(-1.29,2.37,-.10,.30,.39,.26);
+   body(-1.29,2.46,-.23,.27,.32,.21);
+   link([-.83,1.72,-.45],[-1.42,1.02,-.64],.17);
+   link([-1.42,1.02,-.64],[-1.66,.43,-.25],.14);
+   body(-1.69,.32,-.12,.20,.13,.25);
+   link([-.80,1.72,.36],[-.35,1.37,.75],.16);
+   link([-.35,1.37,.75],[.17,1.28,.88],.12);
+   body(.20,1.28,.88,.17,.12,.14);
+   link([.31,.82,.24],[1.02,1.01,.54],.30);
+   link([1.02,1.01,.54],[1.71,.36,.70],.19);
+   body(1.79,.28,.82,.22,.16,.27);
+   link([.20,.73,-.28],[1.14,.75,-.64],.28);
+   link([1.14,.75,-.64],[1.61,.36,-.13],.17);
+   body(1.72,.28,-.03,.21,.15,.25);
+   body(.52,.66,.83,.24,.37,.22);
+   cylinder(bronze,.52,1.02,.83,.15,.10,'patina');
+   cylinder(0x424947,0,.10,0,1.9,.20);
   }else if(model==='birmingham-iron-man'){
    add('iron-man','patina',0x774b36,0,0,0,1,1,1);
   }else if(model==='waharoa'){
@@ -1022,6 +1053,39 @@ function render(plan,group,b){
      limb(corner(a,-1,c),corner(a,1,c),.027,aluminium,'metal');
      limb(corner(a,c,-1),corner(a,c,1),.027,aluminium,'metal');
     }
+   }
+  }else if(model==='kasarmitori-winter-war-memorial'){
+   const steel=0xc7d1d5,glass=0x6c7a7b;
+   sphere(steel,0,1.8,0,1.8,1.8,1.8,'metal');
+   for(const latitude of [-.55,-.24,.09,.42])for(let window=0;window<12;window++){
+    const bearing=(window+(latitude>0?.50:0))*Math.PI/6;
+    const radius=Math.cos(latitude);
+    const direction=new T.Vector3(Math.sin(bearing)*radius,Math.sin(latitude),Math.cos(bearing)*radius);
+    const face=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,0,1),direction);
+    add('sphere','metal',glass,1.8*direction.x,1.8+1.8*direction.y,1.8*direction.z,.072,.072,.023,face);
+   }
+   add('kasarmitori-perforated-figure','metal',steel,0,3.54,0,1,7.06/7,1);
+  }else if(model==='kasarmitori-the-eye'){
+   cylinder(0x737c7e,0,.019,0,.90,.038,'metal');
+   cylinder(0xa9b0b1,0,.037,0,.59,.036,'metal');
+  }else if(model==='karhupuisto-bear'){
+   const granite=0x90665d,pedestal=0x806f68;
+   box(pedestal,0,.14,0,2.31,.28,2.81);
+   box(pedestal,0,.50,0,2.11,.46,2.64);
+   sphere(granite,0,.84,.38,.82,.19,.88,'stone');
+   sphere(granite,0,1.85,-.41,.64,.66,.74,'stone');
+   sphere(granite,0,1.88,.24,.63,.57,.79,'stone');
+   sphere(granite,0,1.63,.76,.45,.43,.53,'stone');
+   sphere(granite,0,1.40,1.08,.26,.25,.35,'stone');
+   sphere(granite,0,1.27,1.30,.19,.13,.18,'stone');
+   for(const x of [-1,1]){
+    sphere(granite,x*.26,1.80,.89,.13,.14,.079,'stone');
+    sphere(granite,x*.43,1.41,-.68,.28,.44,.36,'stone');
+    sphere(granite,x*.45,1.01,-.64,.21,.24,.27,'stone');
+    sphere(granite,x*.44,.88,-.50,.24,.14,.30,'stone');
+    const forward=x>0?.83:.61;
+    limb([x*.48,1.64,.41],[x*.43,1.11,forward],.18,granite,'stone');
+    sphere(granite,x*.43,1.00,forward+.07,.21,.14,.29,'stone');
    }
   }else if(model==='verrazzano-memorial'){
    const travertine=0xb9ae96;
@@ -1256,6 +1320,20 @@ function render(plan,group,b){
     box(0x69523d,0,3.95,side*.939,1.05,.65,.028,'patina');
     box(0x69523d,side*.939,3.95,0,.028,.65,1.05,'patina');
    }
+  }else if(model==='dapitan-mindanao-relief'){
+   const redWall=0xa74a40,whiteCap=0xe8ddce,reliefGround=0x5c8a50,blueSea=0x63a1af;
+   box(stone,0,.15,0,32,.30,28);
+   box(blueSea,0,.32,0,31,.08,27,'water');
+   add('mindanao-land','stone',reliefGround,0,.62,0,25.2,.54,20.8);
+   for(const [x,z,rx,rz] of [[-2.5,1.5,3.4,2.2],[2.1,-1.4,4.5,2.8],[5.9,-3.6,2.9,3.4],[4.1,4.3,2.6,4.2]]){
+    sphere(0x6b955b,x,.72,z,rx,.48,rz,'stone');
+   }
+   for(const side of [-1,1]){
+    box(redWall,0,.59,side*13.56,32,.61,.60);
+    box(redWall,side*15.70,.59,0,.60,.61,27);
+    for(let i=-6;i<=6;i++)box(whiteCap,i*2.42,1.03,side*13.56,.94,.27,.65);
+    for(let i=-5;i<=5;i++)box(whiteCap,side*15.70,1.03,i*2.42,.65,.27,.94);
+   }
   }else if(model==='laoag-tobacco-obelisk'){
    const brick=0x995d46,darkBrick=0x734a3d,cap=0xb17b63;
    box(brick,0,.29,0,3.5,.58,3.5);
@@ -1401,6 +1479,18 @@ function render(plan,group,b){
  const localModels=[];
  for(const item of plan.items){owner=item;const first=parts.length;build(item.feature.model);localModels.push({item,first,end:parts.length});}
  const geos={box:new T.BoxGeometry(1,1,1),sphere:new T.SphereGeometry(1,12,8),cylinder:new T.CylinderGeometry(1,1,1,12),cone:new T.ConeGeometry(1,1,12),torus:new T.TorusGeometry(1,.045,6,20),pyramid:new T.CylinderGeometry(.12,1,1,4),robe:new T.CylinderGeometry(.55,1,1,10),cape:new T.PlaneGeometry(1,1,10,12)};
+ if(parts.some(part=>part.kind==='mindanao-land')){
+  // Generalised island silhouette for the painted exhibit.
+  const outline=[[-.50,-.02],[-.40,-.11],[-.32,-.04],[-.26,-.16],[-.16,-.19],[-.15,-.30],
+   [-.06,-.37],[.02,-.30],[.12,-.36],[.18,-.29],[.31,-.29],[.34,-.46],[.39,-.41],
+   [.42,-.24],[.50,-.11],[.47,.06],[.41,.13],[.40,.30],[.30,.48],[.22,.45],
+   [.24,.34],[.14,.32],[.14,.45],[.05,.43],[.02,.32],[-.13,.26],[-.24,.17],
+   [-.30,.07],[-.38,.08],[-.45,.05]];
+  const shape=new T.Shape();
+  outline.forEach(([x,z],i)=>i===0?shape.moveTo(x,-z):shape.lineTo(x,-z));
+  shape.closePath();
+  geos['mindanao-land']=new T.ExtrudeGeometry(shape,{depth:1,bevelEnabled:false}).translate(0,0,-.5).rotateX(-Math.PI/2);
+ }
  if(parts.some(part=>part.kind==='iron-man')){
   // Approximate the cast-iron silhouette, with the feet below the paving.
   const section=[[0,.37,.31],[.65,.45,.38],[2.15,.64,.46],[3.06,.74,.54],
@@ -1484,6 +1574,20 @@ function render(plan,group,b){
   const section=[[0,0],[.62,0],[.61,.05],[.70,.20],[.83,.42],[.94,.68],[1,.89],[.99,1],[0,1]];
   geos['kamppi-chapel-shell']=new T.LatheGeometry(section.map(([radius,y])=>new T.Vector2(radius,y)),32);
   geos['kamppi-chapel-seam']=new T.TorusGeometry(1,.006,4,40).rotateX(Math.PI/2);
+ }
+ if(parts.some(part=>part.kind==='kasarmitori-perforated-figure')){
+  const figure=new T.Shape();
+  const contour=[[-.92,0],[-.87,.82],[-.61,1.9],[-.63,3.53],[-.99,3.38],[-1.23,3.76],[-1.18,4.60],
+   [-.76,5.33],[-.44,5.63],[-.44,6.39],[-.12,6.92],[.25,7],[.61,6.60],[.61,6.09],[.37,5.67],
+   [.71,5.38],[1.08,4.83],[1.14,4.23],[.88,3.82],[.64,3.87],[.54,2.49],[.65,.83],[.84,.23],[.80,0],
+   [.30,0],[.13,.42],[.10,1.95],[-.10,2.17],[-.22,.89],[-.46,0]];
+  figure.moveTo(...contour[0]);for(const point of contour.slice(1))figure.lineTo(...point);figure.closePath();
+  for(const [x,y,radius] of [[.09,6.48,.14],[-.33,5.04,.15],[.22,5.21,.18],[.01,4.65,.19],[.47,4.61,.14],
+   [-.38,4.31,.14],[.19,4.13,.15],[-.21,3.74,.17],[.24,3.43,.15],[-.20,3.18,.13],[-.41,2.46,.09],
+   [.34,2.45,.10],[-.40,1.63,.09],[.34,1.60,.10],[-.56,.82,.09],[.44,.74,.08]]){
+   const opening=new T.Path();opening.absarc(x,y,radius,0,Math.PI*2,true);figure.holes.push(opening);
+  }
+  geos['kasarmitori-perforated-figure']=new T.ExtrudeGeometry(figure,{depth:.32,bevelEnabled:false,curveSegments:7}).translate(0,0,-.16);
  }
  if(parts.some(part=>part.kind==='herterich-basin')){
   const basin=[[0,0],[3.85,0],[3.85,.18],[3.68,.25],[3.59,.99],[3.73,1.05],
