@@ -25,6 +25,7 @@ Object.assign(MODEL_SPECS,{
  'peoples-heroes-memorial':{height:7.52,width:10,depth:12.2,parcelWidth:.40},
  'chairman-mao-memorial-hall':{height:4.12,width:10,depth:10,parcelWidth:.42},
  'liberty-paifang':{height:6,width:16,depth:2.15,parcelWidth:.70},
+ 'waharoa':{height:7,width:10.132,depth:.62,parcelWidth:.38},
  'king-sejong-seated':{height:7.0,width:5.5,depth:5.3,parcelWidth:.45},
  'joseon-armillary':{height:1.48,width:.82,depth:.82},
  'joseon-rain-gauge':{height:1.32,width:.63,depth:.63},
@@ -618,6 +619,61 @@ function render(plan,group,b){
      box(central?0x9a9386:trim,x,top-(central?.39:.29),face,central?2.05:width*.53,central?.39:.25,.054);
      for(const edge of [-1,1])box(limestone,x+edge*width*.37,top-.40,face,.21,.40,.078);
     }
+   }
+  }else if(model==='waharoa'){
+   const timber=0x68472f,carving=0xaa8057,copper=0x518981,rose=0x965656;
+   const across=new T.Vector3(1,0,0);
+   const beam=(a,b,thickness,depth,color)=>{
+    const from=new T.Vector3(...a),to=new T.Vector3(...b),direction=to.clone().sub(from);
+    const length=direction.length(),position=from.add(to).multiplyScalar(.5);
+    const rotation=new T.Quaternion().setFromUnitVectors(across,direction.normalize());
+    add('box','patina',color,position.x,position.y,position.z,length,thickness,depth,rotation);
+   };
+   for(const side of [-1,1]){
+    const x=side*4.31;
+    box(timber,x,1.785,0,1.30,3.57,.52,'patina');
+    beam([x,3.34,0],[0,5.34,0],1.02,.52,timber);
+    beam([x,3.19,.263],[0,5.19,.263],.30,.045,carving);
+    for(let row=0;row<5;row++){
+     const y=.49+row*.49,color=row%2?copper:carving;
+     beam([x-.47,y,.272],[x,y+.17,.272],.10,.04,color);
+     beam([x,y+.17,.272],[x+.47,y,.272],.10,.04,color);
+    }
+    for(let panel=0;panel<4;panel++){
+     const t=(panel+.60)/4.4,xPanel=x*(1-t),yPanel=3.30+2*t;
+     sphere(panel%2?rose:copper,xPanel,yPanel+.33,.279,.25,.14,.028,'patina');
+     beam([xPanel-.16,yPanel+.24,.286],[xPanel+.16,yPanel+.39,.286],.050,.025,carving);
+    }
+   }
+   // Five crest silhouettes cite the published arrangement without reproducing the carved artwork.
+   beam([-.11,5.43,0],[-.11,6.68,0],.125,.33,timber);
+   sphere(copper,-.11,6.46,0,.38,.26,.23,'patina');
+   for(const side of [-1,1]){
+    beam([-.11,6.41,0],[side*.65,6.90,0],.15,.27,copper);
+    beam([side*.13,6.29,0],[side*.44,5.76,0],.12,.24,copper);
+   }
+   beam([-1.91,4.66,0],[-1.91,6.01,0],.18,.31,timber);
+   for(let branch=0;branch<3;branch++){
+    const y=5.17+branch*.29;
+    beam([-2.15,y-.13,0],[-1.39,y+.41,0],.135,.35,copper);
+   }
+   beam([-3.54,3.87,0],[-3.54,5.40,0],.16,.28,timber);
+   let previous=[-3.26,5.61,0];
+   for(let i=1;i<=10;i++){
+    const theta=(.40+1.33*i/10)*Math.PI;
+    const next=[-3.48+Math.cos(theta)*.40,5.24+Math.sin(theta)*.40,0];
+    beam(previous,next,.116,.29,copper);
+    previous=next;
+   }
+   beam([1.73,4.62,0],[1.73,5.93,0],.17,.30,timber);
+   sphere(copper,1.88,5.83,0,.52,.19,.19,'patina');
+   beam([2.22,5.82,0],[2.62,6.10,0],.18,.25,copper);
+   beam([2.22,5.82,0],[2.64,5.71,0],.18,.25,copper);
+   beam([3.64,3.86,0],[3.64,5.39,0],.15,.29,timber);
+   sphere(copper,3.64,5.34,0,.34,.34,.20,'patina');
+   for(let ray=0;ray<8;ray++){
+    const angle=ray*Math.PI/4,point=r=>[3.64+Math.cos(angle)*r,5.34+Math.sin(angle)*r,0];
+    beam(point(.27),point(.52),.092,.26,copper);
    }
   }else if(model==='king-sejong-seated'){
    const gilt=0x947232,fold=0xa9883d,granite=0xc5b7aa;
