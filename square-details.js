@@ -139,6 +139,10 @@ Object.assign(MODEL_SPECS,{
  'lusaka-sata-mausoleum':{height:9.2,width:17.16,depth:14.88,parcelWidth:.52},
  'lusaka-chiluba-mausoleum':{height:7.9,width:15.89,depth:21.07,parcelWidth:.54},
  'harare-unity-fountain':{height:4.32,width:20.9,depth:20.9,parcelWidth:.56},
+ 'gaborone-three-dikgosi':{height:7,width:13.6,depth:4.35,parcelWidth:.65},
+ 'gaborone-shelter-north-west':{height:4.6,width:8.68,depth:8.68,parcelWidth:.30},
+ 'gaborone-shelter-north-east':{height:3.15,width:3.80,depth:3.80},
+ 'gaborone-shelter-central':{height:3.05,width:3.26,depth:3.80},
  'registan-sher-dor':{height:32,width:60.23,depth:71.79,parcelWidth:.86},
  'registan-tilla-kari':{height:30,width:78.71,depth:73.87,parcelWidth:.86},
  'islamabad-unity-pillars':{height:4.7,width:17,depth:17,parcelWidth:.36},
@@ -5754,6 +5758,60 @@ function render(plan,group,b){
    add('lusaka-chapel-roof','stone',roof,0,4.05,-.88,6.77,2.39,7.68);
    box(trim,0,7.09,-.88,.21,1.62,.21);
    box(trim,0,7.35,-.88,1.09,.21,.24);
+  }else if(model==='gaborone-three-dikgosi'){
+   const base=0xd1c9b9,granite=0xb8ad98,trim=0xe0d9ca,casting=0x605143,patina=0x796651;
+   box(base,0,.14,0,13.6,.28,4.35);
+   box(trim,0,.39,0,13.35,.22,4.10);
+   box(granite,0,.99,0,13.12,.98,3.88);
+   box(base,0,1.54,0,13.31,.12,4.00);
+   for(const [x,lean,forward,gesture] of [[-4.28,-.04,.10,0],[0,.03,.05,1],[4.28,.02,.09,2]]){
+    const at=(dx,y,z)=>[x+dx,1.60+y,z];
+    const cast=(dx,y,z,rx,ry,rz,color=casting)=>sphere(color,...at(dx,y,z),rx,ry,rz,'patina');
+    const join=(a,b,r,color=casting)=>limb(at(...a),at(...b),r,color,'patina');
+    for(const side of [-1,1]){
+     const step=side*forward;
+     cast(side*.53,.16,step+.12,.30,.17,.56);
+     join([side*.51,.22,step],[side*.48,1.07,step-.08],.24);
+     join([side*.48,1.07,step-.08],[side*.38,2.31,-.05],.31);
+     cast(side*.48,1.07,step-.08,.25,.25,.27);
+    }
+    add('robe','patina',casting,...at(0,2.72,-.08),.92,1.47,.51);
+    cast(lean,3.62,-.03,.91,.78,.48);
+    join([-.35,3.93,.32],[-.08,3.12,.40],.074,patina);
+    join([.35,3.93,.32],[.11,3.14,.41],.073,patina);
+    cast(lean,4.23,0,.22,.23,.22);
+    cast(lean,4.86,.01,.47,.54,.40);
+    cast(lean,4.82,.40,.13,.16,.10,patina);
+    cast(lean,4.57,.27,.28,.24,.16);
+    cast(lean,5.08,-.05,.45,.30,.37);
+    for(const side of [-1,1]){
+     const isRaised=gesture===1&&side===-1||gesture===0&&side===1;
+     const elbow=[side*(isRaised?.96:.91),isRaised?3.22:3.02,isRaised?.31:.07];
+     const hand=[side*(isRaised?.55:.91),isRaised?3.53:2.37,isRaised?.69:.21];
+     join([side*.68,3.87,-.02],elbow,.223);
+     cast(...elbow,.184,.23,.199);
+     join(elbow,hand,.147);
+     cast(...hand,.155,.226,.137,patina);
+    }
+    if(gesture===2)cast(.92,2.15,.24,.37,.15,.33);
+   }
+  }else if(model.startsWith('gaborone-shelter-')){
+   const {width,depth,height}=MODEL_SPECS[model],large=model==='gaborone-shelter-north-west';
+   const posts=large?6:4,eave=large?2.45:2.07,thatch=0x957743,wood=0x654a33;
+   for(let i=0;i<posts;i++){
+    const angle=2*Math.PI*i/posts;
+    const x=Math.cos(angle)*width*.35,z=Math.sin(angle)*depth*.35;
+    cylinder(wood,x,(eave+.04)/2,z,large?.145:.095,eave+.04);
+   }
+   add('gaborone-thatch','stone',thatch,0,eave,0,width/2,height-eave,depth/2);
+   if(large){
+    box(0x8c6743,0,.78,0,2.10,.08,.77);
+    for(const x of [-.72,.72]){
+     box(wood,x,.38,0,.11,.76,.52);
+     box(wood,x,.42,0,.13,.12,1.63);
+    }
+    for(const z of [-.69,.69])box(0x8c6743,0,.47,z,2.10,.09,.26);
+   }
   }else if(['registan-ulugh-beg','registan-sher-dor','registan-tilla-kari'].includes(model)){
    const {width,depth}=MODEL_SPECS[model],front=depth/2,back=-front;
    const west=model==='registan-ulugh-beg',north=model==='registan-tilla-kari';
@@ -6601,6 +6659,20 @@ function render(plan,group,b){
   geos['sundial-bowl']=new T.LatheGeometry(profile.map(([r,y])=>new T.Vector2(r,y)),20);
  }
  if(parts.some(part=>part.kind==='triangular-base'))geos['triangular-base']=new T.CylinderGeometry(1,1,1,3);
+ if(parts.some(part=>part.kind==='gaborone-thatch')){
+  const pitch=[[0,0],[.92,0],[1,.05],[1,.16],[.83,.27],[.66,.43],[.48,.61],[.30,.78],[.12,.94],[.018,1],[0,1]];
+  const segments=36,roof=new T.LatheGeometry(pitch.map(([radius,y])=>new T.Vector2(radius,y)),segments);
+  const strands=[];
+  for(let i=0;i<=segments;i++){
+   const tone=.79+.21*(((i%segments)*37)%13)/12;
+   for(const [,y] of pitch){
+    const shade=y<=.05?tone*.79:tone;
+    strands.push(shade,shade,shade);
+   }
+  }
+  roof.setAttribute('color',new T.Float32BufferAttribute(strands,3));
+  geos['gaborone-thatch']=roof;
+ }
  if(parts.some(part=>part.kind==='hanoi-bandstand-roof')){
   const pitch=[[0,0],[1,0],[1,.11],[.91,.21],[.73,.64],[.51,1.28],[.30,1.82],[.12,2.17],[.025,2.31],[0,2.33]];
   geos['hanoi-bandstand-roof']=new T.LatheGeometry(pitch.map(([radius,y])=>new T.Vector2(radius,y)),8);
@@ -6959,6 +7031,7 @@ function render(plan,group,b){
   geos['ordino-slate-roof']=roof.toNonIndexed();
   geos['ordino-slate-roof'].computeVertexNormals();
  }
+ if(parts.some(part=>part.kind==='veer-soudha-hip'))geos['veer-soudha-hip']=new T.CylinderGeometry(.24,1,1,4,1,false,Math.PI/4);
  if(parts.some(part=>part.kind==='bandstand-roof')){
   const roof=[[0,0],[.95,0],[1,.08],[.82,.24],[.56,.54],[.28,.83],[0,1]];
   geos['bandstand-roof']=new T.LatheGeometry(roof.map(([radius,y])=>new T.Vector2(radius,y)),8);
@@ -7080,7 +7153,7 @@ function render(plan,group,b){
  }
  for(const batch of batches.values()){
   const waterMaterial=batch.material==='water',patina=batch.material==='patina';
-  const material=new T.MeshStandardMaterial({side:batch.kind==='cape'?T.DoubleSide:T.FrontSide,color:0xffffff,roughness:waterMaterial?.18:patina?.58:batch.material==='metal'?.43:.83,metalness:waterMaterial?.18:patina?.24:batch.material==='metal'?.58:.02});
+  const material=new T.MeshStandardMaterial({side:batch.kind==='cape'?T.DoubleSide:T.FrontSide,vertexColors:batch.kind==='gaborone-thatch',color:0xffffff,roughness:waterMaterial?.18:patina?.58:batch.material==='metal'?.43:.83,metalness:waterMaterial?.18:patina?.24:batch.material==='metal'?.58:.02});
   const mesh=new T.InstancedMesh(geos[batch.kind],material,batch.parts.length),tint=new T.Color();
   batch.parts.forEach((p,i)=>{const item=p.owner,ca=Math.cos(item.angle),sa=Math.sin(item.angle);dummy.position.set(b.x+item.x+(p.x*ca-p.z*sa)*item.scale,itemBase.get(item)+p.y*item.scale,b.z+item.z+(p.x*sa+p.z*ca)*item.scale);yaw.setFromAxisAngle(UP,-item.angle);dummy.quaternion.copy(yaw);if(p.rotation)dummy.quaternion.multiply(p.rotation);dummy.scale.set(p.sx*item.scale,p.sy*item.scale,p.sz*item.scale);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);mesh.setColorAt(i,tint.setHex(p.color));});
   mesh.computeBoundingSphere();mesh.castShadow=!waterMaterial;mesh.receiveShadow=true;mesh.userData.squareLandmark=true;mesh.userData.sculpturePart=batch.kind;mesh.userData.squareModels=[...new Set(batch.parts.map(p=>p.owner.feature.model))];mesh.userData.squareFeatureIDs=batch.parts.map(p=>p.owner.feature.id);group.add(mesh);

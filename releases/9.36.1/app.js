@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=45',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=46',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -2265,6 +2265,67 @@ function resize(){
  camera.aspect=Math.max(1,r.width)/Math.max(1,r.height);
  camera.updateProjectionMatrix();updateCamera();
 }
+// Only nearby solid building volumes can obstruct the eye or its near plane.
+const CAMERA_CELL_SIZE=24,CAMERA_MAX_CORRECTION=28,CAMERA_WALL_CLEARANCE=.60;
+function recordCameraBuilding(index,bounds,{x,y,z,w,height,d,rotation}){
+ const c=Math.cos(rotation),s=Math.sin(rotation);
+ const minX=bounds.min.x*w,maxX=bounds.max.x*w,minY=bounds.min.y*height,maxY=bounds.max.y*height;
+ const minZ=bounds.min.z*d,maxZ=bounds.max.z*d;
+ const radiusX=Math.max(Math.abs(minX),Math.abs(maxX)),radiusZ=Math.max(Math.abs(minZ),Math.abs(maxZ));
+ const spanX=Math.abs(c)*radiusX+Math.abs(s)*radiusZ,spanZ=Math.abs(s)*radiusX+Math.abs(c)*radiusZ;
+ const building={x,y,z,c,s,minX,maxX,minY,maxY,minZ,maxZ};
+ for(let i=Math.floor((x-spanX)/CAMERA_CELL_SIZE);i<=Math.floor((x+spanX)/CAMERA_CELL_SIZE);i++){
+  for(let j=Math.floor((z-spanZ)/CAMERA_CELL_SIZE);j<=Math.floor((z+spanZ)/CAMERA_CELL_SIZE);j++){
+   const key=i+','+j;
+   let cell=index.get(key);
+   if(!cell){cell=[];index.set(key,cell);}
+   cell.push(building);
+  }
+ }
+}
+function clipCameraOrbit(dx,dy,dz,near){
+ const buildings=group?.userData.cameraBuildings;
+ if(!buildings?.size)return distance;
+ const reach=Math.min(near,CAMERA_MAX_CORRECTION/2);
+ const from=Math.max(4,distance-CAMERA_MAX_CORRECTION);
+ const scanStart=from-reach;
+ const scanEnd=distance+CAMERA_WALL_CLEARANCE;
+ const startX=target.x+dx*scanStart,endX=target.x+dx*scanEnd;
+ const startZ=target.z+dz*scanStart,endZ=target.z+dz*scanEnd;
+ const candidates=new Set(),gaps=[];
+ for(let x=Math.floor((Math.min(startX,endX)-CAMERA_WALL_CLEARANCE)/CAMERA_CELL_SIZE);x<=Math.floor((Math.max(startX,endX)+CAMERA_WALL_CLEARANCE)/CAMERA_CELL_SIZE);x++){
+  for(let z=Math.floor((Math.min(startZ,endZ)-CAMERA_WALL_CLEARANCE)/CAMERA_CELL_SIZE);z<=Math.floor((Math.max(startZ,endZ)+CAMERA_WALL_CLEARANCE)/CAMERA_CELL_SIZE);z++){
+   for(const building of buildings.get(x+','+z)||[]){
+    if(building.y+building.maxY+CAMERA_WALL_CLEARANCE>=target.y+dy*scanStart)candidates.add(building);
+   }
+  }
+ }
+ if(!candidates.size)return distance;
+ const ray=new THREE.Ray(),box=new THREE.Box3(),hit=new THREE.Vector3(),end=new THREE.Vector3();
+ for(const building of candidates){
+  const {x,y,z,c,s,minX,maxX,minY,maxY,minZ,maxZ}=building;
+  const ox=target.x-x,oz=target.z-z;
+  ray.origin.set(ox*c-oz*s,target.y-y,ox*s+oz*c);
+  ray.direction.set(dx*c-dz*s,dy,dx*s+dz*c);
+  box.min.set(minX,minY,minZ);box.max.set(maxX,maxY,maxZ);box.expandByScalar(CAMERA_WALL_CLEARANCE);
+  const inside=box.containsPoint(ray.origin);
+  if(!ray.intersectBox(box,hit))continue;
+  const entry=inside?0:hit.sub(ray.origin).dot(ray.direction);
+  if(entry>distance||entry<=1)continue;
+  // The reverse ray finds the rear face and excludes volumes already behind the near plane.
+  ray.at(distance+CAMERA_MAX_CORRECTION*3,end);
+  ray.origin.copy(end);ray.direction.negate();
+  if(!ray.intersectBox(box,hit))continue;
+  const exit=distance+CAMERA_MAX_CORRECTION*3-hit.sub(end).dot(ray.direction);
+  if(exit>=scanStart)gaps.push({entry,exit});
+ }
+ let available=distance;
+ gaps.sort((a,b)=>b.entry-a.entry);
+ for(const {entry,exit} of gaps){
+  if(entry<=available&&exit>=available-reach)available=entry-.15;
+ }
+ return available>=from?available:distance;
+}
 function updateCamera(){
  if(!camera)return;
  distance=clamp(Number.isFinite(distance)?distance:180,12,24000);
@@ -2274,13 +2335,15 @@ function updateCamera(){
  target.x=Number.isFinite(target.x)?target.x:0;
  target.z=Number.isFinite(target.z)?target.z:0;
  target.y=Number.isFinite(target.y)?target.y:0;
- const c=Math.cos(elevation),sn=Math.sin(elevation);
- camera.position.set(target.x+distance*Math.sin(azimuth)*c,target.y+distance*sn,target.z+distance*Math.cos(azimuth)*c);
+ const c=Math.cos(elevation),dy=Math.sin(elevation),dx=Math.sin(azimuth)*c,dz=Math.cos(azimuth)*c;
+ const near=Math.max(.65,Math.min(100,distance*.032));
+ const eye=clipCameraOrbit(dx,dy,dz,near);
+ camera.position.set(target.x+eye*dx,target.y+eye*dy,target.z+eye*dz);
  // Camera.up must remain Y-up: prevents inverted or sky-only views.
  camera.up.set(0,1,0);
  camera.lookAt(target.x,target.y,target.z);
  // Preserve depth precision for garden surfaces against the continental terrain.
- camera.near=Math.max(.65,Math.min(100,distance*.032));
+ camera.near=Math.min(near,Math.max(.65,eye*.032));
  camera.far=Math.max(48000,distance*5);
  camera.updateProjectionMatrix();camera.updateMatrixWorld(true);
 }
@@ -6122,6 +6185,7 @@ function* renderHouseStages(selected){
     }
   }
   const renderBatches=new Map();
+  const cameraBuildings=new Map();
   const spatialBatches=selected.length>=2000;
   for(const [key,batch] of batches.entries()){
     const texture=/homeGardenLawn/i.test(key)?'lawn':/(roof|gable|hip|towerTop|cornice)/i.test(key)?'roof':
@@ -6134,8 +6198,11 @@ function* renderHouseStages(selected){
     const premiumDetail=/^premiumTowerBalcony(Post|Bottom|SideCap)_/.test(key);
     const facadeDetail=spatialBatches&&/^arch[^_]*(ShutterSlat|WindowCross|WindowVertical)_/.test(key);
     const distantDetail=premiumDetail||facadeDetail;
+    const cameraSolid=/^(towerBase|towerRoof|towerCrownBase|towerCrownLantern|towerCrownSetback|penthouse|homeMainBody|homeMainRoof|homeWingBody|homeVillaEastBody|apartmentTiledRoof)_/.test(key);
+    if(cameraSolid&&!batch.geo.boundingBox)batch.geo.computeBoundingBox();
     const profile=[batch.geo.id,texture,normalStrength,roughness,metalness,casts,receives].join(':')+(distantDetail?':distantDetail':'');
     for(const entry of batch.entries){
+      if(cameraSolid)recordCameraBuilding(cameraBuildings,batch.geo.boundingBox,entry);
       // Dense cities cull whole neighborhoods instead of submitting every house.
       const span=distantDetail?120:368;
       const key=spatialBatches||distantDetail?profile+':'+Math.floor(entry.h.x/span)+':'+Math.floor(entry.h.z/span):profile;
@@ -6190,6 +6257,7 @@ function* renderHouseStages(selected){
     }else group.add(mesh);
     if(batch.entries[0].h)houseMeshes.push(mesh);
   }
+  group.userData.cameraBuildings=cameraBuildings;
   if(selected.length){
     const contactGeo=new THREE.PlaneGeometry(1,1);
     contactGeo.rotateX(-Math.PI/2);
@@ -6718,6 +6786,8 @@ function* progressiveDetailStages(tier,focus,output){
 // must never leave a city made only of garden fences.
 function renderFallbackHouses(selected){
  const geo=new THREE.BoxGeometry(1,1,1),dummy=new THREE.Object3D();
+ geo.computeBoundingBox();
+ const cameraBuildings=new Map();
  const batches=new Map();
  for(const h of selected){
   const tier=houseTier(h.points),fp=houseFootprint(h,tier),paint=housePaint(h);
@@ -6733,10 +6803,13 @@ function renderFallbackHouses(selected){
    dummy.position.set(h.x+Math.sin(a)*fp.offsetZ,(height+LOT_FOUNDATION_Y)/2,h.z+Math.cos(a)*fp.offsetZ);
    dummy.rotation.set(0,a,0);dummy.scale.set(fp.width,height-LOT_FOUNDATION_Y,fp.depth);
    dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);
+   const {x,y,z}=dummy.position;
+   recordCameraBuilding(cameraBuildings,geo.boundingBox,{x,y,z,w:fp.width,height:dummy.scale.y,d:fp.depth,rotation:a});
   });
   mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();
   mesh.userData.homes=items.map(e=>e.h);group.add(mesh);houseMeshes.push(mesh);
  }
+ group.userData.cameraBuildings=cameraBuildings;
 }
 function* staticTreeStages(){
  const batches=new Map(),part=new THREE.Matrix4(),matrix=new THREE.Matrix4(),color=new THREE.Color();
