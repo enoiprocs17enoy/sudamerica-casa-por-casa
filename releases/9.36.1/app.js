@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=3',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=4',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -1391,14 +1391,14 @@ function drawSurveyedCitySquare(profile,b){
   box(0xa9947a,side*(b.width/2-4.1),.345,0,.18,.025,b.depth-2.2,0,false);
  }
  for(let z=-b.depth/2+4;z<b.depth/2-2;z+=4.5)for(const side of [-1,1])box(0xb1a18b,side*(b.width/2-2.35),.345,z,3.3,.02,.05,0,false);
- polygon([root,...(profile.holes||[])],capitol?0x697070:profile.base==='lawn'?profile.green||0x76965c:0xd7c9b3,.42,false,true,profile.base==='lawn'?'lawn':'stone');
+ polygon([root,...(profile.holes||[])],capitol?0x697070:profile.base==='lawn'?profile.green||0x76965c:profile.continuousPaving?profile.stone:0xd7c9b3,.42,false,true,profile.base==='lawn'?'lawn':'stone');
  border(root,0xe2d6bf,.26,.15,.43);
  for(const surface of profile.surfaces||[]){
   const lawn=surface.kind==='lawn',water=surface.kind==='water';
   polygon(surface.rings,lawn?(profile.green||0x63894c):water?0x319bb5:0xddd0b8,lawn?.57:water?.53:.49,lawn||water,false,lawn?'lawn':water?'water':'stone');
  }
  // Distribute the flower budget around each bed rather than filling only the first edge.
- const lawns=(profile.surfaces||[]).filter(surface=>!profile.reviewed&&surface.kind==='lawn'&&surface.rings?.[0]?.length>3);
+ const lawns=(profile.surfaces||[]).filter(surface=>!profile.realGeometry&&surface.kind==='lawn'&&surface.rings?.[0]?.length>3);
  let blooms=0;const perBed=Math.max(1,Math.min(24,Math.floor(100/Math.max(1,lawns.length))));
  for(const surface of lawns){
   const ring=surface.rings[0],points=ring.map(fit.point),centre=points.reduce((p,q)=>({x:p.x+q.x/points.length,z:p.z+q.z/points.length}),{x:0,z:0});
@@ -1415,7 +1415,8 @@ function drawSurveyedCitySquare(profile,b){
  }
  const routes=profile.walkwayDetails?.length?profile.walkwayDetails:(profile.paths||[]).map(points=>({points}));
  const routeWidth=route=>Math.max(profile.reviewed?.24:.66,Math.min(2.35,(Number(route.widthMeters)||3)*scale));
- const validRoutes=capitol?[]:routes.filter(route=>route.points?.length>1&&route.points.every(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.z)));
+ // Network centerlines across a continuous paving surface are not visible stripes.
+ const validRoutes=capitol||profile.continuousPaving?[]:routes.filter(route=>route.points?.length>1&&route.points.every(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.z)));
  if((capitol||validRoutes.length)&&typeof document!=='undefined'){
   const canvas=document.createElement('canvas');
   canvas.width=b.width>27?512:256;canvas.height=b.depth>58?1024:512;
@@ -1484,6 +1485,24 @@ function drawSurveyedCitySquare(profile,b){
   for(const side of [-1,1]){part(0x344d48,side*.78,.59,0,.12,.62,.55);part(0x344d48,side*1.02,1.07,.02,.08,.14,.58);part(0x344d48,side*1.02,.98,-.22,.08,.50,.08);}
   return true;
  };
+ let mappedSurfaces;
+ const mappedGround=(x,z)=>{
+  mappedSurfaces??=(profile.surfaces||[]).map(surface=>({
+   kind:surface.kind,rings:(surface.rings||[]).map(ring=>ring.map(fit.point))
+  }));
+  let ground=.42;
+  for(const surface of mappedSurfaces){
+   let inside=false;
+   for(const ring of surface.rings)for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+    const a=ring[j],b=ring[i];
+    if((a.z>z)!==(b.z>z)&&x<a.x+(b.x-a.x)*(z-a.z)/(b.z-a.z))inside=!inside;
+   }
+   if(!inside)continue;
+   if(surface.kind==='water')return null;
+   ground=Math.max(ground,surface.kind==='lawn'?.57:.49);
+  }
+  return ground;
+ };
  const mappedSeats=[];
  const seats=(profile.benches||[]).filter(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.z));
  if(profile.realGeometry&&seats.length){
@@ -1493,15 +1512,6 @@ function drawSurveyedCitySquare(profile,b){
    const points=route.points.map(fit.point),radius=(routeWidth(route)+.15)/2;
    return points.slice(1).map((b,i)=>({a:points[i],b,radius}));
   });
-  const surfaces=(profile.surfaces||[]).map(surface=>({kind:surface.kind,rings:(surface.rings||[]).map(ring=>ring.map(fit.point))}));
-  const insideRing=(x,z,ring)=>{
-   let inside=false;
-   for(let i=0,j=ring.length-1;i<ring.length;j=i++){
-    const a=ring[j],b=ring[i];
-    if((a.z>z)!==(b.z>z)&&x<a.x+(b.x-a.x)*(z-a.z)/(b.z-a.z))inside=!inside;
-   }
-   return inside;
-  };
   for(const seat of positions){
    const {x,z}=seat;
    let nearest=null,distance=Infinity;
@@ -1530,13 +1540,8 @@ function drawSurveyedCitySquare(profile,b){
     return true;
    });
    if(onRoute)continue;
-   let ground=.42,water=false;
-   for(const surface of surfaces){
-    if(!surface.rings.reduce((inside,ring)=>inside!==insideRing(x,z,ring),false))continue;
-    if(surface.kind==='water'){water=true;break;}
-    ground=Math.max(ground,surface.kind==='lawn'?.57:.49);
-   }
-   if(!water&&bench(x,z,angle,size,ground,1.45*size)){
+   const ground=mappedGround(x,z);
+   if(ground!==null&&bench(x,z,angle,size,ground,1.45*size)){
     mappedSeats.push({...placedBenches.at(-1),size});
    }
   }
@@ -1562,8 +1567,8 @@ function drawSurveyedCitySquare(profile,b){
    const color=[0xd99ac4,0xf2cc72,0xf5d9d4][(k+seed)%3];for(let petal=0;petal<4;petal++){const a=petal*Math.PI/2;put('leaf',color,x+dx+Math.sin(a)*.095,1.20,z+dz+Math.cos(a)*.095,.10,.065,.10);}
   }
  };
- // Detailed perimeter promenade integrates irregular map footprints into the street block.
- for(const side of [-1,1])for(let i=0;i<7;i++){
+ // Furnish generated plazas while keeping mapped footprints source-driven.
+ if(!profile.realGeometry)for(const side of [-1,1])for(let i=0;i<7;i++){
   const z=-b.depth*.36+i*b.depth*.12,x=side*(b.width/2-2.1);
   if(profile.openStoneSquare){if(i%3===1)lamp(x,z);}
   else if(i%2===0)lamp(x,z);
@@ -1574,15 +1579,18 @@ function drawSurveyedCitySquare(profile,b){
  const treePositions=[];
  for(const p of profile.trees||[]){
   const q=fit.point(p);
-  if(Math.abs(q.x)<b.width/2-2&&Math.abs(q.z)<b.depth/2-3)treePositions.push({...q,leafType:p.leafType});
+  if(Math.abs(q.x)<b.width/2-2&&Math.abs(q.z)<b.depth/2-3)treePositions.push({...q,leafType:p.leafType,mapped:profile.realGeometry});
  }
- if(!treePositions.length&&!profile.reviewed&&!profile.openStoneSquare)for(const side of [-1,1])for(let i=0;i<5;i++)treePositions.push({x:side*(b.width/2-3.5),z:-b.depth*.32+i*b.depth*.16});
- const maxTrees=Math.min(72,treePositions.length);
+ if(!treePositions.length&&!profile.realGeometry&&!profile.openStoneSquare)for(const side of [-1,1])for(let i=0;i<5;i++)treePositions.push({x:side*(b.width/2-3.5),z:-b.depth*.32+i*b.depth*.16});
+ const maxTrees=Math.min(72,treePositions.length),mappedTrees=[];
  for(let i=0;i<maxTrees;i++){
   const p=treePositions[Math.floor(i*treePositions.length/maxTrees)],x=p.x,z=p.z;
-  if(!clearDetail(x,z,1.65))continue;
-  const size=.79+rnd(x*43+z*31+17)*.46;
-  const crownY=height=>plazaTop+(height-plazaTop)*size;
+  const treeScale=p.mapped?Math.min(1,scale):1;
+  const ground=p.mapped?mappedGround(x,z):plazaTop;
+  if(ground===null||!clearDetail(x,z,1.65*treeScale))continue;
+  const size=(.79+rnd(x*43+z*31+17)*.46)*treeScale;
+  if(p.mapped)mappedTrees.push({x,z,size});
+  const crownY=height=>ground+(height-plazaTop)*size;
   const tree=(type,color,dx,height,dz,w,h,d,angle=0)=>put(type,color,x+dx*size,crownY(height),z+dz*size,w*size,h*size,d*size,angle);
   if(palmCity&&p.leafType!=='broadleaved'&&p.leafType!=='needleleaved'){
    tree('round',0x88704e,0,(5.15+plazaTop)/2,0,.22,5.15-plazaTop,.22);
@@ -1598,9 +1606,10 @@ function drawSurveyedCitySquare(profile,b){
    }
   }
  }
- // Extra space around square or compact outlines becomes furnished terraces.
+ group.userData.squareMappedTrees=mappedTrees;
+ // Furnish terraces in the free space around generated outlines.
  const gap=(b.depth-fit.depth)/2;
- if(gap>12&&!profile.openStoneSquare)for(const side of [-1,1]){
+ if(gap>12&&!profile.realGeometry&&!profile.openStoneSquare)for(const side of [-1,1]){
   const z=side*(fit.depth/2+gap*.51);
   box(0xdccbb0,0,.40,z,12,.10,6.5,0,false);
   for(const x of [-4.7,4.7])bench(x,z,side<0?0:Math.PI);
@@ -1609,28 +1618,6 @@ function drawSurveyedCitySquare(profile,b){
    for(const x of [-5.7,5.7])for(const dz of [-2.6,2.6])box(0x92724e,x,2.03,z+dz,.20,3.3,.20);
    for(let slat=-8;slat<=8;slat++)box(slat%2?0xc8a778:0xb48a5f,slat*.70,3.79,z,.16,.17,5.9);
    for(const dz of [-2.75,2.75])box(0x98744c,0,3.61,z+dz,12,.20,.24);
-  }
- }
- // Side gardens fill unused parcel space beyond a surveyed outline, never inside it.
- if(profile.realGeometry&&!profile.openStoneSquare&&(fit.width<b.width*.70||fit.depth<b.depth*.70)){
-  const edge=root.map(fit.point);
-  const outside=(x,z,radius)=>{
-   let within=false;
-   for(let i=0,j=edge.length-1;i<edge.length;j=i++){
-    const a=edge[j],p=edge[i],dx=p.x-a.x,dz=p.z-a.z;
-    const u=Math.max(0,Math.min(1,((x-a.x)*dx+(z-a.z)*dz)/(dx*dx+dz*dz||1)));
-    if(Math.hypot(x-a.x-u*dx,z-a.z-u*dz)<radius)return false;
-    if((a.z>z)!==(p.z>z)&&x<a.x+(z-a.z)*dx/dz)within=!within;
-   }
-   return !within;
-  };
-  for(const side of [-1,1])for(const end of [-1,1]){
-   const x=side*b.width*.31,z=end*b.depth*.23,w=Math.min(5.9,b.width*.16),d=Math.min(10,b.depth*.15);
-   if(!outside(x,z,Math.hypot(w,d)*.5+.9)||!clearDetail(x,z,Math.hypot(w,d)*.5))continue;
-   put('round',0xd9cebb,x,.405,z,w+.24,.15,d+.24,0,false);
-   put('round',profile.green||0x63894c,x,.49,z,w,.13,d,0,false);
-   planter(x,z,side===end?2:4);
-   bench(x-side*(w*.5+.8),z,side*Math.PI/2);
   }
  }
  if(profile.localDesign&&profile.fountain){
@@ -1647,7 +1634,7 @@ function drawSurveyedCitySquare(profile,b){
    }
   }
  }
- for(const side of [-1,1]){
+ if(!profile.realGeometry)for(const side of [-1,1]){
   const x=side*(b.width/2-2.1),z=b.depth*.405;
   put('round',0x42796a,x,(1.45+plazaTop)/2,z,.56,1.45-plazaTop,.56);put('round',0x2e5149,x,1.50,z,.63,.12,.63);
  }
