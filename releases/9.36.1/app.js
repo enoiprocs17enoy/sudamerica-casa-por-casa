@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=12',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=13',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -1406,8 +1406,8 @@ function drawSurveyedCitySquare(profile,b){
  border(root,0xe2d6bf,.26,.15,.43);
  // Context surfaces preserve separately mapped ground outside the plaza outline.
  for(const surface of profile.contextSurfaces||[]){
-  const lawn=surface.kind==='lawn';
-  polygon(surface.rings,lawn?(profile.green||0x63894c):paving,.42,false,true,lawn?'lawn':'stone');
+  const lawn=surface.kind==='lawn',water=surface.kind==='water';
+  polygon(surface.rings,lawn?(profile.green||0x63894c):water?0x319bb5:paving,.42,false,true,lawn?'lawn':water?'water':'stone');
  }
  for(const surface of profile.surfaces||[]){
   const lawn=surface.kind==='lawn',water=surface.kind==='water';

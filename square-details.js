@@ -1,7 +1,7 @@
 /* Source-driven 3D square details. Models are stylised reconstructions, not scans. */
 (function(){
 'use strict';
-const MODEL_SPECS={'iquique-naval-monument':{height:13.3,width:8.2,depth:8.2},'floral-calendar':{height:1.2,width:8},'arenales-ensemble':{height:11,width:10},'freedom-chains':{height:7,width:5},pyramid:{height:13,width:7},obelisk:{height:10,width:3},column:{height:10,width:4},'liberty-column':{height:13,width:6},equestrian:{height:8,width:7},'equestrian-fountain':{height:8,width:9},'standing-sword':{height:7,width:4},'standing-civil':{height:10,width:7},'ornate-fountain':{height:7,width:9},'liberty-fountain':{height:7,width:8},fountain:{height:3,width:6},bust:{height:4,width:3},plaque:{height:1.5,width:2},'classical-figure':{height:3,width:2}};
+const MODEL_SPECS={'verrazzano-memorial':{height:7.2,width:4.3,depth:4.3},herterichsbrunnen:{height:5.1,width:7.7,depth:7.7,parcelWidth:.5},'iquique-naval-monument':{height:13.3,width:8.2,depth:8.2},'floral-calendar':{height:1.2,width:8},'arenales-ensemble':{height:11,width:10},'freedom-chains':{height:7,width:5},pyramid:{height:13,width:7},obelisk:{height:10,width:3},column:{height:10,width:4},'liberty-column':{height:13,width:6},equestrian:{height:8,width:7},'equestrian-fountain':{height:8,width:9},'standing-sword':{height:7,width:4},'standing-civil':{height:10,width:7},'ornate-fountain':{height:7,width:9},'liberty-fountain':{height:7,width:8},fountain:{height:3,width:6},bust:{height:4,width:3},plaque:{height:1.5,width:2},'classical-figure':{height:3,width:2}};
 MODEL_SPECS['accademia-conegliano']={height:15,width:32,depth:18,parcelWidth:.80};
 MODEL_SPECS['stone-sphinx']={height:3.15,width:3.6};
 MODEL_SPECS['hallstatt-trinity-column']={height:6.1,width:3.4};
@@ -897,6 +897,22 @@ function render(plan,group,b){
     limb(at(0,billY,billZ),at(0,.62,4.55),.033,water,'water');
     limb(at(0,4.50,.76),at(0,.62,4.36),.035,water,'water');
    }
+  }else if(model==='verrazzano-memorial'){
+   const travertine=0xb9ae96;
+   steps(0,4.3);
+   box(travertine,0,1.11,0,3.16,.94,3.16);
+   box(travertine,0,2.33,0,2.26,1.62,2.16);
+   box(marble,0,3.21,0,2.54,.24,2.45);
+   plaque(2.15,1.38,1.1);
+   human(0,3.33,0,1.45,'civil',0x38534a);
+  }else if(model==='herterichsbrunnen'){
+   const sandstone=0xbdac8b;
+   add('herterich-basin','stone',sandstone,0,0,0,1,1,1);
+   cylinder(water,0,.67,0,3.22,.09,'water');
+   cylinder(sandstone,0,1.06,0,.89,.88);
+   cylinder(sandstone,0,2.27,0,.36,2.25);
+   cylinder(sandstone,0,3.38,0,.63,.27);
+   human(0,3.51,0,.60,'sword',sandstone);
   }else if(model==='iquique-naval-monument'){
    const granite=0xada59d,trim=0xc1b8a9,patina=0x48675d;
    steps(0,8.2);
@@ -1146,6 +1162,11 @@ function render(plan,group,b){
   }
   outline.closePath();
   geos['flag-star']=new T.ExtrudeGeometry(outline,{depth:1,bevelEnabled:false}).translate(0,0,-.5);
+ }
+ if(parts.some(part=>part.kind==='herterich-basin')){
+  const basin=[[0,0],[3.85,0],[3.85,.18],[3.68,.25],[3.59,.99],[3.73,1.05],
+   [3.73,1.23],[3.26,1.23],[3.26,.44],[0,.44]];
+  geos['herterich-basin']=new T.LatheGeometry(basin.map(([radius,y])=>new T.Vector2(radius,y)),12);
  }
  if(parts.some(part=>part.kind==='cistern-stonework')){
   const profile=[[0,0],[2.25,0],[2.25,.14],[1.98,.14],[1.98,.28],[1.70,.28],[1.70,.44],
