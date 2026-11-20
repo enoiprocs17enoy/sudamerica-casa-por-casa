@@ -9,6 +9,7 @@ MODEL_SPECS['suzhou-jinji-lake-fountain']={height:65,width:140,depth:200,parcelW
 MODEL_SPECS['tehran-azadi-tower']={height:45,width:70,depth:42,parcelWidth:.48};
 MODEL_SPECS['tunis-clock-tower']={height:37.5,width:28,depth:28,parcelWidth:.65};
 MODEL_SPECS['tunis-bourguiba-equestrian']={height:8.95,width:4.8,depth:5.4,parcelWidth:.32};
+MODEL_SPECS['algiers-emir-abdelkader']={height:11.4,width:12.1,depth:13.1,parcelWidth:.62};
 MODEL_SPECS['fray-bentos-bandstand']={height:6.2,width:7.5,depth:7.5};
 MODEL_SPECS['paraitinga-bandstand']={height:5.6,width:7.5,depth:7.5};
 MODEL_SPECS['accademia-conegliano']={height:15,width:32,depth:18,parcelWidth:.80};
@@ -27,6 +28,8 @@ MODEL_SPECS['mumbai-martyrs-memorial']={height:6.5,width:4.24,depth:3.54};
 MODEL_SPECS['bengaluru-freedom-park-watchtower']={height:10.7,width:6.6,depth:6.6};
 MODEL_SPECS['bengaluru-freedom-park-block-east']={height:5.4,width:61.065,depth:7.428,parcelWidth:.76};
 MODEL_SPECS['bengaluru-freedom-park-block-southeast']={height:5.4,width:49.445,depth:7.896,parcelWidth:.76};
+MODEL_SPECS['lucknow-hussainabad-clock']={height:67.3608,width:8.75,depth:8.75,parcelWidth:.35};
+MODEL_SPECS['lucknow-hussainabad-tank']={height:3.36,width:104,depth:116,parcelWidth:.70};
 MODEL_SPECS['pune-bajirao-equestrian']={height:7.39,width:9.63,depth:10.19,parcelWidth:.36};
 MODEL_SPECS['pune-shaniwarwada-stage']={height:1.26,width:21.52,depth:11.33,parcelWidth:.62};
 MODEL_SPECS['pune-dilli-darwaza']={height:13.5,width:29.45,depth:19.82,parcelWidth:.70};
@@ -41,6 +44,9 @@ Object.assign(MODEL_SPECS,{
  'bangkok-rama-iii':{height:6.35,width:8.4,depth:6.4,parcelWidth:.26,minimumScale:.04},
  'miami-pepper-fountain':{height:13.2,width:48.35,depth:48.35,parcelWidth:.62,minimumScale:.04},
  'miami-slide-mantra':{height:3.20,width:5.6,depth:5.6,parcelWidth:.25,minimumScale:.04},
+ 'new-orleans-jackson-equestrian':{height:6.15,width:4.6,depth:5.4,parcelWidth:.26,minimumScale:.04},
+ 'new-orleans-st-louis-cathedral':{height:52.4,width:30.49,depth:59.21,parcelWidth:.48,minimumScale:.04},
+ 'jeju-sanjicheon-gallery':{height:14.6,width:30.72,depth:15.44,parcelWidth:.45,minimumScale:.04},
  'dhaka-tower-of-light':{height:45.72,width:12.02,depth:10.51,parcelWidth:.40,minimumScale:.035},
  'hongshan-dong-biwu':{height:5.9,width:4.1,depth:3.5},
  'kindi-mosque-ensemble':{height:25,width:82.64,depth:69.49,parcelWidth:.85},
@@ -105,6 +111,7 @@ Object.assign(MODEL_SPECS,{
  'taksim-mosque':{height:64.8,width:94.14,depth:50.90,parcelWidth:.66},
  'taksim-republic-monument':{height:11,width:17,depth:17,parcelWidth:.45},
  'haizhu-liberation-monument':{height:11.5,width:10.2,depth:10.2,parcelWidth:.45},
+ 'pohang-homigot-lighthouse':{height:26.4,width:8.4,depth:8.4,parcelWidth:.26},
  'tianjin-century-clock':{height:40,width:19,depth:8.4,parcelWidth:.55},
  'copenhagen-dragon-fountain':{height:5.3,width:14,depth:14,parcelWidth:.42},
  'gdansk-neptune-fountain':{height:6.1,width:6.6,depth:6.6},
@@ -128,6 +135,10 @@ Object.assign(MODEL_SPECS,{
  'lahore-hazuri-baradari':{height:5.23,width:21.66,depth:21.66,parcelWidth:.62},
  'islamabad-monument-petals':{height:17.7,width:68.1,depth:55.6,parcelWidth:.68},
  'registan-ulugh-beg':{height:34.7,width:58.71,depth:87.33,parcelWidth:.86},
+ 'lusaka-mwanawasa-mausoleum':{height:6.4,width:15.43,depth:15.92,parcelWidth:.52},
+ 'lusaka-sata-mausoleum':{height:9.2,width:17.16,depth:14.88,parcelWidth:.52},
+ 'lusaka-chiluba-mausoleum':{height:7.9,width:15.89,depth:21.07,parcelWidth:.54},
+ 'harare-unity-fountain':{height:4.32,width:20.9,depth:20.9,parcelWidth:.56},
  'registan-sher-dor':{height:32,width:60.23,depth:71.79,parcelWidth:.86},
  'registan-tilla-kari':{height:30,width:78.71,depth:73.87,parcelWidth:.86},
  'islamabad-unity-pillars':{height:4.7,width:17,depth:17,parcelWidth:.36},
@@ -158,6 +169,8 @@ Object.assign(MODEL_SPECS,{
  'malaga-torrijos-obelisk':{height:17,width:10.11,depth:10.11,parcelWidth:.54},
  'malaga-seated-picasso':{height:1.4,width:1.95,depth:1.1},
  'valencia-city-hall-fountain':{height:4.4,width:20,depth:20,parcelWidth:.54},
+ 'cordoba-tendillas-captain-fountain':{height:8.29,width:19.29,depth:19.29,parcelWidth:.56},
+ 'cordoba-tendillas-floor-jets':{height:1.72,width:9.13,depth:9.13,parcelWidth:.45},
  'valencia-vinatea':{height:8.3,width:2.47,depth:2.47},
  'alicante-luceros-fountain':{height:15,width:20,depth:20,parcelWidth:.72},
  'cuenca-calderon-monument':{height:6.5,width:3.9,depth:3.9},
@@ -392,7 +405,8 @@ function render(plan,group,b){
    }
   }
  };
- const horse=(y=0,gesture='reins')=>{
+ const horse=(y=0,gesture='reins',head=bronze)=>{
+  const headMaterial=head===marble?'stone':'metal';
   sphere(bronze,0,y+1.65,0,.62,.70,1.48);sphere(bronze,0,y+1.70,.92,.48,.63,.53);
   limb([0,y+1.75,.83],[0,y+2.77,1.17],.41);sphere(bronze,0,y+2.91,1.33,.34,.40,.58);sphere(bronze,0,y+2.77,1.73,.29,.26,.37);
   for(const side of [-1,1]){
@@ -402,7 +416,7 @@ function render(plan,group,b){
   limb([0,y+1.95,-1.30],[.20,y+1.29,-1.63],.15);limb([.20,y+1.29,-1.63],[.25,y+.57,-1.69],.12);
   box(0x455b52,0,y+2.23,-.13,.92,.14,1.23,'metal');
   // Rider, breeches and reins are separate volumes rather than a box on the horse.
-  sphere(bronze,0,y+3.10,-.12,.39,.56,.24);sphere(bronze,0,y+3.86,-.10,.23,.28,.22);
+  sphere(bronze,0,y+3.10,-.12,.39,.56,.24);sphere(head,0,y+3.86,-.10,.23,.28,.22,headMaterial);
   const raisedArm=['pointing','flag','charter','salute'].includes(gesture);
   for(const side of [-1,1]){
    limb([side*.23,y+2.72,-.15],[side*.64,y+2.37,.32],.14);limb([side*.64,y+2.37,.32],[side*.67,y+1.64,.28],.105);
@@ -437,7 +451,7 @@ function render(plan,group,b){
    sphere(bronze,-.74,y+4.59,.66,.104,.15,.058);
    sphere(bronze,-.635,y+4.54,.65,.048,.084,.045);
   }
-  sphere(bronze,0,y+4.12,-.10,.35,.11,.27);
+  sphere(head,0,y+4.12,-.10,.35,.11,.27,headMaterial);
  };
  const basin=(r=3.2,y=0)=>{cylinder(stone,0,y+.20,0,r,.38);ring(stone,0,y+.44,0,r,.13,'stone');cylinder(water,0,y+.40,0,r*.91,.045,'water');};
  const jet=(x,y,z,height,radius=.65)=>{
@@ -736,6 +750,56 @@ function render(plan,group,b){
    horse(4.10,'salute');
    return;
   }
+  if(model==='algiers-emir-abdelkader'){
+   const figure=0x48504a,relief=0x585146,pedestal=0xafaa9f,trim=0xc9c1b1,fountain=0x74a5ad;
+   box(trim,0,.18,0,5.55,.36,6.65);
+   box(pedestal,0,2.66,0,3.85,4.66,4.68);
+   box(trim,0,5.11,0,4.17,.26,5.06);
+   for(const side of [-1,1]){
+    box(relief,side*1.94,2.88,0,.11,1.7,3.65);
+    for(const z of [-1.23,0,1.23]){
+     sphere(trim,side*2.012,2.74,z,.075,.22,.39,'stone');
+     limb([side*2.01,2.79,z+.2],[side*2.01,3.14,z+.45],.078,trim,'stone');
+     sphere(trim,side*2.01,3.29,z-.09,.06,.29,.11,'stone');
+     sphere(trim,side*2.01,3.57,z-.06,.06,.12,.089,'stone');
+    }
+   }
+   const y=5.24;
+   const at=(x,rise,z)=>[x,y+rise,z];
+   const cast=(a,b,width)=>limb(at(...a),at(...b),width,figure);
+   cast([0,1.22,-1.01],[0,2.39,.77],.64);
+   sphere(figure,...at(0,2.19,.35),.68,.72,.93);
+   cast([0,2.35,.72],[0,3.17,1.31],.38);
+   sphere(figure,...at(0,3.25,1.52),.32,.32,.48);
+   sphere(figure,...at(0,3.08,1.90),.24,.24,.34);
+   for(const side of [-1,1]){
+    cast([side*.39,1.30,-1.0],[side*.46,.59,-.84],.17);
+    cast([side*.46,.59,-.84],[side*.51,.10,-1.12],.12);
+    cast([side*.42,2.30,.71],[side*.49,1.91,1.25],.16);
+    cast([side*.49,1.91,1.25],[side*.50,1.59,1.66],.105);
+    cast([side*.17,2.98,.24],[side*.55,2.24,.43],.14);
+    add('cone','metal',figure,side*.15,y+3.59,1.42,.10,.44,.11);
+   }
+   cast([0,1.47,-1.29],[.30,.68,-1.84],.13);
+   sphere(figure,...at(0,3.57,.19),.40,.67,.29);
+   sphere(figure,...at(0,4.35,.20),.31,.38,.26);
+   add('cape','metal',figure,0,y+3.39,-.20,1.03,1.9,.43);
+   cast([-.34,3.89,.23],[-.48,3.54,.72],.11);
+   cast([-.48,3.54,.72],[-.26,3.23,1.19],.081);
+   cast([.34,3.88,.25],[.59,4.28,.31],.11);
+   cast([.59,4.28,.31],[.66,4.72,.34],.085);
+   cast([.65,4.66,.33],[.70,5.66,.51],.052);
+   cast([.70,5.66,.51],[.77,6.0,.68],.036);
+   // Relaid ground-level water zones flank the monument. Their nozzle spacing is schematic.
+   for(const side of [-1,1]){
+    box(0xaaa99d,side*4.95,.09,6.65,2.15,.18,6.2);
+    box(fountain,side*4.95,.193,6.65,1.69,.035,5.75,'water');
+    for(const z of [4.3,5.45,6.6,7.75,8.9]){
+     limb([side*4.95,.20,z],[side*4.87,1.06,z+.08],.04,0xc0d8da,'water');
+    }
+   }
+   return;
+  }
   if(model==='floral-calendar'){
    box(stone,0,.12,0,8,.24,4);box(0x426d38,0,.29,0,7.65,.14,3.65);
    const digits=new Intl.DateTimeFormat('en-GB',{timeZone:'America/Argentina/Buenos_Aires',day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date());
@@ -1010,6 +1074,99 @@ function render(plan,group,b){
    for(let step=0;step<8;step++){
     box(shade,-.45,.18+.11*step,-1.85+.17*step,.76,.23+.22*step,.25);
    }
+  }else if(model==='new-orleans-jackson-equestrian'){
+   const iron=0x53594b,granite=0xbdb2a0,cut=0xa49a89;
+   box(granite,0,.22,0,4.6,.44,5.1);
+   box(cut,0,.54,0,3.85,.22,4.38);
+   box(granite,0,1.54,0,2.56,1.86,3.48);
+   box(granite,0,2.59,0,2.88,.27,3.80);
+   box(iron,0,2.76,0,1.54,.09,2.34,'metal');
+   const pitch=new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),-.65);
+   add('sphere','metal',iron,0,3.86,.02,.39,.47,1.02,pitch);
+   sphere(iron,0,3.36,-.56,.43,.48,.48,'metal');
+   limb([0,4.32,.62],[0,5.20,.98],.26,iron);
+   limb([0,5.20,.98],[0,5.02,1.48],.22,iron);
+   limb([0,3.55,-.87],[0,3.13,-1.27],.12,iron);
+   limb([0,3.13,-1.27],[0,2.86,-1.13],.09,iron);
+   for(const side of [-1,1]){
+    limb([side*.26,3.61,-.56],[side*.35,3.16,-.37],.12,iron);
+    limb([side*.35,3.16,-.37],[side*.38,2.84,-.87],.09,iron);
+    box(iron,side*.38,2.83,-.86,.18,.13,.20,'metal');
+    limb([side*.27,4.08,.62],[side*.38,4.23,1.18],.13,iron);
+    limb([side*.38,4.23,1.18],[side*.38,3.87,1.43],.08,iron);
+    limb([side*.15,5.18,.99],[side*.19,5.43,1.00],.057,iron);
+    limb([side*.24,4.37,-.33],[side*.43,4.04,.04],.13,iron);
+    limb([side*.43,4.04,.04],[side*.47,3.74,-.10],.09,iron);
+   }
+   limb([0,4.36,-.35],[0,5.27,-.57],.29,iron);
+   sphere(iron,0,5.52,-.53,.21,.26,.20,'metal');
+   limb([-.21,5.15,-.48],[-.42,4.91,-.18],.10,iron);
+   limb([-.42,4.91,-.18],[-.32,4.88,.24],.082,iron);
+   limb([.22,5.17,-.48],[.59,5.20,-.22],.10,iron);
+   limb([.59,5.20,-.22],[.91,5.65,-.15],.086,iron);
+   box(iron,.96,5.73,-.14,.53,.10,.26,'metal');
+   box(iron,.96,5.90,-.14,.35,.28,.18,'metal');
+  }else if(model==='new-orleans-st-louis-cathedral'){
+   const cream=0xe3d9c1,trim=0xf3ebd7,slate=0x4b5457,glass=0x4d5c65;
+   box(cream,0,.70,0,28.4,1.40,57.2);
+   box(cream,0,9.3,-1.35,24.7,16.7,53.7);
+   add('pediment','stone',slate,0,20.00,-1.7,25.65,6.95,53.45);
+   box(cream,0,10.7,26.0,29.6,20.0,5.2);
+   box(trim,0,20.8,26.6,30.2,1.05,5.7);
+   add('pediment','stone',cream,0,24.05,27.20,16.5,6.15,3.25);
+   for(const x of [-10.7,10.7]){
+    box(cream,x,23.40,23.2,6.50,14.0,7.1);
+    box(trim,x,30.48,23.2,7.1,.88,7.7);
+    add('cone','stone',slate,x,35.44,23.2,3.63,9.03,3.63);
+    box(slate,x,40.10,23.2,.24,1.30,.24,'metal');
+    box(slate,x,40.43,23.2,.85,.23,.23,'metal');
+    box(glass,x,24.90,26.77,1.45,4.36,.18,'glass');
+   }
+   box(cream,0,27.0,22.0,7.7,16,7.8);
+   box(trim,0,35.25,22.0,8.30,.70,8.35);
+   cylinder(cream,0,38.64,22.0,3.49,6.05);
+   add('cone','stone',slate,0,46.34,22.0,3.76,9.34,3.76);
+   box(slate,0,51.45,22.0,.27,1.90,.27,'metal');
+   box(slate,0,51.76,22.0,1.30,.28,.28,'metal');
+   const verticalFace=new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),Math.PI/2);
+   add('cylinder','stone',trim,0,29.6,25.96,1.61,.20,1.61,verticalFace);
+   box(slate,0,29.96,26.09,.13,.83,.14,'metal');
+   box(slate,.34,29.60,26.09,.69,.14,.14,'metal');
+   for(const x of [-7.5,0,7.5]){
+    box(glass,x,4.30,28.68,2.9,6.3,.26,'glass');
+    sphere(glass,x,7.27,28.72,1.45,1.45,.20,'glass');
+    box(glass,x,13.2,28.72,2.3,4.6,.20,'glass');
+   }
+   for(const x of [-13,-5.25,5.25,13]){
+    box(trim,x,9.0,28.90,.88,15.80,.58);
+   }
+   for(const side of [-1,1])for(const z of [-22,-14,-6,2,10,18]){
+    box(glass,side*12.39,10.30,z,.16,5.2,2.41,'glass');
+    box(trim,side*12.55,7.56,z,.34,.40,2.7);
+   }
+  }else if(model==='jeju-sanjicheon-gallery'){
+   const white=0xdbded6,rust=0x8c4f39, dark=0x394042,glass=0x668183;
+   box(0xa29f95,0,.16,0,30.40,.32,15.1);
+   box(white,-8.22,5.20,-.52,12.95,9.84,13.85);
+   box(white,-8.22,10.17,-.52,13.25,.30,14.17);
+   box(rust,7.61,5.76,.04,14.95,11.20,14.54);
+   box(rust,7.61,11.44,.04,15.20,.32,14.76);
+   box(dark,-.57,4.83,-.68,2.55,9.25,11.90);
+   box(glass,-.57,3.7,5.37,2.15,6.64,.23,'glass');
+   box(glass,7.72,2.63,7.35,12.6,4.15,.22,'glass');
+   for(const x of [1.42,4.57,7.72,10.87,14.02]){
+    box(dark,x,2.63,7.47,.11,4.35,.12,'metal');
+   }
+   for(const y of [5.46,7.22,8.98,10.75]){
+    box(0x79503f,7.63,y,7.41,14.76,.045,.13,'metal');
+   }
+   for(const x of [-12.32,-8.17,-4.02]){
+    for(const y of [3.05,6.05,8.30]){
+     box(glass,x,y,6.48,1.58,1.71,.14,'glass');
+    }
+   }
+   box(dark,-5.1,11.95,-3.52,1.06,3.65,.97);
+   box(dark,-5.1,14.10,-3.52,.69,.85,.69,'metal');
   }else if(model==='dhaka-tower-of-light'){
    const finish=[0x9ac0bc,0xa9cecb,0x83aaa9];
    box(0x949a91,0,.48,0,12.02,.96,10.51);
@@ -1424,6 +1581,34 @@ function render(plan,group,b){
     sphere(trim,x,y,z,.18,.20,.17,'stone');
    }
    sphere(shade,-.56,8.02,-.69,.81,1.22,.56,'stone');
+  }else if(model==='pohang-homigot-lighthouse'){
+   const plaster=0xe9e5db,trim=0xf2eee2,glass=0x3c4a4a,iron=0x313738;
+   const octagon=(kind,color,y,radius,height,material='stone')=>add(kind,material,color,0,y,0,radius,height,radius);
+   octagon('homigot-octagon',0xbdbbb3,.12,4.20,.24);
+   octagon('homigot-tower',plaster,0,1,1);
+   octagon('homigot-octagon',trim,20.56,3.32,.61);
+   octagon('homigot-octagon',trim,21.03,3.24,.37);
+   ring(iron,0,21.94,0,2.98,.055);
+   for(let i=0;i<16;i++){
+    const angle=i*Math.PI/8;
+    cylinder(iron,Math.sin(angle)*2.98,21.55,Math.cos(angle)*2.98,.055,.78,'metal');
+   }
+   octagon('homigot-octagon',glass,23.13,2.09,3.79,'metal');
+   for(let i=0;i<8;i++){
+    const angle=i*Math.PI/4+Math.PI/8;
+    cylinder(trim,Math.sin(angle)*2.12,23.13,Math.cos(angle)*2.12,.088,3.79);
+   }
+   octagon('homigot-octagon',iron,25.06,2.20,.22,'metal');
+   add('cone','metal',iron,0,25.67,0,2.22,1.00,2.22);
+   sphere(iron,0,26.27,0,.13,.13,.13);
+   box(0x82776d,0,1.97,3.60,1.40,3.00,.17);
+   for(const x of [-.89,.89])box(trim,x,1.97,3.66,.28,3.30,.36);
+   box(trim,0,3.65,3.62,2.07,.24,.46);
+   limb([-.99,3.76,3.78],[0,4.33,3.78],.11,trim,'stone');
+   limb([0,4.33,3.78],[.99,3.76,3.78],.11,trim,'stone');
+   for(const [x,y,z] of [[0,8.1,-3.02],[2.93,12.5,0],[-2.74,16.2,0],[0,18.7,2.63]]){
+    box(glass,x,y,z,x===0?.58:.14,1.0,z===0?.58:.14,'metal');
+   }
   }else if(model==='tianjin-century-clock'){
    const brass=0xc3a15e,copper=0x775f40,steel=0x636d72,ivory=0xe7dfcb,ink=0x33312b;
    const flat=new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),Math.PI/2);
@@ -2818,6 +3003,41 @@ function render(plan,group,b){
    box(highlight,-.48,.747,.30,.257,.011,.218,'patina');
    limb([-.48,.754,.197],[-.48,.755,.401],.006,patina,'patina');
    limb([-.49,.747,.35],[-.38,.774,.43],.012,0x817a63,'patina');
+  }else if(model==='cordoba-tendillas-captain-fountain'){
+   const granite=0x9c6d5b,trim=0xc09782,foot=0xcec1b2,bronzePlaque=0x62514b,waterTint=0x6ab6c9;
+   box(foot,0,.21,0,4.17,.42,5.59);
+   box(granite,0,.64,0,3.94,.45,5.14);
+   box(trim,0,.92,0,3.65,.19,4.82);
+   box(granite,0,2.23,0,2.94,2.45,4.12);
+   box(trim,0,3.53,0,3.16,.26,4.40);
+   box(granite,0,3.77,0,2.58,.25,3.90);
+   box(trim,0,4.005,0,2.68,.11,3.99);
+   for(const side of [-1,1]){
+    box(bronzePlaque,0,2.47,side*2.077,1.86,1.16,.053,'patina');
+    for(let row=0;row<4;row++)box(trim,0,2.85-row*.235,side*2.107,1.50-row*.12,.055,.023);
+    box(bronzePlaque,side*1.485,2.44,0,.045,.92,2.73,'patina');
+    for(let row=0;row<4;row++)box(trim,side*1.514,2.76-row*.184,0,.022,.045,2.31-row*.13);
+   }
+   horse(4.06,'reins',marble);
+   add('fountain-deck','water',waterTint,0,.205,0,4.33,.054,4.33);
+   ring(foot,0,.236,0,4.38,.09,'stone');
+   for(let nozzle=0;nozzle<16;nozzle++){
+    const angle=nozzle*Math.PI/8,x=Math.sin(angle),z=Math.cos(angle);
+    let previous=[3.62*x,.241,3.62*z];
+    for(let step=1;step<=6;step++){
+     const t=step/6,r=3.62+.69*t;
+     const point=[x*r,.241+4.15*t*(1-t),z*r];
+     limb(previous,point,.030,waterTint,'water');previous=point;
+    }
+   }
+  }else if(model==='cordoba-tendillas-floor-jets'){
+   const bronzeNozzle=0x7e827a,waterTint=0x77bacd;
+   for(let row=-1;row<=1;row++)for(let col=-1;col<=1;col++){
+    const x=col*2.24,z=row*2.24,height=row===0&&col===0?1.63:1.02;
+    cylinder(bronzeNozzle,x,.04,z,.11,.08);
+    cylinder(waterTint,x,.08+height/2,z,.049,height,'water');
+    sphere(waterTint,x,.074+height,z,.045,.016,.045,'water');
+   }
   }else if(model==='valencia-city-hall-fountain'){
    const lip=0xc1b8a8,basinBody=0x9f998e,bowl=0x7c9693,waterTint=0x61abc0;
    add('fountain-deck','stone',basinBody,0,.19,0,10,.38,10);
@@ -4371,6 +4591,57 @@ function render(plan,group,b){
    box(stonework,0,4.55,0,2.44,.46,2.44);
    add('mactan-obelisk-shaft','stone',stonework,0,6.79,0,1.66,4.04,1.66);
    add('pyramid','stone',trim,0,8.95,0,.92,.50,.92);
+  }else if(model==='lucknow-hussainabad-clock'){
+   const brick=0x995943,rose=0xb97154,pale=0xd5b99d,dark=0x56443c,clock=0xf2e4c8,copper=0xb2a083;
+   box(pale,0,.39,0,8.12,.78,8.12);
+   box(rose,0,1.70,0,7.16,1.90,7.16);
+   box(brick,0,22.48,0,6.096,39.70,6.096);
+   for(const x of [-2.94,2.94])for(const z of [-2.94,2.94])box(rose,x,23.1,z,.24,39.1,.24);
+   for(const y of [3.2,12.4,24.65,36.5,41.97])box(pale,0,y,0,6.41,.51,6.41);
+   box(rose,0,42.52,0,7.19,.68,7.19);
+   box(pale,0,43.06,0,7.75,.50,7.75);
+   box(brick,0,47.23,0,6.90,8.02,6.90);
+   box(pale,0,51.30,0,7.81,.52,7.81);
+   box(rose,0,52.12,0,7.21,1.18,7.21);
+   box(brick,0,55.44,0,6.10,5.52,6.10);
+   box(pale,0,58.19,0,6.64,.55,6.64);
+   for(let quadrant=0;quadrant<4;quadrant++){
+    const yaw=quadrant*Math.PI/2,ca=Math.cos(yaw),sa=Math.sin(yaw);
+    const place=(x,y,z)=>[x*ca+z*sa,y,-x*sa+z*ca];
+    const orientation=new T.Quaternion().setFromAxisAngle(UP,yaw);
+    for(const y of [9.15,19.66,31.85]){
+     add('box','stone',dark,...place(0,y,3.043),.91,2.7,.087,orientation);
+     add('masonry-arch','stone',rose,...place(0,y+.34,3.10),1.55,3.15,.24,orientation);
+    }
+    const face=3.46;
+    add('sphere','stone',pale,...place(0,47.25,face),2.41,2.41,.13,orientation);
+    for(let petal=0;petal<12;petal++){
+     const angle=petal*Math.PI/6;
+     add('sphere','stone',pale,...place(2.28*Math.sin(angle),47.25+2.28*Math.cos(angle),face+.02),.337,.337,.12,orientation);
+     add('sphere','metal',dark,...place(1.66*Math.sin(angle),47.25+1.66*Math.cos(angle),face+.19),.105,.105,.075,orientation);
+    }
+    add('sphere','stone',clock,...place(0,47.25,face+.10),1.95,1.95,.125,orientation);
+    limb(place(0,47.25,face+.25),place(0,48.65,face+.25),.073,dark,'stone');
+    limb(place(0,47.25,face+.25),place(.66,46.87,face+.25),.093,dark,'stone');
+    add('box','stone',dark,...place(0,55.33,3.047),1.26,2.81,.12,orientation);
+    add('masonry-arch','stone',pale,...place(0,55.59,3.13),2.18,3.34,.23,orientation);
+   }
+   for(const x of [-2.90,2.90])for(const z of [-2.90,2.90]){
+    box(rose,x,58.95,z,.93,1.45,.93);
+    add('pyramid','stone',copper,x,60.13,z,.78,1.06,.78);
+   }
+   box(rose,0,59.08,0,4.4,1.60,4.4);
+   add('pyramid','stone',copper,0,61.38,0,3.13,3.12,3.13,
+    new T.Quaternion().setFromAxisAngle(UP,Math.PI/4));
+   cylinder(copper,0,63.17,0,.47,1.36);
+   cylinder(copper,0,65.13,0,.16,3.72);
+   sphere(copper,0,67.0404,0,.24,.3204,.24,'stone');
+  }else if(model==='lucknow-hussainabad-tank'){
+   const walls=[0xb27859,0xbf876a,0xbe8665,0xc49070];
+   for(const [i] of owner.feature.terraceRims.entries()){
+    const height=.83*(i+1);
+    add('lucknow-tank-terrace-'+i,'stone',walls[i],0,height/2,0,1,height,1);
+   }
   }else if(model==='chongqing-great-hall'){
    const marbleTrim=0xdbd2be,wall=0xb89f83,red=0x952e2f,shadow=0x413632;
    const green=0x326a68,teal=0x4a8180,burnished=0xbe9a55;
@@ -5413,6 +5684,76 @@ function render(plan,group,b){
   }else if(model==='se-dialogo'){
    box(0xa09d92,0,.115,0,5.30,.23,2.05);
    add('se-dialogo-steel','metal',0xb52527,0,.23,0,1,1,1);
+  }else if(model==='harare-unity-fountain'){
+   const paving=0xc2b39f,rim=0xbeb6aa,basinBlue=0x5ca4b9;
+   add('harare-basin','stone',paving,0,.15,0,10.45,.30,10.45);
+   add('harare-basin','water',basinBlue,0,.333,0,9.92,.032,9.92);
+   ring(rim,0,.42,0,9.98,.19,'stone');
+   cylinder(0x657d82,0,.48,0,.55,.27,'metal');
+   jet(0,.52,0,3.80,3.8);
+  }else if(model==='lusaka-mwanawasa-mausoleum'){
+   const concrete=0xd5d1c5,trim=0xe2ddd0,glazing=0x52676a;
+   add('lusaka-podium','stone',concrete,0,.15,0,7.715,.30,7.96);
+   add('lusaka-podium','stone',trim,0,.48,0,7.35,.36,7.62);
+   for(const [i,depth] of [1.64,1.35,1.11].entries()){
+    const y=(i+1)*.16;
+    box(trim,0,y/2,7.87-depth/2-i*.31,4.08,y,depth);
+   }
+   for(let i=0;i<12;i++){
+    const axis=i*Math.PI/6,x=5.42*Math.sin(axis),z=5.66*Math.cos(axis);
+    if(i!==0){
+     const rotation=new T.Quaternion().setFromAxisAngle(UP,axis);
+     add('box','metal',glazing,x,2.11,z,2.81,2.94,.13,rotation);
+    }
+    const post=axis+Math.PI/12,dx=Math.sin(post),dz=Math.cos(post);
+    limb([5.61*dx,.66,5.83*dz],[6.14*dx,5.09,6.36*dz],.33,concrete,'stone');
+   }
+   add('lusaka-stool-roof','stone',trim,0,4.94,0,7.43,1.46,7.66);
+  }else if(model==='lusaka-sata-mausoleum'){
+   const surface=0xc7beb2,trim=0xe3dad0,foundation=0x9e9588,glazing=0x465d62;
+   box(foundation,0,.16,0,17.16,.32,14.88);
+   box(surface,0,4.34,-2.08,16.61,8.04,10.23);
+   box(trim,0,4.11,-1.95,16.84,.25,10.73);
+   box(trim,0,8.79,-2.03,16.93,.82,10.47);
+   for(const side of [-1,1]){
+    for(let i=0;i<9;i++){
+     const h=.43*(i+1),z=7.02-i*.45;
+     box(trim,side*3.07,h/2,z,2.46,h,.68);
+    }
+    for(const x of [side*4.31,side*1.84]){
+     limb([x,1.33,7.15],[x,4.77,3.55],.054,0x55534c);
+     for(const i of [0,4,8]){
+      const h=.43*(i+1),z=7.15-i*.45;
+      limb([x,h-.04,z],[x,h+.90,z],.050,0x55534c);
+     }
+    }
+    for(const x of [4.83,6.67]){
+     box(glazing,side*x,2.23,3.083,1.32,2.36,.18,'metal');
+     box(glazing,side*x,6.34,3.083,1.38,2.51,.18,'metal');
+    }
+   }
+   box(glazing,0,2.05,3.085,2.85,3.10,.18,'metal');
+   box(glazing,0,6.03,3.085,4.15,3.38,.18,'metal');
+   for(const x of [-2.08,0,2.08])box(trim,x,6.02,3.20,.12,3.44,.15);
+  }else if(model==='lusaka-chiluba-mausoleum'){
+   const plaster=0xd9d3c7,trim=0xefebe0,roof=0xc4bfb3,glazing=0x53646c;
+   add('lusaka-podium','stone',plaster,0,.18,0,7.945,.36,10.535);
+   add('lusaka-podium','stone',trim,0,.43,-.88,6.87,.16,7.54);
+   add('lusaka-podium','stone',plaster,0,2.22,-.88,5.47,3.41,6.49);
+   for(let i=0;i<10;i++){
+    const axis=i*Math.PI/5,x=Math.sin(axis)*5.44,z=Math.cos(axis)*6.46-.88,turn=new T.Quaternion().setFromAxisAngle(UP,axis);
+    if(i===0)add('box','metal',glazing,x,1.91,z,2.65,2.94,.15,turn);
+    else{
+     const window=new T.Vector3(0,0,.085).applyQuaternion(turn);
+     add('registan-arch','stone',trim,x+window.x,1.27,z+window.z,2.42,2.44,.35,turn);
+     add('box','metal',glazing,x+window.x*.68,2.22,z+window.z*.68,1.28,1.77,.14,turn);
+    }
+    const post=axis+Math.PI/10;
+    cylinder(0xb0aaa0,6.12*Math.sin(post),2.37,-.88+7.15*Math.cos(post),.26,3.76);
+   }
+   add('lusaka-chapel-roof','stone',roof,0,4.05,-.88,6.77,2.39,7.68);
+   box(trim,0,7.09,-.88,.21,1.62,.21);
+   box(trim,0,7.35,-.88,1.09,.21,.24);
   }else if(['registan-ulugh-beg','registan-sher-dor','registan-tilla-kari'].includes(model)){
    const {width,depth}=MODEL_SPECS[model],front=depth/2,back=-front;
    const west=model==='registan-ulugh-beg',north=model==='registan-tilla-kari';
@@ -6053,6 +6394,14 @@ function render(plan,group,b){
  const localModels=[];
  for(const item of plan.items){owner=item;const first=parts.length;build(item.feature.model);localModels.push({item,first,end:parts.length});}
  const geos={box:new T.BoxGeometry(1,1,1),sphere:new T.SphereGeometry(1,12,8),cylinder:new T.CylinderGeometry(1,1,1,12),cone:new T.ConeGeometry(1,1,12),torus:new T.TorusGeometry(1,.045,6,20),pyramid:new T.CylinderGeometry(.12,1,1,4),robe:new T.CylinderGeometry(.55,1,1,10),cape:new T.PlaneGeometry(1,1,10,12)};
+ if(parts.some(part=>part.kind==='lusaka-podium')){
+  geos['lusaka-podium']=new T.CylinderGeometry(1,1,1,24);
+  const stool=[[.86,0],[.97,.13],[1,.37],[.96,.63],[.81,.88],[.58,.985],[0,1]];
+  geos['lusaka-stool-roof']=new T.LatheGeometry(stool.map(([r,y])=>new T.Vector2(r,y)),36);
+  const chapel=[[1,0],[.96,.26],[.83,.49],[.67,.66],[.37,.88],[.06,1],[0,1]];
+  geos['lusaka-chapel-roof']=new T.LatheGeometry(chapel.map(([r,y])=>new T.Vector2(r,y)),32);
+ }
+ if(parts.some(part=>part.kind==='harare-basin'))geos['harare-basin']=new T.CylinderGeometry(1,1,1,48);
  if(parts.some(part=>part.kind==='registan-arch')){
   const arch=new T.Shape();
   arch.moveTo(-.5,0);arch.lineTo(-.5,1);arch.lineTo(.5,1);arch.lineTo(.5,0);
@@ -6429,6 +6778,17 @@ function render(plan,group,b){
  if(parts.some(part=>part.kind==='mactan-obelisk-shaft')){
   geos['mactan-obelisk-shaft']=new T.CylinderGeometry(.30*Math.SQRT2,.50*Math.SQRT2,1,4,1,false,Math.PI/4);
  }
+ const lucknowTank=plan.items.find(item=>item.feature.model==='lucknow-hussainabad-tank');
+ if(lucknowTank){
+  const {feature}=lucknowTank;
+  const waterline=plan.profile.surfaces.find(surface=>surface.source===feature.source).rings[0];
+  const local=ring=>ring.map(({x,z})=>new T.Vector2(x-feature.x,feature.z-z));
+  for(const [i,rim] of feature.terraceRims.entries()){
+   const shape=new T.Shape(local(rim));
+   shape.holes.push(new T.Path(local(i===0?waterline:feature.terraceRims[i-1])));
+   geos['lucknow-tank-terrace-'+i]=new T.ExtrudeGeometry(shape,{depth:1,bevelEnabled:false}).rotateX(-Math.PI/2).translate(0,-.5,0);
+  }
+ }
  if(parts.some(part=>part.kind==='chongqing-hall-footprint')){
   const {feature}=plan.items.find(item=>item.feature.model==='chongqing-great-hall');
   const ring=plan.profile.contextSurfaces.find(surface=>surface.source===feature.source).rings[0];
@@ -6521,6 +6881,11 @@ function render(plan,group,b){
   portal.quadraticCurveTo(.51,.235,.5,-.12);
   portal.lineTo(.5,-.5);portal.closePath();
   geos['karachi-mausoleum-portal']=new T.ExtrudeGeometry(portal,{depth:1,bevelEnabled:false,curveSegments:8}).translate(0,0,-.5);
+ }
+ if(parts.some(part=>part.kind==='homigot-tower')){
+  geos['homigot-octagon']=new T.CylinderGeometry(1,1,1,8,1,false,Math.PI/8);
+  const taper=[[0,.24],[3.92,.24],[3.86,1.4],[3.52,3.6],[3.21,7],[3.01,11],[2.88,15],[2.78,18],[2.73,20.3],[0,20.3]];
+  geos['homigot-tower']=new T.LatheGeometry(taper.map(([r,y])=>new T.Vector2(r,y)),8,Math.PI/8);
  }
  if(parts.some(part=>part.kind==='tianjin-clock-disc'))geos['tianjin-clock-disc']=new T.CylinderGeometry(1,1,1,40);
  if(parts.some(part=>part.kind==='vertical-torus'))geos['vertical-torus']=new T.TorusGeometry(1,.024,6,48);

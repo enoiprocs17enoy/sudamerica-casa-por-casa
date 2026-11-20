@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=44',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=45',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -1367,7 +1367,10 @@ function drawSurveyedCitySquare(profile,b){
  const capitol=profile.source==='https://www.openstreetmap.org/way/23055100'&&
   profile.landmarks?.find(landmark=>landmark.id==='way:429078984');
  const detailPlan=typeof window!=='undefined'&&window.SquareDetails?window.SquareDetails.prepare(profile,fit,b,currentCity):null;
- const plazaTop=.33,pavingTop=.42,lawnTop=.57,stoneInsetTop=.49;
+ const plazaTop=.33,lawnTop=.57,stoneInsetTop=.49;
+ const raisedPavingMeters=Number(profile.raisedPavingMeters);
+ const raisedPaving=Number.isFinite(raisedPavingMeters)?Math.max(0,raisedPavingMeters)*scale:0;
+ const pavingTop=raisedPaving?plazaTop+raisedPaving:.42;
  const clearDetail=(x,z,r=0)=>!detailPlan||detailPlan.clear(x,z,r);
  const project=p=>{const q=fit.point(p);return new THREE.Vector2(q.x,-q.z);};
  const surfaceBatches=new Map(),batches=new Map(),dummy=new THREE.Object3D(),geometries={box:new THREE.BoxGeometry(1,1,1),round:new THREE.CylinderGeometry(.5,.5,1,12),leaf:new THREE.IcosahedronGeometry(1,1),ring:new THREE.TorusGeometry(.35,.045,6,16)};
@@ -1404,7 +1407,9 @@ function drawSurveyedCitySquare(profile,b){
  const baseKind=['lawn','sand','gravel'].includes(profile.base)?profile.base:'stone';
  const baseColor=baseKind==='lawn'?profile.green||0x76965c:baseKind==='sand'?0xd8b477:baseKind==='gravel'?0xcbbda7:paving;
  polygon([root,...(profile.holes||[])],capitol?0x697070:baseColor,pavingTop,false,true,baseKind);
- border(root,0xe2d6bf,.26,.15,.43);
+ const pavingBorderHeight=raisedPaving?raisedPaving+.06:.15;
+ const pavingBorderY=raisedPaving?plazaTop+pavingBorderHeight/2:.43;
+ border(root,0xe2d6bf,.26,pavingBorderHeight,pavingBorderY);
  // Context surfaces preserve separately mapped ground outside the plaza outline.
  for(const surface of profile.contextSurfaces||[]){
   const lawn=surface.kind==='lawn',water=surface.kind==='water';
@@ -1412,7 +1417,9 @@ function drawSurveyedCitySquare(profile,b){
  }
  for(const surface of profile.surfaces||[]){
   const lawn=surface.kind==='lawn',water=surface.kind==='water';
-  polygon(surface.rings,lawn?(profile.green||0x63894c):water?0x319bb5:0xddd0b8,lawn?lawnTop:water?.53:stoneInsetTop,lawn||water,false,lawn?'lawn':water?'water':'stone');
+  const recessedWater=water&&surface.recessed===true;
+  const height=lawn?lawnTop:recessedWater?plazaTop+.015:water?.53:stoneInsetTop;
+  polygon(surface.rings,lawn?(profile.green||0x63894c):water?0x319bb5:0xddd0b8,height,lawn||water&&!recessedWater,false,lawn?'lawn':water?'water':'stone');
  }
  // Distribute the flower budget around each bed rather than filling only the first edge.
  const lawns=(profile.surfaces||[]).filter(surface=>!profile.realGeometry&&surface.kind==='lawn'&&surface.rings?.[0]?.length>3);
