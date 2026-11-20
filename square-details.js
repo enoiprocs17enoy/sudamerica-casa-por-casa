@@ -23,6 +23,7 @@ Object.assign(MODEL_SPECS,{
  'franklin-fountain':{height:2.5,width:6.8,depth:6.8,parcelWidth:.51},
  'freedom-arches':{height:4.8,width:9.9,depth:6.8,parcelWidth:.64},
  'liberty-carousel':{height:5.2,width:7.8,depth:7.8,parcelWidth:.25},
+ 'telc-silenus':{height:3.5,width:6.9,depth:6.9},
  'se-anchieta':{height:9.37,width:2.6,depth:2.05},
  'marco-zero':{height:1.15,width:5.7,depth:5.7,parcelWidth:.3},
  'dam-memorial':{height:12,width:6.9,depth:6.9,parcelWidth:.4},
@@ -41,6 +42,7 @@ Object.assign(MODEL_SPECS,{
  'bratislava-maximilian-fountain':{height:10.5,width:10.4,depth:8.6},
  'bratislava-city-guard':{height:2.68,width:.91,depth:1.42},
  'bratislava-napoleonic-soldier':{height:1.53,width:1.80,depth:1.18},
+ 'jicin-coronation-well':{height:7,width:7.2,depth:3.9,parcelWidth:.5},
  'andorra-casa-de-la-vall':{height:14.5,width:20.6,depth:17.2,parcelWidth:.7},
  'cuenca-calderon-monument':{height:6.5,width:3.9,depth:3.9},
  'cuenca-calderon-glorieta':{height:4.8,width:7.2,depth:7.2},
@@ -48,6 +50,7 @@ Object.assign(MODEL_SPECS,{
  'budapest-millennium-colonnade-north':{height:8.2,width:38,depth:14,parcelWidth:.85},
  'budapest-millennium-colonnade-east':{height:8.2,width:16,depth:38,parcelWidth:.85},
  'budapest-heroes-memorial-stone':{height:.85,width:10,depth:6,parcelWidth:.5},
+ 'luanda-agostinho-neto-memorial':{height:120,width:48,depth:46,parcelWidth:.8},
  'shanghai-huangpu-light-fountain':{height:5.3,width:32.6,depth:32.6,parcelWidth:.8},
  'hong-kong-thomas-jackson':{height:6.2,width:3.65,depth:3.8},
  'kingston-manley-statue':{height:5,width:3,depth:3},
@@ -775,6 +778,22 @@ function render(plan,group,b){
    box(0xb5ad9b,0,.11,0,10,.22,6.0);
    box(0xaaa18f,0,.50,0,8.3,.56,4.0);
    box(0xc5bca7,0,.80,0,8.55,.11,4.18);
+  }else if(model==='luanda-agostinho-neto-memorial'){
+   const concrete=0xaeb0ad,light=0xc2c3bd,shadow=0x777d7d;
+   for(let i=0;i<4;i++){
+    box(concrete,0,1.15+i*1.75,0,44-i*3.4,2.3,42-i*3.3);
+   }
+   box(shadow,0,9.62,13.74,13.1,6.35,.36);
+   box(light,0,8.99,0,34,5.20,31);
+   box(shadow,0,9.65,15.58,6.2,4.80,.20);
+   add('obelisk-shaft','stone',concrete,0,47.3,0,22.0,76.6,19.8);
+   box(light,0,84.75,0,12,2.2,10.5);
+   add('pyramid','stone',light,0,102.90,0,7.0,34.2,6.1);
+   for(const side of [-1,1]){
+    add('obelisk-shaft','stone',light,side*10.4,28.0,-1.55,8.8,41.2,12.65);
+   }
+   box(shadow,0,40.6,7.92,1.1,32.2,.50);
+   box(shadow,0,27.6,10.18,1.0,6.3,.38);
   }else if(model==='shanghai-huangpu-light-fountain'){
    const rim=0xbababa,granite=0x8f9193,nozzle=0x686e73,water=0x78c5d9;
    add('fountain-deck','stone',rim,0,.15,0,15.25,.30,15.25);
@@ -1835,6 +1854,60 @@ function render(plan,group,b){
     const angle=petal*Math.PI*2/5;
     sphere(gold,Math.sin(angle)*.028,.887,-.745+Math.cos(angle)*.028,.022,.013,.022);
    }
+  }else if(model==='jicin-coronation-well'){
+   const sandstone=0xbba47f, moulding=0xd2bc98, shadowedStone=0x9a8260, roof=0x535c55, iron=0x3c423d;
+   const westWing=new T.Quaternion().setFromAxisAngle(UP,Math.PI);
+   box(sandstone,0,.14,0,4.22,.28,3.82);
+   box(moulding,0,.31,0,4.28,.10,3.85);
+   // The north and south arches leave the pavilion open around the 1936 weather pillar.
+   for(const side of [-1,1]){
+    const face=side*1.60;
+    add('jicin-well-arch','stone',sandstone,0,.35,face,4.18,4.35,.39);
+    box(moulding,0,3.78,face+side*.215,.30,.40,.12);
+    for(const x of [-1.84,1.84]){
+     box(moulding,x,.48,face+side*.125,.59,.23,.33);
+     box(sandstone,x,2.42,face+side*.135,.43,3.72,.30);
+     box(moulding,x,4.39,face+side*.135,.58,.23,.35);
+    }
+   }
+   box(shadowedStone,0,4.72,0,4.21,.20,3.70);
+   box(sandstone,0,4.95,0,4.24,.26,3.78);
+   box(moulding,0,5.14,0,4.35,.16,3.88);
+   add('jicin-well-roof','patina',roof,0,5.22,0,2.10,1.59,1.86);
+   sphere(roof,0,6.85,0,.073,.145,.073,'patina');
+   box(shadowedStone,0,.56,0,1.10,.40,.91);
+   box(sandstone,0,1.15,0,.77,.81,.67);
+   box(sandstone,0,2.15,0,.73,1.24,.66);
+   box(moulding,0,2.82,0,.90,.14,.83);
+   for(const side of [-1,1])box(iron,0,2.22,side*.348,.52,.88,.045,'metal');
+
+   for(const side of [-1,1]){
+    const x=side*2.02,turn=side<0?westWing:null;
+    box(sandstone,x,4.37,0,.35,.68,3.43);
+    add('jicin-well-portico','stone',sandstone,x,.14,0,1.55,.28,1.83,turn);
+    add('jicin-well-portico','stone',moulding,x,3.81,0,1.57,.29,1.83,turn);
+    add('jicin-well-wing-roof','patina',roof,x,4.16,0,1.57,.45,1.83,turn);
+    // Three columns and two engaged end columns support each half-round wing.
+    const posts=[0,Math.PI/4,Math.PI/2,Math.PI*3/4,Math.PI].map(angle=>[
+     x+side*Math.sin(angle)*1.36,Math.cos(angle)*1.62
+    ]);
+    for(const [postX,postZ] of posts){
+     cylinder(moulding,postX,.44,postZ,.217,.25);
+     cylinder(sandstone,postX,2.06,postZ,.148,3.00);
+     cylinder(moulding,postX,3.60,postZ,.215,.15);
+    }
+    for(let i=1;i<posts.length;i++){
+     const [ax,az]=posts[i-1],[bx,bz]=posts[i];
+     limb([ax,.68,az],[bx,.68,bz],.032,iron,'metal');
+     limb([ax,2.06,az],[bx,2.06,bz],.032,iron,'metal');
+     limb([ax,.75,az],[bx,1.97,bz],.019,iron,'metal');
+     limb([ax,1.97,az],[bx,.75,bz],.019,iron,'metal');
+     for(const mix of [.25,.5,.75]){
+      const railX=ax+(bx-ax)*mix,railZ=az+(bz-az)*mix;
+      limb([railX,.70,railZ],[railX,2.13,railZ],.024,iron,'metal');
+     }
+    }
+   }
   }else if(model==='bratislava-maximilian-fountain'){
    const sandstone=0xb7a88c, trim=0xd2c5a8, shadedStone=0x96896f, waterTint=0x61a5af;
    add('bratislava-basin','stone',sandstone,0,0,0,1,1,1);
@@ -1962,6 +2035,40 @@ function render(plan,group,b){
     box(granite,x,.89,0,1.03,.58,1.21);human(x,1.18,0,.85,'sword');
    }
    plaque(1.51,2.01,1.079);
+  }else if(model==='telc-silenus'){
+   const rim=0xa9a59a,trim=0xbdb8aa,pedestal=0xcac3b0,figure=0xddd7c8;
+   add('hex','stone',rim,0,.14,0,3.36,.28,3.36);
+   add('hex','water',0x579b9e,0,.31,0,3.06,.044,3.06);
+   for(let side=0;side<6;side++){
+    const angle=(side+.5)*Math.PI/3,sin=Math.sin(angle),cos=Math.cos(angle);
+    const turn=new T.Quaternion().setFromAxisAngle(UP,angle);
+    const apothem=3.18*Math.cos(Math.PI/6);
+    add('box','stone',rim,sin*apothem,.33,cos*apothem,3.24,.42,.25,turn);
+    add('box','stone',trim,sin*apothem,.55,cos*apothem,3.34,.11,.36,turn);
+   }
+   box(pedestal,0,.37,0,1.40,.34,1.40);
+   box(figure,0,.60,0,1.28,.13,1.28);
+   box(pedestal,0,1.15,0,.84,1.0,.88);
+   box(figure,0,1.69,0,1.01,.16,.99);
+   const form=(x,y,z,w,h,d,c=figure)=>sphere(c,x,y,z,w,h,d,'stone');
+   const join=(a,b,r,c=figure)=>limb(a,b,r,c,'stone');
+   form(-.20,1.96,-.17,.31,.31,.29,pedestal);
+   join([-.17,1.79,.17],[-.19,2.22,.03],.13);
+   join([-.19,2.22,.03],[-.12,2.58,-.02],.16);
+   join([.21,1.79,.05],[.17,2.21,.13],.13);
+   join([.17,2.21,.13],[.02,2.58,-.03],.16);
+   form(-.05,2.48,-.02,.27,.23,.20);
+   form(-.08,2.79,-.06,.28,.33,.19);
+   form(-.15,3.19,-.05,.17,.21,.15);
+   form(-.15,3.11,.07,.13,.13,.12,pedestal);
+   join([-.28,2.95,-.07],[-.37,2.75,.12],.102);
+   join([-.37,2.75,.12],[.01,2.70,.27],.084);
+   join([.09,2.93,-.05],[.24,2.78,.09],.103);
+   join([.24,2.78,.09],[.24,2.94,.22],.077);
+   // The child is cradled across Silenus's chest and forearms.
+   join([-.08,2.75,.19],[.26,3.04,.22],.105);
+   form(.32,3.12,.22,.115,.125,.10);
+   join([.01,2.80,.22],[-.13,2.68,.28],.055);
   }else if(model==='se-anchieta'){
    const granite=0x96958f,trim=0xaaa7a0,metal=0x505954,dark=0x424c46;
    box(trim,0,.17,0,1.96,.34,2.05);
@@ -2346,6 +2453,21 @@ function render(plan,group,b){
   opening.quadraticCurveTo(.38,.77,.38,.62);
   opening.lineTo(.38,0);opening.lineTo(.5,0);opening.lineTo(.5,1);opening.lineTo(-.5,1);opening.closePath();
   geos['park-arch']=new T.ExtrudeGeometry(opening,{depth:1,bevelEnabled:false,curveSegments:4}).translate(0,0,-.5);
+ }
+ if(parts.some(part=>part.kind==='jicin-well-arch')){
+  const face=new T.Shape();
+  face.moveTo(-.5,0);face.lineTo(-.5,1);face.lineTo(.5,1);face.lineTo(.5,0);
+  face.lineTo(.28,0);face.lineTo(.28,.49);
+  for(let step=1;step<=16;step++){
+   const angle=Math.PI*step/16;
+   face.lineTo(Math.cos(angle)*.28,.49+Math.sin(angle)*.28);
+  }
+  face.lineTo(-.28,0);face.closePath();
+  geos['jicin-well-arch']=new T.ExtrudeGeometry(face,{depth:1,bevelEnabled:false}).translate(0,0,-.5);
+  const roof=[[1,0],[.98,.15],[.94,.40],[.83,.63],[.65,.80],[.38,.93],[0,1]];
+  geos['jicin-well-roof']=new T.LatheGeometry(roof.map(([radius,y])=>new T.Vector2(radius,y)),20);
+  geos['jicin-well-portico']=new T.CylinderGeometry(1,1,1,16,1,false,0,Math.PI);
+  geos['jicin-well-wing-roof']=new T.CylinderGeometry(.20,1,1,16,1,false,0,Math.PI);
  }
  if(parts.some(part=>part.kind==='triumphal-arch')){
   const outline=new T.Shape();
