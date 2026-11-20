@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=19',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=20',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -1599,7 +1599,11 @@ function drawSurveyedCitySquare(profile,b){
   if(Math.abs(q.x)<b.width/2-2&&Math.abs(q.z)<b.depth/2-3)treePositions.push({...q,leafType:p.leafType,mapped:profile.realGeometry});
  }
  if(!treePositions.length&&!profile.realGeometry&&!profile.openStoneSquare)for(const side of [-1,1])for(let i=0;i<5;i++)treePositions.push({x:side*(b.width/2-3.5),z:-b.depth*.32+i*b.depth*.16});
- const maxTrees=Math.min(72,treePositions.length),mappedTrees=[];
+ // Washington Square has hundreds of mapped nodes. Use simpler foliage to retain
+ // their positions within the existing scene budget and tree scale.
+ const compactMappedTrees=profile.realGeometry&&profile.source==='https://www.openstreetmap.org/way/22899302';
+ if(compactMappedTrees)geometries.compactLeaf=new THREE.IcosahedronGeometry(1,0);
+ const maxTrees=compactMappedTrees?treePositions.length:Math.min(72,treePositions.length),mappedTrees=[];
  for(let i=0;i<maxTrees;i++){
   const p=treePositions[Math.floor(i*treePositions.length/maxTrees)],x=p.x,z=p.z;
   const treeScale=p.mapped?Math.min(1,scale):1;
@@ -1617,7 +1621,10 @@ function drawSurveyedCitySquare(profile,b){
    }
   }else{
    tree('round',0x75583d,0,(3.525+plazaTop)/2,0,.25,3.525-plazaTop,.25);
-   for(let lobe=0;lobe<6;lobe++){
+   if(compactMappedTrees){
+    tree('compactLeaf',0x67894a,0,3.85,0,.88,.65,.82);
+    tree('compactLeaf',0x789952,-.10,4.36,.04,.52,.39,.49);
+   }else for(let lobe=0;lobe<6;lobe++){
     const a=lobe*Math.PI*.8;
     tree('leaf',[0x517b3e,0x67894a,0x789952][(lobe+i)%3],Math.sin(a)*.56,3.75+(lobe%3)*.36,Math.cos(a)*.48,.76,.85,.73,a);
    }
