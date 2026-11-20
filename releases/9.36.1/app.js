@@ -1414,7 +1414,9 @@ function drawSurveyedCitySquare(profile,b){
   }
  }
  const routes=profile.walkwayDetails?.length?profile.walkwayDetails:(profile.paths||[]).map(points=>({points}));
- if((capitol||routes.length)&&typeof document!=='undefined'){
+ const routeWidth=route=>Math.max(profile.reviewed?.24:.66,Math.min(2.35,(Number(route.widthMeters)||3)*scale));
+ const validRoutes=capitol?[]:routes.filter(route=>route.points?.length>1&&route.points.every(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.z)));
+ if((capitol||validRoutes.length)&&typeof document!=='undefined'){
   const canvas=document.createElement('canvas');
   canvas.width=b.width>27?512:256;canvas.height=b.depth>58?1024:512;
   const paint=canvas.getContext('2d');
@@ -1427,9 +1429,8 @@ function drawSurveyedCitySquare(profile,b){
    paint.beginPath();
    for(const ring of [root,...(profile.holes||[])])if(ring.length>=4){trace(ring);paint.closePath();}
    paint.clip('evenodd');paint.lineCap='round';paint.lineJoin='round';
-   const valid=capitol?[]:routes.filter(route=>route.points?.length>1&&route.points.every(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.z)));
-   for(const edge of [true,false])for(const route of valid){
-    const width=Math.max(profile.reviewed?.24:.66,Math.min(2.35,(Number(route.widthMeters)||3)*scale));
+   for(const edge of [true,false])for(const route of validRoutes){
+    const width=routeWidth(route);
     const stone=/asphalt/i.test(route.surface||'')?'#a09f92':/concrete/i.test(route.surface||'')?'#d0c8b6':'#dbc8a6';
     paint.strokeStyle=edge?'#b9a78e':stone;paint.lineWidth=width+(edge?.15:0);
     paint.beginPath();trace(route.points);paint.stroke();
@@ -1459,30 +1460,93 @@ function drawSurveyedCitySquare(profile,b){
     paint.beginPath();for(const ring of surface.rings||[])if(ring.length>=4){trace(ring);paint.closePath();}
     paint.fill('evenodd');
    }
-   if(capitol||valid.length){
+   if(capitol||validRoutes.length){
     // All paths meet in a single alpha-tested surface, including at crossings.
     const texture=new THREE.CanvasTexture(canvas);
     texture.colorSpace=THREE.SRGBColorSpace;texture.minFilter=THREE.LinearMipmapLinearFilter;
     texture.anisotropy=Math.min(8,typeof renderer!=='undefined'?renderer?.capabilities?.getMaxAnisotropy?.()||1:1);
     const material=new THREE.MeshStandardMaterial({map:texture,alphaTest:.45,roughness:.88});
     const mesh=new THREE.Mesh(new THREE.PlaneGeometry(b.width,b.depth).rotateX(-Math.PI/2),material);
-    mesh.position.set(b.x,capitol?.448:.605,b.z);mesh.receiveShadow=true;mesh.userData.squareWalkways=valid.length;group.add(mesh);
+    mesh.position.set(b.x,capitol?.448:.605,b.z);mesh.receiveShadow=true;mesh.userData.squareWalkways=validRoutes.length;group.add(mesh);
    }
   }
  }
 
- const bench=(x,z,angle=0)=>{
-  if(!clearDetail(x,z,1.45))return;
-  const ca=Math.cos(angle),sa=Math.sin(angle),part=(color,dx,y,dz,w,h,d)=>box(color,x+dx*ca+dz*sa,y,z-dx*sa+dz*ca,w,h,d,angle);
+ const benchRadius=1.12,placedBenches=[];
+ const bench=(x,z,angle=0,size=1,ground=.28,reserve=1.45)=>{
+  const radius=benchRadius*size;
+  if(!clearDetail(x,z,reserve)||placedBenches.some(p=>Math.hypot(p.x-x,p.z-z)<p.radius+radius))return false;
+  placedBenches.push({x,z,radius});
+  const ca=Math.cos(angle),sa=Math.sin(angle);
+  const part=(color,dx,y,dz,w,h,d)=>box(color,x+(dx*ca+dz*sa)*size,ground+(y-.28)*size,z+(-dx*sa+dz*ca)*size,w*size,h*size,d*size,angle);
   for(let slat=-2;slat<=2;slat++)part(0xad7950,0,.88,slat*.115,2.1,.10,.087);
   for(let slat=0;slat<3;slat++)part(0xb88a57,0,1.14+slat*.14,-.30,2.1,.10,.08);
   for(const side of [-1,1]){part(0x344d48,side*.78,.59,0,.12,.62,.55);part(0x344d48,side*1.02,1.07,.02,.08,.14,.58);part(0x344d48,side*1.02,.98,-.22,.08,.50,.08);}
+  return true;
  };
- for(const seat of profile.benches||[]){
-  if(!seat||!Number.isFinite(seat.x)||!Number.isFinite(seat.z))continue;
-  const {x,z}=fit.point(seat);
-  bench(x,z,fit.angle+(Number(seat.bearing)||0));
+ const mappedSeats=[];
+ const seats=(profile.benches||[]).filter(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.z));
+ if(profile.realGeometry&&seats.length){
+  // Keep mapped centers in place. Furniture and distances must use the same scale.
+  const positions=seats.map(seat=>({...fit.point(seat),bearing:seat.bearing}));
+  const segments=validRoutes.flatMap(route=>{
+   const points=route.points.map(fit.point),radius=(routeWidth(route)+.15)/2;
+   return points.slice(1).map((b,i)=>({a:points[i],b,radius}));
+  });
+  const surfaces=(profile.surfaces||[]).map(surface=>({kind:surface.kind,rings:(surface.rings||[]).map(ring=>ring.map(fit.point))}));
+  const insideRing=(x,z,ring)=>{
+   let inside=false;
+   for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+    const a=ring[j],b=ring[i];
+    if((a.z>z)!==(b.z>z)&&x<a.x+(b.x-a.x)*(z-a.z)/(b.z-a.z))inside=!inside;
+   }
+   return inside;
+  };
+  for(const seat of positions){
+   const {x,z}=seat;
+   let nearest=null,distance=Infinity;
+   for(const p of positions){
+    if(p===seat)continue;
+    const d=Math.hypot(x-p.x,z-p.z);
+    if(d>0&&d<distance){nearest=p;distance=d;}
+   }
+   const size=Math.min(1,scale,distance/(2.18*benchRadius));
+   // Unrecorded bearings follow nearby rows of mapped seats.
+   const angle=Number.isFinite(seat.bearing)?seat.bearing-fit.angle:
+    nearest&&distance<=5*scale?Math.atan2(z-nearest.z,nearest.x-x):-fit.angle;
+   const ca=Math.cos(angle),sa=Math.sin(angle);
+   const onRoute=segments.some(({a,b,radius})=>{
+    // Clip each centerline against the bench footprint padded by the painted path radius.
+    const ax=(a.x-x)*ca-(a.z-z)*sa,az=(a.x-x)*sa+(a.z-z)*ca;
+    const dx=(b.x-a.x)*ca-(b.z-a.z)*sa,dz=(b.x-a.x)*sa+(b.z-a.z)*ca;
+    let start=0,end=1;
+    for(const [origin,delta,extent] of [[ax,dx,1.06*size+radius],[az,dz,.34*size+radius]]){
+     if(Math.abs(delta)<1e-9){if(Math.abs(origin)>extent)return false;continue;}
+     const first=(-extent-origin)/delta,last=(extent-origin)/delta;
+     start=Math.max(start,Math.min(first,last));
+     end=Math.min(end,Math.max(first,last));
+     if(start>end)return false;
+    }
+    return true;
+   });
+   if(onRoute)continue;
+   let ground=.42,water=false;
+   for(const surface of surfaces){
+    if(!surface.rings.reduce((inside,ring)=>inside!==insideRing(x,z,ring),false))continue;
+    if(surface.kind==='water'){water=true;break;}
+    ground=Math.max(ground,surface.kind==='lawn'?.57:.49);
+   }
+   if(!water&&bench(x,z,angle,size,ground,1.45*size)){
+    mappedSeats.push({...placedBenches.at(-1),size});
+   }
+  }
+ }else{
+  for(const seat of seats){
+   const {x,z}=fit.point(seat);
+   bench(x,z,fit.angle+(Number(seat.bearing)||0));
+  }
  }
+ group.userData.squareMappedSeats=mappedSeats;
  const lamp=(x,z)=>{
   if(!clearDetail(x,z,.35))return;
   put('round',0x314b48,x,(4.38+plazaTop)/2,z,.13,4.38-plazaTop,.13);
