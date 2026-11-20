@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=50',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=51',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -8109,13 +8109,17 @@ function openSquareDetailPanel(focusHeading=true){
   !group.userData.squareMappedSeats?.length&&!group.userData.squareMappedTrees?.length;
  const intro=document.createElement('p');
  const chosenWithReference=['curated-central-square','documented-civic-square','named-reference'].includes(profile.selection);
- intro.textContent=profile.layoutEvidence==='schematic-from-design'?'Perimetro da OpenStreetMap. Disposizione interna schematica basata sul progetto, con posizioni indicative.':
+ intro.textContent=profile.layoutEvidence==='cartographic-reconstruction'?'Planimetria ricostruita dalla cartografia e dai documenti disponibili.':
+  profile.layoutEvidence==='schematic-from-design'?'Perimetro da OpenStreetMap. Disposizione interna schematica basata sul progetto, con posizioni indicative.':
   profile.reviewed?(outlineOnly?'Perimetro verificato nelle fonti. Per ora la scena riproduce il solo contorno della piazza.':
    'Perimetro verificato nelle fonti. Gli elementi ricostruiti seguono la documentazione disponibile.'):
   profile.realGeometry?(chosenWithReference?'Piazza scelta con riferimenti locali. I dettagli della ricostruzione sono da verificare.':
    'Candidato trovato sulla mappa. La scelta della piazza e i dettagli della scena sono da verificare.'):
   'Piazza di gioco generata in attesa di una planimetria reale.';
  body.append(intro);
+ if(profile.layoutEvidence==='cartographic-reconstruction'&&profile.geometryScope){
+  const scope=document.createElement('p');scope.textContent=profile.geometryScope;body.append(scope);
+ }
  function sourceLink(parent,address,label){
   if(typeof address!=='string')return;
   let url;
@@ -8126,7 +8130,8 @@ function openSquareDetailPanel(focusHeading=true){
   parent.append(link);
  }
  const references=document.createElement('div');references.className='civic-objective-actions';
- const geometryLabel=profile.geometryAttribution?'Planimetria ufficiale':
+ const geometryLabel=profile.layoutEvidence==='cartographic-reconstruction'?'Riferimento cartografico':
+  profile.geometryAttribution?'Planimetria ufficiale':
   /^https:\/\/www\.openstreetmap\.org\//.test(profile.source||'')?'Planimetria OpenStreetMap':'Fonte della planimetria';
  sourceLink(references,profile.source,geometryLabel);
  if(profile.geometryAttribution)sourceLink(references,profile.geometryTerms,profile.geometryAttribution);

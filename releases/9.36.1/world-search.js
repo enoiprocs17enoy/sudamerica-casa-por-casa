@@ -12,7 +12,11 @@ async function unpack(path){const r=await fetch(DATA+path);if(!r.ok)throw Error(
 // The compact world buckets do not carry every GeoNames alias loaded by the atlas.
 // YesMilano also uses the simplified Chinese name 米兰 for Milan.
 // Vitoria-Gasteiz uses the joined name in its municipal tourism directory.
-const extraCityAliases=new Map([[3173435,['米兰']],[3104499,['Vitoria-Gasteiz','Vitoria']]]);
+const extraCityAliases=new Map([
+ [3173435,['米兰']],
+ [3104499,['Vitoria-Gasteiz','Vitoria']],
+ [3164603,['Venezia']],
+]);
 // GeoNames gives the municipality and Madrid's district the same primary name.
 const placeSearchHints=new Map([
  [3111108,{region:'Castilla y León',aliases:['Salamanca Castilla y León']}],
