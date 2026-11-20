@@ -3,6 +3,8 @@
 'use strict';
 const MODEL_SPECS={
  'karachi-mazar-e-quaid':{height:36,width:75,depth:75,parcelWidth:.46,minimumScale:.035},'trujillo-liberty-monument':{height:14.85,width:11.5,depth:11.5,parcelWidth:.28},'alcazar-cervantes-riders':{height:6.5,width:6.6,depth:5.1},'gravina-benedict-statue':{height:6.2,width:3.4,depth:3.4},'ceglie-clock-tower':{height:12,width:5,depth:4.7},'assisi-three-lions-fountain':{height:3.75,width:7.5,depth:7.5},'verrazzano-memorial':{height:7.2,width:4.3,depth:4.3},herterichsbrunnen:{height:5.1,width:7.7,depth:7.7,parcelWidth:.5},'iquique-naval-monument':{height:13.3,width:8.2,depth:8.2},'floral-calendar':{height:1.2,width:8},'arenales-ensemble':{height:11,width:10},'freedom-chains':{height:7,width:5},pyramid:{height:13,width:7},obelisk:{height:10,width:3},column:{height:10,width:4},'liberty-column':{height:13,width:6},equestrian:{height:8,width:7},'equestrian-fountain':{height:8,width:9},'standing-sword':{height:7,width:4},'standing-civil':{height:10,width:7},'ornate-fountain':{height:7,width:9},'liberty-fountain':{height:7,width:8},fountain:{height:3,width:6},bust:{height:4,width:3},plaque:{height:1.5,width:2},'classical-figure':{height:3,width:2}};
+MODEL_SPECS['freedom-plaza-west-fountain']={height:4.6,width:15.8,depth:22.2,parcelWidth:.38,minimumScale:.04};
+MODEL_SPECS['freedom-plaza-pulaski']={height:6.40,width:4.88,depth:6.10,parcelWidth:.32,minimumScale:.04};
 MODEL_SPECS['hangzhou-wulin-eight-girls']={height:6.35,width:31,depth:31,parcelWidth:.58};
 MODEL_SPECS['suzhou-gate-to-the-east']={height:301.8,width:180,depth:102,parcelWidth:.50,minimumScale:.032};
 MODEL_SPECS['suzhou-jinji-lake-fountain']={height:65,width:140,depth:200,parcelWidth:.38,minimumScale:.034};
@@ -519,8 +521,6 @@ function render(plan,group,b){
    }
   }
  };
-MODEL_SPECS['freedom-plaza-west-fountain']={height:4.6,width:15.8,depth:22.2,parcelWidth:.38,minimumScale:.04};
-MODEL_SPECS['freedom-plaza-pulaski']={height:6.40,width:4.88,depth:6.10,parcelWidth:.32,minimumScale:.04};
  const horse=(y=0,gesture='reins',head=bronze)=>{
   const headMaterial=head===marble?'stone':'metal';
   sphere(bronze,0,y+1.65,0,.62,.70,1.48);sphere(bronze,0,y+1.70,.92,.48,.63,.53);
