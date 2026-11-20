@@ -217,6 +217,7 @@ body.game-hub .v4Panel .civic-quick-actions > button { min-height: 44px; text-al
 .civic-phase-count { margin-inline-start: auto; color: #4d6960; flex: none; font-weight: 600; }
 .civic-phase-rows { padding: 0 8px 8px; }
 .civic-phase-rows .civicObjective { margin-block: 6px 0; }
+body.game-hub .v4Panel .civicObjective > span { color: #435b50; }
 .civic-objective-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 .civic-phase summary:focus-visible {
   outline: 2px solid #187e69;
@@ -270,8 +271,18 @@ body.game-hub .v4Panel .city-rank-resident {
     max-width: 470px;
     justify-content: center;
   }
-  body.game-hub .v4Nav button { flex: 1 1 0; width: auto; min-height: 49px !important; }
-  body.game-hub .v4Nav button span { font-size: clamp(9px, 2.55vw, 12px) !important; overflow-wrap: anywhere; }
+  body.game-hub .v4Nav button {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 44px !important;
+    min-height: 49px !important;
+  }
+  body.game-hub .v4Nav button span {
+    font-size: clamp(9px, 2.4vw, 12px) !important;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
   body.game-hub .earthControls { right: auto !important; inset-inline-end: 7px; max-height: 38dvh; }
   body.game-hub .earthControls > button { width: 41px !important; height: 41px !important; }
   body.game-hub .v4Panel, body.game-hub #card {
@@ -290,4 +301,8 @@ body.game-hub .v4Panel .city-rank-resident {
 
 @media (max-height: 460px) {
   .hub-city-strip { display: none; }
+}
+
+@media (max-width: 350px) {
+  body.game-hub .v4Nav { width: calc(100% - 4px) !important; }
 }

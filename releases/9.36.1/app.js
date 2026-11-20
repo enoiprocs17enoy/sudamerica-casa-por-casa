@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=15',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=16',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -1391,8 +1391,9 @@ function drawSurveyedCitySquare(profile,b){
   const key=kind+':'+color+':'+y;if(!surfaceBatches.has(key))surfaceBatches.set(key,{color,y,kind,geometries:[]});surfaceBatches.get(key).geometries.push(new THREE.ShapeGeometry(shapes));
   if(raised)for(const ring of rings)border(ring,0xd9cebb,.145,.12,y-.020);
  };
- // The paving bed supports both the mapped footprint and the surrounding promenade.
- box(profile.stone||0xc8bcaa,0,.22,0,b.width-.50,.22,b.depth-.50,0,false);
+ // Use a distinct surrounding pavement so the mapped square does not read as the whole parcel.
+ const promenadeColor=profile.reviewed&&profile.continuousPaving?0xb6afa3:profile.stone||0xc8bcaa;
+ box(promenadeColor,0,.22,0,b.width-.50,.22,b.depth-.50,0,false);
  for(const side of [-1,1]){
   box(0xe8deca,side*(b.width/2-.42),.39,0,.28,.30,b.depth-.70,0,false);
   box(0xe8deca,0,.39,side*(b.depth/2-.42),b.width-.70,.30,.28,0,false);
@@ -6817,6 +6818,7 @@ function* rebuildStages(){
  const previousGroup=group,previousHouseMeshes=houseMeshes;
  clearAvatarLabels();residentBatches=null;
  group=new THREE.Group();houseMeshes=[];window.v47Marker=null;window.v49Focus=null;
+ group.userData.cityId=currentCity.id;
  const selected=homes,errors=[];
  function safe(label,fn){const started=window.ReviewPerformance?performance.now():null;try{fn()}catch(err){console.error(label,err);errors.push(label+': '+err.message)}finally{if(started!==null)window.ReviewPerformance.recordStage(label,performance.now()-started);}}
  safe('Strade',()=>drawRoadNetwork(selected));
@@ -7960,10 +7962,18 @@ function closeCivicPanel(){
 function openSquareDetailPanel(focusHeading=true){
  localizedPanelRoute={type:'square'};
  const panel=revealCivicPanel(focusHeading),body=$('v4Body'),profile=citySquareProfile(currentCity);$('v4Title').textContent=profile.name;if(profile.name.startsWith('Piazza civica di '))delete $('v4Title').dataset.i18nSkip;else $('v4Title').dataset.i18nSkip='true';body.replaceChildren();
+ const meshes=active&&group?.name==='city-geometry'&&group.userData.cityId===currentCity.id?
+  group.children.filter(mesh=>mesh.visible&&mesh.userData.publicZone?.block===0):[];
+ const grounds=meshes.filter(({userData:{citySquare}})=>citySquare?.name===profile.name&&citySquare.source===(profile.source||null));
+ const renderedFeatures=new Set(meshes.flatMap(mesh=>mesh.userData.squareFeatureIDs||[]));
+ const outlineOnly=grounds.length===1&&!renderedFeatures.size&&
+  !meshes.some(mesh=>Number.isInteger(mesh.userData.squareWalkways))&&
+  !group.userData.squareMappedSeats?.length&&!group.userData.squareMappedTrees?.length;
  const intro=document.createElement('p');
- const chosenWithReference=['curated-central-square','named-reference'].includes(profile.selection);
+ const chosenWithReference=['curated-central-square','documented-civic-square','named-reference'].includes(profile.selection);
  intro.textContent=profile.layoutEvidence==='schematic-from-design'?'Perimetro da OpenStreetMap. Disposizione interna schematica basata sul progetto, con posizioni indicative.':
-  profile.reviewed?'Piazza verificata singolarmente. La ricostruzione segue la cartografia e i riferimenti disponibili.':
+  profile.reviewed?(outlineOnly?'Perimetro verificato nelle fonti. Per ora la scena riproduce il solo contorno della piazza.':
+   'Perimetro verificato nelle fonti. Gli elementi ricostruiti seguono la documentazione disponibile.'):
   profile.realGeometry?(chosenWithReference?'Piazza scelta con riferimenti locali. I dettagli della ricostruzione sono da verificare.':
    'Candidato trovato sulla mappa. La scelta della piazza e i dettagli della scena sono da verificare.'):
   'Piazza di gioco generata in attesa di una planimetria reale.';
@@ -7986,11 +7996,12 @@ function openSquareDetailPanel(focusHeading=true){
  if(references.childElementCount)body.append(references);
  const adjacent=profile.contextSurfaces?.length?profile.adjacentLandmarks||[]:[];
  const features=[...(profile.landmarks||[]),...adjacent];
- if(!features.length){const empty=document.createElement('p');empty.textContent='Le fonti disponibili non descrivono ancora statue e fontane di questa piazza.';body.append(empty);}
  for(const feature of features){
-  const row=document.createElement('div');row.className='civicObjective '+(feature.status==='needs-model'?'pending':'documented');
+  const mappedSurface=feature.model==='mapped-water-surface'||feature.evidence?.shape==='mapped-surface';
+  const pending=feature.status==='needs-model'||(grounds.length&&!mappedSurface&&!feature.partOf&&!renderedFeatures.has(feature.id));
+  const row=document.createElement('div');row.className='civicObjective '+(pending?'pending':'documented');
   const name=document.createElement('strong');name.textContent=feature.name;if(!['Opera mappata','Fontana mappata'].includes(feature.name))name.dataset.i18nSkip='true';
-  const state=document.createElement('span');state.textContent=feature.model==='mapped-water-surface'||feature.evidence?.shape==='mapped-surface'?'Vasca riprodotta dal perimetro cartografico':feature.status==='needs-model'?'Presenza mappata · forma 3D da completare':feature.status==='reference-model'?'Riferimento documentato · modello 3D stilizzato':'Tipologia mappata · modello 3D da verificare nei dettagli';row.append(name,state);
+  const state=document.createElement('span');state.textContent=pending?'Presenza mappata · forma 3D da completare':mappedSurface?'Vasca riprodotta dal perimetro cartografico':feature.status==='reference-model'?'Riferimento documentato · modello 3D stilizzato':'Tipologia mappata · modello 3D da verificare nei dettagli';row.append(name,state);
   if(feature.description){const description=document.createElement('p');description.textContent=feature.description;row.append(description);}
   if(feature.evidence?.position){
    const evidence=document.createElement('small');
