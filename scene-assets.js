@@ -39,7 +39,7 @@
   if(scenePromise)return scenePromise;
   const three=script(engineUrl,'THREE');
   const geography=sceneModules.map(module=>releaseScript(...module));
-  const engine=three.then(()=>script('render-engine.js?v=9.36.1-forest1','SudamericaRender8'));
+  const engine=three.then(()=>script('render-engine.js?v=9.36.1-sun1','SudamericaRender8'));
   scenePromise=Promise.all([engine,...geography])
    .then(()=>releaseScript('world-neighbors.js','WorldNeighbors'))
    .catch(error=>{scenePromise=null;throw error;});

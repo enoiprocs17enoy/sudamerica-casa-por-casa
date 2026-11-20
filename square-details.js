@@ -155,6 +155,8 @@ Object.assign(MODEL_SPECS,{
  'segovia-music-bandstand':{height:6.3,width:8.12,depth:9.5,parcelWidth:.34},
  'segovia-machado':{height:1.85,width:.82,depth:.62},
  'segovia-press-kiosk':{height:2.58,width:4.03,depth:4.03},
+ 'malaga-torrijos-obelisk':{height:17,width:10.11,depth:10.11,parcelWidth:.54},
+ 'malaga-seated-picasso':{height:1.4,width:1.95,depth:1.1},
  'valencia-city-hall-fountain':{height:4.4,width:20,depth:20,parcelWidth:.54},
  'valencia-vinatea':{height:8.3,width:2.47,depth:2.47},
  'alicante-luceros-fountain':{height:15,width:20,depth:20,parcelWidth:.72},
@@ -2732,6 +2734,90 @@ function render(plan,group,b){
     add('box','metal',roof,0,roofPitch(z),z,4.03,.10,.50,turn);
     box(shell,0,(2.10+roofPitch(z))/2,z,3.92,roofPitch(z)-2.10,.45,'metal');
    }
+  }else if(model==='malaga-torrijos-obelisk'){
+   const limestone=0xd4c7b3,trim=0xe5d9c5,shade=0xb7a793,iron=0x454643,patina=0x63665e;
+   box(shade,0,.12,0,10.11,.24,10.11);
+   box(limestone,0,.35,0,7.52,.26,7.52);
+   box(trim,0,.69,0,6.40,.42,6.40);
+   box(limestone,0,1.54,0,5.45,1.32,5.45);
+   box(trim,0,2.28,0,5.72,.24,5.72);
+   box(limestone,0,3.44,0,4.26,2.08,4.26);
+   box(trim,0,4.57,0,4.59,.21,4.59);
+   box(shade,0,4.91,0,3.03,.47,3.03);
+   box(trim,0,5.20,0,3.20,.22,3.20);
+   add('pyramid','stone',limestone,0,10.82,0,1.64,11.03,1.64,new T.Quaternion().setFromAxisAngle(UP,Math.PI/4));
+   box(trim,0,16.50,0,.59,.31,.59);
+   box(limestone,0,16.77,0,.43,.28,.43);
+   add('cone','stone',trim,0,16.96,0,.32,.08,.32);
+
+   for(let side=0;side<4;side++){
+    const angle=side*Math.PI/2,ca=Math.cos(angle),sa=Math.sin(angle);
+    const point=(x,y,z)=>[x*ca+z*sa,y,z*ca-x*sa];
+    const orientation=new T.Quaternion().setFromAxisAngle(UP,angle);
+    const slab=(color,x,y,z,w,h,d,material='stone')=>add('box',material,color,...point(x,y,z),w,h,d,orientation);
+
+    slab(iron,0,1.51,2.738,3.68,.76,.05,'metal');
+    slab(iron,0,3.43,2.151,2.87,1.31,.054,'metal');
+    for(let row=0;row<5;row++){
+     slab(patina,0,3.84-row*.20,2.184,2.38-row*.13,.037,.018,'patina');
+     if(row<4)slab(patina,0,1.78-row*.158,2.769,3.1-row*.12,.034,.016,'patina');
+    }
+    for(let level=0;level<6;level++){
+     const y=6.43+level*1.57,r=.37-level*.035;
+     const surface=h=>1.64*Math.SQRT1_2*(1-(h-5.305)/11.03*.88);
+     for(const sign of [-1,1]){
+      for(let leaf=0;leaf<7;leaf++){
+       const a=leaf*Math.PI/6,h=y-r*.60*Math.cos(a);
+       const x=sign*(r*.92+r*.57*Math.sin(a));
+       const turn=orientation.clone().multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0,0,1),sign*(a-Math.PI/2)));
+       add('sphere','stone',trim,...point(x,h,surface(h)+.025),r*.22,r*.34,.095,turn);
+      }
+     }
+     slab(trim,0,y-.28,surface(y-.28)+.065,.16,.13,.14);
+    }
+
+    // One corner pier per side keeps the four runs of iron railing continuous.
+    slab(limestone,4.87,.71,4.87,.35,.95,.35);
+    slab(trim,4.87,1.23,4.87,.43,.12,.43);
+    for(const h of [.48,1.05])slab(iron,0,h,4.87,9.57,.053,.059,'metal');
+    for(let bar=0;bar<26;bar++){
+     const x=-4.57+bar*.365;
+     slab(iron,x,.81,4.87,.037,.80,.037,'metal');
+     add('cone','metal',iron,...point(x,1.27,4.87),.046,.14,.046);
+    }
+   }
+  }else if(model==='malaga-seated-picasso'){
+   const marbleSeat=0xc4c0b3,seatEdge=0xd1cbbd,bronzeBody=0x67705c,patina=0x586453,highlight=0x747d67;
+   for(const x of [-.66,.67])box(marbleSeat,x,.21,0,.19,.42,.52);
+   box(seatEdge,0,.445,0,1.95,.105,.64);
+   sphere(bronzeBody,-.50,.59,.02,.245,.17,.22,'patina');
+   sphere(bronzeBody,-.51,.90,-.085,.228,.299,.16,'patina');
+   sphere(bronzeBody,-.53,1.135,-.05,.077,.095,.071,'patina');
+   sphere(patina,-.55,1.254,-.034,.119,.145,.113,'patina');
+   sphere(bronzeBody,-.566,1.221,.073,.029,.030,.036,'patina');
+   sphere(bronzeBody,-.655,1.228,-.034,.023,.045,.020,'patina');
+   sphere(bronzeBody,-.442,1.234,-.032,.023,.043,.021,'patina');
+   for(const side of [-1,1]){
+    limb([-.53+side*.047,1.13,.06],[-.53+side*.106,1.06,.08],.022,highlight,'patina');
+    limb([-.52+side*.08,.88,.076],[-.52+side*.13,.72,.036],.015,patina,'patina');
+   }
+   for(const [x,delta] of [[-.67,-.05],[-.38,.10]]){
+    limb([x,.63,.08],[x+delta,.535,.41],.095,bronzeBody,'patina');
+    sphere(bronzeBody,x+delta,.535,.41,.094,.093,.091,'patina');
+    limb([x+delta,.535,.41],[x+delta,.105,.54],.072,patina,'patina');
+    sphere(bronzeBody,x+delta,.077,.633,.072,.074,.14,'patina');
+    box(patina,x+delta,.039,.656,.136,.064,.221,'patina');
+   }
+   limb([-.70,1.055,-.05],[-.79,.78,.18],.071,patina,'patina');
+   limb([-.79,.78,.18],[-.56,.722,.31],.055,bronzeBody,'patina');
+   limb([-.31,1.04,-.05],[-.26,.78,.12],.071,patina,'patina');
+   limb([-.26,.78,.12],[-.45,.733,.35],.050,bronzeBody,'patina');
+   sphere(bronzeBody,-.79,.78,.18,.060,.062,.061,'patina');
+   sphere(bronzeBody,-.26,.78,.12,.056,.061,.055,'patina');
+   box(patina,-.48,.725,.30,.277,.036,.235,'patina');
+   box(highlight,-.48,.747,.30,.257,.011,.218,'patina');
+   limb([-.48,.754,.197],[-.48,.755,.401],.006,patina,'patina');
+   limb([-.49,.747,.35],[-.38,.774,.43],.012,0x817a63,'patina');
   }else if(model==='valencia-city-hall-fountain'){
    const lip=0xc1b8a8,basinBody=0x9f998e,bowl=0x7c9693,waterTint=0x61abc0;
    add('fountain-deck','stone',basinBody,0,.19,0,10,.38,10);

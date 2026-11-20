@@ -3,7 +3,7 @@
    no blur, downsampling or dark screen-space filters. */
 (function(){
  'use strict';
- const target=new THREE.Vector3(),direction=new THREE.Vector3(),offset=new THREE.Vector3(-155,156,115);
+ const target=new THREE.Vector3(),direction=new THREE.Vector3(),offset=new THREE.Vector3(-155,252,115);
  const shadowCenter=new THREE.Vector3(Infinity,0,Infinity);
  const guardedShadowMaps=new WeakSet();
  let sun=null,lastShadow=-Infinity;
