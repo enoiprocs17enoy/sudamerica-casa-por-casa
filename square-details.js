@@ -30,6 +30,7 @@ Object.assign(MODEL_SPECS,{
  'delhi-baradari':{height:4.8,width:8.4,depth:8.4,parcelWidth:.32},
  'delhi-entry-arcade':{height:3.6,width:12.4,depth:.9,parcelWidth:.42},
  'delhi-open-air-theatre':{height:1.3,width:15,depth:11,parcelWidth:.46},
+ 'birmingham-iron-man':{height:6,width:2.5,depth:1.94},
  'king-sejong-seated':{height:7.0,width:5.5,depth:5.3,parcelWidth:.45},
  'joseon-armillary':{height:1.48,width:.82,depth:.82},
  'joseon-rain-gauge':{height:1.32,width:.63,depth:.63},
@@ -37,6 +38,8 @@ Object.assign(MODEL_SPECS,{
  'three-rivers-fountain':{height:5.5,width:10,depth:10,parcelWidth:.35},
  'rizal-monument':{height:9.6,width:7.4,depth:7.4,parcelWidth:.42},
  'monas':{height:19.0,width:7.1,depth:7.1,parcelWidth:.50},
+ 'pirulito-obelisk':{height:13.57,width:7.60,depth:7.60},
+ 'boa-vista-garimpeiro':{height:7.5,width:15.7,depth:7.5,parcelWidth:.38},
  'tahrir-obelisk':{height:20.1,width:4.7,depth:4.3},
  'sydney-cenotaph':{height:3.8,width:7.7,depth:3.6,parcelWidth:.35}
 });
@@ -686,6 +689,8 @@ function render(plan,group,b){
      box(tread,side*4.1,height+.07,z,6.7,.14,1.52);
     }
    }
+  }else if(model==='birmingham-iron-man'){
+   add('iron-man','patina',0x774b36,0,0,0,1,1,1);
   }else if(model==='waharoa'){
    const timber=0x68472f,carving=0xaa8057,copper=0x518981,rose=0x965656;
    const across=new T.Vector3(1,0,0);
@@ -866,6 +871,54 @@ function render(plan,group,b){
    sanMartin();
   }else if(model==='standing-sword'){
    steps(0,4.0);box(stone,0,1.8,0,2.7,2.15,2.7);box(marble,0,3.0,0,3.0,.27,3.0);plaque(1.9,1.6,1.39);human(0,3.135,0,1.45,'sword');
+  }else if(model==='pirulito-obelisk'){
+   // Belotur records the dimensions of the granite courses and pyramid.
+   const granite=0xa39d93,polished=0x807d77,molding=0xb7afa3;
+   box(granite,0,.35,0,7.60,.70,7.60);
+   box(granite,0,.96,0,4.88,.52,4.88);
+   box(granite,0,1.82,0,2.40,1.20,2.40);
+   box(molding,0,2.60,0,2.52,.36,2.52);
+   box(polished,0,3.92,0,1.85,2.28,1.85);
+   box(molding,0,5.25,0,2.02,.38,2.02);
+   add('obelisk-cap','stone',granite,0,9.505,0,1.20,8.13,1.20);
+   for(const side of [-1,1]){
+    box(0x69523d,0,3.95,side*.939,1.05,.65,.028,'patina');
+    box(0x69523d,side*.939,3.95,0,.028,.65,1.05,'patina');
+   }
+  }else if(model==='boa-vista-garimpeiro'){
+   const figure=0xc6a064,shade=0x9d7644,plinth=0xb5a48e;
+   // A shallow reflecting pool surrounds the masonry support.
+   box(plinth,0,.12,0,15.7,.24,7.5);
+   box(water,0,.255,0,15.18,.035,6.98,'water');
+   for(const side of [-1,1]){
+    box(stone,side*7.72,.30,0,.26,.22,7.5);
+    box(stone,0,.30,side*3.62,15.18,.22,.26);
+   }
+   box(plinth,0,.74,-.18,4.18,1.0,3.36);
+   box(stone,0,1.30,-.18,4.30,.16,3.48);
+   // Bent knees and forward shoulders carry the head and the two-handed bateia.
+   for(const side of [-1,1]){
+    const hip=[side*.59,4.44,-.83],knee=[side*.99,2.92,-.04],ankle=[side*1.03,1.63,-.55];
+    limb(hip,knee,.42,figure,'stone');
+    sphere(figure,...knee,.41,.40,.40,'stone');
+    limb(knee,ankle,.29,figure,'stone');
+    sphere(figure,ankle[0],1.55,-.21,.36,.17,.68,'stone');
+    const shoulder=[side*.78,5.70,.57],elbow=[side*1.20,4.77,1.29],hand=[side*1.20,4.03,2.64];
+    sphere(figure,...shoulder,.44,.52,.45,'stone');
+    limb(shoulder,elbow,.28,figure,'stone');
+    sphere(figure,...elbow,.25,.26,.25,'stone');
+    limb(elbow,hand,.21,figure,'stone');
+    sphere(figure,...hand,.26,.24,.27,'stone');
+   }
+   sphere(shade,0,4.43,-.80,.92,.62,.54,'stone');
+   limb([0,4.45,-.65],[0,5.71,.49],.72,figure,'stone');
+   sphere(figure,0,5.75,.45,1.0,.58,.69,'stone');
+   limb([0,5.82,.85],[0,6.30,1.04],.34,figure,'stone');
+   sphere(figure,0,6.43,1.20,.53,.58,.50,'stone');
+   sphere(figure,0,6.30,1.62,.20,.19,.21,'stone');
+   cylinder(shade,0,6.85,1.18,.85,.12);
+   cylinder(figure,0,7.06,1.18,.48,.36);
+   add('bateia','stone',shade,0,3.78,2.41,1,1,1,new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),.22));
   }else if(model==='tahrir-obelisk'){
    // Pink granite shaft and pyramidion, with the relief indicated schematically.
    const granite=0xb98370,engraving=0x955f51,shaftWidth=2.4,shaftDepth=2.1,topRatio=.62;
@@ -907,7 +960,34 @@ function render(plan,group,b){
  const localModels=[];
  for(const item of plan.items){owner=item;const first=parts.length;build(item.feature.model);localModels.push({item,first,end:parts.length});}
  const geos={box:new T.BoxGeometry(1,1,1),sphere:new T.SphereGeometry(1,12,8),cylinder:new T.CylinderGeometry(1,1,1,12),cone:new T.ConeGeometry(1,1,12),torus:new T.TorusGeometry(1,.045,6,20),pyramid:new T.CylinderGeometry(.12,1,1,4),robe:new T.CylinderGeometry(.55,1,1,10),cape:new T.PlaneGeometry(1,1,10,12)};
+ if(parts.some(part=>part.kind==='iron-man')){
+  // Approximate the cast-iron silhouette, with the feet below the paving.
+  const section=[[0,.37,.31],[.65,.45,.38],[2.15,.64,.46],[3.06,.74,.54],
+   [4.12,.82,.56],[4.82,.92,.46],[5.10,.51,.37],[5.20,.29,.28],
+   [5.36,.35,.34],[5.78,.31,.30],[5.99,.17,.19],[6,0,0]];
+  const vertices=[],indices=[],segments=12;
+  for(const [height,width,depth] of section){
+   for(let i=0;i<segments;i++){
+    const angle=i*2*Math.PI/segments;
+    vertices.push(Math.sin(angle)*width-height*Math.tan(5*Math.PI/180),height,
+     Math.cos(angle)*depth-height*Math.tan(7.5*Math.PI/180));
+   }
+  }
+  for(let row=1;row<section.length;row++){
+   for(let i=0;i<segments;i++){
+    const a=(row-1)*segments+i,b=(row-1)*segments+(i+1)%segments;
+    indices.push(a,b,a+segments,b,b+segments,a+segments);
+   }
+  }
+  const shape=new T.BufferGeometry();
+  shape.setAttribute('position',new T.Float32BufferAttribute(vertices,3));shape.setIndex(indices);
+  shape.computeVertexNormals();geos['iron-man']=shape;
+ }
  if(parts.some(part=>part.kind==='hex'))geos.hex=new T.CylinderGeometry(1,1,1,6);
+ if(parts.some(part=>part.kind==='bateia')){
+  const profile=[[0,0],[.70,0],[1.24,.35],[1.30,.40],[1.23,.41],[.62,.10],[0,.10]];
+  geos.bateia=new T.LatheGeometry(profile.map(([r,y])=>new T.Vector2(r,y)),24);
+ }
  if(parts.some(part=>part.kind==='sundial-bowl')){
   const profile=[[0,0],[.13,0],[.27,.08],[.38,.22],[.42,.36],[.38,.36],[.34,.23],[.24,.11],[.11,.05],[0,.05]];
   geos['sundial-bowl']=new T.LatheGeometry(profile.map(([r,y])=>new T.Vector2(r,y)),20);
@@ -915,10 +995,8 @@ function render(plan,group,b){
  if(parts.some(part=>part.kind==='triangular-base'))geos['triangular-base']=new T.CylinderGeometry(1,1,1,3);
  if(parts.some(part=>part.kind==='fountain-crown'))geos['fountain-crown']=new T.CylinderGeometry(1,.53,1,12);
  if(parts.some(part=>part.kind==='tapered-column'))geos['tapered-column']=new T.CylinderGeometry(.56,1,1,16);
- if(parts.some(part=>part.kind==='obelisk-shaft')){
-  geos['obelisk-shaft']=new T.CylinderGeometry(.62*Math.SQRT1_2,Math.SQRT1_2,1,4).rotateY(Math.PI/4);
-  geos['obelisk-cap']=new T.ConeGeometry(Math.SQRT1_2,1,4).rotateY(Math.PI/4);
- }
+ if(parts.some(part=>part.kind==='obelisk-shaft'))geos['obelisk-shaft']=new T.CylinderGeometry(.62*Math.SQRT1_2,Math.SQRT1_2,1,4).rotateY(Math.PI/4);
+ if(parts.some(part=>part.kind==='obelisk-cap'))geos['obelisk-cap']=new T.ConeGeometry(Math.SQRT1_2,1,4).rotateY(Math.PI/4);
  if(parts.some(part=>part.kind==='monas-base'))geos['monas-base']=new T.CylinderGeometry(1,.76,1,4).rotateY(Math.PI/4);
  if(parts.some(part=>part.kind==='park-arch')){
   const opening=new T.Shape();
