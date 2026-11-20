@@ -39,8 +39,13 @@ Object.assign(MODEL_SPECS,{
  'tabaco-plaza-gazebo':{height:4.8,width:6.4,depth:6.4,parcelWidth:.34},
  'bratislava-maximilian-fountain':{height:10.5,width:10.4,depth:8.6},
  'bratislava-city-guard':{height:2.68,width:.91,depth:1.42},
+ 'bratislava-napoleonic-soldier':{height:1.53,width:1.80,depth:1.18},
  'cuenca-calderon-monument':{height:6.5,width:3.9,depth:3.9},
  'cuenca-calderon-glorieta':{height:4.8,width:7.2,depth:7.2},
+ 'budapest-millennium-column':{height:40.5,width:17,depth:17,parcelWidth:.5},
+ 'budapest-millennium-colonnade-north':{height:8.2,width:38,depth:14,parcelWidth:.85},
+ 'budapest-millennium-colonnade-east':{height:8.2,width:16,depth:38,parcelWidth:.85},
+ 'budapest-heroes-memorial-stone':{height:.85,width:10,depth:6,parcelWidth:.5},
  'kingston-manley-statue':{height:5,width:3,depth:3},
  'kingston-bustamante-statue':{height:5,width:3,depth:3},
  'waharoa':{height:7,width:10.132,depth:.62,parcelWidth:.38},
@@ -49,11 +54,16 @@ Object.assign(MODEL_SPECS,{
  'delhi-open-air-theatre':{height:1.3,width:15,depth:11,parcelWidth:.46},
  'birmingham-iron-man':{height:6,width:2.5,depth:1.94},
  'birmingham-the-river':{height:2.8,width:4,depth:2.5},
+ 'campidoglio-nilo':{height:3.15,width:4.65,depth:2.2},
+ 'campidoglio-tevere':{height:3.12,width:5.05,depth:2.2},
  'delft-hugo-de-groot':{height:5.8,width:2.7,depth:2.7},
  'birmingham-queen-victoria':{height:6.6,width:3.8,depth:3.7},
  'goiania-tres-racas':{height:7,width:3.1,depth:4.7},
  'tartini-monument':{height:6,width:2.75,depth:2.75},
  'monaco-malizia':{height:4.25,width:2.2,depth:2.2},
+ 'tartu-countrywomen':{height:2.1,width:1.78,depth:1.10},
+ 'tartu-town-hall':{height:27,width:36.25,depth:19.8,parcelWidth:.75},
+ 'tartu-kissing-students':{height:4.4,width:10.2,depth:10.2,parcelWidth:.40},
  'vilnius-gediminas':{height:8.5,width:7.4,depth:6.8,parcelWidth:.30},
  'vilnius-cathedral-belfry':{height:57,width:14.45,depth:14.45,parcelWidth:.50},
  'vilnius-cathedral-basilica':{height:21.5,width:44.1,depth:72,parcelWidth:.78},
@@ -87,6 +97,7 @@ Object.assign(MODEL_SPECS,{
  'laoag-tobacco-obelisk':{height:6.3,width:3.5,depth:3.5},
  'dapitan-mindanao-relief':{height:1.55,width:32,depth:28,parcelWidth:.45},
  'daet-rizal-pylon':{height:6.1,width:3.8,depth:3.8},
+ 'morong-claudio-statue':{height:4.3,width:2.75,depth:2.75},
  'tahrir-obelisk':{height:20.1,width:4.7,depth:4.3},
  'sydney-cenotaph':{height:3.8,width:7.7,depth:3.6,parcelWidth:.35}
 });
@@ -695,6 +706,70 @@ function render(plan,group,b){
    const travertine=0xb6a78f;
    add('cistern-stonework','stone',travertine,0,0,0,1,1,1);
    cylinder(0x4d463c,0,.59,0,.97,.10);
+  }else if(model==='budapest-millennium-column'){
+   const limestone=0xc7c0af,trim=0xa99e85,darkBronze=0x485346;
+   for(let step=0;step<4;step++){
+    const width=12.8-step*.7;
+    box(limestone,0,.18+step*.34,0,width,.36,width);
+   }
+   box(limestone,0,2.85,0,9.8,3.1,9.8);
+   box(trim,0,4.48,0,10.1,.38,10.1);
+   cylinder(limestone,0,5.07,0,2.78,.78);
+   cylinder(trim,0,5.59,0,2.35,.31);
+   add('tapered-column','stone',limestone,0,20.0,0,1.91,28.50,1.91);
+   cylinder(limestone,0,34.5,0,1.65,.66);
+   cylinder(trim,0,35.07,0,2.02,.53);
+   box(limestone,0,35.56,0,3.78,.46,3.78);
+   sphere(trim,0,36.33,0,.82,.63,.82,'metal');
+   const angel=36.85;
+   human(0,angel,0,1.35,'classical',darkBronze);
+   for(const side of [-1,1]){
+    const wing=new T.Quaternion().setFromAxisAngle(new T.Vector3(0,0,1),side*-.49);
+    add('sphere','metal',darkBronze,side*1.02,angel+1.73,-.32,.64,1.38,.19,wing);
+   }
+   limb([.71,angel+1.56,.24],[.71,angel+3.57,.24],.075,darkBronze);
+   for(const y of [2.76,3.22])limb([.37,angel+y,.24],[1.05,angel+y,.24],.058,darkBronze);
+   // The seven mounted figures are simplified as individual bronze silhouettes.
+   for(let i=0;i<7;i++){
+    const angle=(i-3)*Math.PI/6,x=Math.sin(angle)*5.15,z=Math.cos(angle)*5.15;
+    sphere(darkBronze,x,4.16,z,.62,.53,1.20,'metal');
+    limb([x,4.07,z+.58],[x,4.84,z+1.11],.32,darkBronze);
+    sphere(darkBronze,x,4.87,z+1.18,.29,.29,.44,'metal');
+    for(const dx of [-.30,.30])for(const dz of [-.66,.64]){
+     limb([x+dx,3.93,z+dz],[x+dx,3.16,z+dz+.11],.13,darkBronze);
+    }
+    human(x,4.39,z,.59,'civil',darkBronze);
+   }
+  }else if(model==='budapest-millennium-colonnade-north'||model==='budapest-millennium-colonnade-east'){
+   const limestone=0xc7c0af,trim=0xa99e85,darkBronze=0x485346;
+   const north=model==='budapest-millennium-colonnade-north';
+   const axes=north
+    ?[[-16.13,-1.61],[-11.7,-4.44],[-6.86,-5.24],[-1.61,-5.24],[3.23,-4.03],[8.07,-2.02],[12.50,1.61],[16.13,4.03]]
+    :[[-5.24,-16.54],[-1.21,-12.10],[2.02,-7.66],[4.03,-2.82],[4.84,2.42],[4.44,7.26],[3.23,12.10],[.81,17.34]];
+   for(const [x,z] of axes){
+    cylinder(trim,x,1.06,z,.75,.22);
+    cylinder(limestone,x,3.62,z,.49,4.93);
+    cylinder(limestone,x,6.08,z,.75,.29);
+   }
+   for(let i=1;i<axes.length;i++){
+    const [ax,az]=axes[i-1],[bx,bz]=axes[i];
+    const x=(ax+bx)/2,z=(az+bz)/2,dx=bx-ax,dz=bz-az;
+    const span=Math.hypot(dx,dz)+.75;
+    const yaw=new T.Quaternion().setFromAxisAngle(UP,-Math.atan2(dz,dx));
+    add('box','stone',limestone,x,.47,z,span,.94,3.00,yaw);
+    add('box','stone',limestone,x,6.48,z,span,.76,2.34,yaw);
+    add('box','stone',trim,x,6.94,z,span,.26,2.58,yaw);
+    box(limestone,x,1.39,z,1.33,.91,1.27);
+    human(x,1.85,z,.97,'classical',darkBronze);
+   }
+   for(const index of [0,axes.length-1]){
+    const [x,z]=axes[index];
+    human(x,7.08,z,.44,'classical',darkBronze);
+   }
+  }else if(model==='budapest-heroes-memorial-stone'){
+   box(0xb5ad9b,0,.11,0,10,.22,6.0);
+   box(0xaaa18f,0,.50,0,8.3,.56,4.0);
+   box(0xc5bca7,0,.80,0,8.55,.11,4.18);
   }else if(model==='kingston-manley-statue'||model==='kingston-bustamante-statue'){
    const limestone=0xd7d3c5,darkBronze=0x494c3d,manley=model==='kingston-manley-statue';
    cylinder(limestone,0,.12,0,1.5,.24);
@@ -888,6 +963,64 @@ function render(plan,group,b){
      beam([side*.24,3.24,1.03-lean],elbow,.105);
      beam(elbow,hand,.082);
      joint(...hand,.08,.10,.07);
+    }
+   }
+  }else if(model==='campidoglio-nilo'||model==='campidoglio-tevere'){
+   const nile=model==='campidoglio-nilo',side=nile?1:-1;
+   const pale=nile?0xded8cd:0xd9cfbc,shade=nile?0xc8bfb0:0xc6baa4;
+   const width=MODEL_SPECS[model].width;
+   box(shade,0,.12,0,width,.24,2.2);
+   box(0xbbae9b,0,.59,0,width-.26,.70,1.94);
+   box(pale,0,1.00,0,width-.10,.16,2.07);
+   const form=(x,y,z,w,h,d,color=pale)=>sphere(color,side*x,y,z,w,h,d,'stone');
+   const link=(a,b,r,color=pale)=>limb([side*a[0],a[1],a[2]],[side*b[0],b[1],b[2]],r,color,'stone');
+   form(0,1.15,0,width*.48,.13,.80,shade);
+   form(-.43,1.48,.07,.77,.38,.53);
+   link([-.20,1.49,-.02],[-.86,1.66,.31],.27,shade);
+   link([-.86,1.66,.31],[-1.79,1.39,.35],.20,shade);
+   link([-.35,1.49,.16],[-1.00,1.55,-.20],.24);
+   link([-1.00,1.55,-.20],[-1.83,1.42,.10],.17);
+   form(-1.91,1.38,.39,.25,.13,.16);
+   form(-1.93,1.39,.03,.22,.12,.15);
+   for(const [x,y,z] of [[-.74,1.49,.47],[-.93,1.49,.38],[-1.09,1.43,.40],[-1.25,1.43,.30]]){
+    link([x+.22,y+.11,z],[x-.15,y-.11,z+.12],.076,shade);
+   }
+   link([-.13,1.50,.01],[.57,2.30,.02],.43);
+   form(.36,1.93,.15,.52,.50,.38);
+   form(.61,2.28,.06,.52,.33,.35);
+   link([.70,2.38,.02],[.87,2.65,.05],.18);
+   form(.94,2.83,.04,.26,.31,.23);
+   form(.94,2.88,-.08,.28,.24,.20,shade);
+   form(.94,2.68,.18,.20,.21,.17,shade);
+   form(.95,2.80,.24,.087,.095,.095);
+   link([.86,2.31,-.10],[1.28,1.82,-.04],.17);
+   link([1.28,1.82,-.04],[1.47,1.71,.39],.146);
+   form(1.49,1.71,.44,.16,.12,.12);
+   link([.28,2.29,.18],[.03,1.91,.47],.16);
+   const horn=nile?[.96,2.31,.52]:[-.48,2.12,.60];
+   link([.03,1.91,.47],horn,.13);
+   const tip=nile?[1.31,2.43,.52]:[-.64,2.19,.60];
+   const foot=nile?[1.55,1.67,.39]:[-.30,1.42,.40];
+   link(foot,horn,.14,shade);
+   link(horn,tip,.22,shade);
+   for(const [dx,dy,dz] of [[-.12,.12,.03],[.12,.08,.02],[.03,.05,.16]]){
+    form(tip[0]+dx,tip[1]+dy,tip[2]+dz,.105,.11,.10);
+   }
+   if(nile){
+    // The small sphinx supports the Nile's upper body.
+    form(1.58,1.32,.17,.48,.25,.30,shade);
+    form(1.88,1.57,.15,.21,.26,.20);
+    form(1.94,1.79,.17,.17,.20,.17);
+    for(const z of [.01,.29])form(1.96,1.23,z,.23,.10,.10,shade);
+   }else{
+    // A she-wolf and the twins distinguish the pendant on the opposite plinth.
+    form(1.52,1.57,.25,.44,.21,.22,shade);
+    form(1.87,1.67,.26,.22,.18,.18,shade);
+    form(2.01,1.60,.26,.17,.10,.12);
+    for(const x of [1.25,1.75])for(const z of [.14,.38])link([x,1.53,z],[x,1.19,z],.065,shade);
+    for(const x of [1.37,1.63]){
+     form(x,1.28,.45,.115,.14,.13);
+     form(x,1.45,.47,.10,.103,.10);
     }
    }
   }else if(model==='delft-hugo-de-groot'){
@@ -1205,6 +1338,76 @@ function render(plan,group,b){
     limb([x*.48,1.64,.41],[x*.43,1.11,forward],.18,granite,'stone');
     sphere(granite,x*.43,1.00,forward+.07,.21,.14,.29,'stone');
    }
+  }else if(model==='tartu-countrywomen'){
+   const patina=0x5c6557;
+   box(0x9a9284,0,.075,0,1.76,.15,.92);
+   box(patina,.38,.47,-.19,.52,.66,.48,'patina');
+   sphere(patina,.39,.98,-.12,.31,.39,.22,'patina');
+   sphere(patina,.44,1.42,-.04,.14,.179,.135,'patina');
+   add('robe','patina',patina,.42,.69,.04,.37,.58,.33);
+   for(const x of [.27,.57]){
+    limb([x,.78,.19],[x,.21,.32],.066,patina,'patina');
+    sphere(patina,x,.17,.40,.092,.034,.16,'patina');
+   }
+   limb([.61,1.18,-.03],[.68,.96,.22],.068,patina,'patina');
+   limb([.68,.96,.22],[.44,.82,.25],.052,patina,'patina');
+   sphere(patina,-.39,1.39,-.10,.22,.38,.16,'patina');
+   sphere(patina,-.38,1.91,-.07,.13,.176,.132,'patina');
+   for(const x of [-.51,-.27]){
+    limb([x,1.13,-.10],[x,.24,-.06],.073,patina,'patina');
+    box(patina,x,.19,.04,.18,.08,.29,'patina');
+   }
+   limb([-.21,1.62,-.07],[.06,1.43,-.18],.057,patina,'patina');
+   limb([.06,1.43,-.18],[.30,1.24,-.10],.049,patina,'patina');
+   limb([-.58,1.61,-.10],[-.63,1.14,-.02],.056,patina,'patina');
+  }else if(model==='tartu-town-hall'){
+   const pale=0xe2a7a1,cream=0xf0ded2,roof=0x986057,spire=0x54645c,glass=0x5c5550;
+   box(0xb0a098,0,.53,0,36.1,1.06,19.7);
+   box(pale,0,7.36,0,35.5,13.6,19.1);
+   for(const y of [4.88,9.25,14.14])box(cream,0,y,0,36.1,.42,19.8);
+   for(const side of [-1,1]){
+    for(let col=-4;col<=4;col++)for(const y of [2.89,7.13,11.28]){
+     const windowX=col*3.65;
+     const frontZ=side*9.61;
+     if(col===0&&y<3){
+      box(0x6a514a,windowX,2.45,frontZ,2.11,3.42,.12,'metal');
+     }else{
+      box(cream,windowX,y,frontZ,1.77,2.68,.14);
+      box(glass,windowX,y,frontZ+side*.10,1.41,2.29,.08,'metal');
+      box(cream,windowX,y,frontZ+side*.153,.07,2.29,.03);
+     }
+    }
+   }
+   for(const x of [-6.62,-3.26,3.26,6.62])box(cream,x,9.48,9.77,.43,8.45,.26);
+   add('tartu-hip-roof','stone',roof,0,14.27,0,35.95,5.90,19.62);
+   for(let course=0;course<7;course++)box(cream,0,14.24+course*.40,9.33,15.7-course*2.12,.43,.69);
+   sphere(0xd6bb9b,0,15.88,9.72,.78,.70,.09,'stone');
+   box(cream,0,20.38,0,4.25,2.15,4.25);
+   box(spire,0,22.17,0,3.22,2.15,3.22,'metal');
+   sphere(0xcfb36f,0,22.27,1.66,.79,.79,.065,'metal');
+   sphere(0x4a443f,0,22.27,1.71,.62,.62,.06,'metal');
+   box(0xddc88d,0,22.44,1.79,.07,.38,.065,'metal');
+   box(0xddc88d,.15,22.26,1.79,.31,.075,.065,'metal');
+   add('bandstand-roof','metal',spire,0,23.25,0,1.97,2.65,1.97);
+   limb([0,25.90,0],[0,26.97,0],.047,spire);
+  }else if(model==='tartu-kissing-students'){
+   const granite=0xaca393,patina=0x576b60;
+   cylinder(granite,0,.21,0,5.07,.42);
+   cylinder(0x7e9ca2,0,.452,0,4.85,.065,'metal');
+   ring(0xd5c8b7,0,.49,0,4.93,.118,'stone');
+   cylinder(granite,0,.65,0,.92,.38);
+   cylinder(0x8c8576,0,1.30,0,.51,.96);
+   cylinder(granite,0,1.81,0,.72,.16);
+   for(const side of [-1,1]){
+    limb([side*.34,1.91,.12],[side*.34,2.67,.02],.088,patina,'patina');
+    limb([side*.36,2.66,0],[side*.22,3.31,.06],.135,patina,'patina');
+    sphere(patina,side*.127,3.50,.10,.133,.178,.134,'patina');
+    limb([side*.29,3.18,.10],[-side*.17,2.95,.20],.072,patina,'patina');
+   }
+   limb([.36,2.49,.03],[.57,2.05,-.38],.077,patina,'patina');
+   limb([-.27,3.30,-.03],[-.58,3.52,-.07],.072,patina,'patina');
+   limb([-.54,3.08,-.09],[-.54,4.03,-.14],.035,patina,'patina');
+   add('bandstand-roof','patina',patina,-.54,3.98,-.14,1.02,.38,1.02);
   }else if(model==='vilnius-gediminas'){
    const granite=0x7f716b,patina=0x576658;
    box(granite,0,.30,0,7.4,.60,6.8);
@@ -1258,8 +1461,8 @@ function render(plan,group,b){
    box(trim,0,12.63,31.4,30.6,1.38,5.9);
    for(let layer=0;layer<11;layer++)box(trim,0,13.49+layer*.52,31.34,29.0-layer*2.55,.53,5.47);
    for(let step=0;step<3;step++)box(trim,0,.12+step*.20,33.84-step*.56,31.3-step*.45,.24,3.38);
-   box(plaster,-14.3,8.64,-28.8,10.4,16.36,10.7);
-   add('bandstand-roof','metal',roof,-14.3,16.9,-28.8,5.20,4.25,5.20);
+   box(plaster,14.3,8.64,-28.8,10.4,16.36,10.7);
+   add('bandstand-roof','metal',roof,14.3,16.9,-28.8,5.20,4.25,5.20);
   }else if(model==='vilnius-miracle-tile'){
    box(0xab726e,0,.037,0,.78,.022,.78);
    for(let ray=0;ray<8;ray++){
@@ -1503,6 +1706,44 @@ function render(plan,group,b){
    box(limestone,0,9.56,0,1.95,.95,1.91);
    add('pyramid','stone',trim,0,10.61,0,2.22,1.20,2.20);
    cylinder(iron,0,11.62,0,.055,.56,'metal');
+  }else if(model==='bratislava-napoleonic-soldier'){
+   const cast=0x4c594b, highlighted=0x67735e, iron=0x424641, wood=0x665842;
+   for(let slat=0;slat<4;slat++)box(wood,0,.452,.53+slat*.101,1.69,.043,.089);
+   for(let slat=0;slat<3;slat++)box(wood,0,.721+slat*.143,.474-slat*.009,1.69,.088,.045);
+   for(const side of [-1,1]){
+    const x=side*.836;
+    limb([x,.022,.489],[x,.443,.517],.031,iron);
+    limb([x,.022,.865],[x,.438,.822],.031,iron);
+    limb([x,.435,.51],[x,1.046,.443],.025,iron);
+    limb([x,.455,.522],[x,.455,.825],.035,iron);
+    limb([x,.671,.529],[x,.691,.679],.024,iron);
+    limb([x,.691,.679],[x,.660,.817],.024,iron);
+    limb([x,.660,.817],[x,.541,.840],.024,iron);
+    limb([x,.541,.840],[x,.478,.766],.024,iron);
+   }
+
+   for(const side of [-1,1]){
+    const x=side*.089,z=side<0?-.035:-.097;
+    sphere(cast,x,.058,z+.042,.062,.058,.130,'patina');
+    limb([x,.086,z],[x,.356,z-.008],.054,cast,'patina');
+    limb([x,.356,z-.008],[side*.085,.655,.027],.061,cast,'patina');
+   }
+   const forwardLean=new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),.48);
+   add('robe','patina',cast,0,.65,.045,.181,.59,.109,forwardLean);
+   add('sphere','patina',cast,0,.962,.159,.177,.267,.118,forwardLean);
+   for(const side of [-1,1]){
+    limb([side*.142,1.153,.208],[side*.209,1.091,.458],.054,cast,'patina');
+    sphere(highlighted,side*.142,1.154,.21,.062,.043,.056,'patina');
+   }
+   limb([-.210,1.093,.459],[.123,1.102,.473],.049,cast,'patina');
+   limb([.212,1.096,.459],[-.120,1.131,.511],.046,cast,'patina');
+   sphere(highlighted,.122,1.109,.477,.064,.037,.043,'patina');
+   sphere(highlighted,-.12,1.135,.511,.062,.036,.042,'patina');
+   limb([0,1.158,.224],[0,1.258,.280],.069,cast,'patina');
+   sphere(cast,0,1.315,.310,.104,.116,.091,'patina');
+   sphere(highlighted,0,1.308,.390,.029,.041,.025,'patina');
+   const hatTilt=new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),.13);
+   add('bratislava-bicorne','patina',cast,0,1.405,.318,.46,.228,.223,hatTilt);
   }else if(model==='bratislava-city-guard'){
    const sandstone=0xd2c6a9, trim=0xded1b5, polished=0x353834, cast=0x496352, relief=0x62745f;
    // The mapped point is the figure at the front of the two-sided stone booth.
@@ -1749,6 +1990,17 @@ function render(plan,group,b){
     box(0x69523d,0,3.95,side*.939,1.05,.65,.028,'patina');
     box(0x69523d,side*.939,3.95,0,.028,.65,1.05,'patina');
    }
+  }else if(model==='morong-claudio-statue'){
+   const plinth=0x9e9687,uniform=0x777357;
+   box(plinth,0,.18,0,2.75,.36,2.75);
+   box(stone,0,.48,0,2.43,.24,2.43);
+   box(plinth,0,1.23,0,1.72,1.27,1.68);
+   box(stone,0,1.93,0,2.04,.18,2.02);
+   box(0x302d28,0,1.30,.86,1.24,.84,.05,'metal');
+   human(0,2.01,0,.84,'standing',uniform);
+   cylinder(uniform,0,4.07,.02,.255,.07,'patina');
+   sphere(uniform,0,4.11,-.03,.21,.15,.21,'patina');
+   limb([.32,2.28,.31],[.46,3.36,.32],.047,uniform,'patina');
   }else if(model==='daet-rizal-pylon'){
    const white=0xece5d9,shade=0xc8c3b7,emblem=0xc29b45;
    box(shade,0,.19,0,3.8,.38,3.8);
@@ -1957,6 +2209,18 @@ function render(plan,group,b){
  }
  if(parts.some(part=>part.kind==='hex'))geos.hex=new T.CylinderGeometry(1,1,1,6);
  if(parts.some(part=>part.kind==='pentagonal-pedestal'))geos['pentagonal-pedestal']=new T.CylinderGeometry(1,1,1,5);
+ if(parts.some(part=>part.kind==='bratislava-bicorne')){
+  const outline=new T.Shape();
+  outline.moveTo(-.5,-.05);
+  outline.quadraticCurveTo(-.37,-.37,0,-.36);
+  outline.quadraticCurveTo(.36,-.37,.5,-.04);
+  outline.quadraticCurveTo(.33,-.12,.26,.18);
+  outline.quadraticCurveTo(.20,.49,0,.48);
+  outline.quadraticCurveTo(-.22,.49,-.28,.16);
+  outline.quadraticCurveTo(-.34,-.12,-.5,-.05);
+  outline.closePath();
+  geos['bratislava-bicorne']=new T.ExtrudeGeometry(outline,{depth:1,bevelEnabled:false,curveSegments:5}).translate(0,0,-.5);
+ }
  if(parts.some(part=>part.kind==='bateia')){
   const profile=[[0,0],[.70,0],[1.24,.35],[1.30,.40],[1.23,.41],[.62,.10],[0,.10]];
   geos.bateia=new T.LatheGeometry(profile.map(([r,y])=>new T.Vector2(r,y)),24);
@@ -2059,6 +2323,12 @@ function render(plan,group,b){
   geos['herterich-basin']=new T.LatheGeometry(basin.map(([radius,y])=>new T.Vector2(radius,y)),12);
  }
  if(parts.some(part=>part.kind==='octagonal-column'))geos['octagonal-column']=new T.CylinderGeometry(1,1,1,8);
+ if(parts.some(part=>part.kind==='tartu-hip-roof')){
+  const roof=new T.BufferGeometry();
+  roof.setAttribute('position',new T.Float32BufferAttribute([-.5,0,-.5,.5,0,-.5,.5,0,.5,-.5,0,.5,-.32,1,0,.32,1,0],3));
+  roof.setIndex([0,4,5,0,5,1,1,5,2,2,5,4,2,4,3,3,4,0]);
+  geos['tartu-hip-roof']=roof.toNonIndexed();geos['tartu-hip-roof'].computeVertexNormals();
+ }
  if(parts.some(part=>part.kind==='bandstand-roof')){
   const roof=[[0,0],[.95,0],[1,.08],[.82,.24],[.56,.54],[.28,.83],[0,1]];
   geos['bandstand-roof']=new T.LatheGeometry(roof.map(([radius,y])=>new T.Vector2(radius,y)),8);
