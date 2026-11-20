@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=10',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=11',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -1400,8 +1400,8 @@ function drawSurveyedCitySquare(profile,b){
  }
  for(let z=-b.depth/2+4;z<b.depth/2-2;z+=4.5)for(const side of [-1,1])box(0xb1a18b,side*(b.width/2-2.35),.345,z,3.3,.02,.05,0,false);
  const paving=profile.continuousPaving?profile.stone:0xd7c9b3;
- const baseKind=profile.base==='lawn'||profile.base==='sand'?profile.base:'stone';
- const baseColor=baseKind==='lawn'?profile.green||0x76965c:baseKind==='sand'?0xd8b477:paving;
+ const baseKind=['lawn','sand','gravel'].includes(profile.base)?profile.base:'stone';
+ const baseColor=baseKind==='lawn'?profile.green||0x76965c:baseKind==='sand'?0xd8b477:baseKind==='gravel'?0xcbbda7:paving;
  polygon([root,...(profile.holes||[])],capitol?0x697070:baseColor,.42,false,true,baseKind);
  border(root,0xe2d6bf,.26,.15,.43);
  // Context surfaces preserve separately mapped ground outside the plaza outline.
