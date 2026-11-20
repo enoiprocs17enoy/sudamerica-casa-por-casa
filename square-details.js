@@ -11,12 +11,21 @@ MODEL_SPECS['suzhou-jinji-lake-fountain']={height:65,width:140,depth:200,parcelW
 MODEL_SPECS['tehran-azadi-tower']={height:45,width:70,depth:42,parcelWidth:.48};
 MODEL_SPECS['tunis-clock-tower']={height:37.5,width:28,depth:28,parcelWidth:.65};
 MODEL_SPECS['tunis-bourguiba-equestrian']={height:8.95,width:4.8,depth:5.4,parcelWidth:.32};
+MODEL_SPECS['santa-cruz-ignacio-warnes']={height:7.58,width:4.05,depth:4.05,parcelWidth:.072};
+MODEL_SPECS['curitiba-republica-monument']={height:7.9,width:4.2,depth:4.9,parcelWidth:.085};
+MODEL_SPECS['curitiba-tiradentes-monument']={height:5.9,width:3.2,depth:3.0,parcelWidth:.069};
+MODEL_SPECS['curitiba-floriano-monument']={height:6.3,width:3.45,depth:3.30,parcelWidth:.071};
+MODEL_SPECS['porto-alegre-osorio']={height:9.9,width:6.8,depth:7.8,parcelWidth:.086};
+MODEL_SPECS['porto-alegre-samaritana']={height:3.55,width:2.1,depth:2.2,parcelWidth:.046};
+MODEL_SPECS['fortaleza-coreto-cupido']={height:5.45,width:4.18,depth:4.18,layoutProjection:true};
+MODEL_SPECS['fortaleza-ilha-do-amor-bridge']={height:1.7,width:2.50,depth:10.88,layoutProjection:true};
 MODEL_SPECS['rio-praca-xv-osorio']={height:8,width:6.7,depth:6.7,parcelWidth:.064};
 MODEL_SPECS['rio-praca-xv-dom-joao']={height:6.5,width:3.5,depth:5.1,parcelWidth:.064};
 MODEL_SPECS['rio-praca-xv-chafariz']={height:7.45,width:6.8,depth:6.8,parcelWidth:.064};
 MODEL_SPECS['bogota-catedral-primada']={height:42,width:72.77,depth:107.70,layoutProjection:true};
 MODEL_SPECS['buenos-aires-casa-rosada']={height:25,width:108.68,depth:80.17,layoutProjection:true};
 MODEL_SPECS['cali-cayzedo-statuette']={height:6.65,width:3.47,depth:3.47,parcelWidth:.068};
+MODEL_SPECS['recife-republica-fountain']={height:2.85,width:15.37,depth:15.37,layoutProjection:true};
 MODEL_SPECS['kinshasa-limete-tower']={height:210,width:183,depth:190,parcelWidth:.96};
 MODEL_SPECS['addis-meskel-terraces']={height:11.2,width:375,depth:184,layoutProjection:true};
 MODEL_SPECS['windhoek-elephant-column']={height:2,width:.96,depth:.96};
@@ -1079,6 +1088,141 @@ function render(plan,group,b){
    sphere(bronzeTone,0,base+2.12,-.29,.277,.39,.188);
    add('cape','metal',bronzeTone,0,base+1.92,-.58,.66,.82,.36);
    sphere(bronzeTone,-.038,base+2.55,-.31,.151,.193,.14);
+   return;
+  }
+  if(model==='recife-republica-fountain'){
+   const stream=0xe7f1ee,nozzle=0x565f56;
+   cylinder(nozzle,0,.045,0,.22,.09,'metal');
+   cylinder(stream,0,1.42,0,.13,2.78,'water');
+   for(let i=0;i<16;i++){
+    const angle=i*Math.PI/8, x=Math.sin(angle), z=Math.cos(angle);
+    const reach=i%2===0?4.1:2.95,height=i%2===0?2.15:1.52;
+    cylinder(nozzle,x*5.27,.035,z*5.27,.115,.07,'metal');
+    let last=[x*5.27,.07,z*5.27];
+    for(let j=1;j<=8;j++){
+     const t=j/8,radius=5.27-reach*t,next=[x*radius,.07+4*height*t*(1-t),z*radius];
+     limb(last,next,.085,stream,'water');
+     last=next;
+    }
+   }
+   return;
+  }
+  if(model==='curitiba-republica-monument'){
+   const granite=0xaba298,trim=0xc8bbad,metal=0x576859;
+   box(granite,0,.24,0,4.2,.48,4.9);
+   box(trim,0,.58,-.40,3.37,.20,3.52);
+   box(granite,0,2.75,-.57,2.53,4.15,2.83);
+   box(trim,0,4.89,-.57,2.89,.22,3.06);
+   box(granite,0,5.13,-.57,1.82,.29,1.76);
+   human(0,5.28,-.57,1,'classical',metal);
+   box(granite,0,.66,1.56,1.45,.37,1.44);
+   human(0,.85,1.56,1.03,'civil',metal);
+   for(const side of [-1,1]){
+    box(metal,side*1.278,2.45,-.57,.056,1.08,2.19,'metal');
+    for(const z of [-1.26,-.57,.12]){
+     limb([side*1.31,2.13,z-.18],[side*1.31,2.71,z+.12],.09,0x718071);
+    }
+   }
+   return;
+  }
+  if(model==='santa-cruz-ignacio-warnes'){
+   const metal=0x4b6555,granite=0x494749,trim=0x575356,relief=0x786b54;
+   box(trim,0,.16,0,4.05,.32,4.05);
+   box(granite,0,.46,0,3.36,.28,3.36);
+   box(trim,0,.78,0,2.70,.36,2.70);
+   box(granite,0,2.20,0,1.97,2.48,1.97);
+   box(trim,0,3.55,0,2.25,.22,2.25);
+   box(metal,0,3.72,0,1.18,.12,1.18,'metal');
+   add('vertical-torus','metal',relief,0,2.86,1.002,.265,.31,.081);
+   box(relief,0,2.17,1.012,1.12,.38,.04,'metal');
+   const y=3.78,scale=1.10;
+   human(0,y,0,scale,'proclaiming',metal);
+   const at=(x,a,z)=>[x*scale,y+a*scale,z*scale];
+   limb(at(-.62,2.85,.23),at(-.66,3.37,.28),.064,metal);
+   limb(at(-.78,3.26,.27),at(-.54,3.26,.28),.041,metal);
+   limb(at(-.66,3.35,.28),at(-.71,3.62,.35),.034,metal);
+   for(const x of [-.32,.32])box(metal,x,y+2.04,.05,.33,.12,.34,'metal');
+   return;
+  }
+  if(model==='curitiba-tiradentes-monument'){
+   const granite=0x988d81,trim=0xb5a79a,metal=0x535f55;
+   box(trim,0,.17,0,3.2,.34,3.0);
+   box(granite,0,1.62,0,1.90,2.58,1.84);
+   box(trim,0,3.04,0,2.15,.26,2.09);
+   plaque(1.97,1.08,.946);
+   human(0,3.17,0,1.04,'civil',metal);
+   box(metal,-.39,4.23,.37,.28,.44,.10,'metal');
+   return;
+  }
+  if(model==='curitiba-floriano-monument'){
+   const granite=0x8e8276,trim=0xb1a293,metal=0x475b53;
+   box(trim,0,.19,0,3.45,.38,3.30);
+   box(granite,0,.50,0,2.88,.24,2.73);
+   box(granite,0,2.01,0,1.85,2.79,1.85);
+   box(trim,0,3.48,0,2.17,.25,2.18);
+   box(metal,0,3.64,0,1.30,.08,1.25,'metal');
+   plaque(2.06,1.16,.947);
+   for(const side of [-1,1])box(metal,side*.937,2.63,0,.05,.34,1.58,'metal');
+   human(0,3.68,0,.97,'civil',metal);
+   for(const side of [-1,1])box(metal,side*.32,5.56,.05,.31,.11,.26,'metal');
+   return;
+  }
+  if(model==='porto-alegre-osorio'){
+   const granite=0xafa89c,cap=0xc4b6a5,shadow=0x807568;
+   box(cap,0,.18,0,6.8,.36,7.8);
+   box(granite,0,.56,0,5.82,.42,6.70);
+   box(cap,0,.94,0,4.85,.34,5.71);
+   box(granite,0,3.16,0,3.74,4.10,4.64);
+   box(cap,0,5.38,0,4.13,.36,5.10);
+   box(shadow,0,5.62,0,3.24,.12,4.43);
+   plaque(3.44,2.3,2.34);
+   horse(5.68,'reins');
+   return;
+  }
+  if(model==='porto-alegre-samaritana'){
+   const stone=0xa9a39a,metal=0x5b665a,urn=0x616a5a;
+   box(stone,0,.145,0,2.1,.29,2.2);
+   box(0xc4bbae,0,.48,0,1.04,.38,1.11);
+   box(stone,0,.79,0,1.17,.24,1.21);
+   const y=.91,scale=.99;
+   human(0,y,0,scale,'classical',metal);
+   sphere(urn,.49,y+1.42,.34,.25,.315,.23);
+   add('vertical-torus','metal',urn,.69,y+1.49,.34,.125,.17,.08);
+   cylinder(urn,.51,y+1.68,.34,.126,.105,'metal');
+   return;
+  }
+  if(model==='fortaleza-coreto-cupido'){
+   const ochre=0xd9a455,paint=0xf3c777,white=0xe7dbc0,statue=0xb46d48;
+   cylinder(white,0,.12,0,2.09,.24);
+   cylinder(ochre,0,.30,0,1.98,.16);
+   for(let i=0;i<8;i++){
+    const x=Math.sin(i*Math.PI/4)*1.71,z=Math.cos(i*Math.PI/4)*1.71;
+    cylinder(ochre,x,.53,z,.20,.25);
+    cylinder(paint,x,1.87,z,.132,2.52);
+    cylinder(ochre,x,3.21,z,.22,.22);
+   }
+   cylinder(ochre,0,3.45,0,2.04,.29);
+   cylinder(paint,0,3.64,0,2.00,.14);
+   add('fortaleza-cupido-dome','stone',paint,0,3.70,0,1,1,1);
+   sphere(ochre,0,5.27,0,.14,.17,.14,'stone');
+   box(white,0,.92,0,.70,1.09,.70);
+   human(0,1.47,0,.49,'classical',statue);
+   for(const side of [-1,1])sphere(statue,side*.23,2.21,-.19,.16,.33,.10,'stone');
+   return;
+  }
+  if(model==='fortaleza-ilha-do-amor-bridge'){
+   const stone=0xc2b5a3,rail=0xe2d2bb;
+   const rise=z=>.46+.36*(1-z*z/(5.44*5.44));
+   for(let i=0;i<9;i++){
+    const a=-5.44+i*10.88/9,b=a+10.88/9;
+    const yaw=new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),-Math.atan2(rise(b)-rise(a),b-a));
+    add('box','stone',stone,0,(rise(a)+rise(b))/2,(a+b)/2,2.50,.19,Math.hypot(b-a,rise(b)-rise(a))+.029,yaw);
+    for(const side of [-1,1]){
+     box(rail,side*1.13,rise(a)+.42,a,.17,.82,.19);
+     limb([side*1.13,rise(a)+.83,a],[side*1.13,rise(b)+.83,b],.087,rail,'stone');
+    }
+   }
+   for(const side of [-1,1])box(rail,side*1.13,rise(5.44)+.42,5.44,.17,.82,.19);
    return;
   }
   if(model==='tunis-bourguiba-equestrian'){
@@ -8254,6 +8398,10 @@ function render(plan,group,b){
   geos['jicin-well-roof']=new T.LatheGeometry(roof.map(([radius,y])=>new T.Vector2(radius,y)),20);
   geos['jicin-well-portico']=new T.CylinderGeometry(1,1,1,16,1,false,0,Math.PI);
   geos['jicin-well-wing-roof']=new T.CylinderGeometry(.20,1,1,16,1,false,0,Math.PI);
+ }
+ if(parts.some(part=>part.kind==='fortaleza-cupido-dome')){
+  const profile=[[1.91,0],[1.86,.32],[1.67,.72],[1.37,1.05],[.96,1.32],[.52,1.49],[0,1.56]];
+  geos['fortaleza-cupido-dome']=new T.LatheGeometry(profile.map(([r,y])=>new T.Vector2(r,y)),24);
  }
  if(parts.some(part=>part.kind==='triumphal-arch')){
   const outline=new T.Shape();
