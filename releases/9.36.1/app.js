@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=30',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=31',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -2378,6 +2378,7 @@ function animate(now=0){
 }
 function drawCityFrame(minInterval=1000/60){
   if(renderer.getContext().isContextLost())throw Error('WebGL context lost');
+  updateResidentRenderLOD();
   const measureFirst=window.ReviewPerformance&&measuredRenderGroup!==group;
   const drawStarted=measureFirst?performance.now():0;
   if(window.SudamericaRender8)SudamericaRender8.render(scene,camera,renderer,minInterval);
@@ -2392,6 +2393,7 @@ function disposeGroup() {
   group.traverse(o=>{
     if(o.isInstancedMesh)o.dispose();
     if(o.geometry)geometries.add(o.geometry);
+    for(const geometry of o.userData.residentGeometries||[])geometries.add(geometry);
     if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>materials.add(m));
   });
   geometries.forEach(g=>g.dispose());materials.forEach(m=>{if(m.map&&!Object.values(homeTextures).includes(m.map))m.map.dispose();if(!streetSurfaceMaterials||![...streetSurfaceMaterials.values()].includes(m))m.dispose()});
@@ -7379,14 +7381,31 @@ const RESIDENT_HIP=.78;
 const RESIDENT_SHOE={height:.14,depth:.34,center:.10,forward:.07};
 let residentBatches=null;
 
+function updateResidentRenderLOD(){
+ if(!residentBatches)return;
+ // At panorama height these faces and limbs cover very few pixels. Keep
+ // their pose and color and restore the original geometry when approaching.
+ const distant=distance>=850&&distance*Math.sin(elevation)>=500;
+ if(residentBatches.distant===distant)return;
+ residentBatches.distant=distant;
+ const {specs,meshes}=residentBatches;
+ for(let i=0;i<specs.length;i++){
+  const createLow=specs[i].panorama;
+  if(!createLow)continue;
+  const mesh=meshes[i],geometries=mesh.userData.residentGeometries;
+  if(distant&&!geometries[1])geometries[1]=createLow();
+  mesh.geometry=geometries[distant?1:0];
+ }
+}
+
 function buildResidentBatches(people){
  const n=people.length;if(!n)return;
  const specs=[
   {name:'torso',geo:new THREE.CylinderGeometry(.37,.43,1.02,8),y:1.12,color:'shirt'},
-  {name:'head',geo:new THREE.SphereGeometry(.38,10,8),y:1.91,color:'skin',face:true},
-  {name:'hair',geo:new THREE.SphereGeometry(.39,9,6,0,Math.PI*2,0,Math.PI*.49),y:2.00,color:'hair',face:true},
+  {name:'head',geo:new THREE.SphereGeometry(.38,10,8),panorama:()=>new THREE.SphereGeometry(.38,6,4),y:1.91,color:'skin',face:true},
+  {name:'hair',geo:new THREE.SphereGeometry(.39,9,6,0,Math.PI*2,0,Math.PI*.49),panorama:()=>new THREE.SphereGeometry(.39,6,4,0,Math.PI*2,0,Math.PI*.49),y:2.00,color:'hair',face:true},
   {name:'legs',geo:new THREE.CylinderGeometry(.105,.085,.71,7),y:.40,pair:true,lateral:.17,joint:'hip',color:'trousers'},
-  {name:'arms',geo:new THREE.CapsuleGeometry(.075,.43,2,6),y:1.12,pair:true,lateral:.40,joint:'shoulder',color:'skin'},
+  {name:'arms',geo:new THREE.CapsuleGeometry(.075,.43,2,6),panorama:()=>new THREE.CapsuleGeometry(.075,.43,1,4),y:1.12,pair:true,lateral:.40,joint:'shoulder',color:'skin'},
   {name:'shoes',geo:new THREE.BoxGeometry(.21,RESIDENT_SHOE.height,RESIDENT_SHOE.depth),y:RESIDENT_SHOE.center,pair:true,lateral:.17,joint:'hip',forward:RESIDENT_SHOE.forward,color:'shoes'},
   {name:'neck',geo:new THREE.CylinderGeometry(.12,.14,.19,7),y:1.64,color:'skin'},
   {name:'sleeves',geo:new THREE.CapsuleGeometry(.11,.17,2,6),y:1.37,pair:true,lateral:.40,joint:'shoulder',color:'sleeves'},
@@ -7400,13 +7419,14 @@ function buildResidentBatches(people){
   const mesh=new THREE.InstancedMesh(spec.geo,new THREE.MeshLambertMaterial({color:0xffffff}),(index<6?n:detailCapacity)*(spec.pair?2:1));
   mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   mesh.frustumCulled=false;mesh.castShadow=true;mesh.receiveShadow=true;
+  if(spec.panorama)mesh.userData.residentGeometries=[spec.geo];
   group.add(mesh);
   return mesh;
  });
  const dummy=new THREE.Object3D();
  const detailOwners=[];
  const detailActors=people.slice(0,detailCapacity);
- residentBatches={meshes,specs,dummy,people,detailOwners,detailActors};
+ residentBatches={meshes,specs,dummy,people,detailOwners,detailActors,distant:false};
  const skin=['#e4b28e','#b47d5e','#f1c9a2','#d99a78','#85513c','#bd805b','#f4d3b2'];
  const shirt=['#e9867c','#75b4cf','#edbf69','#9b8ac5','#75b67b','#d98049','#4c8294'];
  const hair=[0x5e4238,0x9a704c,0x33343c];
