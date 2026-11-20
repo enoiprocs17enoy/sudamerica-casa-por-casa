@@ -25,6 +25,9 @@
     if(!shadowMap.enabled||(!shadowMap.autoUpdate&&!shadowMap.needsUpdate))return drawShadows.apply(this,args);
     const held=[];
     args[1].traverse(o=>{
+     // The city-wide shadow cache must include shop fittings even if the
+     // main camera opens on a panorama where those fittings are hidden.
+     if(o.userData.shopDetailChunk&&o.castShadow&&!o.visible){held.push([o,false]);o.visible=true;}
      if(!o.isLOD||!o.userData.fullDetailShadow||o.levels.length<2)return;
      for(let i=0;i<o.levels.length;i++){const mesh=o.levels[i].object;held.push([mesh,mesh.visible]);mesh.visible=i===0;}
     });

@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=48',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=50',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -2451,8 +2451,6 @@ function animate(now=0){
   if(window.WorldNeighbors)WorldNeighbors.update(now);
   if(regionalWaterUniform)regionalWaterUniform.value=t;
   updateProgressiveDetails();
-  updateRoadDetailLOD(now);
-  updateShopDetailLOD(now);
   animateLife(t);
   updateAvatarLabels(t);
   if(releaseSky)releaseSky.position.copy(camera.position);
@@ -2460,6 +2458,10 @@ function animate(now=0){
 }
 function drawCityFrame(minInterval=1000/60){
   if(renderer.getContext().isContextLost())throw Error('WebGL context lost');
+  // The entry frame is drawn before the animation loop resumes.
+  const now=performance.now();
+  updateRoadDetailLOD(now);
+  updateShopDetailLOD(now);
   updateResidentRenderLOD();
   const measureFirst=window.ReviewPerformance&&measuredRenderGroup!==group;
   const drawStarted=measureFirst?performance.now():0;
