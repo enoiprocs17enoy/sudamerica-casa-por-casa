@@ -1241,7 +1241,7 @@ function loadWorldSquareCatalog(city){
  if(typeof DecompressionStream!=='function')return;
  const part=worldSquareCatalogPart(city.id);
  if(!worldSquareCatalogRequests.has(part)){
-  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=4',{signal:AbortSignal.timeout(15000)})
+  const pending=fetch('world-square-catalog-20261120-'+part+'.json.gz'+'?v=5',{signal:AbortSignal.timeout(15000)})
    .then(response=>{
     if(!response.ok||!response.body)throw Error('Catalogo piazze non disponibile');
     return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
@@ -1329,7 +1329,8 @@ function addCitySquareNameSign(profile,b){
  const w=b.width,d=b.depth;
  const signWidth=Math.min(w*.23,9.5),signHeight=signWidth/4,signZ=b.z+d*.466,signX=b.x-w*.26;
  const signBottom=1.60,signY=signBottom+signHeight/2;
- const material=new THREE.MeshBasicMaterial({map:billboardTexture([currentCity.name.toUpperCase(),profile.documented?profile.name:'PIAZZA CIVICA','PIAZZA PRINCIPALE'],'#234f63',{wide:true}),side:THREE.FrontSide,toneMapped:false});
+ const source=profile.realGeometry?profile.geometrySource||'OpenStreetMap':'';
+ const material=new THREE.MeshBasicMaterial({map:billboardTexture([currentCity.name.toUpperCase(),profile.documented?profile.name:'PIAZZA CIVICA',source],'#234f63',{wide:true}),side:THREE.FrontSide,toneMapped:false});
  const geo=new THREE.PlaneGeometry(signWidth,signHeight);
  for(const rear of [false,true]){
   const label=new THREE.Mesh(geo,material);label.position.set(signX,signY,signZ+(rear?-.102:.102));label.rotation.y=rear?Math.PI:0;
@@ -1345,8 +1346,12 @@ function addCitySquareNameSign(profile,b){
 
 }
 function fitSquareToParcel(profile,b){
- const root=profile.outline,angles=[0,Math.PI/2];
- for(let i=1;i<root.length;i++){const a=root[i-1],c=root[i];if(Math.hypot(c.x-a.x,c.z-a.z)>.1){const angle=Math.atan2(c.z-a.z,c.x-a.x);angles.push(-angle,Math.PI/2-angle);}}
+ const rings=[profile.outline,...(profile.contextSurfaces||[]).flatMap(surface=>surface.rings)];
+ const root=rings.flat(),angles=[0,Math.PI/2];
+ for(const ring of rings)for(let i=1;i<ring.length;i++){
+  const a=ring[i-1],c=ring[i];
+  if(Math.hypot(c.x-a.x,c.z-a.z)>.1){const angle=Math.atan2(c.z-a.z,c.x-a.x);angles.push(-angle,Math.PI/2-angle);}
+ }
  let best;
  for(const angle of angles){const ca=Math.cos(angle),sa=Math.sin(angle),points=root.map(p=>({x:p.x*ca-p.z*sa,z:p.x*sa+p.z*ca}));
  const minX=Math.min(...points.map(p=>p.x)),maxX=Math.max(...points.map(p=>p.x)),minZ=Math.min(...points.map(p=>p.z)),maxZ=Math.max(...points.map(p=>p.z));
@@ -1391,8 +1396,11 @@ function drawSurveyedCitySquare(profile,b){
   box(0xa9947a,side*(b.width/2-4.1),.345,0,.18,.025,b.depth-2.2,0,false);
  }
  for(let z=-b.depth/2+4;z<b.depth/2-2;z+=4.5)for(const side of [-1,1])box(0xb1a18b,side*(b.width/2-2.35),.345,z,3.3,.02,.05,0,false);
- polygon([root,...(profile.holes||[])],capitol?0x697070:profile.base==='lawn'?profile.green||0x76965c:profile.continuousPaving?profile.stone:0xd7c9b3,.42,false,true,profile.base==='lawn'?'lawn':'stone');
+ const paving=profile.continuousPaving?profile.stone:0xd7c9b3;
+ polygon([root,...(profile.holes||[])],capitol?0x697070:profile.base==='lawn'?profile.green||0x76965c:paving,.42,false,true,profile.base==='lawn'?'lawn':'stone');
  border(root,0xe2d6bf,.26,.15,.43);
+ // Context paving is mapped separately from the plaza outline.
+ for(const surface of profile.contextSurfaces||[])polygon(surface.rings,paving,.42,false,true);
  for(const surface of profile.surfaces||[]){
   const lawn=surface.kind==='lawn',water=surface.kind==='water';
   polygon(surface.rings,lawn?(profile.green||0x63894c):water?0x319bb5:0xddd0b8,lawn?.57:water?.53:.49,lawn||water,false,lawn?'lawn':water?'water':'stone');
@@ -7963,7 +7971,8 @@ function openSquareDetailPanel(focusHeading=true){
  if(profile.geometryAttribution)sourceLink(references,profile.geometryTerms,profile.geometryAttribution);
  if(profile.reference!==profile.source)sourceLink(references,profile.reference,'Riferimento ufficiale');
  if(references.childElementCount)body.append(references);
- const features=profile.landmarks||[];
+ const adjacent=profile.contextSurfaces?.length?profile.adjacentLandmarks||[]:[];
+ const features=[...(profile.landmarks||[]),...adjacent];
  if(!features.length){const empty=document.createElement('p');empty.textContent='Le fonti disponibili non descrivono ancora statue e fontane di questa piazza.';body.append(empty);}
  for(const feature of features){
   const row=document.createElement('div');row.className='civicObjective '+(feature.status==='needs-model'?'pending':'documented');

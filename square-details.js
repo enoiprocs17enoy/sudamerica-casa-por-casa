@@ -24,6 +24,7 @@ Object.assign(MODEL_SPECS,{
  'tiananmen-flagpole':{height:7.5,width:3.8,depth:3.4},
  'peoples-heroes-memorial':{height:7.52,width:10,depth:12.2,parcelWidth:.40},
  'chairman-mao-memorial-hall':{height:4.12,width:10,depth:10,parcelWidth:.42},
+ 'liberty-paifang':{height:6,width:16,depth:2.15,parcelWidth:.70},
  'king-sejong-seated':{height:7.0,width:5.5,depth:5.3,parcelWidth:.45},
  'joseon-armillary':{height:1.48,width:.82,depth:.82},
  'joseon-rain-gauge':{height:1.32,width:.63,depth:.63},
@@ -46,7 +47,8 @@ function enrich(profile,city){
  return data?{...profile,landmarks:data.landmarks||[],walkwayDetails:data.walkways||[],detailProvenance:data.provenance||[],detailSchema:data.schema}:profile;
 }
 function prepare(profile,fit,b,city){
- const all=profile.landmarks||[],items=[],reservations=[];
+ const adjacent=profile.contextSurfaces?.length?profile.adjacentLandmarks||[]:[];
+ const all=[...(profile.landmarks||[]),...adjacent],items=[],reservations=[];
  for(const feature of [...all].sort((a,b)=>(b.status==='reference-model')-(a.status==='reference-model'))){
   if(feature.partOf||!MODEL_SPECS[feature.model]||!Number.isFinite(feature.x)||!Number.isFinite(feature.z))continue;
   const spec=MODEL_SPECS[feature.model],p=fit.point(feature),wanted=feature.displayHeight||5;
@@ -472,6 +474,36 @@ function render(plan,group,b){
    }
    for(const [x,z] of [[0,-2.08],[1.96,.74],[-1.96,.74]])human(x,1.98,z,.73,'classical',marble);
    human(0,7.79,0,1.13,'laurel',bronze);
+   // The front group shares the monument base. The bronze lion guards the urn behind it.
+   const lion=0x3e5148,mane=0x35473f,pawY=1.53;
+   box(stone,0,1.40,3.09,2.62,.16,1.04);
+   const urnZ=2.49;
+   box(bronze,0,2.005,urnZ,.86,.05,.53,'metal');
+   box(bronze,0,2.28,urnZ,.72,.51,.43,'metal');
+   box(bronze,0,2.56,urnZ,.84,.09,.56,'metal');
+   box(mane,0,2.611,urnZ,.34,.014,.06,'metal');
+   sphere(lion,.04,1.97,3.08,.74,.31,.28);
+   sphere(lion,.58,1.92,3.08,.34,.33,.29);
+   sphere(mane,-.51,2.18,3.08,.34,.44,.32);
+   sphere(lion,-.77,2.37,3.08,.24,.25,.21);
+   sphere(lion,-.98,2.27,3.08,.18,.074,.14);
+   sphere(mane,-1.105,2.33,3.08,.063,.051,.092);
+   for(const side of [-1,1]){
+    const z=3.08+side*.17;
+    limb([-.46,2.04,z],[-.51,1.60,z],.093,lion);
+    sphere(lion,-.55,pawY,z,.16,.06,.095);
+    limb([.60,1.95,z],[.71,1.68,z],.108,lion);
+    limb([.71,1.68,z],[.65,1.60,z],.085,lion);
+    sphere(lion,.60,pawY,z,.14,.06,.095);
+    sphere(mane,-.69,2.54,z,.075,.084,.065);
+    sphere(lion,-.99,2.32,3.08+side*.069,.139,.086,.081);
+    sphere(mane,-.43,2.25,3.08+side*.238,.26,.30,.105);
+    sphere(lion,-.37,2.05,3.08+side*.172,.25,.26,.13);
+    sphere(0x27372f,-.89,2.41,z+side*.027,.040,.024,.020);
+   }
+   const tail=[[.71,1.96,3.24],[.94,1.70,3.22],[1.09,1.56,3.32],[.95,1.54,3.44],[.74,1.55,3.45]];
+   for(let segment=1;segment<tail.length;segment++)limb(tail[segment-1],tail[segment],.045,lion);
+   sphere(mane,...tail.at(-1),.095,.061,.06);
   }else if(model==='bundesplatz-jets'){
    let index=0;
    for(let row=0;row<5;row++){
@@ -556,6 +588,37 @@ function render(plan,group,b){
    box(columns,0,3.58,0,7.45,.44,7.45);
    box(roof,0,3.87,0,7.79,.14,7.79);
    box(0x9c865b,0,4.01,0,7.18,.14,7.18);
+  }else if(model==='liberty-paifang'){
+   const limestone=0xe4e1d6,trim=0xc3bfb4,blue=0x284977,ridge=0x3b5980;
+   const columns=[-7.44,-4.93,-2.33,2.33,4.93,7.44];
+   const capitals=[2.11,2.76,3.46,3.46,2.76,2.11];
+   const springs=[1.18,1.70,2.25,1.70,1.18];
+   const lintels=[3.01,3.80,5.13,3.80,3.01];
+   const roof=(x,y,width,depth,height)=>{
+    box(trim,x,y-.08,0,width*.92,.17,depth*.84);
+    add('paifang-roof','stone',blue,x,y,0,width,height,depth);
+    box(ridge,x,y+height,0,width*.54,.07,.12);
+   };
+   for(const [i,x] of columns.entries()){
+    const h=capitals[i];
+    box(limestone,x,.10,0,.86,.20,1.36);
+    box(trim,x,.23,0,.74,.13,1.18);
+    box(limestone,x,(h+.24)/2,0,.64,h-.24,1.10);
+    box(trim,x,h-.07,0,.82,.18,1.27);
+    roof(x,h,.98,1.52,.27);
+   }
+   for(const [i,spring] of springs.entries()){
+    const x=(columns[i]+columns[i+1])/2,width=columns[i+1]-columns[i];
+    const top=lintels[i],central=i===2;
+    add('paifang-span','stone',limestone,x,spring,0,width,top-spring,central?.89:.72);
+    box(trim,x,top-.10,0,width+.17,.16,central?1.12:.94);
+    roof(x,top,width+.43,central?2.08:1.58,central?.79:.48);
+    for(const side of [-1,1]){
+     const face=side*(central?.463:.38);
+     box(central?0x9a9386:trim,x,top-(central?.39:.29),face,central?2.05:width*.53,central?.39:.25,.054);
+     for(const edge of [-1,1])box(limestone,x+edge*width*.37,top-.40,face,.21,.40,.078);
+    }
+   }
   }else if(model==='king-sejong-seated'){
    const gilt=0x947232,fold=0xa9883d,granite=0xc5b7aa;
    steps(0,5.3);box(granite,0,1.43,0,4.65,1.52,4.65);box(marble,0,2.27,0,4.80,.20,4.80);
@@ -755,6 +818,47 @@ function render(plan,group,b){
   }
   outline.closePath();
   geos['flag-star']=new T.ExtrudeGeometry(outline,{depth:1,bevelEnabled:false}).translate(0,0,-.5);
+ }
+ if(parts.some(part=>part.kind==='paifang-span')){
+  const outline=new T.Shape();
+  outline.moveTo(-.5,0);outline.lineTo(-.5,1);outline.lineTo(.5,1);outline.lineTo(.5,0);
+  for(let step=1;step<=18;step++){
+   const angle=Math.PI*step/18;
+   outline.lineTo(.5*Math.cos(angle),.76*Math.sin(angle));
+  }
+  outline.closePath();
+  geos['paifang-span']=new T.ExtrudeGeometry(outline,{depth:1,bevelEnabled:false}).translate(0,0,-.5);
+ }
+ if(parts.some(part=>part.kind==='paifang-roof')){
+  const rows=[[-.5,0,.50],[-.32,.28,.45],[0,1,.27],[.32,.28,.45],[.5,0,.50]];
+  const vertices=[],indices=[],columns=11;
+  for(const [z,y,width] of rows)for(let i=0;i<columns;i++){
+   const u=2*i/(columns-1)-1;
+   vertices.push(u*width,y+(1-y)*.17*Math.abs(u)**6,z);
+  }
+  const lower=rows.length*columns;
+  for(let i=0;i<lower;i++)vertices.push(vertices[3*i],0,vertices[3*i+2]);
+  for(let row=0;row<rows.length-1;row++)for(let column=0;column<columns-1;column++){
+   const a=row*columns+column,b=a+columns;
+   indices.push(a,b,a+1,a+1,b,b+1);
+   indices.push(a+lower,a+1+lower,b+lower,a+1+lower,b+1+lower,b+lower);
+  }
+  // Close the hips and the raised eave tips to give the tiles a visible underside.
+  const edge=(a,b)=>indices.push(a,b,a+lower,b,b+lower,a+lower);
+  for(let row=0;row<rows.length-1;row++){
+   const left=row*columns,right=left+columns-1;
+   edge(left+columns,left);
+   edge(right,right+columns);
+  }
+  for(let column=0;column<columns-1;column++){
+   edge(column,column+1);
+   const rear=(rows.length-1)*columns+column;
+   edge(rear+1,rear);
+  }
+  const roof=new T.BufferGeometry();
+  roof.setAttribute('position',new T.Float32BufferAttribute(vertices,3));
+  roof.setIndex(indices);roof.computeVertexNormals();
+  geos['paifang-roof']=roof;
  }
  if(parts.some(part=>part.kind==='pediment')){
   const shape=new T.Shape();shape.moveTo(-.5,-.5);shape.lineTo(.5,-.5);shape.lineTo(0,.5);shape.closePath();
