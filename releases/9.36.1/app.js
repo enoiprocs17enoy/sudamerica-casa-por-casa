@@ -6080,18 +6080,8 @@ function* renderHouseStages(selected){
         }
       }else if(['screens','screen','mashrabiya','jali'].includes(towerDetail)){
         const screen=towerDetail==='mashrabiya'?0x3f746e:trim;
-        const panelW=footW*.245;
-        for(const face of [-1,1])for(const side of [-1,1])for(let floor=0;floor<levels;floor++){
-          const cx=x+side*footW*.26,cy=1.60+floor*storeyHeight,cz=z+face*(facadeZ+.10);
-          for(const edge of [-1,1]){
-            place('countryTowerScreenFrame',boxGeo,screen,h,cx+edge*panelW*.50,cy,cz,.075,1.52,.13);
-            place('countryTowerScreenFrame',boxGeo,screen,h,cx,cy+edge*.76,cz,panelW+.08,.075,.13);
-          }
-          for(const bar of [-.25,0,.25])place('countryTowerScreenLattice',boxGeo,screen,h,
-            cx+bar*panelW,cy,cz,.045,1.39,.14);
-          for(const row of [-.34,0,.34])place('countryTowerScreenLattice',boxGeo,screen,h,
-            cx,cy+row,cz,panelW,.045,.14);
-        }
+        for(const face of [-1,1])for(const side of [-1,1])for(let bar=-1;bar<=1;bar++)
+          place('countryTowerScreen',boxGeo,screen,h,x+side*footW*.36+bar*.16,height*.52,z+face*(facadeZ+.10),.075,height*.78,.12);
       }else if(towerDetail==='redframe'){
         for(const face of [-1,1]){
           for(const side of [-1,1])place('countryTowerRedPier',boxGeo,0x8f3130,h,x+side*footW*.45,height*.51,z+face*facadeZ,.18,height*.94,.18);
@@ -6100,8 +6090,6 @@ function* renderHouseStages(selected){
       }else if(['loggia','arcade','shutters','balcony'].includes(towerDetail)){
         for(let floor=1;floor<levels;floor+=2)for(const face of [-1,1]){
           const by=floor*storeyHeight+.25,bz=z+face*(facadeZ+.25);
-          if(['loggia','arcade'].includes(towerDetail))place('countryTowerLoggiaRecess',boxGeo,0x334f54,h,
-            x,by+.67,z+face*(facadeZ+.05),footW*.72,1.46,.10);
           place('countryTowerLoggia',boxGeo,trim,h,x,by,bz,footW*.78,.16,.62);
           for(const side of [-1,0,1])place('countryTowerLoggiaPier',boxGeo,trim,h,x+side*footW*.34,by+.69,bz+face*.28,.12,1.30,.12);
         }
@@ -6110,22 +6098,19 @@ function* renderHouseStages(selected){
           place('countryTowerCourse',boxGeo,trim,h,x,floor*storeyHeight+.18,z+face*facadeZ,footW+.24,.14,.22);
         if(['timber','wood'].includes(towerDetail))for(const face of [-1,1])for(const side of [-1,1])
           place('countryTowerVerticalFrame',boxGeo,trim,h,x+side*footW*.39,height*.51,z+face*facadeZ,.14,height*.90,.16);
-      }else if(towerDetail==='stonebase'){
-        for(const face of [-1,1]){
-          place('countryTowerStoneBase',boxGeo,0x857461,h,x,1.52,z+face*facadeZ,footW+.20,2.78,.32);
-          for(const side of [-1,1])place('countryTowerStonePier',boxGeo,0x756655,h,
-            x+side*footW*.43,height*.28,z+face*facadeZ,.42,height*.52,.35);
-        }
-      }else if(towerDetail==='courtyard'){
-        for(const face of [-1,1]){
-          place('countryTowerPortalBand',boxGeo,trim,h,x,3.05,z+face*(facadeZ+.12),footW*.58,.24,.42);
-          for(const side of [-1,1])place('countryTowerPortalPier',boxGeo,trim,h,
-            x+side*footW*.27,1.62,z+face*(facadeZ+.12),.28,2.85,.42);
-        }
       }
-      // Never stack a second national roof over the tower's own crown,
-      // terrace or Premium amenities. Country identity is expressed by the
-      // structural facade above; the native crown remains unobstructed.
+      const towerRoofLanguage=architecture?.roof;
+      // Premium towers already own a terrace pavilion and parapet. Adding a
+      // second national roof through that volume caused visible intersections.
+      if(!premium&&['layered','tiered'].includes(towerRoofLanguage)){
+        place('countryTowerEave',boxGeo,trim,h,x,height+1.02,z,footW+.75,.18,footD+.72);
+        place('countryTowerCrown',villaRoofGeo,trim,h,x,height+.96,z,(footW*.64)/2,1.18,(footD*.62)/2);
+        if(towerRoofLanguage==='tiered')place('countryTowerUpperEave',boxGeo,trim,h,x,height+2.02,z,footW*.44,.14,footD*.42);
+      }else if(!premium&&['steep','mansard','gable'].includes(towerRoofLanguage)){
+        place('countryTowerCrown',roofGeo,trim,h,x,height+.70,z,(footW*.78)/2,Math.max(1.7,footW*.15),(footD*.78)/2);
+      }else if(!premium&&['terracotta','hip','widehip'].includes(towerRoofLanguage)){
+        place('countryTowerCrown',villaRoofGeo,trim,h,x,height+.58,z,(footW*.70)/2,1.25,(footD*.70)/2);
+      }
       continue;
     }
     // The default architecture is shared by all homes of the same tier.
@@ -6189,8 +6174,6 @@ function* renderHouseStages(selected){
       place('countryBayWindow',boxGeo,0x78b8cd,h,x-width*.20,1.42,z+depth*.89,width*.28,1.18,.08);
     }else if(['screens','screen','mashrabiya','jali'].includes(countryDetail)){
       const screen=countryDetail==='mashrabiya'?0x467b74:coordinatedHouseColor(roof,0x4b382c,.38);
-      if(countryDetail==='mashrabiya')place('countryMashrabiyaVolume',boxGeo,screen,h,
-        x,1.62,z+depth*.545,coreW*.72,1.85,.62);
       for(const side of [-1,1])for(let bar=-1;bar<=1;bar++)place('countryFacadeScreen',boxGeo,screen,h,
         x+side*width*.24+bar*.19,1.58,z+depth*.505,.07,1.45,.11);
     }else if(countryDetail==='redframe'){
@@ -6199,41 +6182,6 @@ function* renderHouseStages(selected){
     }else if(countryDetail==='timber'){
       for(const side of [-1,1])place('countryTimberFrame',boxGeo,roof,h,x+side*coreW*.34,height*.45,z+depth*.505,.12,height*.84,.14);
       place('countryTimberFrame',boxGeo,roof,h,x,height*.54,z+depth*.505,coreW*.80,.12,.15);
-    }else if(countryDetail==='wood'){
-      for(let course=0;course<5;course++)place('countryWoodCourse',boxGeo,roof,h,x,
-        .72+course*height*.18,z+depth*.505,coreW*.88,.10,.16);
-      for(const side of [-1,1])place('countryWoodCorner',boxGeo,lightTrim,h,
-        x+side*coreW*.46,height*.47,z+depth*.505,.16,height*.88,.18);
-    }else if(['loggia','arcade'].includes(countryDetail)){
-      const arcadeY=Math.min(height*.62,3.15),arcadeZ=z+depth*.56;
-      place('countryArcadeRecess',boxGeo,shadow,h,x,arcadeY*.53,z+depth*.515,coreW*.78,arcadeY-.32,.16);
-      place('countryArcadeSlab',boxGeo,roof,h,x,arcadeY,arcadeZ,coreW*.86,.20,1.05);
-      for(const side of [-1,-.33,.33,1])place('countryArcadePier',boxGeo,lightTrim,h,
-        x+side*coreW*.39,arcadeY*.52,arcadeZ+.43,.15,arcadeY-.18,.15);
-      if(countryDetail==='loggia')place('countryLoggiaRail',boxGeo,lightTrim,h,x,
-        arcadeY+.48,arcadeZ+.48,coreW*.82,.72,.10);
-    }else if(countryDetail==='shutters'){
-      for(const side of [-1,1])for(const wing of [-1,1])place('countryShutter',boxGeo,roof,h,
-        x+side*coreW*.24+wing*coreW*.105,1.62,z+depth*.511,coreW*.16,1.28,.09);
-    }else if(countryDetail==='balcony'){
-      place('countryFrenchBalcony',boxGeo,lightTrim,h,x,2.72,z+depth*.56,coreW*.70,.16,1.00);
-      place('countryFrenchRail',boxGeo,shadow,h,x,3.28,z+depth*.99,coreW*.68,.86,.09);
-      for(const bar of [-.45,-.30,-.15,0,.15,.30,.45])place('countryFrenchRailBar',boxGeo,shadow,h,
-        x+bar*coreW*.68,3.23,z+depth*.99,.055,.78,.07);
-    }else if(countryDetail==='cornice'){
-      for(const level of [.34,.68,.94])place('countryCornice',boxGeo,lightTrim,h,x,
-        height*level,z+depth*.506,coreW+(level===.94?.55:.25),.17,.24);
-      for(const side of [-1,1])place('countryCornicePier',boxGeo,stone,h,
-        x+side*coreW*.43,height*.46,z+depth*.51,.20,height*.86,.18);
-    }else if(countryDetail==='stonebase'){
-      place('countryStoneBase',boxGeo,0x8b7966,h,x,.82,z+coreZ,coreW+.22,1.42,coreD+.20);
-      for(const side of [-1,1])place('countryStoneButtress',boxGeo,0x786756,h,
-        x+side*coreW*.43,1.12,z+depth*.51,.38,2.05,.44);
-    }else if(countryDetail==='courtyard'){
-      place('countryCourtyardPortal',boxGeo,roof,h,x,1.62,z+depth*.57,coreW*.52,3.05,.68);
-      place('countryCourtyardDoor',boxGeo,0x3f716d,h,x,1.35,z+depth*.93,coreW*.24,2.45,.09);
-      for(const side of [-1,1])place('countryCourtyardPier',boxGeo,lightTrim,h,
-        x+side*coreW*.31,1.62,z+depth*.91,.26,3.05,.20);
     }
     if(hasWing){
       place('homeWingBody',boxGeo,wall,h,x+wingX,wingH/2,z+wingZ,wingW,wingH,wingD);

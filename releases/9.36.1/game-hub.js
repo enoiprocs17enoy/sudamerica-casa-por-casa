@@ -21,7 +21,7 @@
  function label(node,text){node.dataset.hubText=text;node.textContent=tr(text);return node;}
  function button(text,action,cls=''){const n=label(el('button',cls),text);n.type='button';n.onclick=action;return n;}
  const shell=el('section','hub-shell');shell.dataset.i18nSkip='true';shell.setAttribute('aria-label','MundoCity');
- const brand=el('button','hub-brand'),name=el('span','hub-brand-name','MundoCity');brand.type='button';brand.onclick=goHome;brand.append(el('span','hub-brand-mark','⌂'),name);shell.append(brand);
+ const brand=el('button','hub-brand'),name=el('span','hub-brand-name','MundoCity');brand.type='button';brand.onclick=goHome;const logo=el('img','mundocity-brand-logo');logo.src='assets/brand/mundocity-logo-v18.png';logo.alt='MundoCity';logo.width=1200;logo.height=279;logo.decoding='async';brand.append(logo);name.hidden=true;shell.append(brand);
  const searchArea=el('div','hub-search-area'),form=el('form','hub-search-form'),input=el('input');input.type='search';input.autocomplete='off';input.maxLength=80;input.id='hubSearch';input.setAttribute('aria-controls','hubSearchResults');input.setAttribute('aria-expanded','false');form.setAttribute('role','search');
  const search=button('Cerca',()=>{}),searchIcon=el('span','hub-search-icon','');searchIcon.setAttribute('aria-hidden','true');search.type='submit';form.append(searchIcon,input,search);const results=el('div','hub-results');results.id='hubSearchResults';results.hidden=true;searchArea.append(label(el('h1','hub-visually-hidden'),'Trova la tua casa'),form,results);shell.append(searchArea);
  const tools=el('div','hub-tools'),help=button('?',showHelp,'hub-round'),menu=button('☰',openDrawer,'hub-round hub-menu-trigger');tools.append(help,menu);shell.append(tools);
