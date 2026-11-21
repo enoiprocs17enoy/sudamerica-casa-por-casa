@@ -5945,8 +5945,60 @@ function* renderHouseStages(selected){
           place('condominiumMasonryRibbon',boxGeo,frame,h,bayX,height*.51,faceZ,.48,height*.97,.09);
         }
       }
-      // Garden unlocks remain at ground level, where parcel reservation can
-      // prevent overlaps. Tower roofs are reserved for coherent architecture.
+      // Premium rooftop amenities are progression rewards. They occupy the
+      // street-side half of the terrace, clear of the rear penthouse volume.
+      if(premium&&h.points>=50){
+        const v=gardenChoice(h,'bench');
+        const bx=x+footW*.24,bz=z+footD*.24,by=height+.95;
+        const bbqColors=[0xc69d7a,0x66747a,0xb77750,0xa5b2b5];
+        const c=bbqColors[v];
+        place('roofBBQPad',boxGeo,0xd9d1be,h,bx,by-.26,bz,2.55,.40,2.15);
+        if(v===0){
+          place('roofBBQBrick',boxGeo,c,h,bx,by+.42,bz,1.52,.96,.94);
+          place('roofBBQOpening',boxGeo,0x35373a,h,bx,by+.61,bz+.49,1.03,.43,.07);
+          place('roofBBQHood',pyramidGeo,0x9d6047,h,bx,by+1.22,bz,1.35,.74,1.08);
+          place('roofBBQFlue',boxGeo,c,h,bx,by+1.77,bz-.22,.44,.79,.44);
+        }else if(v===1){
+          place('roofBBQLegs',boxGeo,c,h,bx,by+.38,bz,.16,.75,.16);
+          place('roofBBQBowl',domeGeo,0x353b3d,h,bx,by+.87,bz,1.40,.60,1.20);
+          place('roofBBQLid',domeGeo,c,h,bx,by+1.26,bz,1.45,.40,1.25);
+          place('roofBBQHandle',boxGeo,0xe2d2b6,h,bx,by+1.49,bz,.44,.12,.15);
+        }else if(v===2){
+          place('roofBBQOvenBase',boxGeo,c,h,bx,by+.37,bz,1.72,.72,1.42);
+          place('roofBBQOvenDome',domeGeo,0xd3a17a,h,bx,by+1.05,bz,1.65,1.03,1.38);
+          place('roofBBQOvenDoorLower',boxGeo,0x40312a,h,bx,by+.84,bz+.48,.70,.30,.48);
+          place('roofBBQOvenDoorArch',domeGeo,0x40312a,h,bx,by+1.06,bz+.49,.70,.38,.49);
+          place('roofBBQOvenFlue',boxGeo,0xa66a4d,h,bx,by+1.65,bz-.25,.36,.83,.36);
+        }else{
+          place('roofBBQKitchen',boxGeo,c,h,bx,by+.42,bz,2.25,.86,.74);
+          place('roofBBQCounter',boxGeo,0xd8e0dd,h,bx,by+.90,bz,2.45,.13,.89);
+          place('roofBBQHob',boxGeo,0x343a3e,h,bx+.47,by+.99,bz,.76,.07,.55);
+          place('roofBBQCabinet',boxGeo,0x536c75,h,bx-.47,by+.45,bz+.39,.63,.56,.07);
+        }
+      }
+      if(premium&&h.points>=90){
+        const v=gardenChoice(h,'patio');
+        const px=x-footW*.17,pz=z+footD*.17,py=height+.97;
+        const water=[0x42bcd4,0x4cb8d9,0x218eb7,0x59c5ba][v];
+        const edge=[0xf4e4c8,0xe5ece9,0xd9c6a2,0xf1f0e7][v];
+        const pw=Math.min(8.4,footW*.52),pd=Math.min(7.2,footD*.37);
+        place('poolRoofDeck',boxGeo,0xded9cb,h,px,py-.29,pz,pw+.46,.38,pd+.46);
+        if(v===1||v===3){
+          const ow=v===1?pw*.86:Math.min(pw,pd)*.91;
+          const od=v===1?pd*.68:Math.min(pw,pd)*.91;
+          place('poolOvalBasin',poolCircleGeo,edge,h,px,py,pz,ow,.30,od);
+          place('poolOvalWater',poolCircleGeo,water,h,px,py+.17,pz,ow*.84,.06,od*.84);
+          if(v===3)place('poolRoundSteps',boxGeo,0xf5f3e9,h,px,py+.22,pz+od*.28,ow*.45,.07,.20);
+        }else{
+          const ww=v===2?pw*.62:pw*.85,dd=v===2?pd*.93:pd*.80;
+          place('poolRectBasin',boxGeo,edge,h,px,py,pz,ww+.26,.31,dd+.26);
+          place('poolRectWater',boxGeo,water,h,px,py+.17,pz,ww,.07,dd);
+          if(v===2){
+            place('poolLapLane',boxGeo,0xe9f2ec,h,px,py+.211,pz,.08,.01,dd*.83);
+            place('poolLapSteps',boxGeo,0xdce5df,h,px,py+.22,pz+dd*.38,ww*.64,.05,.24);
+          }
+        }
+      }
       // One instanced window strip per floor, visible on front and rear.
       for(let floor=0;floor<levels;floor++){
         const wy=1.6+floor*storeyHeight;
