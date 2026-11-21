@@ -766,7 +766,12 @@ function coordinatedHouseColor(wall,other,amount){
 }
 function housePaint(h){
  const index=housePaintIndex(h);
- return HOUSE_PAINTS[index]||HOUSE_PAINTS[0];
+ const chosen=HOUSE_PAINTS[index]||HOUSE_PAINTS[0];
+ const architecture=window.WorldArchitecture?.forCity(currentCity);
+ if(!architecture)return chosen;
+ return {name:chosen.name,
+  wall:coordinatedHouseColor(chosen.wall,architecture.homeWalls[index%architecture.homeWalls.length],.58),
+  roof:coordinatedHouseColor(chosen.roof,architecture.homeRoofs[index%architecture.homeRoofs.length],.66)};
 }
 function isPremiumHouse(h){return designOverrides.get(scoreOverrideKey(h.cityId,h.id))??window.HouseShowcase?.styleFor(h)?.premium??(simulatedChoice(h,'house','premium',100)<35);}
 
@@ -2511,6 +2516,7 @@ function drawCityFrame(minInterval=1000/60){
 }
 const walls = [0xd98972,0xb4d8b3,0xdca1ad,0x89b9df,0xc6a7de,0xe6b768,0x9bc9bd,0xd9a184,0xbac8d5];
 const roofs = [0xa44d3f,0x518a70,0x627bb2,0x9d5a73,0x886b9c,0xc07943,0x4d8b8c,0x795d48,0xc66a50];
+function blendHex(a,b,amount=.5){return new THREE.Color(a).lerp(new THREE.Color(b),amount).getHex();}
 function disposeGroup() {
   if (!group) return;
   const geometries=new Set(),materials=new Set();
@@ -2620,20 +2626,42 @@ function civicBench(x,z){
   urbanBench((color,x,y,z,w,h,d)=>addBox(w,h,d,x,y,z,color),x,z,.26,-1);
 }
 function makeHouse(h) {
+  const architecture=window.WorldArchitecture?.forCity(currentCity);
+  const wallPalette=architecture?.homeWalls||walls,roofPalette=architecture?.homeRoofs||roofs;
+  const wallColor=wallPalette[h.variant%wallPalette.length],roofColor=roofPalette[h.variant%roofPalette.length];
   const height = [2.4,3,3.8,5.6,7.3,2.8,4.4][h.type];
   const width = [2.7,3.5,3,4.1,4.3,3.3,3.7][h.type];
   const depth = [2.7,3.2,3.4,3.6,3.8,3.5,3.2][h.type];
   if (h.garden) addBox(12.7,.035,11.8,h.x,.015,h.z,houseLawnColor(h));
-  const body = addBox(width,height,depth,h.x,height/2,h.z,walls[h.variant]);
+  const body = addBox(width,height,depth,h.x,height/2,h.z,wallColor);
   body.userData.home = h;houseMeshes.push(body);
   let roof;
-  if (h.type === 3 || h.type === 4) {
-    roof = addBox(width+.4,.42,depth+.4,h.x,height+.23,h.z,roofs[h.variant]);
+  const roofLanguage=architecture?.roof||'terracotta';
+  const flatRoof=['flat','terrace'].includes(roofLanguage)||h.type===3||h.type===4;
+  if (flatRoof) {
+    roof = addBox(width+.4,.42,depth+.4,h.x,height+.23,h.z,roofColor);
     // A second level gives some buildings a different silhouette.
-    if (h.type === 4) addBox(width*.55,1.4,depth*.55,h.x,height+1.1,h.z,walls[h.variant]);
+    if (h.type === 4) addBox(width*.55,1.4,depth*.55,h.x,height+1.1,h.z,wallColor);
+    if(['flat','terrace'].includes(roofLanguage)){
+      const parapet=architecture?.detail==='mashrabiya'?.28:.19,top=height+.53;
+      for(const side of [-1,1]){
+        addBox(.14,parapet,depth+.36,h.x+side*(width/2+.13),top,h.z,roofColor);
+        addBox(width+.36,parapet,.14,h.x,top,h.z+side*(depth/2+.13),roofColor);
+      }
+    }
   } else {
-    roof = new THREE.Mesh(new THREE.ConeGeometry(width*.78,1.5+(h.type%3)*.35,4),new THREE.MeshLambertMaterial({color:roofs[h.variant]}));
+    const wide=['widehip','layered','tiered'].includes(roofLanguage),steep=['steep','gable','mansard'].includes(roofLanguage);
+    const roofHeight=(steep?2.05:1.5)+(h.type%3)*.35;
+    roof = new THREE.Mesh(new THREE.ConeGeometry(width*(wide?.92:.78),roofHeight,4),new THREE.MeshLambertMaterial({color:roofColor}));
     roof.rotation.y=Math.PI/4;roof.position.set(h.x,height+.65,h.z);group.add(roof);
+    if(['layered','tiered'].includes(roofLanguage)){
+      const lower=new THREE.Mesh(new THREE.ConeGeometry(width*1.02,.62,4),new THREE.MeshLambertMaterial({color:roofColor}));
+      lower.rotation.y=Math.PI/4;lower.position.set(h.x,height+.22,h.z);group.add(lower);
+      if(roofLanguage==='tiered'){
+        const upper=new THREE.Mesh(new THREE.ConeGeometry(width*.50,.72,4),new THREE.MeshLambertMaterial({color:roofColor}));
+        upper.rotation.y=Math.PI/4;upper.position.set(h.x,height+1.42,h.z);group.add(upper);
+      }
+    }
   }
   roof.userData.home=h;houseMeshes.push(roof);
   const door=addBox(.65,1.3,.09,h.x,.66,h.z+depth/2+.05,0x79543e);
@@ -2645,10 +2673,34 @@ function makeHouse(h) {
   }
   // v6.4.5: readable residential architecture, using existing box primitives.
   // Details sit slightly in front of the facade, without blocking the door.
-  const facade=h.z+depth/2, accent=[0xf4e5d4,0xe5f0e1,0xf6e0e5,0xe5ecf4][h.variant%4];
+  const facade=h.z+depth/2, accent=blendHex(wallColor,0xfff4dd,.52);
   const sill=0xd0c6b3, dark=0x566b73;
   addBox(.87,.10,.21,h.x,1.39,facade+.15,sill); // entrance lintel
   addBox(.83,.11,.40,h.x,.12,facade+.23,0xbab2a4); // doorstep
+  const language=architecture?.detail;
+  if(['veranda','porch'].includes(language)){
+    addBox(width*.92,.16,1.08,h.x,2.24,facade+.47,roofColor);
+    for(const side of [-1,1])addBox(.12,2.05,.12,h.x+side*width*.40,1.15,facade+.87,accent);
+  }else if(language==='bay'){
+    addBox(width*.42,1.62,.58,h.x-width*.20,1.35,facade+.34,accent);
+    addBox(width*.31,1.18,.09,h.x-width*.20,1.43,facade+.67,0x8bc8dc);
+  }else if(['screens','screen','mashrabiya','jali'].includes(language)){
+    const screenColor=architecture?.detail==='mashrabiya'?0x426f6b:blendHex(roofColor,0x6b4a35,.45);
+    for(const side of [-1,1])for(let bar=-1;bar<=1;bar++)
+      addBox(.07,1.18,.10,h.x+side*width*.24+bar*.19,1.62,facade+.14,screenColor);
+  }else if(language==='redframe'){
+    for(const side of [-1,1])addBox(.13,Math.min(height,3.2),.14,h.x+side*(width/2-.14),Math.min(height,3.2)/2,facade+.12,0x8f3130);
+    addBox(width*.91,.15,.20,h.x,Math.min(height,3.2)-.10,facade+.12,0x8f3130);
+  }else if(language==='timber'){
+    for(const side of [-1,1])addBox(.11,height*.82,.13,h.x+side*width*.32,height*.44,facade+.12,roofColor);
+    addBox(width*.86,.11,.15,h.x,height*.52,facade+.12,roofColor);
+  }else if(['shutters','loggia','arcade'].includes(language)){
+    for(const side of [-1,1]){
+      const wx=h.x+side*width*.24;
+      addBox(.18,.78,.12,wx-side*.48,1.80,facade+.14,roofColor);
+      addBox(.18,.78,.12,wx+side*.48,1.80,facade+.14,roofColor);
+    }
+  }else if(language==='cornice')addBox(width+.18,.24,.34,h.x,height-.08,facade+.16,roofColor);
   if(h.type<=2 || h.type===5 || h.type===6){
     // Compact houses: front pilasters and pitched-roof fascia.
     for(const side of [-1,1]){
@@ -2665,13 +2717,13 @@ function makeHouse(h) {
       }
     }
     if(h.type===2){ // villa: pronounced portico above the entrance
-      addBox(1.85,.16,.92,h.x,2.35,facade+.42,roofs[h.variant]);
+      addBox(1.85,.16,.92,h.x,2.35,facade+.42,roofColor);
       for(const side of [-1,1])
         addBox(.15,1.88,.17,h.x+side*.83,1.19,facade+.77,accent);
     }
     if(h.type===5){ // premium low house: contrasting side bays
       for(const side of [-1,1])
-        addBox(.22,1.55,.33,h.x+side*(width*.40),1.45,facade+.15,roofs[h.variant]);
+        addBox(.22,1.55,.33,h.x+side*(width*.40),1.45,facade+.15,roofColor);
     }
     if(h.type===6){ // premium residence: balcony over entrance
       addBox(width*.60,.15,.74,h.x,2.60,facade+.34,sill);
@@ -2724,6 +2776,7 @@ function addPitch(x,z,w,d,baseColor,lines=true){
 function drawCivicBuilding(zone,b){
  const kind=zone.kind;
  if(kind==='park'||kind==='monument')return false;
+ const architecture=window.WorldArchitecture?.forCity(currentCity);
  const w=b.width,d=b.depth,batches=new Map(),pavingTop=.12;
  const geometries={box:new THREE.BoxGeometry(1,1,1),glass:new THREE.BoxGeometry(1,1,1),
   cylinder:new THREE.CylinderGeometry(1,1,1,20),dome:new THREE.SphereGeometry(1,20,12,0,Math.PI*2,0,Math.PI/2),
@@ -2739,6 +2792,8 @@ function drawCivicBuilding(zone,b){
  const round=(color,fx,y,fz,r,h)=>add('cylinder',color,fx,y,fz,r,h,r);
  const tyre=(fx,y,fz,radius,thickness,color=0x303c42)=>add('wheel',color,fx,y,fz,thickness,radius,radius);
  const building=(fx,fz,fw,fd,floors,wall,trim,entranceWidth=0)=>{
+  wall=architecture?.civic?.wall??wall;
+  trim=architecture?.civic?.trim??trim;
   const height=floors*3.5;
   box(wall,fx,height/2+.18,fz,fw,height,fd);
   box(trim,fx,height+.34,fz,fw+.018,.40,fd+.012);
@@ -3312,6 +3367,7 @@ const shopStyles=[
   {name:'Mercato',walls:0xe0bca6,trim:0x9b624e,glass:0x8ed3d2}
 ];
 function drawShops(){
+  const architecture=window.WorldArchitecture?.forCity(currentCity);
   const box=new THREE.BoxGeometry(1,1,1),dummy=new THREE.Object3D(),batches=new Map();
   const groundBases=[];
   const pavingKinds=new Set(['shopPaving','restaurantTerrace','shopDiningDeck','libraryGardenDeck','gymPoolDeck']);
@@ -3780,9 +3836,9 @@ function drawShops(){
     const fashionAnnexHeight=Math.min(height*.83,stage>=5?7.3:5.1);
     const x=shop.x,z=shop.z;
     // Premium enriches finishes without changing the activity's base colour.
-    const wallColor=style.walls;
-    const paving=progress.premium?0xc7ad8b:[0xaba99f,0xb8b5a9,0x9ba9a8][progress.pavingIndex??seed%3];
-    const front=z+d/2, trim=style.trim, glass=style.glass;
+    const wallColor=blendHex(style.walls,architecture?.shop?.wall??style.walls,.34);
+    const paving=progress.premium?blendHex(0xc7ad8b,architecture?.shop?.wall??0xc7ad8b,.20):[0xaba99f,0xb8b5a9,0x9ba9a8][progress.pavingIndex??seed%3];
+    const front=z+d/2, trim=blendHex(style.trim,architecture?.shop?.trim??style.trim,.48), glass=style.glass;
     const diningUpper=(shape===0||shape===2)&&stage>=3;
     const marketHall=shape===11&&stage>=2;
     const bakerySplit=shape===7&&stage>=3;
@@ -3928,6 +3984,20 @@ function drawShops(){
         }
       }
     }else put('body',wallColor,shop,x,height/2,z,w,height,d);
+    if(stage>=1){
+      const roofLanguage=architecture?.roof;
+      if(['flat','terrace'].includes(roofLanguage)){
+        put('roof',trim,shop,x,height+.18,z-d*.42,w+.22,.36,d*.12);
+        for(const side of [-1,1])put('roof',trim,shop,x+side*(w/2+.05),height+.40,z,.18,.44,d+.18);
+      }else if(['layered','tiered','widehip'].includes(roofLanguage)){
+        put('roof',trim,shop,x,height+.26,z,w+1.15,.28,d+1.05);
+        if(roofLanguage==='tiered'&&stage>=4)put('roof',trim,shop,x,height+.72,z,w*.62,.34,d*.55);
+      }else if(['steep','mansard','gable'].includes(roofLanguage)){
+        put('roof',trim,shop,x,height+.32,z,w+.44,.64,d+.36);
+      }else if(roofLanguage==='terracotta'||roofLanguage==='hip'){
+        put('roof',trim,shop,x,height+.22,z,w+.62,.38,d+.54);
+      }
+    }
     let serviceRear=z-d/2;
 
     if(stage>=1&&!(shape===8&&progress.premium)){
@@ -5605,6 +5675,7 @@ function useStuccoScale(material){
 function renderAllHouses(selected){const steps=renderHouseStages(selected);while(!steps.next().done){}}
 function* renderHouseStages(selected){
   // Multiple architectural families, all instanced: render every house at every zoom.
+  const architecture=window.WorldArchitecture?.forCity(currentCity);
   const boxGeo=new THREE.BoxGeometry(1,1,1);
   const roofGeo=makeRidgeRoof();
   const villaRoofGeo=makeHippedRoof();
@@ -5957,6 +6028,16 @@ function* renderHouseStages(selected){
           }
         }
       }
+      const towerRoofLanguage=architecture?.roof;
+      if(['layered','tiered'].includes(towerRoofLanguage)){
+        place('countryTowerEave',boxGeo,trim,h,x,height+1.02,z,footW+.75,.18,footD+.72);
+        place('countryTowerCrown',villaRoofGeo,trim,h,x,height+.96,z,(footW*.64)/2,1.18,(footD*.62)/2);
+        if(towerRoofLanguage==='tiered')place('countryTowerUpperEave',boxGeo,trim,h,x,height+2.02,z,footW*.44,.14,footD*.42);
+      }else if(['steep','mansard','gable'].includes(towerRoofLanguage)){
+        place('countryTowerCrown',roofGeo,trim,h,x,height+.70,z,(footW*.78)/2,Math.max(1.7,footW*.15),(footD*.78)/2);
+      }else if(['terracotta','hip','widehip'].includes(towerRoofLanguage)){
+        place('countryTowerCrown',villaRoofGeo,trim,h,x,height+.58,z,(footW*.70)/2,1.25,(footD*.70)/2);
+      }
       continue;
     }
     // The default architecture is shared by all homes of the same tier.
@@ -5983,13 +6064,26 @@ function* renderHouseStages(selected){
     const hasWing=tier>0||premium;
     place('homeMainBody',boxGeo,wall,h,x,height/2,z+coreZ,coreW,height,coreD);
     foundation('homeMainPlinth',plinth,h,x,.40,z+coreZ,coreW+.12,coreD+.12);
-    place('homeMainRoof',tier===2?villaRoofGeo:roofGeo,roof,h,x,height-.03,z+coreZ,
-      (coreW+.45)/2,Math.max(1.3,coreW*.20),(coreD+.48)/2);
+    const roofLanguage=architecture?.roof||'terracotta';
+    const flatCountryRoof=['flat','terrace'].includes(roofLanguage);
+    const layeredCountryRoof=['layered','tiered','widehip','hip'].includes(roofLanguage);
+    const countryRoofGeo=flatCountryRoof?boxGeo:layeredCountryRoof?villaRoofGeo:tier===2?villaRoofGeo:roofGeo;
+    if(flatCountryRoof)place('homeMainRoof',countryRoofGeo,roof,h,x,height+.12,z+coreZ,coreW+.45,.24,coreD+.48);
+    else place('homeMainRoof',countryRoofGeo,roof,h,x,height-.03,z+coreZ,
+      (coreW+.45)/2,Math.max(['steep','gable','mansard'].includes(roofLanguage)?1.85:1.3,coreW*(['steep','gable','mansard'].includes(roofLanguage)?.27:.20)),(coreD+.48)/2);
+    if(['layered','tiered'].includes(roofLanguage)){
+      place('countryLowerEave',boxGeo,roof,h,x,height+.02,z+coreZ,coreW+.82,.18,coreD+.78);
+      if(roofLanguage==='tiered')place('countryUpperEave',boxGeo,roof,h,x,height+.86,z+coreZ,coreW*.55,.15,coreD*.52);
+    }
+    if(flatCountryRoof)for(const side of [-1,1]){
+      place('countryRoofParapet',boxGeo,wall,h,x,height+.49,z+coreZ+side*coreD*.48,coreW+.42,.50,.16);
+      place('countryRoofParapet',boxGeo,wall,h,x+side*coreW*.48,height+.49,z+coreZ,.16,.50,coreD);
+    }
     // True raised terracotta courses follow each roof slope. Each row is
     // a thin instanced strip, kept INSIDE the roof footprint.
     const roofRise=Math.max(1.3,coreW*.20),roofHalf=(coreW+.45)/2;
     const roofBase=height-.03;
-    for(const side of tier===2?[]:[-1,1]){
+    for(const side of tier===2||flatCountryRoof||layeredCountryRoof?[]:[-1,1]){
       for(let row=1;row<=7;row++){
         const t=row/8;
         const rx=x+side*(roofHalf*(1-t));
@@ -5997,6 +6091,24 @@ function* renderHouseStages(selected){
         place('roofRaisedTileCourse',boxGeo,coordinatedHouseColor(roof,0x57301e,.10),
           h,rx,ry,z+coreZ,.095,.075,coreD*.93);
       }
+    }
+    const countryDetail=architecture?.detail;
+    if(['veranda','porch'].includes(countryDetail)){
+      place('countryVerandaRoof',boxGeo,roof,h,x,height*.58,z+depth*.54,width*.84,.18,1.22);
+      for(const side of [-1,1])place('countryVerandaPost',boxGeo,lightTrim,h,x+side*width*.36,height*.29,z+depth*.70,.14,height*.56,.14);
+    }else if(countryDetail==='bay'){
+      place('countryBayBody',boxGeo,wall,h,x-width*.20,1.25,z+depth*.51,width*.38,1.82,.72);
+      place('countryBayWindow',boxGeo,0x78b8cd,h,x-width*.20,1.42,z+depth*.89,width*.28,1.18,.08);
+    }else if(['screens','screen','mashrabiya','jali'].includes(countryDetail)){
+      const screen=countryDetail==='mashrabiya'?0x467b74:coordinatedHouseColor(roof,0x4b382c,.38);
+      for(const side of [-1,1])for(let bar=-1;bar<=1;bar++)place('countryFacadeScreen',boxGeo,screen,h,
+        x+side*width*.24+bar*.19,1.58,z+depth*.505,.07,1.45,.11);
+    }else if(countryDetail==='redframe'){
+      for(const side of [-1,1])place('countryRedFrame',boxGeo,0x8f3130,h,x+side*coreW*.46,height*.46,z+depth*.505,.15,height*.90,.14);
+      place('countryRedFrame',boxGeo,0x8f3130,h,x,height*.89,z+depth*.505,coreW*.93,.16,.15);
+    }else if(countryDetail==='timber'){
+      for(const side of [-1,1])place('countryTimberFrame',boxGeo,roof,h,x+side*coreW*.34,height*.45,z+depth*.505,.12,height*.84,.14);
+      place('countryTimberFrame',boxGeo,roof,h,x,height*.54,z+depth*.505,coreW*.80,.12,.15);
     }
     if(hasWing){
       place('homeWingBody',boxGeo,wall,h,x+wingX,wingH/2,z+wingZ,wingW,wingH,wingD);
