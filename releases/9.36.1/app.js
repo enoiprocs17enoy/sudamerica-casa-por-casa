@@ -2834,6 +2834,22 @@ function drawCivicBuilding(zone,b){
    box(trim,fx,height+.66,fz+side*(fd/2+.003),fw+.018,.34,.005);
    box(0x6d807f,fx+side*(fw/2-.018),height/2+.2,fz+fd/2+.005,.004,height,.004);
   }
+  const detail=architecture?.detail,front=fz+fd/2+.010;
+  if(['veranda','porch'].includes(detail)){
+   box(trim,fx,3.48,front+.030,fw*.76,.24,.070);
+   for(const side of [-1,-.33,.33,1])box(trim,fx+side*fw*.34,1.78,front+.058,.009,3.28,.009);
+  }else if(['loggia','arcade','shutters','balcony'].includes(detail)){
+   box(trim,fx,3.36,front+.018,fw*.82,.20,.040);
+   for(const side of [-1,-.5,0,.5,1])box(trim,fx+side*fw*.37,1.73,front+.025,.008,3.16,.008);
+  }else if(['screens','screen','mashrabiya','jali'].includes(detail)){
+   for(const side of [-1,1])for(let bar=-1;bar<=1;bar++)box(trim,fx+side*fw*.31+bar*.006,2.12,front+.008,.004,2.95,.011);
+  }else if(detail==='redframe'){
+   for(const side of [-1,1])box(0x8f3130,fx+side*fw*.43,height*.49,front+.006,.010,height*.88,.011);
+   box(0x8f3130,fx,height-.32,front+.007,fw*.88,.20,.012);
+  }else if(['cornice','timber','wood','bay'].includes(detail)){
+   box(trim,fx,height-.34,front+.009,fw+.025,.26,.018);
+   for(const side of [-1,1])box(trim,fx+side*fw*.42,height*.49,front+.008,.008,height*.84,.014);
+  }
   return height+.54;
  };
  const canopy=(fx,y,fz,fw,fd,trim)=>{
@@ -3407,6 +3423,7 @@ function drawShops(){
       'garageRoof','superRoof','displayGlass','entryDoor','entryDoorGlass',
       'signFascia','signInset','garageGate','cinemaParapet','hotelUpperWindow']);
   for(const kind of ['shopTradeCanopy','shopTradePost','shopDisplayStand','shopFixtureFoot'])structuralKinds.add(kind);
+  for(const kind of ['countryShopVeranda','countryShopPost','countryShopBay','countryShopScreen','countryShopPier','countryShopBand','countryShopArcade','countryShopCornice'])structuralKinds.add(kind);
   structuralKinds.add('tradeBracket');
   for(const kind of ['libraryGardenRafter','libraryGardenDeck','libraryGardenRoof','libraryGardenGlass','libraryGardenBeam','libraryGardenPost','libraryGardenRidge','gymTrainingPost','gymTrainingBeam','gymTrainingSlat','gymPoolDeck','gymPoolBasin','gymPoolWater','gymTreadmillBase','cinemaPremiereCanopy','cinemaPremiereColumn','cinemaPremiereFascia','cinemaPosterCase','cinemaPosterArtwork','cinemaTicketBooth','cinemaTicketGlass','hotelBalcony','hotelBalconyGlass','hotelBalconyRail','hotelBalconySideRail','hotelPoolBase','hotelPoolWater','hotelRoofGuard','hotelRoofGuardCap','marketServiceDoor','marketGable','marketHallPost','bakeryGable','workshopDaylightRoof','pharmacyWingRoof','fashionTerraceDeck','fashionBalustrade','superClerestory','libraryDome','libraryDrum','gymVault','pizzaGable','diningTerraceDeck','diningBalustrade','diningTerraceAwning'])structuralKinds.add(kind);
   function put(kind,color,shop,x,y,z,w,h,d){
@@ -3996,6 +4013,26 @@ function drawShops(){
         put('roof',trim,shop,x,height+.32,z,w+.44,.64,d+.36);
       }else if(roofLanguage==='terracotta'||roofLanguage==='hip'){
         put('roof',trim,shop,x,height+.22,z,w+.62,.38,d+.54);
+      }
+    }
+    if(stage>=1){
+      const detail=architecture?.detail;
+      if(['veranda','porch'].includes(detail)){
+        put('countryShopVeranda',trim,shop,x,3.66,front+1.05,w*.93,.22,2.20);
+        for(const side of [-1,0,1])put('countryShopPost',trim,shop,x+side*w*.43,1.86,front+2.02,.15,3.55,.15);
+      }else if(detail==='bay'){
+        for(const side of [-1,1])put('countryShopBay',wallColor,shop,x+side*w*.27,2.18,front+.34,w*.31,3.72,.70);
+      }else if(['screens','screen','mashrabiya','jali'].includes(detail)){
+        for(const side of [-1,1])for(let bar=-1;bar<=1;bar++)put('countryShopScreen',trim,shop,x+side*w*.28+bar*.16,2.40,front+.39,.07,3.50,.12);
+      }else if(detail==='redframe'){
+        for(const side of [-1,1])put('countryShopPier',0x8f3130,shop,x+side*w*.46,height*.48,front+.10,.22,height*.90,.22);
+        put('countryShopBand',0x8f3130,shop,x,height-.45,front+.11,w*.94,.20,.22);
+      }else if(['loggia','arcade','shutters','balcony'].includes(detail)){
+        put('countryShopArcade',trim,shop,x,3.60,front+.55,w*.92,.20,1.18);
+        for(const side of [-1,0,1])put('countryShopPost',trim,shop,x+side*w*.43,1.85,front+1.02,.16,3.42,.16);
+      }else if(['cornice','timber','wood'].includes(detail)){
+        put('countryShopCornice',trim,shop,x,height-.34,front+.12,w+.30,.25,.28);
+        for(const side of [-1,1])put('countryShopPier',trim,shop,x+side*w*.43,height*.48,front+.10,.16,height*.86,.16);
       }
     }
     let serviceRear=z-d/2;
@@ -5908,67 +5945,8 @@ function* renderHouseStages(selected){
           place('condominiumMasonryRibbon',boxGeo,frame,h,bayX,height*.51,faceZ,.48,height*.97,.09);
         }
       }
-      // Rooftop amenities are instanced just like the buildings. The four
-      // choices have DIFFERENT silhouettes, not only different colors.
-      if(premium&&h.points>=50){
-        const v=gardenChoice(h,'bench');
-        const bx=x+footW*.24,bz=z+footD*.24,by=height+.95;
-        const bbqColors=[0xc69d7a,0x66747a,0xb77750,0xa5b2b5];
-        const c=bbqColors[v];
-        place('roofBBQPad',boxGeo,0xd9d1be,h,bx,by-.26,bz,2.55,.40,2.15);
-        if(v===0){ // tall brick barbecue with extraction hood
-          place('roofBBQBrick',boxGeo,c,h,bx,by+.42,bz,1.52,.96,.94);
-          place('roofBBQOpening',boxGeo,0x35373a,h,bx,by+.61,bz+.49,1.03,.43,.07);
-          place('roofBBQHood',pyramidGeo,0x9d6047,h,bx,by+1.22,bz,1.35,.74,1.08);
-          place('roofBBQFlue',boxGeo,c,h,bx,by+1.77,bz-.22,.44,.79,.44);
-        }else if(v===1){ // compact freestanding kettle grill
-          place('roofBBQLegs',boxGeo,c,h,bx,by+.38,bz,.16,.75,.16);
-          place('roofBBQBowl',domeGeo,0x353b3d,h,bx,by+.87,bz,1.40,.60,1.20);
-          place('roofBBQLid',domeGeo,c,h,bx,by+1.26,bz,1.45,.40,1.25);
-          place('roofBBQHandle',boxGeo,0xe2d2b6,h,bx,by+1.49,bz,.44,.12,.15);
-        }else if(v===2){ // rustic pizza oven with chimney
-          place('roofBBQOvenBase',boxGeo,c,h,bx,by+.37,bz,1.72,.72,1.42);
-          place('roofBBQOvenDome',domeGeo,0xd3a17a,h,bx,by+1.05,bz,1.65,1.03,1.38);
-          place('roofBBQOvenDoorLower',boxGeo,0x40312a,h,bx,by+.84,bz+.48,.70,.30,.48);
-          place('roofBBQOvenDoorArch',domeGeo,0x40312a,h,bx,by+1.06,bz+.49,.70,.38,.49);
-          place('roofBBQOvenFlue',boxGeo,0xa66a4d,h,bx,by+1.65,bz-.25,.36,.83,.36);
-        }else{ // outdoor kitchen with side counter
-          place('roofBBQKitchen',boxGeo,c,h,bx,by+.42,bz,2.25,.86,.74);
-          place('roofBBQCounter',boxGeo,0xd8e0dd,h,bx,by+.90,bz,2.45,.13,.89);
-          place('roofBBQHob',boxGeo,0x343a3e,h,bx+.47,by+.99,bz,.76,.07,.55);
-          place('roofBBQCabinet',boxGeo,0x536c75,h,bx-.47,by+.45,bz+.39,.63,.56,.07);
-        }
-      }
-      if(premium&&h.points>=90){
-        const v=gardenChoice(h,'patio');
-        const px=x-footW*.17,pz=z+footD*.17;
-        const py=height+.97;
-        const water=[0x42bcd4,0x4cb8d9,0x218eb7,0x59c5ba][v];
-        const edge=[0xf4e4c8,0xe5ece9,0xd9c6a2,0xf1f0e7][v];
-        // A single compact terrace, fully above the roof surface.
-        const pw=Math.min(8.4,footW*.52),pd=Math.min(7.2,footD*.37);
-        place('poolRoofDeck',boxGeo,0xded9cb,h,px,py-.29,pz,pw+.46,.38,pd+.46);
-        if(v===1||v===3){
-          // oval pool vs round plunge pool: two distinct proportions
-          const ow=v===1?pw*.86:Math.min(pw,pd)*.91;
-          const od=v===1?pd*.68:Math.min(pw,pd)*.91;
-          place('poolOvalBasin',poolCircleGeo,edge,h,px,py,pz,ow,.30,od);
-          place('poolOvalWater',poolCircleGeo,water,h,px,py+.17,pz,ow*.84,.06,od*.84);
-          if(v===3)place('poolRoundSteps',boxGeo,0xf5f3e9,h,px,py+.22,pz+od*.28,ow*.45,.07,.20);
-        }else{
-          // classic rectangle vs narrow lap pool with lane and steps
-          const ww=v===2?pw*.62:pw*.85;
-          const dd=v===2?pd*.93:pd*.80;
-          place('poolRectBasin',boxGeo,edge,h,px,py,pz,ww+.26,.31,dd+.26);
-          place('poolRectWater',boxGeo,water,h,px,py+.17,pz,ww,.07,dd);
-          if(v===2){
-            place('poolLapLane',boxGeo,0xe9f2ec,h,px,py+.211,pz,.08,.01,dd*.83);
-            place('poolLapSteps',boxGeo,0xdce5df,h,px,py+.22,pz+dd*.38,ww*.64,.05,.24);
-          }
-        }
-        // Pool furniture deliberately placed beyond water but on deck.
-
-      }
+      // Garden unlocks remain at ground level, where parcel reservation can
+      // prevent overlaps. Tower roofs are reserved for coherent architecture.
       // One instanced window strip per floor, visible on front and rear.
       for(let floor=0;floor<levels;floor++){
         const wy=1.6+floor*storeyHeight;
@@ -6028,14 +6006,57 @@ function* renderHouseStages(selected){
           }
         }
       }
+      // Country identity changes the tower silhouette and facade depth, not
+      // merely its paint. All pieces stay close to the envelope and remain
+      // instanced, so the distinction survives at city scale without a large
+      // draw-call cost.
+      const towerDetail=architecture?.detail;
+      const facadeZ=footD/2+.14;
+      if(['veranda','porch'].includes(towerDetail)){
+        for(let floor=1;floor<levels;floor+=2){
+          const by=floor*storeyHeight+.22;
+          for(const face of [-1,1]){
+            place('countryTowerVeranda',boxGeo,trim,h,x,by,z+face*(facadeZ+.38),footW*.92,.16,.92);
+            for(const side of [-1,1])place('countryTowerVerandaPost',boxGeo,trim,h,x+side*footW*.42,by+.63,z+face*(facadeZ+.79),.11,1.22,.11);
+          }
+        }
+      }else if(towerDetail==='bay'){
+        for(const side of [-1,1])for(const face of [-1,1]){
+          const bx=x+side*footW*.27,bz=z+face*(facadeZ+.24);
+          place('countryTowerBay',boxGeo,wall,h,bx,height*.51,bz,footW*.25,height*.90,.55);
+          for(let floor=0;floor<levels;floor++)place('countryTowerBayWindow',boxGeo,0x39738f,h,bx,1.6+floor*storeyHeight,bz+face*.31,footW*.17,1.15,.07);
+        }
+      }else if(['screens','screen','mashrabiya','jali'].includes(towerDetail)){
+        const screen=towerDetail==='mashrabiya'?0x3f746e:trim;
+        for(const face of [-1,1])for(const side of [-1,1])for(let bar=-1;bar<=1;bar++)
+          place('countryTowerScreen',boxGeo,screen,h,x+side*footW*.36+bar*.16,height*.52,z+face*(facadeZ+.10),.075,height*.78,.12);
+      }else if(towerDetail==='redframe'){
+        for(const face of [-1,1]){
+          for(const side of [-1,1])place('countryTowerRedPier',boxGeo,0x8f3130,h,x+side*footW*.45,height*.51,z+face*facadeZ,.18,height*.94,.18);
+          for(let floor=2;floor<levels;floor+=3)place('countryTowerRedBand',boxGeo,0x8f3130,h,x,floor*storeyHeight+.25,z+face*facadeZ,footW*.92,.16,.18);
+        }
+      }else if(['loggia','arcade','shutters','balcony'].includes(towerDetail)){
+        for(let floor=1;floor<levels;floor+=2)for(const face of [-1,1]){
+          const by=floor*storeyHeight+.25,bz=z+face*(facadeZ+.25);
+          place('countryTowerLoggia',boxGeo,trim,h,x,by,bz,footW*.78,.16,.62);
+          for(const side of [-1,0,1])place('countryTowerLoggiaPier',boxGeo,trim,h,x+side*footW*.34,by+.69,bz+face*.28,.12,1.30,.12);
+        }
+      }else if(['cornice','timber','wood'].includes(towerDetail)){
+        for(const face of [-1,1])for(let floor=1;floor<levels;floor+=2)
+          place('countryTowerCourse',boxGeo,trim,h,x,floor*storeyHeight+.18,z+face*facadeZ,footW+.24,.14,.22);
+        if(['timber','wood'].includes(towerDetail))for(const face of [-1,1])for(const side of [-1,1])
+          place('countryTowerVerticalFrame',boxGeo,trim,h,x+side*footW*.39,height*.51,z+face*facadeZ,.14,height*.90,.16);
+      }
       const towerRoofLanguage=architecture?.roof;
-      if(['layered','tiered'].includes(towerRoofLanguage)){
+      // Premium towers already own a terrace pavilion and parapet. Adding a
+      // second national roof through that volume caused visible intersections.
+      if(!premium&&['layered','tiered'].includes(towerRoofLanguage)){
         place('countryTowerEave',boxGeo,trim,h,x,height+1.02,z,footW+.75,.18,footD+.72);
         place('countryTowerCrown',villaRoofGeo,trim,h,x,height+.96,z,(footW*.64)/2,1.18,(footD*.62)/2);
         if(towerRoofLanguage==='tiered')place('countryTowerUpperEave',boxGeo,trim,h,x,height+2.02,z,footW*.44,.14,footD*.42);
-      }else if(['steep','mansard','gable'].includes(towerRoofLanguage)){
+      }else if(!premium&&['steep','mansard','gable'].includes(towerRoofLanguage)){
         place('countryTowerCrown',roofGeo,trim,h,x,height+.70,z,(footW*.78)/2,Math.max(1.7,footW*.15),(footD*.78)/2);
-      }else if(['terracotta','hip','widehip'].includes(towerRoofLanguage)){
+      }else if(!premium&&['terracotta','hip','widehip'].includes(towerRoofLanguage)){
         place('countryTowerCrown',villaRoofGeo,trim,h,x,height+.58,z,(footW*.70)/2,1.25,(footD*.70)/2);
       }
       continue;
